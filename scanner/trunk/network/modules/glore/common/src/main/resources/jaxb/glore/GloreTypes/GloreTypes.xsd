@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<xsd:schema version="1.0"
+            targetNamespace="http://scanner.misd.isi.edu/network/types/glore"
+            xmlns:tns="http://scanner.misd.isi.edu/network/types/glore"            
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">  
+      
+                   
+    <xsd:element name="GloreData">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
+
+               </xsd:documentation>
+            </xsd:annotation>             
+            <xsd:sequence>  
+               
+              <xsd:element name="Beta"
+                           type="tns:MatrixType"/>                 
+              
+              <xsd:element name="D"
+                           type="tns:MatrixType"/>   
+              
+              <xsd:element name="E"
+                           type="tns:MatrixType"/>                                                                          
+              
+              <xsd:element name="CovarianceMatrix"
+                           type="tns:MatrixType"/>  
+              
+              <xsd:element name="SDMatrix"
+                           type="tns:MatrixType"/>                              
+              
+              <xsd:element name="iteration" 
+                           type="xsd:int"/>
+
+              <xsd:element name="features" 
+                           type="xsd:int"/>
+                                          
+              <xsd:element name="state" 
+                           type="xsd:string"/>                        
+            </xsd:sequence>
+        </xsd:complexType> 
+    </xsd:element>  
+
+    <xsd:element name="GloreResultData">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
+
+               </xsd:documentation>
+            </xsd:annotation>             
+            <xsd:sequence>                                                                                        
+              
+              <xsd:element name="Beta"
+                           type="tns:MatrixType"/>     
+                              
+              <xsd:element name="CovarianceMatrix"
+                           type="tns:MatrixType"/>  
+              
+              <xsd:element name="SDMatrix"
+                           type="tns:MatrixType"/>                              
+                                   
+            </xsd:sequence>
+        </xsd:complexType> 
+    </xsd:element>    
+                 
+    <xsd:complexType name="DoubleArray">
+        <xsd:annotation>
+            <xsd:documentation>
+                An array of (one or more) doubles
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>
+            <xsd:element name="double" 
+                         type="xsd:double"
+                         minOccurs="1"
+                         maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="MatrixType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An array of (one or more) arrays of doubles
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>
+            <xsd:element name="doubles" 
+                         type="tns:DoubleArray"
+                         minOccurs="1"
+                         maxOccurs="unbounded"/>                             
+        </xsd:sequence>
+    </xsd:complexType>
+
+                  
+</xsd:schema>

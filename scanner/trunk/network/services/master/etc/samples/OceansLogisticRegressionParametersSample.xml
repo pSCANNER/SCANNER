@@ -1,0 +1,12 @@
+<OceansLogisticRegressionParameters
+    xmlns="http://scanner.misd.isi.edu/network/types/oceans">   
+    
+    <dependentVariableName>Outcome</dependentVariableName>
+    <independentVariableNames>Age</independentVariableNames>
+    <independentVariableNames>Race_Cat</independentVariableNames>
+    <independentVariableNames>Creatinine</independentVariableNames>
+    <independentVariableNames>CAD</independentVariableNames>
+    <independentVariableNames>LOS</independentVariableNames>
+    <independentVariableNames>Diabetes</independentVariableNames>    
+        
+</OceansLogisticRegressionParameters>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:camel="http://camel.apache.org/schema/spring"      
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"       
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <import resource="classpath:META-INF/spring/ExampleRouteContext.xml"/>                                                
+    <import resource="classpath:META-INF/spring/OceansRouteContext.xml"/>  
+    <import resource="classpath:META-INF/spring/GloreRouteContext.xml"/>     
+          
+    <camel:camelContext id="camelContext" 
+                        errorHandlerRef="deadLetterErrorHandler">
+        
+        <camel:propertyPlaceholder id="properties" 
+                                   location="file:etc/worker.properties"/>     
+        
+        <camel:packageScan>
+            <camel:package>edu.isi.misd.scanner.network.base.worker</camel:package>
+            <camel:package>edu.isi.misd.scanner.network.modules.worker</camel:package>
+            <camel:excludes>**.*Excluded*</camel:excludes>
+            <camel:includes>**.*</camel:includes>
+        </camel:packageScan>
+                
+        <camel:routeContextRef ref="OceansRouteContext"/>
+        <camel:routeContextRef ref="GloreRouteContext"/>        
+        <camel:routeContextRef ref="ExampleRouteContext"/>        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+    </camel:camelContext>
+
+</beans>

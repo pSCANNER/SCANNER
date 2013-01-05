@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<xsd:schema version="1.0"
+            targetNamespace="http://scanner.misd.isi.edu/network/types/example"
+            xmlns:tns="http://scanner.misd.isi.edu/network/types/example"            
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">  
+            
+    <xsd:element name="ExampleIterationMessage">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
+
+               </xsd:documentation>
+            </xsd:annotation>             
+            <xsd:sequence>  
+              <xsd:element name="random" 
+                           type="xsd:int"/> 
+              <xsd:element name="aMatrix"
+                           type="tns:Matrix"/>                                                              
+              <xsd:element name="total" 
+                           type="xsd:long"/>
+              <xsd:element name="iterations" 
+                           type="xsd:int"/>
+              <xsd:element name="average" 
+                           type="xsd:double"/> 
+              <xsd:element name="status" 
+                           type="xsd:string"/>                      
+            </xsd:sequence>
+        </xsd:complexType> 
+    </xsd:element>  
+  
+    <xsd:complexType name="DoubleArray">
+        <xsd:annotation>
+            <xsd:documentation>
+                An array of (one or more) doubles
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>
+            <xsd:element name="values" 
+                         type="xsd:double"
+                         minOccurs="1"
+                         maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Matrix">
+        <xsd:annotation>
+            <xsd:documentation>
+                An array of (one or more) arrays of doubles
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>
+            <xsd:element name="doubles" 
+                         type="tns:DoubleArray"
+                         minOccurs="1"
+                         maxOccurs="unbounded"/>                             
+        </xsd:sequence>
+    </xsd:complexType>
+
+                  
+</xsd:schema>
