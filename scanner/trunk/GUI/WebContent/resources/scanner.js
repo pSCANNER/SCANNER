@@ -1,242 +1,15 @@
 var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
 var HOME = 'https://aspc.isi.edu/scanner';
-var TAGFILER_HOME = 'https://serbancentos.isi.edu/tagfiler';
-var TAGFILER_USER = 'serban';
-var TAGFILER_PASSWORD = 'doru1let';
-
-var jsonResponse = 
-{
-  "OceansLogisticRegressionResults": [
-    {
-      "Coefficients": [
-        {
-          "Name": "intercept",
-          "Estimate": "-49.17319326200402",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "age",
-          "Estimate": "-0.0015326074927496935",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "race_cat",
-          "Estimate": "-0.09121409300196073",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "creatinine",
-          "Estimate": "6.511528405950525",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "cad",
-          "Estimate": "3.966338828149793",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "los",
-          "Estimate": "4.080943065244493",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "diabetes",
-          "Estimate": "1.6001542228424734",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        }
-      ]
-    },
-    {
-      "Coefficients": [
-        {
-          "Name": "intercept",
-          "Estimate": "-49.003834917368614",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "age",
-          "Estimate": "0.002101516293679945",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "race_cat",
-          "Estimate": "-0.16047351645369307",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "creatinine",
-          "Estimate": "6.89574870531013",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "cad",
-          "Estimate": "4.015949011951625",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "los",
-          "Estimate": "3.42355259219059",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "diabetes",
-          "Estimate": "1.5550061118245901",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        }
-      ]
-    },
-    {
-      "Coefficients": [
-        {
-          "Name": "intercept",
-          "Estimate": "-49.003834917368614",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "age",
-          "Estimate": "0.002101516293679945",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "race_cat",
-          "Estimate": "-0.16047351645369307",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "creatinine",
-          "Estimate": "6.89574870531013",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "cad",
-          "Estimate": "4.015949011951625",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "los",
-          "Estimate": "3.42355259219059",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "diabetes",
-          "Estimate": "1.5550061118245901",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        }
-      ]
-    },
-    {
-      "Coefficients": [
-        {
-          "Name": "intercept",
-          "Estimate": "-49.17319326200402",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "age",
-          "Estimate": "-0.0015326074927496935",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "race_cat",
-          "Estimate": "-0.09121409300196073",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "creatinine",
-          "Estimate": "6.511528405950525",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "cad",
-          "Estimate": "3.966338828149793",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "los",
-          "Estimate": "4.080943065244493",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        },
-        {
-          "Name": "diabetes",
-          "Estimate": "1.6001542228424734",
-          "DegreeOfFreedom": "0",
-          "StandardError": "0.0",
-          "PValue": "0.0"
-        }
-      ]
-    }
-  ]
-};
 
 function test() {
-	//getTableColumns(jsonResponse);
-	//getTableColumnsValues(jsonResponse);
-	//buildDataTable(jsonResponse);
 	renderLogin();
 }
 
 function getTableColumns(res) {
-	//alert(valueToString(res));
 	var outerColumns = new Array();
 	var columns = new Array();
 	getTableColumnsFrom(res, columns, outerColumns);
-	//alert(columns);
-	//alert(outerColumns);
 	return {	'columns': columns,
 			'group': outerColumns.join('_')
 		};
@@ -260,16 +33,11 @@ function getTableColumnsFrom(res, columns, outerColumns) {
 function getTableColumnsValues(res) {
 	var columnsValues = new Array();
 	getTableColumnsValuesFrom(res, columnsValues);
-	//alert(columnsValues.length);
-	//alert(outerColumns);
 	$.each(columnsValues, function(i, val) {
 		if ($.isArray(val)) {
-			//alert(val.length);
 			$.each(val, function(j, value) {
 				if ($.isArray(value)) {
-					//alert(value.length);
 					$.each(value, function(k, tr) {
-						//alert(tr);
 					});
 				}
 			});
@@ -327,7 +95,6 @@ function buildDataTable(res) {
 	var tbody = $('<tbody>');
 	table.append(tbody);
 	var datasets = getTableColumnsValues(res)[0];
-	//alert(datasets.length);
 	var groupNo = 0;
 	var display = true;
 	$.each(datasets, function(i, dataset) {
@@ -671,7 +438,6 @@ function loginRegistry() {
 function postLoginRegistry(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
-		//renderAvailableDatasets();
 		renderAvailableLibraries();
 	} else {
 		alert(res['status']);
@@ -772,12 +538,12 @@ function encodeSafeURIComponent(value) {
 	return ret;
 }
 function renderAvailableFunction() {
-	$('#funcDiv').remove();
-	$('#datasetDiv').remove();
+	$('#funcDiv').html('');
+	$('#datasetDiv').html('');
 	$('#paramsDiv').remove();
 	$('#buttonsDiv').remove();
 	$('#resultDiv').remove();
-	var lib = $('#libs').val();
+	var lib = $('input:radio[name=libs]:checked').val();
 	if (lib != '') {
 		var url = HOME + '/tagfiler?action=getFunctions&lib=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableFunctions, null, null, 0);
@@ -785,32 +551,30 @@ function renderAvailableFunction() {
 }
 
 function postRenderAvailableFunctions(data, textStatus, jqXHR, param) {
-	var div = $('#ui');
-	var funcDiv = $('<div>');
-	funcDiv.attr({'id': 'funcDiv'});
-	div.append(funcDiv);
-	var b = $('<b>');
-	b.html('Function: ');
-	funcDiv.append(b);
-	var select = $('<select>');
-	select.attr({	id: 'funcs',
-		'onchange': 'renderAvailableDatasets();'
-		});
-	funcDiv.append(select);
-	var option = $('<option>');
-	option.text('Choose a function');
-	option.attr('value', '');
-	select.append(option);
+	var funcDiv = $('#funcDiv');
+	var table = $('<table>');
+	funcDiv.append(table);
 	var names = [];
 	$.each(data, function(name, value) {
 		names.push(name);
 	});
 	names.sort(compareIgnoreCase);
 	$.each(names, function(i, name) {
-		option = $('<option>');
-		option.text(data[name]);
-		option.attr('value', name);
-		select.append(option);
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'funcs',
+			'value': name
+		});
+		input.click(function(event) {renderAvailableDatasets();});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(data[name]);
 	});
 }
 
@@ -834,11 +598,9 @@ function submitQuery() {
 	var obj = {};
 	obj['params'] = params;
 	obj['action'] = 'getResults';
-	obj['dataset'] = $('#datasets').val();
-	obj['lib'] = $('#libs').val();
-	obj['func'] = $('#funcs').val();
-	//var url = HOME + '/tagfiler?action=getResults';
-	//scanner.GET(url, true, postSubmitQuery, null, null, 0);
+	obj['dataset'] = $('input:radio[name=datasets]:checked').val();
+	obj['lib'] = $('input:radio[name=libs]:checked').val();
+	obj['func'] = $('input:radio[name=funcs]:checked').val();
 	var url = HOME + '/tagfiler';
 	$('*', $('#paramsDiv')).css('cursor', 'wait');
 	$('*', $('#buttonsDiv')).css('cursor', 'wait');
@@ -851,16 +613,19 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	$('*', $('#buttonsDiv')).css('cursor', 'default');
 	document.body.style.cursor = "default";
 	data = $.parseJSON(data);
-	//buildDataTable(data);
-	buildTreeResult(data);
+	if ($('input:radio[name=libs]:checked').val() == 'Oceans') {
+		buildDataTable(data);
+	} else {
+		buildTreeResult(data);
+	}
 }
 
 function renderAvailableDatasets() {
-	$('#datasetDiv').remove();
+	$('#datasetDiv').html('');
 	$('#paramsDiv').remove();
 	$('#buttonsDiv').remove();
 	$('#resultDiv').remove();
-	var func = $('#funcs').val();
+	var func = $('input:radio[name=funcs]:checked').val();
 	if (func != '') {
 		var url = HOME + '/tagfiler?action=getDatasets&func=' + encodeSafeURIComponent(func);
 		scanner.GET(url, true, postRenderAvailableDatasets, null, null, 0);
@@ -868,34 +633,31 @@ function renderAvailableDatasets() {
 }
 
 function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
-	var div = $('#ui');
-	var datasetDiv = $('<div>');
-	datasetDiv.attr({'id': 'datasetDiv'});
-	div.append(datasetDiv);
-	var b = $('<b>');
-	b.html('Dataset: ');
-	datasetDiv.append(b);
-	var select = $('<select>');
-	select.attr({	id: 'datasets',
-		'onchange': 'renderAvailableParameters();'
-		});
-	datasetDiv.append(select);
-	var option = $('<option>');
-	option.text('Choose a dataset');
-	option.attr('value', '');
-	select.append(option);
+	var datasetDiv = $('#datasetDiv');
+	var table = $('<table>');
+	datasetDiv.append(table);
 	var datasets = [];
 	$.each(data[0]['datasetNodes'], function(i, dataset) {
 		datasets.push(dataset);
 	});
 	datasets.sort(compareIgnoreCase);
 	$.each(datasets, function(i, name) {
-		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
-		select.append(option);
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'datasets',
+			'value': name
+		});
+		input.click(function(event) {renderAvailableParameters();});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(name);
 	});
-
 }
 
 function renderAvailableLibraries() {
@@ -905,8 +667,11 @@ function renderAvailableLibraries() {
 
 function renderSelectTable() {
 	var div = $('#ui');
+	var tableDiv = $('<div>');
+	div.append(tableDiv);
+	var div = $('#ui');
 	var table = $('<table>');
-	div.append(table);
+	tableDiv.append(table);
 	table.css({'border': '1px solid black',
 		'border-collapse': 'collapse'
 	});
@@ -915,12 +680,18 @@ function renderSelectTable() {
 	var tr = $('<tr>');
 	thead.append(tr);
 	var th = $('<th>');
+	th.css({'border': '1px solid black'
+	});
 	tr.append(th);
 	th.html('Libraries');
 	var th = $('<th>');
+	th.css({'border': '1px solid black'
+	});
 	tr.append(th);
 	th.html('Functions');
 	var th = $('<th>');
+	th.css({'border': '1px solid black'
+	});
 	tr.append(th);
 	th.html('Datasets');
 	var tbody = $('<tbody>');
@@ -928,14 +699,28 @@ function renderSelectTable() {
 	var tr = $('<tr>');
 	tbody.append(tr);
 	var td = $('<td>');
+	td.css({'border': '1px solid black'
+	});
 	tr.append(td);
-	td.html('GLORE');
+	var libDiv = $('<div>');
+	libDiv.attr({'id': 'libDiv'});
+	td.append(libDiv);
 	var td = $('<td>');
+	td.css({'border': '1px solid black'
+	});
 	tr.append(td);
-	td.html('Logistic Regression');
+	var funcDiv = $('<div>');
+	funcDiv.attr({'id': 'funcDiv'});
+	td.append(funcDiv);
 	var td = $('<td>');
+	td.css({'border': '1px solid black'
+	});
 	tr.append(td);
-	td.html('GLORE1');
+	var datasetDiv = $('<div>');
+	datasetDiv.attr({'id': 'datasetDiv'});
+	td.append(datasetDiv);
+	tableDiv.append($('<br>'));
+	tableDiv.append($('<br>'));
 	
 }
 
@@ -943,42 +728,40 @@ function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
 	var div = $('#ui');
 	div.html('');
 	renderSelectTable();
-	var libDiv = $('<div>');
-	libDiv.attr({'id': 'libDiv'});
-	div.append(libDiv);
-	var b = $('<b>');
-	b.html('Library: ');
-	libDiv.append(b);
-	var select = $('<select>');
-	select.attr({	id: 'libs',
-		'onchange': 'renderAvailableFunction();'
-		});
-	libDiv.append(select);
-	var option = $('<option>');
-	option.text('Choose a library');
-	option.attr('value', '');
-	select.append(option);
+	var libDiv = $('#libDiv');
 	var libs = [];
 	$.each(data, function(i, lib) {
 		libs.push(lib['datasetName']);
 	});
 	libs.sort(compareIgnoreCase);
+	var table = $('<table>');
+	libDiv.append(table);
 	$.each(libs, function(i, name) {
-		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
-		select.append(option);
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'libs',
+			'value': name
+		});
+		input.click(function(event) {renderAvailableFunction();});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(name);
 	});
-
 }
 
 function renderAvailableParameters() {
 	$('#paramsDiv').remove();
 	$('#buttonsDiv').remove();
 	$('#resultDiv').remove();
-	var dataset = $('#datasets').val();
+	var dataset = $('input:radio[name=datasets]:checked').val();
 	if (dataset != '') {
-		var url = HOME + '/tagfiler?action=getParameters&func=' + encodeSafeURIComponent($('#funcs').val());
+		var url = HOME + '/tagfiler?action=getParameters&func=' + encodeSafeURIComponent($('input:radio[name=funcs]:checked').val());
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -992,9 +775,7 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 	paramsDiv.append(h1);
 	h1.html('Request Parameters');
 	$.each(data, function(i, param) {
-		//alert(valueToString(param));
 		$.each(param, function(key, res) {
-			//alert(valueToString(res));
 			var h2 = $('<h2>');
 			paramsDiv.append(h2);
 			h2.html(res['datasetDisplayName']);
@@ -1036,12 +817,6 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 	buttonsDiv.append(input);
 	var input = $('<input>');
 	input.attr({'type': 'button',
-		'value': 'Expand All'});
-	input.val('Expand All');
-	input.click(function(event) {expandAll();});
-	buttonsDiv.append(input);
-	var input = $('<input>');
-	input.attr({'type': 'button',
 		'value': 'Clear'});
 	input.val('Clear');
 	input.click(function(event) {renderAvailableLibraries();});
@@ -1051,10 +826,8 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 }
 
 function expandAll() {
-	//alert($('#navigation').html());
 	$('#navigation').find('div.hitarea.expandable-hitarea').click();
-	//alert(($('#navigation>li>div.hitarea.tree-hitarea.collapsable-hitarea')).length);
-	$('#navigation').find('div.hitarea.tree-hitarea.expandable-hitarea').click();
+	//$('#navigation').find('div.hitarea.tree-hitarea.expandable-hitarea').click();
 }
 
 function getSelectedParameters() {
@@ -1074,12 +847,10 @@ function getSelectedParameters() {
 			params[name].push(value);
 		}
 	});
-	//alert(valueToString(params));
 	return valueToString(params);
 }
 
 function buildTreeResult(res) {
-	//alert(valueToString(res));
 	$('#resultDiv').remove();
 	var div = $('#ui');
 	var resultDiv = $('<div>');
@@ -1088,11 +859,18 @@ function buildTreeResult(res) {
 	var h1 = $('<h1>');
 	resultDiv.append(h1);
 	h1.html('Response Results');
+	var input = $('<input>');
+	input.attr({'type': 'button',
+		'value': 'Expand All'});
+	input.val('Expand All');
+	input.click(function(event) {expandAll();});
+	resultDiv.append(input);
+	resultDiv.append($('<br>'));
+	resultDiv.append($('<br>'));
 	var ul = $('<ul>');
 	ul.attr({'id': 'navigation'});
 	resultDiv.append(ul);
 	appendTreeItem(ul, res);
-	//alert($('#resultDiv').html());
 	$('#navigation').treeview({
 		persist: 'location',
 		collapsed: true,
@@ -1106,13 +884,6 @@ function appendTreeItem(div, res) {
 		div.append(ul);
 		$.each(res, function(i, item) {
 			var root = ul;
-			//if ($.isPlainObject(item)) {
-				//var li = $('<li>');
-				//ul.append(li);
-				//var ulRoot = $('<ul>');
-				//li.append(ulRoot);
-				//root = ulRoot;
-			//}
 			appendTreeItem(ul, item);
 		});
 	} else if ($.isPlainObject(res)) {
@@ -1132,9 +903,6 @@ function appendTreeItem(div, res) {
 		var label = $('<label>');
 		li.append(label);
 		label.html(res);
-		//var label = $('<label>');
-		//div.append(label);
-		//label.html(': ' + res);
 	}
 }
 

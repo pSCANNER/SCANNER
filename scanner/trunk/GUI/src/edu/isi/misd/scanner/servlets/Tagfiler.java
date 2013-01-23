@@ -54,7 +54,6 @@ public class Tagfiler extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(res);
 		} else if (action.equals("getLibraries")) {
-			//String dataset = request.getParameter("dataset");
 			String url = "https://serbancentos.isi.edu/tagfiler/query/datasetType=library(datasetName)";
 			ClientURLResponse rsp = httpClient.get(url, cookie);
 			String res = rsp.getEntityString();
@@ -92,15 +91,6 @@ public class Tagfiler extends HttpServlet {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		} else if (action.equals("getDataSources")) {
-			String func = request.getParameter("func");
-			String url = "https://serbancentos.isi.edu/tagfiler/query/datasetType=function;datasetName=" + Utils.urlEncode(func) + "(datasetSources)";
-			System.out.println("Get getDataSources url: "+url);
-			ClientURLResponse rsp = httpClient.get(url, cookie);
-			String res = rsp.getEntityString();
-			System.out.println("Get getDataSources:\n"+res);
-			PrintWriter out = response.getWriter();
-			out.print(res);
 		} else if (action.equals("getParameters")) {
 			try {
 				String func = request.getParameter("func");
@@ -128,16 +118,6 @@ public class Tagfiler extends HttpServlet {
 				out.print(ret.toString());
 				//JSONObject test = new JSONObject(Utils.oceansResult);
 				//System.out.println("test:\n"+test.toString());
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else if (action.equals("getResults")) {
-			JSONObject test;
-			try {
-				test = new JSONObject(Utils.oceansResult);
-				PrintWriter out = response.getWriter();
-				out.print(test.toString());
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
