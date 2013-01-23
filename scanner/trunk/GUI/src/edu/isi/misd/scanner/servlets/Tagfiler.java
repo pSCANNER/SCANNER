@@ -3,6 +3,7 @@ package edu.isi.misd.scanner.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,6 +25,10 @@ import edu.isi.misd.scanner.utils.Utils;
 @WebServlet("/tagfiler")
 public class Tagfiler extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private ServletConfig servletConfig;
+	private String tagfilerURL;
+	private String tagfilerUser;
+	private String tagfilerPassword;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -32,6 +37,14 @@ public class Tagfiler extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
+
+	public void init(ServletConfig config){
+		servletConfig = config;
+		tagfilerURL = servletConfig.getInitParameter("tagfilerURL");
+		tagfilerUser = servletConfig.getInitParameter("tagfilerUser");
+		tagfilerPassword = servletConfig.getInitParameter("tagfilerPassword");
+		//System.out.println("tagfilerURL: " + tagfilerURL +", tagfilerUser: " + tagfilerUser +", tagfilerPassword: " + tagfilerPassword);
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -45,7 +58,7 @@ public class Tagfiler extends HttpServlet {
 		httpClient.setCookieValue(cookie);
 		if (action.equals("getDatasets")) {
 			String func = request.getParameter("func");
-			String url = "https://serbancentos.isi.edu/tagfiler/query/datasetType=function;datasetName=" + Utils.urlEncode(func) + "(datasetNodes)";
+			String url = tagfilerURL + "/query/datasetType=function;datasetName=" + Utils.urlEncode(func) + "(datasetNodes)";
 			ClientURLResponse rsp = httpClient.get(url, cookie);
 			String res = rsp.getEntityString();
 			System.out.println("url: "+url);
@@ -54,7 +67,7 @@ public class Tagfiler extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(res);
 		} else if (action.equals("getLibraries")) {
-			String url = "https://serbancentos.isi.edu/tagfiler/query/datasetType=library(datasetName)";
+			String url = tagfilerURL + "/query/datasetType=library(datasetName)";
 			ClientURLResponse rsp = httpClient.get(url, cookie);
 			String res = rsp.getEntityString();
 			System.out.println("Get libraries:\n"+res);
@@ -63,7 +76,7 @@ public class Tagfiler extends HttpServlet {
 		} else if (action.equals("getFunctions")) {
 			try {
 				String lib = request.getParameter("lib");
-				String url = "https://serbancentos.isi.edu/tagfiler/query/datasetType=library;datasetName=" + Utils.urlEncode(lib) + "(datasetFunctions)";
+				String url = tagfilerURL + "/query/datasetType=library;datasetName=" + Utils.urlEncode(lib) + "(datasetFunctions)";
 				System.out.println("Functions URL: "+url);
 				ClientURLResponse rsp = httpClient.get(url, cookie);
 				String res = rsp.getEntityString();
@@ -74,7 +87,7 @@ public class Tagfiler extends HttpServlet {
 				JSONObject ret = new JSONObject();
 				for (int i=0; i < functions.length(); i++) {
 					String functionName = functions.getString(i);
-					url = "https://serbancentos.isi.edu/tagfiler/query/datasetType=function;datasetName=" + Utils.urlEncode(functionName) + "(datasetDisplayName)";
+					url = tagfilerURL + "/query/datasetType=function;datasetName=" + Utils.urlEncode(functionName) + "(datasetDisplayName)";
 					System.out.println("Functions Display URL: "+url);
 					rsp = httpClient.get(url, cookie);
 					res = rsp.getEntityString();
@@ -94,7 +107,7 @@ public class Tagfiler extends HttpServlet {
 		} else if (action.equals("getParameters")) {
 			try {
 				String func = request.getParameter("func");
-				String url = "https://serbancentos.isi.edu/tagfiler/query/datasetType=function;datasetName=" + Utils.urlEncode(func) + "(datasetParameters)";
+				String url = tagfilerURL + "/query/datasetType=function;datasetName=" + Utils.urlEncode(func) + "(datasetParameters)";
 				ClientURLResponse rsp = httpClient.get(url, cookie);
 				String res = rsp.getEntityString();
 				System.out.println("Get parameters name:\n"+res);
@@ -103,7 +116,7 @@ public class Tagfiler extends HttpServlet {
 				JSONArray ret = new JSONArray();
 				for (int i=0; i < params.length(); i++) {
 					String param = params.getString(i);
-					url = "https://serbancentos.isi.edu/tagfiler/query/datasetType=parameter;datasetName=" + Utils.urlEncode(param) + "(datasetDisplayName;minOccurs;maxOccurs;parametersValues)";
+					url = tagfilerURL + "/query/datasetType=parameter;datasetName=" + Utils.urlEncode(param) + "(datasetDisplayName;minOccurs;maxOccurs;parametersValues)";
 					rsp = httpClient.get(url, cookie);
 					res = rsp.getEntityString();
 					JSONArray temp = new JSONArray(res);
@@ -138,7 +151,7 @@ public class Tagfiler extends HttpServlet {
 			JakartaClient httpClient = (JakartaClient) session.getAttribute("httpClient");
 			if (action.equals("login")) {
 				obj.put("status", "login error");
-				ClientURLResponse rsp = httpClient.login("https://serbancentos.isi.edu/tagfiler/session", "guest", "just4demo");
+				ClientURLResponse rsp = httpClient.login(tagfilerURL + "/session", tagfilerUser, tagfilerPassword);
 				if (rsp != null) {
 					//rsp.debug();
 					session.setAttribute("tagfilerCookie", httpClient.getCookieValue());
@@ -151,7 +164,7 @@ public class Tagfiler extends HttpServlet {
 				obj.put("status", "download error");
 				String cookie = (String) session.getAttribute("tagfilerCookie");
 				httpClient.setCookieValue(cookie);
-				ClientURLResponse rsp = httpClient.downloadFile("https://serbancentos.isi.edu/tagfiler/file/name=OceanTypes", cookie);
+				ClientURLResponse rsp = httpClient.downloadFile(tagfilerURL + "/file/name=OceanTypes", cookie);
 				if (rsp != null) {
 					if (httpClient.getCookieValue() != null) {
 						session.setAttribute("tagfilerCookie", httpClient.getCookieValue());
@@ -165,7 +178,7 @@ public class Tagfiler extends HttpServlet {
 				obj.put("status", "logout error");
 				String cookie = (String) session.getAttribute("tagfilerCookie");
 				httpClient.setCookieValue(cookie);
-				ClientURLResponse rsp = httpClient.delete("https://serbancentos.isi.edu/tagfiler/session", cookie);
+				ClientURLResponse rsp = httpClient.delete(tagfilerURL + "/session", cookie);
 				if (rsp != null) {
 					session.setAttribute("tagfilerCookie", null);
 					//System.out.println("tagfilerCookie: "+httpClient.getCookieValue());
@@ -182,19 +195,19 @@ public class Tagfiler extends HttpServlet {
 					System.out.println("dataset: "+dataset+", lib: "+lib+", func: "+func);
 					String cookie = (String) session.getAttribute("tagfilerCookie");
 					httpClient.setCookieValue(cookie);
-					ClientURLResponse rsp = httpClient.get("https://serbancentos.isi.edu/tagfiler/query/datasetType=node;datasetName=" + Utils.urlEncode(dataset)  + "(datasetWorkers;datasetURL)", cookie);
+					ClientURLResponse rsp = httpClient.get(tagfilerURL + "/query/datasetType=node;datasetName=" + Utils.urlEncode(dataset)  + "(datasetWorkers;datasetURL)", cookie);
 					String res = rsp.getEntityString();
 					System.out.println("Get dataset attributes:\n"+res);
 					JSONObject temp = (new JSONArray(res)).getJSONObject(0);
 					JSONArray targets = temp.getJSONArray("datasetWorkers");
 					String datasetURL = temp.getString("datasetURL");
 					
-					rsp = httpClient.get("https://serbancentos.isi.edu/tagfiler/query/datasetType=library;datasetName=" + Utils.urlEncode(lib)  + "(datasetPath)", cookie);
+					rsp = httpClient.get(tagfilerURL + "/query/datasetType=library;datasetName=" + Utils.urlEncode(lib)  + "(datasetPath)", cookie);
 					res = rsp.getEntityString();
 					temp = (new JSONArray(res)).getJSONObject(0);
 					String libPath = temp.getString("datasetPath");
 
-					rsp = httpClient.get("https://serbancentos.isi.edu/tagfiler/query/datasetType=function;datasetName=" + Utils.urlEncode(func)  + "(datasetPath)", cookie);
+					rsp = httpClient.get(tagfilerURL + "/query/datasetType=function;datasetName=" + Utils.urlEncode(func)  + "(datasetPath)", cookie);
 					res = rsp.getEntityString();
 					temp = (new JSONArray(res)).getJSONObject(0);
 					String funcPath = temp.getString("datasetPath");
@@ -205,8 +218,8 @@ public class Tagfiler extends HttpServlet {
 						if (i > 0) {
 							buff.append(",");
 						}
-						rsp = httpClient.get("https://serbancentos.isi.edu/tagfiler/query/datasetType=worker;datasetName=" + Utils.urlEncode(targets.getString(i))  + "(datasetSource;datasetURL)", cookie);
-						//rsp = httpClient.get("https://serbancentos.isi.edu/tagfiler/query/datasetType=function;datasetName=" + Utils.urlEncode(func)  + "(datasetPath)", cookie);
+						rsp = httpClient.get(tagfilerURL + "/query/datasetType=worker;datasetName=" + Utils.urlEncode(targets.getString(i))  + "(datasetSource;datasetURL)", cookie);
+						//rsp = httpClient.get(tagfilerURL + "/query/datasetType=function;datasetName=" + Utils.urlEncode(func)  + "(datasetPath)", cookie);
 						res = rsp.getEntityString();
 						temp = (new JSONArray(res)).getJSONObject(0);
 						String dataSource = temp.getString("datasetSource");
