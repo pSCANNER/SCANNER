@@ -28,12 +28,16 @@ public class Worker extends Main
     protected String propertiesFile = null;
     protected Properties properties = null;
 
+    /**
+     *
+     */
     public Worker()
     {
         super.addOption(
             new ParameterOption(
             "cfg", "config", "Configuration properties file to use", "filename")
         {
+            @Override
             protected void doProcess(
                 String arg, String parameter, LinkedList<String> remainingArgs) {
                 setPropertiesFile(parameter);
@@ -41,14 +45,27 @@ public class Worker extends Main
         });
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPropertiesFile() {
         return this.propertiesFile;
     }
 
+    /**
+     *
+     * @param propertiesFile
+     */
     public void setPropertiesFile(String propertiesFile) {
         this.propertiesFile = propertiesFile;
     }
 
+    /**
+     *
+     * @param args
+     * @throws Exception
+     */
     public static void main(String... args) throws Exception
     {
         Worker main = new Worker();
@@ -57,6 +74,10 @@ public class Worker extends Main
         main.run(args);
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Override
     protected void doStart() throws Exception
     {
@@ -64,6 +85,10 @@ public class Worker extends Main
         this.startEventProcessor();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Override
     protected void doStop() throws Exception
     {
@@ -77,9 +102,7 @@ public class Worker extends Main
     }
 
 	/**
-	 * <p>Wait and process requests, forwarding files to a configured destination.</p>
 	 *
-	 * @param	properties
 	 * @exception	Exception
      * @exception	IOException
 	 */

@@ -29,8 +29,16 @@ public class GloreProcessor implements Processor
     private static final transient Logger log = 
         LoggerFactory.getLogger(GloreProcessor.class); 
         
+    /**
+     *
+     */
     public static Map<String, Object> dataStore = new HashMap<String, Object>();
 
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {   
@@ -142,6 +150,11 @@ public class GloreProcessor implements Processor
         return data;
     }
 
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     protected void readDataFile(Exchange exchange) throws Exception
     {
         FileInputStream file_stream;
@@ -205,6 +218,11 @@ public class GloreProcessor implements Processor
         log.info("Successfully loaded file: " + file.getAbsolutePath());
     }
     
+    /**
+     *
+     * @param exchange
+     * @return
+     */
     protected static GloreStateData getState(Exchange exchange)
     {
         String key = 
@@ -218,6 +236,11 @@ public class GloreProcessor implements Processor
         return state;
     }
     
+    /**
+     *
+     * @param exchange
+     * @return
+     */
     protected static GloreStateData removeState(Exchange exchange)
     {
         String key = 
@@ -226,6 +249,9 @@ public class GloreProcessor implements Processor
             return (GloreStateData)dataStore.remove(key);
     }
     
+    /**
+     *
+     */
     protected static class GloreStateData
     {
         // data structures used to hold the client data read in from files

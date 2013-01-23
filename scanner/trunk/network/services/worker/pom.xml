@@ -133,6 +133,13 @@
       <version>2.10.1</version>
     </dependency>
 
+    <!-- security -->
+    <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activemq-jaas</artifactId>
+        <version>5.7.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>

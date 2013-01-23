@@ -8,6 +8,12 @@ import org.apache.camel.Processor;
  */
 public class ErrorUtils 
 {
+    /**
+     *
+     * @param exchange
+     * @param e
+     * @return
+     */
     public static String formatErrorResponse(Exchange exchange, Throwable e) 
     {
         String response = 
@@ -31,6 +37,12 @@ public class ErrorUtils
         return response;    
     }  
     
+    /**
+     *
+     * @param exchange
+     * @param ex
+     * @param httpResponseCode
+     */
     public static void setHttpError(Exchange exchange,
                                     Throwable ex, 
                                     int httpResponseCode)
@@ -38,6 +50,13 @@ public class ErrorUtils
         setHttpError(exchange,ex,httpResponseCode,true);
     }
     
+    /**
+     *
+     * @param exchange
+     * @param ex
+     * @param httpResponseCode
+     * @param setException
+     */
     public static void setHttpError(Exchange exchange,
                                     Throwable ex, 
                                     int httpResponseCode,
@@ -51,8 +70,16 @@ public class ErrorUtils
         }
     }
     
+    /**
+     *
+     */
     public static class ErrorProcessor implements Processor
     {
+        /**
+         *
+         * @param exchange
+         * @throws Exception
+         */
         @Override
         public void process(Exchange exchange) 
             throws Exception 

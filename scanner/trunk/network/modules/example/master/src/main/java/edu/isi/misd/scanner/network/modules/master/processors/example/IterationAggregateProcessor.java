@@ -17,6 +17,11 @@ public class IterationAggregateProcessor implements Processor
     private static final transient Logger log = 
         LoggerFactory.getLogger(IterationAggregateProcessor.class);
     
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {

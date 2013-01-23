@@ -22,6 +22,11 @@ public class BaseRequestProcessor implements Processor
     // consider making this an externally configurable value
     private static final boolean USE_CAMEL_UUID_GENERATOR = false;
     
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {        

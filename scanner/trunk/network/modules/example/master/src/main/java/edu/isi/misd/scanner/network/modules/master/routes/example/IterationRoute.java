@@ -9,6 +9,9 @@ import org.apache.camel.builder.ValueBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *
+ */
 public class IterationRoute extends DefaultRoute 
 {
     private static final transient Logger log = 

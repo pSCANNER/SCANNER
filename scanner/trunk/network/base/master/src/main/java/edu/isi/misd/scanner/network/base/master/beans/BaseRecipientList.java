@@ -22,6 +22,12 @@ public class BaseRecipientList
     
     private static String options = "bridgeEndpoint=true";
     
+    /**
+     *
+     * @param targetURLS
+     * @param body
+     * @return
+     */
     public ArrayList<String> list(
         @Header(BaseConstants.TARGETS) String targetURLS, String body) 
     {

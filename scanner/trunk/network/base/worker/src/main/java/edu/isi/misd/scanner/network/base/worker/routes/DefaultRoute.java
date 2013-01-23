@@ -14,26 +14,50 @@ public class DefaultRoute extends RouteBuilder
     private static final transient Logger log = 
         LoggerFactory.getLogger(DefaultRoute.class);
         
+    /**
+     *
+     * @return
+     */
     protected String getRouteName() {
         return this.getClass().getSimpleName();
     }
     
+    /**
+     *
+     * @return
+     */
     public String getComputeProcessorRef() {
         return "BaseComputeProcessor";
     }      
        
+    /**
+     *
+     * @return
+     */
     protected String getCacheReadProcessorRef() {
         return "BaseCacheReadProcessor";
     }
 
+    /**
+     *
+     * @return
+     */
     protected String getCacheWriteProcessorRef() {
         return "BaseCacheWriteProcessor";
     }
     
+    /**
+     *
+     * @return
+     */
     public String getJAXBContext() {
         return "edu.isi.misd.scanner.network.types.base";
     }
     
+    /**
+     *
+     * @throws Exception
+     */
     @Override
     public void configure() throws Exception 
     {

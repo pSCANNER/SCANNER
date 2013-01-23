@@ -13,6 +13,12 @@ public class ConfigUtils
     private static final transient Logger log = 
         LoggerFactory.getLogger(ConfigUtils.class);
     
+    /**
+     *
+     * @param exchange
+     * @param baseInputDirPropName
+     * @return
+     */
     public static String getBaseInputDir(Exchange exchange,  
                                          String baseInputDirPropName)
     {
@@ -31,6 +37,12 @@ public class ConfigUtils
         return baseInputDir;
     }  
     
+    /**
+     *
+     * @param exchange
+     * @param baseOutputDirPropName
+     * @return
+     */
     public static String getBaseOutputDir(Exchange exchange, 
                                           String baseOutputDirPropName)
     {

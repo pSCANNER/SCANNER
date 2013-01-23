@@ -15,6 +15,11 @@ public class BaseComputeProcessor implements Processor
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseComputeProcessor.class);
         
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {                

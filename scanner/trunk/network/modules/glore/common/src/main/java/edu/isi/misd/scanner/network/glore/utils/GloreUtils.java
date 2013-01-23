@@ -17,6 +17,13 @@ import java.util.List;
  */
 public class GloreUtils 
 {
+    /**
+     *
+     * @param matrix
+     * @param w
+     * @param d
+     * @return
+     */
     public static String matrixToString(Matrix matrix, int w, int d)
     {
         String matrixStr = "";        
@@ -38,6 +45,11 @@ public class GloreUtils
         return matrixStr;
     }
     
+    /**
+     *
+     * @param matrixType
+     * @return
+     */
     public static Matrix convertMatrixTypeToMatrix(MatrixType matrixType)
     {
         List<DoubleArray> doubleArrays = matrixType.getDoubles();
@@ -51,6 +63,11 @@ public class GloreUtils
         return matrix;
     }
 
+    /**
+     *
+     * @param matrix
+     * @return
+     */
     public static MatrixType convertMatrixToMatrixType(Matrix matrix) 
     {
         ArrayList<DoubleArray> doubleArraysList = new ArrayList<DoubleArray>();        
@@ -74,6 +91,11 @@ public class GloreUtils
     
     /* Returns the absolute maximum of the elements in the two dimensional
        array matrix. */
+    /**
+     *
+     * @param matrix
+     * @return
+     */
     public static double max_abs(double[][] matrix) 
     {
         int i,j;
@@ -99,6 +121,11 @@ public class GloreUtils
     }
 
     /* Convert a 2D ArrayList of Doubles into a 2D array of doubles. */
+    /**
+     *
+     * @param V
+     * @return
+     */
     public static double[][] two_dim_list_to_arr(List<List<Double>>V) 
     {
         // allocate part of the array
@@ -115,6 +142,11 @@ public class GloreUtils
     }
 
     /* Convert a ArrayList of Doubles into an array of doubles. */
+    /**
+     *
+     * @param V
+     * @return
+     */
     public static double[] one_dim_list_to_arr(List<Double> V) 
     {
         int size = V.size();
@@ -130,6 +162,10 @@ public class GloreUtils
 
     /* Set each element of the 2D double array to e^a where a is the value of
        an element. */
+    /**
+     *
+     * @param A
+     */
     public static void exp(double[][] A) 
     {
         int i,j;
@@ -142,6 +178,10 @@ public class GloreUtils
 
     /* Set each element of the 2D double array to 1 + a where a is the value of
        an element. */
+    /**
+     *
+     * @param A
+     */
     public static void add_one(double[][] A) 
     {
         int i,j;
@@ -154,6 +194,10 @@ public class GloreUtils
 
     /* Set each element of the 2D double array to 1/a where a is the value of
        an element. */
+    /**
+     *
+     * @param A
+     */
     public static void div_one(double[][] A) 
     {
         int i,j;
@@ -166,6 +210,11 @@ public class GloreUtils
 
     /* Given an array of length n, returns an n by n matrix M where
        M[i][j] = A[i] if i = j and 0 otherwise. */
+    /**
+     *
+     * @param A
+     * @return
+     */
     public static Matrix diag(double[] A) 
     {
         int n = A.length;

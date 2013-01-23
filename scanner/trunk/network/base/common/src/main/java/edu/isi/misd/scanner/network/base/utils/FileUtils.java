@@ -18,6 +18,12 @@ public class FileUtils
     private static final transient Logger log = 
         LoggerFactory.getLogger(FileUtils.class);
         
+    /**
+     *
+     * @param exchange
+     * @param baseDir
+     * @throws Exception
+     */
     public static void readFile(Exchange exchange, String baseDir)
         throws Exception
     {
@@ -47,6 +53,12 @@ public class FileUtils
         }                
     }
     
+    /**
+     *
+     * @param exchange
+     * @param baseDir
+     * @throws Exception
+     */
     public static void writeFile(Exchange exchange, String baseDir)
         throws Exception
     {

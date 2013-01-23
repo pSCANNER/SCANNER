@@ -2,6 +2,9 @@ package edu.isi.misd.scanner.network.modules.master.routes.oceans;
 
 import edu.isi.misd.scanner.network.base.master.routes.DefaultRoute;
 
+/**
+ *
+ */
 public class OceansLogisticRegressionRoute extends DefaultRoute 
 {
 

@@ -17,6 +17,12 @@ public class BaseResultsAggregator implements AggregationStrategy
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseResultsAggregator.class); 
     
+    /**
+     *
+     * @param oldExchange
+     * @param newExchange
+     * @return
+     */
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) 
     {  

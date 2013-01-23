@@ -13,6 +13,11 @@ import org.apache.camel.Processor;
  */
 public class OceansLogisticRegressionAggregateProcessor implements Processor 
 {
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {

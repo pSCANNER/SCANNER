@@ -16,6 +16,11 @@ public class IterationProcessor implements Processor
     private static final transient Logger log = 
         LoggerFactory.getLogger(IterationProcessor.class); 
         
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {        

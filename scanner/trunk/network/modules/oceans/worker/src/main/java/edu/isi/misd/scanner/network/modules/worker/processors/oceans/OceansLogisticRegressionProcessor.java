@@ -29,6 +29,11 @@ public class OceansLogisticRegressionProcessor implements Processor
     private static Log log =
         LogFactory.getLog(OceansLogisticRegressionProcessor.class.getName());
         
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {

@@ -16,6 +16,11 @@ public class BaseCacheReadProcessor implements Processor
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseCacheReadProcessor.class);    
     
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {

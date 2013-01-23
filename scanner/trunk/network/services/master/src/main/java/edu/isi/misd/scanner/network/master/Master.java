@@ -35,6 +35,7 @@ public class Master extends Main
             new ParameterOption(
             "cfg", "config", "Configuration properties file to use", "filename")
         {
+            @Override
             protected void doProcess(
                 String arg, String parameter, LinkedList<String> remainingArgs) {
                 setPropertiesFile(parameter);
@@ -42,14 +43,27 @@ public class Master extends Main
         });
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPropertiesFile() {
         return this.propertiesFile;
     }
 
+    /**
+     *
+     * @param propertiesFile
+     */
     public void setPropertiesFile(String propertiesFile) {
         this.propertiesFile = propertiesFile;
     }
 
+    /**
+     *
+     * @param args
+     * @throws Exception
+     */
     public static void main(String... args) throws Exception
     {
         Master main = new Master();
@@ -58,6 +72,10 @@ public class Master extends Main
         main.run(args);
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Override
     protected void doStart() throws Exception
     {
@@ -65,6 +83,10 @@ public class Master extends Main
         this.startEventProcessor();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     @Override
     protected void doStop() throws Exception
     {
@@ -78,9 +100,7 @@ public class Master extends Main
     }
 
 	/**
-	 * <p>Wait and process requests.</p>
 	 *
-	 * @param	properties
 	 * @exception	Exception
      * @exception	IOException
 	 */

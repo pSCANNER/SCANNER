@@ -30,7 +30,7 @@ public class DefaultRoute extends RouteBuilder
     
     protected static final String TARGET_PARAMS_NULL_CLAUSE =     
         "${in.headers." + BaseConstants.TARGETS + "} == null";
-    
+
     protected static final String JSON_CONTENT_TYPE_CLAUSE = 
         "${in.headers.Content-Type} contains 'application/json'";
     
@@ -41,50 +41,98 @@ public class DefaultRoute extends RouteBuilder
     protected JacksonDataFormat json = new JacksonDataFormat();        
     protected XmlJsonDataFormat xmlToJson = new XmlJsonDataFormat();    
 
+    /**
+     *
+     * @return
+     */
     protected String getRouteName() {
         return getClass().getSimpleName();
     }
     
+    /**
+     *
+     * @return
+     */
     protected String getAggregatorRouteName() {
         return getClass().getSimpleName() + "Aggregator";
     }   
     
+    /**
+     *
+     * @return
+     */
     protected String getRequestProcessorRef() {
         return "BaseRequestProcessor";
     }
     
+    /**
+     *
+     * @return
+     */
     protected String getCacheReadProcessorRef() {
         return "BaseCacheReadProcessor";
     }
 
+    /**
+     *
+     * @return
+     */
     protected String getCacheWriteProcessorRef() {
         return "BaseCacheWriteProcessor";
     } 
        
+    /**
+     *
+     * @return
+     */
     protected String getAggregationStrategyRef() {
         return "BaseResultsAggregator";
     }
    
+    /**
+     *
+     * @return
+     */
     protected String getPostAggregationProcessorRef() {
         return "BaseAggregateProcessor";
     }
 
+    /**
+     *
+     * @return
+     */
     public String getJAXBContext() {
         return "edu.isi.misd.scanner.network.types.base";
     }
     
+    /**
+     *
+     * @return
+     */
     public String getJSONUnmarshallType() {
         return "edu.isi.misd.scanner.network.types.base.SimpleMapArray";
     }
     
+    /**
+     *
+     * @return
+     */
     protected ValueBuilder getRecipientList() {
         return method("BaseRecipientList","list");
     }
 
+    /**
+     *
+     * @return
+     */
     protected ValueBuilder getDynamicRouter() {
         return method(getClass(),"defaultRoutingSlip");
     }
     
+    /**
+     *
+     * @throws Exception
+     */
     @Override
     public void configure() throws Exception 
     {    
@@ -130,6 +178,10 @@ public class DefaultRoute extends RouteBuilder
         configureAggregation();
     }
 
+    /**
+     *
+     * @throws Exception
+     */
     protected void configureAggregation() throws Exception
     {
         from("direct:" + getAggregatorRouteName()).
@@ -151,6 +203,12 @@ public class DefaultRoute extends RouteBuilder
         end();
     }
         
+    /**
+     *
+     * @param body
+     * @param properties
+     * @return
+     */
     public String defaultRoutingSlip(@Body String body, 
                                      @Properties Map<String, Object> properties) 
     {
@@ -165,6 +223,12 @@ public class DefaultRoute extends RouteBuilder
         }
     }   
     
+    /**
+     *
+     * @param body
+     * @param properties
+     * @return
+     */
     public String loopingRoutingSlip(@Body String body, 
                                      @Properties Map<String, Object> properties) 
     {

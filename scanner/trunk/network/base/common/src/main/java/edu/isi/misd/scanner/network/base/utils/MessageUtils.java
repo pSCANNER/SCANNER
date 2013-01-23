@@ -19,26 +19,50 @@ public class MessageUtils
     private static final transient Logger log = 
         LoggerFactory.getLogger(MessageUtils.class);
     
+    /**
+     *
+     * @param exchange The current message exchange.
+     * @return
+     */
     public static String getID(Exchange exchange)
     {
         return (String)exchange.getIn().getHeader(BaseConstants.ID);
     }
     
+    /**
+     *
+     * @param exchange The current message exchange.
+     * @param id
+     */
     public static void setID(Exchange exchange, String id) 
     {
         exchange.getIn().setHeader(BaseConstants.ID, id);
     }
     
+    /**
+     *
+     * @param exchange The current message exchange.
+     * @return
+     */
     public static String getTimestamp(Exchange exchange) 
     {
        return (String)exchange.getIn().getHeader(BaseConstants.TIMESTAMP);
     }
 
+    /**
+     *
+     * @param exchange The current message exchange.
+     */
     public static void setTimestamp(Exchange exchange) 
     {
         setTimestamp(exchange, Calendar.getInstance().getTime());
     }
     
+    /**
+     *
+     * @param exchange The current message exchange.
+     * @param date
+     */
     public static void setTimestamp(Exchange exchange, Date date) 
     {
         SimpleDateFormat sdf = 
@@ -46,16 +70,30 @@ public class MessageUtils
         exchange.getIn().setHeader(BaseConstants.TIMESTAMP, sdf.format(date));
     }
     
+    /**
+     *
+     * @param exchange The current message exchange.
+     * @return
+     */
     public static String getSource(Exchange exchange)
     {
         return (String)exchange.getIn().getHeader(BaseConstants.SOURCE);
     }
     
+    /**
+     *
+     * @param exchange The current message exchange.
+     */
     public static void setSource(Exchange exchange)
     {
         setSource(exchange, false);
     }
     
+    /**
+     *
+     * @param exchange The current message exchange. 
+     * @param appendID
+     */
     public static void setSource(Exchange exchange, boolean appendID) 
     {
         String uri = exchange.getFromEndpoint().getEndpointUri();
@@ -68,16 +106,35 @@ public class MessageUtils
         exchange.getIn().setHeader(BaseConstants.SOURCE, sourceURL);
     } 
 
+    /**
+     *
+     * @param exchange The current message exchange.
+     * @return A comma delimited string of target URLS that is the value of the 
+     * header {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} or NULL/
+     */
     public static String getTargets(Exchange exchange)
     {
         return (String)exchange.getIn().getHeader(BaseConstants.TARGETS);
     }
     
+    /**
+     *
+     * @param exchange The current message exchange.
+     * @param targetURLS
+     */
     public static void setTargets(Exchange exchange, String targetURLS) 
     {
         exchange.getIn().setHeader(BaseConstants.TARGETS, targetURLS);
     }  
 
+    /**
+     *
+     * @param toType
+     * @param fromType
+     * @param exchange The current message exchange.
+     * @return
+     * @throws Exception
+     */
     public static Object convertTo(Class<?> toType,
                                    Object fromType,                                 
                                    Exchange exchange)
@@ -92,6 +149,11 @@ public class MessageUtils
         return converter.mandatoryConvertTo(toType, exchange, fromType);
     }    
     
+    /**
+     *
+     * @param path
+     * @return
+     */
     public static String parseIdFromUrlPath(String path) 
     {
         if (path.endsWith("/")) {
@@ -104,6 +166,12 @@ public class MessageUtils
             path.substring(idIndex + BaseConstants.ID.length()+2) : "");
     }
    
+    /**
+     *
+     * @param message
+     * @return
+     * @throws Exception
+     */
     public static String getHostFromMessageURL(Message message) 
         throws Exception
     {
@@ -113,6 +181,12 @@ public class MessageUtils
             return url.getHost();
     }
     
+    /**
+     *
+     * @param message
+     * @return
+     * @throws Exception
+     */
     public static int getPortFromMessageURL(Message message) 
         throws Exception
     {
@@ -122,6 +196,12 @@ public class MessageUtils
             return url.getPort();
     }
     
+    /**
+     *
+     * @param message
+     * @return
+     * @throws Exception
+     */
     public static String getPathFromMessageURL(Message message) 
         throws Exception
     {

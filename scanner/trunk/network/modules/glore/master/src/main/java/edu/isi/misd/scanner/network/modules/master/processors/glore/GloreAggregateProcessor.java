@@ -22,8 +22,16 @@ public class GloreAggregateProcessor implements Processor
     private static final transient Logger log = 
         LoggerFactory.getLogger(GloreAggregateProcessor.class);
     
+    /**
+     *
+     */
     public static final double epsilon = Math.pow(10.0, -6.0);
             
+    /**
+     *
+     * @param exchange
+     * @throws Exception
+     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {
