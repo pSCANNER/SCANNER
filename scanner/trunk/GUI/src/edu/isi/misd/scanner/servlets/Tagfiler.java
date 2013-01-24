@@ -38,12 +38,12 @@ public class Tagfiler extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
-	public void init(ServletConfig config){
+	public void init(ServletConfig config)  throws ServletException {
+		super.init(config);
 		servletConfig = config;
 		tagfilerURL = servletConfig.getInitParameter("tagfilerURL");
 		tagfilerUser = servletConfig.getInitParameter("tagfilerUser");
 		tagfilerPassword = servletConfig.getInitParameter("tagfilerPassword");
-		//System.out.println("tagfilerURL: " + tagfilerURL +", tagfilerUser: " + tagfilerUser +", tagfilerPassword: " + tagfilerPassword);
 	}
 
 	/**
@@ -61,26 +61,26 @@ public class Tagfiler extends HttpServlet {
 			String url = tagfilerURL + "/query/datasetType=function;datasetName=" + Utils.urlEncode(func) + "(datasetNodes)";
 			ClientURLResponse rsp = httpClient.get(url, cookie);
 			String res = rsp.getEntityString();
-			System.out.println("url: "+url);
-			System.out.println("cookie: "+cookie);
-			System.out.println("Get datasets:\n"+res);
+			//System.out.println("url: "+url);
+			//System.out.println("cookie: "+cookie);
+			System.out.println("Get Datasets:\n"+res);
 			PrintWriter out = response.getWriter();
 			out.print(res);
 		} else if (action.equals("getLibraries")) {
 			String url = tagfilerURL + "/query/datasetType=library(datasetName)";
 			ClientURLResponse rsp = httpClient.get(url, cookie);
 			String res = rsp.getEntityString();
-			System.out.println("Get libraries:\n"+res);
+			System.out.println("Get Libraries:\n"+res);
 			PrintWriter out = response.getWriter();
 			out.print(res);
 		} else if (action.equals("getFunctions")) {
 			try {
 				String lib = request.getParameter("lib");
 				String url = tagfilerURL + "/query/datasetType=library;datasetName=" + Utils.urlEncode(lib) + "(datasetFunctions)";
-				System.out.println("Functions URL: "+url);
+				//System.out.println("Functions URL: "+url);
 				ClientURLResponse rsp = httpClient.get(url, cookie);
 				String res = rsp.getEntityString();
-				System.out.println("Get functions: "+res);
+				//System.out.println("Get functions: "+res);
 				JSONArray arr = new JSONArray(res);
 				JSONObject obj = arr.getJSONObject(0);
 				JSONArray functions = obj.getJSONArray("datasetFunctions");
@@ -88,16 +88,16 @@ public class Tagfiler extends HttpServlet {
 				for (int i=0; i < functions.length(); i++) {
 					String functionName = functions.getString(i);
 					url = tagfilerURL + "/query/datasetType=function;datasetName=" + Utils.urlEncode(functionName) + "(datasetDisplayName)";
-					System.out.println("Functions Display URL: "+url);
+					//System.out.println("Functions Display URL: "+url);
 					rsp = httpClient.get(url, cookie);
 					res = rsp.getEntityString();
-					System.out.println("Get functions display result: "+res);
+					//System.out.println("Get functions display result: "+res);
 					arr = new JSONArray(res);
 					obj = arr.getJSONObject(0);
 					String displayName = obj.getString("datasetDisplayName");
 					ret.put(functionName, displayName);
 				}
-				System.out.println("Returned value: "+ret.toString());
+				System.out.println("Get Functions: "+ret.toString());
 				PrintWriter out = response.getWriter();
 				out.print(ret.toString());
 			} catch (JSONException e) {
@@ -110,7 +110,7 @@ public class Tagfiler extends HttpServlet {
 				String url = tagfilerURL + "/query/datasetType=function;datasetName=" + Utils.urlEncode(func) + "(datasetParameters)";
 				ClientURLResponse rsp = httpClient.get(url, cookie);
 				String res = rsp.getEntityString();
-				System.out.println("Get parameters name:\n"+res);
+				//System.out.println("Get parameters name:\n"+res);
 				JSONArray arr = new JSONArray(res);
 				JSONArray params = arr.getJSONObject(0).getJSONArray("datasetParameters");
 				JSONArray ret = new JSONArray();
@@ -124,9 +124,9 @@ public class Tagfiler extends HttpServlet {
 					//obj.put(param, temp.getJSONObject(0).getJSONArray("datasetContains"));
 					obj.put(param, temp.getJSONObject(0));
 					ret.put(obj);
-					System.out.println("Get parameters:\n"+res);
+					//System.out.println("Get parameters:\n"+res);
 				}
-				System.out.println("Return results:\n"+ret.toString());
+				System.out.println("Get Parameters:\n"+ret.toString());
 				PrintWriter out = response.getWriter();
 				out.print(ret.toString());
 				//JSONObject test = new JSONObject(Utils.oceansResult);
@@ -143,7 +143,7 @@ public class Tagfiler extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		System.out.println("In Tagfiler servlet");
+		//System.out.println("In Tagfiler servlet");
 		JSONObject obj = new JSONObject();
 		try {
 			String action = request.getParameter("action");
@@ -188,16 +188,16 @@ public class Tagfiler extends HttpServlet {
 			} else if (action.equals("getResults")) {
 				try {
 					String params = request.getParameter("params");
-					System.out.println("Params:\n"+params);
+					//System.out.println("Params:\n"+params);
 					String dataset = request.getParameter("dataset");
 					String lib = request.getParameter("lib");
 					String func = request.getParameter("func");
-					System.out.println("dataset: "+dataset+", lib: "+lib+", func: "+func);
+					//System.out.println("dataset: "+dataset+", lib: "+lib+", func: "+func);
 					String cookie = (String) session.getAttribute("tagfilerCookie");
 					httpClient.setCookieValue(cookie);
 					ClientURLResponse rsp = httpClient.get(tagfilerURL + "/query/datasetType=node;datasetName=" + Utils.urlEncode(dataset)  + "(datasetWorkers;datasetURL)", cookie);
 					String res = rsp.getEntityString();
-					System.out.println("Get dataset attributes:\n"+res);
+					//System.out.println("Get dataset attributes:\n"+res);
 					JSONObject temp = (new JSONArray(res)).getJSONObject(0);
 					JSONArray targets = temp.getJSONArray("datasetWorkers");
 					String datasetURL = temp.getString("datasetURL");
@@ -240,7 +240,7 @@ public class Tagfiler extends HttpServlet {
 					
 					rsp = httpClient.postScannerQuery(url, targetsURLs, params);
 					res = rsp.getEntityString();
-					System.out.println("Real Result: \n"+res);
+					System.out.println("Response Body: \n"+res);
 
 					PrintWriter out = response.getWriter();
 					out.print(res);
