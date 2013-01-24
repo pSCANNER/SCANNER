@@ -1,8 +1,9 @@
 var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
-var HOME = 'https://aspc.isi.edu/scanner';
+var HOME;
 
-function test() {
+function initScanner() {
+	HOME = window.location;
 	renderLogin();
 }
 
@@ -423,14 +424,11 @@ function submitLogin() {
 function postSubmitLogin(data, textStatus, jqXHR, param) {
 	// check if the login page was loaded under an i-frame
 	document.body.style.cursor = "default";
-	var res = $.parseJSON(data);
-	if (res['status'] == 'success') {
-		loginRegistry();
-	}
+	loginRegistry();
 }
 
 function loginRegistry() {
-	var url = HOME + '/tagfiler';
+	var url = HOME + '/query';
 	var obj = new Object();
 	obj['action'] = 'login';
 	scanner.POST(url, obj, true, postLoginRegistry, null, null, 0);
@@ -444,7 +442,7 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 	}
 }
 function downloadFile() {
-	var url = HOME + '/tagfiler';
+	var url = HOME + '/query';
 	var obj = new Object();
 	obj['action'] = 'file';
 	scanner.POST(url, obj, true, postDownloadFile, null, null, 0);
@@ -459,7 +457,7 @@ function postDownloadFile(data, textStatus, jqXHR, param) {
 }
 
 function tagfilerUserLogout() {
-	var url = HOME + '/tagfiler';
+	var url = HOME + '/query';
 	var obj = new Object();
 	obj['action'] = 'logout';
 	scanner.POST(url, obj, true, postTagfilerUserLogout, null, null, 0);
@@ -545,7 +543,7 @@ function renderAvailableFunction() {
 	$('#resultDiv').remove();
 	var lib = $('input:radio[name=libs]:checked').val();
 	if (lib != '') {
-		var url = HOME + '/tagfiler?action=getFunctions&lib=' + encodeSafeURIComponent(lib);
+		var url = HOME + '/query?action=getFunctions&lib=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableFunctions, null, null, 0);
 	}
 }
@@ -601,7 +599,7 @@ function submitQuery() {
 	obj['dataset'] = $('input:radio[name=datasets]:checked').val();
 	obj['lib'] = $('input:radio[name=libs]:checked').val();
 	obj['func'] = $('input:radio[name=funcs]:checked').val();
-	var url = HOME + '/tagfiler';
+	var url = HOME + '/query';
 	$('*', $('#paramsDiv')).css('cursor', 'wait');
 	$('*', $('#buttonsDiv')).css('cursor', 'wait');
 	document.body.style.cursor = "wait";
@@ -627,7 +625,7 @@ function renderAvailableDatasets() {
 	$('#resultDiv').remove();
 	var func = $('input:radio[name=funcs]:checked').val();
 	if (func != '') {
-		var url = HOME + '/tagfiler?action=getDatasets&func=' + encodeSafeURIComponent(func);
+		var url = HOME + '/query?action=getDatasets&func=' + encodeSafeURIComponent(func);
 		scanner.GET(url, true, postRenderAvailableDatasets, null, null, 0);
 	}
 }
@@ -661,15 +659,17 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
 }
 
 function renderAvailableLibraries() {
-	var url = HOME + '/tagfiler?action=getLibraries';
+	var url = HOME + '/query?action=getLibraries';
 	scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
 }
 
 function renderSelectTable() {
 	var div = $('#ui');
+	var h1 = $('<h1>');
+	div.append(h1);
+	h1.html('Query Scope');
 	var tableDiv = $('<div>');
 	div.append(tableDiv);
-	var div = $('#ui');
 	var table = $('<table>');
 	tableDiv.append(table);
 	table.css({'border': '1px solid black',
@@ -761,7 +761,7 @@ function renderAvailableParameters() {
 	$('#resultDiv').remove();
 	var dataset = $('input:radio[name=datasets]:checked').val();
 	if (dataset != '') {
-		var url = HOME + '/tagfiler?action=getParameters&func=' + encodeSafeURIComponent($('input:radio[name=funcs]:checked').val());
+		var url = HOME + '/query?action=getParameters&func=' + encodeSafeURIComponent($('input:radio[name=funcs]:checked').val());
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }

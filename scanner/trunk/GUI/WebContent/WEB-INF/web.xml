@@ -18,23 +18,23 @@
     <url-pattern>/login</url-pattern>
   </servlet-mapping>
   <servlet>
-    <servlet-name>Tagfiler</servlet-name>
-    <servlet-class>edu.isi.misd.scanner.servlets.Tagfiler</servlet-class>
+    <servlet-name>Query</servlet-name>
+    <servlet-class>edu.isi.misd.scanner.servlets.Query</servlet-class>
     <init-param>
-    	<param-name>tagfilerURL</param-name>
-    	<param-value>https://serbancentos.isi.edu/tagfiler</param-value>
+      <param-name>tagfilerURL</param-name>
+      <param-value>https://serbancentos.isi.edu/tagfiler</param-value>
     </init-param>
     <init-param>
-    	<param-name>tagfilerUser</param-name>
-    	<param-value>guest</param-value>
+      <param-name>tagfilerUser</param-name>
+      <param-value>guest</param-value>
     </init-param>
     <init-param>
-    	<param-name>tagfilerPassword</param-name>
-    	<param-value>just4demo</param-value>
+      <param-name>tagfilerPassword</param-name>
+      <param-value>just4demo</param-value>
     </init-param>
   </servlet>
   <servlet-mapping>
-    <servlet-name>Tagfiler</servlet-name>
-    <url-pattern>/tagfiler</url-pattern>
+    <servlet-name>Query</servlet-name>
+    <url-pattern>/query</url-pattern>
   </servlet-mapping>
 </web-app>

@@ -257,7 +257,9 @@ public class JakartaClient {
     		try {
     			response = new ClientURLResponse(httpclient.execute(request));
 				setCookieValue(response.getCookieValue());
-        		System.out.println("Response cookie: "+ getCookieValue());
+				if (getCookieValue() != null) {
+	        		System.out.println("Response cookie: "+ getCookieValue());
+				}
     			break;
     		} catch (ConnectException e) {
     			// Can not connect and send the request
@@ -334,7 +336,7 @@ public class JakartaClient {
      */
     private void setCookie(String cookie, HttpUriRequest request) {
     	if (cookie != null) {
-    		System.out.println("Request cookie: "+cookie);
+    		//System.out.println("Request cookie: "+cookie);
         	//request.setHeader("Cookie", cookieName+"="+cookie);
         	request.setHeader("Cookie", cookie);
     	}
@@ -468,8 +470,8 @@ public class JakartaClient {
         	String res = null;
         	try {
         		Header cookies[] = response.getHeaders("Set-Cookie");
-        		System.out.println("Number of cookies: " + cookies.length);
         		if (cookies.length > 0) {
+            		System.out.println("Number of cookies: " + cookies.length);
     				res = URLDecoder.decode(response.getFirstHeader("Set-Cookie").getValue(), "UTF-8");
        		}
 			} catch (UnsupportedEncodingException e) {

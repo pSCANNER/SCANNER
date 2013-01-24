@@ -19,21 +19,23 @@ import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 import edu.isi.misd.scanner.utils.Utils;
 
+
 /**
- * Servlet implementation class Tagfiler
+ * Servlet implementation class Query
  */
-@WebServlet("/tagfiler")
-public class Tagfiler extends HttpServlet {
+@WebServlet(description = "Query Tagfiler and SCANNER", urlPatterns = { "/query" })
+public class Query extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ServletConfig servletConfig;
 	private String tagfilerURL;
 	private String tagfilerUser;
 	private String tagfilerPassword;
        
+       
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Tagfiler() {
+    public Query() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -143,7 +145,7 @@ public class Tagfiler extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//System.out.println("In Tagfiler servlet");
+		System.out.println("In Tagfiler servlet");
 		JSONObject obj = new JSONObject();
 		try {
 			String action = request.getParameter("action");
