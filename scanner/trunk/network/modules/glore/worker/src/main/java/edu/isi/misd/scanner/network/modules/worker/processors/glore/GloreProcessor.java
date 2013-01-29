@@ -185,11 +185,19 @@ public class GloreProcessor implements Processor
 
         // read file and populate X and Y matrices
         state.rows = 0;
+        // get rid of the first line
+        if ((file_line = file_br.readLine()) != null){
+            // do nothing
+        }
+        else{
+            log.info("Warning: no line is read...");
+        }
+
         while ((file_line = file_br.readLine()) != null) 
         {
             // update number of rows
             state.rows = state.rows + 1;
-            line_tokens = file_line.split("\t");
+            line_tokens = file_line.split(",");
 
             // detect number of columns in data file
             if (state.columns == -1) {
