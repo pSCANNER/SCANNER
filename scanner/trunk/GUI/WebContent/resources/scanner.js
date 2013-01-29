@@ -1,9 +1,39 @@
+/*
+ * Copyright 2012 University of Southern California
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * SCANNER UI
+ * 
+ * @author Serban Voinea
+ * 
+ */
+
 var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
 var HOME;
 
+var oTable = null;
+
 function initScanner() {
-	HOME = window.location;
+	var val = '' + window.location;
+	var len = val.length - 1;
+	if (val[len] == '/') {
+		val = val.substr(0, len);
+	}
+	HOME = val;
 	renderLogin();
 }
 
@@ -66,6 +96,11 @@ function getTableColumnsValuesFrom(res, columnsValues) {
 }
 
 function buildDataTable(res) {
+	if (oTable != null) {
+		//oTable.fnDestroy(true);
+		$('#example').remove();
+		oTable = null;
+	}
 	$('#resultDiv').remove();
 	var div = $('#ui');
 	var resultDiv = $('<div>');
@@ -124,7 +159,7 @@ function buildDataTable(res) {
 			});
 		});
 	});
-	var oTable = $('#example').dataTable({
+	oTable = $('#example').dataTable({
 		'aLengthMenu': [
 		                [-1],
 		                ['All']
@@ -422,21 +457,39 @@ function submitLogin() {
 }
 
 function postSubmitLogin(data, textStatus, jqXHR, param) {
-	// check if the login page was loaded under an i-frame
 	document.body.style.cursor = "default";
-	loginRegistry();
+	var res = $.parseJSON(data);
+	var uiDiv = $('#ui');
+	$('#errorDiv').remove();
+	if (res['status'] == 'success') {
+		loginRegistry();
+	} else {
+		var errorDiv = $('<div>');
+		uiDiv.append(errorDiv);
+		errorDiv.attr({
+			'id': 'errorDiv'
+		});
+		var b = $('<b>');
+		errorDiv.append($('<br>'));
+		errorDiv.append($('<br>'));
+		errorDiv.append(b);
+		b.css({
+			'color': 'red'
+		});
+		b.html(res['status']);
+	}
 }
 
 function loginRegistry() {
 	var url = HOME + '/query';
 	var obj = new Object();
-	obj['action'] = 'login';
+	obj['action'] = 'loginRegistry';
 	scanner.POST(url, obj, true, postLoginRegistry, null, null, 0);
 }
 function postLoginRegistry(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
-		renderAvailableLibraries();
+		renderAvailableStudies();
 	} else {
 		alert(res['status']);
 	}
@@ -450,20 +503,20 @@ function downloadFile() {
 function postDownloadFile(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
-		tagfilerUserLogout();
+		registryUserLogout();
 	} else {
 		alert(res['status']);
 	}
 }
 
-function tagfilerUserLogout() {
+function registryUserLogout() {
 	var url = HOME + '/query';
 	var obj = new Object();
 	obj['action'] = 'logout';
-	scanner.POST(url, obj, true, postTagfilerUserLogout, null, null, 0);
+	scanner.POST(url, obj, true, postRegistryUserLogout, null, null, 0);
 }
 
-function postTagfilerUserLogout(data, textStatus, jqXHR, param) {
+function postRegistryUserLogout(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	alert('logout: '+res['status']);
 }
@@ -535,9 +588,8 @@ function encodeSafeURIComponent(value) {
 	});
 	return ret;
 }
-function renderAvailableFunction() {
+function renderAvailableFunctions() {
 	$('#funcDiv').html('');
-	$('#datasetDiv').html('');
 	$('#paramsDiv').remove();
 	$('#buttonsDiv').remove();
 	$('#resultDiv').remove();
@@ -568,7 +620,7 @@ function postRenderAvailableFunctions(data, textStatus, jqXHR, param) {
 			'name': 'funcs',
 			'value': name
 		});
-		input.click(function(event) {renderAvailableDatasets();});
+		input.click(function(event) {renderAvailableParameters();});
 		td.append(input);
 		var td = $('<td>');
 		tr.append(td);
@@ -596,7 +648,6 @@ function submitQuery() {
 	var obj = {};
 	obj['params'] = params;
 	obj['action'] = 'getResults';
-	obj['dataset'] = $('input:radio[name=datasets]:checked').val();
 	obj['lib'] = $('input:radio[name=libs]:checked').val();
 	obj['func'] = $('input:radio[name=funcs]:checked').val();
 	var url = HOME + '/query';
@@ -611,7 +662,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	$('*', $('#buttonsDiv')).css('cursor', 'default');
 	document.body.style.cursor = "default";
 	data = $.parseJSON(data);
-	if ($('input:radio[name=libs]:checked').val() == 'Oceans') {
+	if ($('input:radio[name=libs]:checked').parent().next().html() == 'Oceans') {
 		buildDataTable(data);
 	} else {
 		buildTreeResult(data);
@@ -619,13 +670,16 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 }
 
 function renderAvailableDatasets() {
-	$('#datasetDiv').html('');
+	$('#datasetsDiv').html('');
+	$('#libDiv').html('');
+	$('#funcDiv').html('');
 	$('#paramsDiv').remove();
 	$('#buttonsDiv').remove();
 	$('#resultDiv').remove();
-	var func = $('input:radio[name=funcs]:checked').val();
-	if (func != '') {
-		var url = HOME + '/query?action=getDatasets&func=' + encodeSafeURIComponent(func);
+
+	var study = $('input:radio[name=studies]:checked').val();
+	if (study != '') {
+		var url = HOME + '/query?action=getDatasets&study=' + encodeSafeURIComponent(study);
 		scanner.GET(url, true, postRenderAvailableDatasets, null, null, 0);
 	}
 }
@@ -635,7 +689,7 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
 	var table = $('<table>');
 	datasetDiv.append(table);
 	var datasets = [];
-	$.each(data[0]['datasetNodes'], function(i, dataset) {
+	$.each(data[0]['resourceDatasets'], function(i, dataset) {
 		datasets.push(dataset);
 	});
 	datasets.sort(compareIgnoreCase);
@@ -650,7 +704,7 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
 			'name': 'datasets',
 			'value': name
 		});
-		input.click(function(event) {renderAvailableParameters();});
+		input.click(function(event) {renderAvailableLibraries();});
 		td.append(input);
 		var td = $('<td>');
 		tr.append(td);
@@ -658,9 +712,29 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
 	});
 }
 
+function renderAvailableStudies() {
+	$('#studiesDiv').html('');
+	$('#datasetsDiv').html('');
+	$('#libDiv').html('');
+	$('#funcDiv').html('');
+	$('#paramsDiv').remove();
+	$('#buttonsDiv').remove();
+	$('#resultDiv').remove();
+	var url = HOME + '/query?action=getStudies';
+	scanner.GET(url, true, postRenderAvailableStudies, null, null, 0);
+}
+
 function renderAvailableLibraries() {
-	var url = HOME + '/query?action=getLibraries';
-	scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
+	$('#libDiv').html('');
+	$('#funcDiv').html('');
+	$('#paramsDiv').remove();
+	$('#buttonsDiv').remove();
+	$('#resultDiv').remove();
+	var dataset = $('input:radio[name=datasets]:checked').val();
+	if (dataset != '') {
+		var url = HOME + '/query?action=getLibraries&dataset=' + encodeSafeURIComponent(dataset);
+		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
+	}
 }
 
 function renderSelectTable() {
@@ -683,21 +757,40 @@ function renderSelectTable() {
 	th.css({'border': '1px solid black'
 	});
 	tr.append(th);
+	th.html('Studies');
+	var th = $('<th>');
+	th.css({'border': '1px solid black'
+	});
+	tr.append(th);
+	th.html('Datasets');
+	var th = $('<th>');
+	th.css({'border': '1px solid black'
+	});
+	tr.append(th);
 	th.html('Libraries');
 	var th = $('<th>');
 	th.css({'border': '1px solid black'
 	});
 	tr.append(th);
 	th.html('Functions');
-	var th = $('<th>');
-	th.css({'border': '1px solid black'
-	});
-	tr.append(th);
-	th.html('Datasets');
 	var tbody = $('<tbody>');
 	table.append(tbody);
 	var tr = $('<tr>');
 	tbody.append(tr);
+	var td = $('<td>');
+	td.css({'border': '1px solid black'
+	});
+	tr.append(td);
+	var studyDiv = $('<div>');
+	studyDiv.attr({'id': 'studyDiv'});
+	td.append(studyDiv);
+	var td = $('<td>');
+	td.css({'border': '1px solid black'
+	});
+	tr.append(td);
+	var datasetDiv = $('<div>');
+	datasetDiv.attr({'id': 'datasetDiv'});
+	td.append(datasetDiv);
 	var td = $('<td>');
 	td.css({'border': '1px solid black'
 	});
@@ -712,31 +805,51 @@ function renderSelectTable() {
 	var funcDiv = $('<div>');
 	funcDiv.attr({'id': 'funcDiv'});
 	td.append(funcDiv);
-	var td = $('<td>');
-	td.css({'border': '1px solid black'
-	});
-	tr.append(td);
-	var datasetDiv = $('<div>');
-	datasetDiv.attr({'id': 'datasetDiv'});
-	td.append(datasetDiv);
 	tableDiv.append($('<br>'));
 	tableDiv.append($('<br>'));
-	
 }
 
-function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
+function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 	var div = $('#ui');
 	div.html('');
 	renderSelectTable();
-	var libDiv = $('#libDiv');
-	var libs = [];
+	var studyDiv = $('#studyDiv');
+	var studies = [];
 	$.each(data, function(i, lib) {
-		libs.push(lib['datasetName']);
+		studies.push(lib['resourceName']);
 	});
-	libs.sort(compareIgnoreCase);
+	studies.sort(compareIgnoreCase);
+	var table = $('<table>');
+	studyDiv.append(table);
+	$.each(studies, function(i, name) {
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'studies',
+			'value': name
+		});
+		input.click(function(event) {renderAvailableDatasets();});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(name);
+	});
+}
+
+function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
+	var libDiv = $('#libDiv');
 	var table = $('<table>');
 	libDiv.append(table);
-	$.each(libs, function(i, name) {
+	var names = [];
+	$.each(data, function(name, value) {
+		names.push(name);
+	});
+	names.sort(compareIgnoreCase);
+	$.each(names, function(i, name) {
 		var tr = $('<tr>');
 		table.append(tr);
 		var td = $('<td>');
@@ -747,11 +860,11 @@ function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
 			'name': 'libs',
 			'value': name
 		});
-		input.click(function(event) {renderAvailableFunction();});
+		input.click(function(event) {renderAvailableFunctions();});
 		td.append(input);
 		var td = $('<td>');
 		tr.append(td);
-		td.html(name);
+		td.html(data[name]);
 	});
 }
 
@@ -759,9 +872,9 @@ function renderAvailableParameters() {
 	$('#paramsDiv').remove();
 	$('#buttonsDiv').remove();
 	$('#resultDiv').remove();
-	var dataset = $('input:radio[name=datasets]:checked').val();
-	if (dataset != '') {
-		var url = HOME + '/query?action=getParameters&func=' + encodeSafeURIComponent($('input:radio[name=funcs]:checked').val());
+	var func = $('input:radio[name=funcs]:checked').val();
+	if (func != '') {
+		var url = HOME + '/query?action=getParameters&func=' + encodeSafeURIComponent(func);
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -778,17 +891,17 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 		$.each(param, function(key, res) {
 			var h2 = $('<h2>');
 			paramsDiv.append(h2);
-			h2.html(res['datasetDisplayName']);
-			var value = res['parametersValues'];
-			var minOccurs = res['minOccurs'];
-			var maxOccurs = res['maxOccurs'];
+			h2.html(res['resourceDisplayName']);
+			var value = res['resourceValues'];
+			var minOccurs = res['resourceMinOccurs'];
+			var maxOccurs = res['resourceMaxOccurs'];
 			$.each(value, function(j, val) {
 				var div = $('<div>');
 				paramsDiv.append(div);
 				var input = $('<input>');
 				input.attr({'type': 'checkbox',
 					'checked': 'checked',
-					'parName': res['datasetDisplayName'],
+					'parName': res['resourceDisplayName'],
 					'parValue': val,
 					'minOccurs': minOccurs,
 					'maxOccurs': maxOccurs});
@@ -819,7 +932,7 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 	input.attr({'type': 'button',
 		'value': 'Clear'});
 	input.val('Clear');
-	input.click(function(event) {renderAvailableLibraries();});
+	input.click(function(event) {renderAvailableStudies();});
 	buttonsDiv.append(input);
 	buttonsDiv.append('<br>');
 	buttonsDiv.append('<br>');
