@@ -816,7 +816,7 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 	var studyDiv = $('#studyDiv');
 	var studies = [];
 	$.each(data, function(i, lib) {
-		studies.push(lib['resourceName']);
+		studies.push(lib['rname']);
 	});
 	studies.sort(compareIgnoreCase);
 	var table = $('<table>');
