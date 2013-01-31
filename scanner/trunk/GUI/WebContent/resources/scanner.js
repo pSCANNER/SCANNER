@@ -618,13 +618,13 @@ function postRenderAvailableFunctions(data, textStatus, jqXHR, param) {
 		input.attr({
 			'type': 'radio',
 			'name': 'funcs',
-			'value': name
+			'value': data[name]
 		});
 		input.click(function(event) {renderAvailableParameters();});
 		td.append(input);
 		var td = $('<td>');
 		tr.append(td);
-		td.html(data[name]);
+		td.html(name);
 	});
 }
 
@@ -689,7 +689,7 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
 	var table = $('<table>');
 	datasetDiv.append(table);
 	var datasets = [];
-	$.each(data[0]['resourceDatasets'], function(i, dataset) {
+	$.each(data, function(dataset, name) {
 		datasets.push(dataset);
 	});
 	datasets.sort(compareIgnoreCase);
@@ -702,7 +702,7 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
 		input.attr({
 			'type': 'radio',
 			'name': 'datasets',
-			'value': name
+			'value': data[name]
 		});
 		input.click(function(event) {renderAvailableLibraries();});
 		td.append(input);
@@ -858,13 +858,13 @@ function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
 		input.attr({
 			'type': 'radio',
 			'name': 'libs',
-			'value': name
+			'value': data[name]
 		});
 		input.click(function(event) {renderAvailableFunctions();});
 		td.append(input);
 		var td = $('<td>');
 		tr.append(td);
-		td.html(data[name]);
+		td.html(name);
 	});
 }
 

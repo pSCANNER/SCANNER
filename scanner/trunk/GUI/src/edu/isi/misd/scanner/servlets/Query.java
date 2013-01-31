@@ -85,20 +85,39 @@ public class Query extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(res);
 		} else if (action.equals("getDatasets")) {
-			String study = request.getParameter("study");
-			String url = tagfilerURL + "/query/resourceType=study;resourceName=" + Utils.urlEncode(study) + "(resourceDatasets)";
-			ClientURLResponse rsp = httpClient.get(url, cookie);
-			String res = rsp.getEntityString();
-			System.out.println("Get Datasets:\n"+res);
-			PrintWriter out = response.getWriter();
-			out.print(res);
+			try {
+				String study = request.getParameter("study");
+				String url = tagfilerURL + "/query/resourceType=study;resourceName=" + Utils.urlEncode(study) + "(resourceDatasets)";
+				ClientURLResponse rsp = httpClient.get(url, cookie);
+				String res = rsp.getEntityString();
+				JSONArray arr;
+				arr = new JSONArray(res);
+				JSONObject obj = arr.getJSONObject(0);
+				JSONArray datasets = obj.getJSONArray("resourceDatasets");
+				JSONObject ret = new JSONObject();
+				for (int i=0; i < datasets.length(); i++) {
+					String datasetName = datasets.getString(i);
+					url = tagfilerURL + "/query/resourceType=dataset;resourceName=" + Utils.urlEncode(datasetName) + "(resourceDisplayName)";
+					rsp = httpClient.get(url, cookie);
+					res = rsp.getEntityString();
+					arr = new JSONArray(res);
+					obj = arr.getJSONObject(0);
+					String displayName = obj.getString("resourceDisplayName");
+					ret.put(displayName, datasetName);
+				}
+				System.out.println("Get Datasets: "+ret.toString());
+				PrintWriter out = response.getWriter();
+				out.print(ret.toString());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else if (action.equals("getLibraries")) {
 			try {
 				String dataset = request.getParameter("dataset");
 				String url = tagfilerURL + "/query/resourceType=dataset;resourceName=" + Utils.urlEncode(dataset) + "(resourceLibraries)";
 				ClientURLResponse rsp = httpClient.get(url, cookie);
 				String res = rsp.getEntityString();
-				System.out.println("Get Libraries:\n"+res);
 				JSONArray arr;
 				arr = new JSONArray(res);
 				JSONObject obj = arr.getJSONObject(0);
@@ -112,7 +131,7 @@ public class Query extends HttpServlet {
 					arr = new JSONArray(res);
 					obj = arr.getJSONObject(0);
 					String displayName = obj.getString("resourceDisplayName");
-					ret.put(libraryName, displayName);
+					ret.put(displayName, libraryName);
 				}
 				System.out.println("Get Libraries: "+ret.toString());
 				PrintWriter out = response.getWriter();
@@ -139,7 +158,7 @@ public class Query extends HttpServlet {
 					arr = new JSONArray(res);
 					obj = arr.getJSONObject(0);
 					String displayName = obj.getString("resourceDisplayName");
-					ret.put(functionName, displayName);
+					ret.put(displayName, functionName);
 				}
 				System.out.println("Get Functions: "+ret.toString());
 				PrintWriter out = response.getWriter();
@@ -152,7 +171,6 @@ public class Query extends HttpServlet {
 			try {
 				String func = request.getParameter("func");
 				String url = tagfilerURL + "/query/resourceType=function;resourceName=" + Utils.urlEncode(func) + "(resourceParameters)";
-				System.out.println("Get parameters url: "+url);
 				ClientURLResponse rsp = httpClient.get(url, cookie);
 				String res = rsp.getEntityString();
 				JSONArray arr = new JSONArray(res);
@@ -195,6 +213,7 @@ public class Query extends HttpServlet {
 					//rsp.debug();
 					session.setAttribute("tagfilerCookie", httpClient.getCookieValue());
 				} else {
+					// to handle this case
 					System.out.println("Response is null");
 				}
 				obj.put("status", "success");
@@ -232,10 +251,8 @@ public class Query extends HttpServlet {
 					String res = rsp.getEntityString();
 					JSONObject temp = (new JSONArray(res)).getJSONObject(0);
 					String master = temp.getString("resourceMaster");
-					System.out.println("Master: " + master);
 					rsp = httpClient.get(tagfilerURL + "/query/resourceType=master;resourceName=" + Utils.urlEncode(master)  + "(resourceWorkers;resourceURL)", cookie);
 					res = rsp.getEntityString();
-					System.out.println("Master attributes:\n"+res);
 					temp = (new JSONArray(res)).getJSONObject(0);
 					JSONArray targets = temp.getJSONArray("resourceWorkers");
 					String masterURL = temp.getString("resourceURL");
