@@ -14,7 +14,8 @@
   <modules>  
     <module>common</module>   
     <module>master</module>   
-    <module>worker</module>            
+    <module>worker</module>
+    <module>test</module>               
   </modules>
   
   <properties>
