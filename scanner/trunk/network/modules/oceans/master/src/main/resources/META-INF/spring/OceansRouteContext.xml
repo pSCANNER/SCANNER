@@ -13,7 +13,7 @@
                 
         <camel:route>
             <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
-            <camel:to uri="direct:OceansLogisticRegressionRoute"/>
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.oceans.OceansLogisticRegressionRoute"/>
         </camel:route>
         
     </camel:routeContext>

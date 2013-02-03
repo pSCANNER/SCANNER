@@ -62,12 +62,12 @@
                 <camel:constant>fce18f85-1294-41bb-aa0a-7ef13acb2528</camel:constant>
             </camel:setHeader>            
             <camel:setHeader headerName="targets">
-                <camel:constant>http://localhost:8888/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka1.csv,http://localhost:8887/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka2.csv,http://localhost:8886/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka1.csv,http://localhost:8885/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka2.csv</camel:constant>
+                <camel:constant>http://localhost:8888/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka1.csv,http://localhost:8887/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka2.csv,http://localhost:8886/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka3.csv,http://localhost:8885/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka4.csv</camel:constant>
             </camel:setHeader>      
             <camel:to uri="http4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr"/>                                                    
             <camel:to uri="stream:out"/>
         </camel:route>
--->   
+-->  
         <!-- test route 4: initiates http client POST request (OCEANS) using a json file as the message body -->
 <!--     
         <camel:route id="testRoute4">
@@ -82,7 +82,7 @@
                 <camel:constant>dce18f85-1294-41bb-aa0a-7ef13acb2528</camel:constant>
             </camel:setHeader>            
             <camel:setHeader headerName="targets">
-                <camel:constant>http://localhost:8888/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka1.csv,http://localhost:8887/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka2.csv,http://localhost:8886/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka1.csv,http://localhost:8885/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka2.csv</camel:constant>
+                <camel:constant>http://localhost:8888/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka1.csv,http://localhost:8887/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka2.csv,http://localhost:8886/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka3.csv,http://localhost:8885/scanner/dataset/oceans/lr?dataSource=OutcomePredictionWeka4.csv</camel:constant>
             </camel:setHeader>                                              
             <camel:to uri="http4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr"/>                                
             <camel:to uri="stream:out"/>
@@ -107,7 +107,7 @@
             <camel:to uri="http4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration"/>                                                    
             <camel:to uri="stream:out"/>
         </camel:route>
--->
+-->    
     
         <!-- test route 6: initiates http client cache refresh request -->
 <!--

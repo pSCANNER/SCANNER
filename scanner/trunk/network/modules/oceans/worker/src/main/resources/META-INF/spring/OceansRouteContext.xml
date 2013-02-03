@@ -13,24 +13,24 @@
                 
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:OceansLogisticRegressionRoute"/>                       
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                       
         </camel:route>
 
 <!-- these additional route entries can be used to simulate multiple nodes on one host -->
 <!--
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>             
-            <camel:to uri="direct:OceansLogisticRegressionRoute"/>                          
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                          
         </camel:route>        
                                                                                                                                                                                                                                                                                  
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>             
-            <camel:to uri="direct:OceansLogisticRegressionRoute"/>                                 
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                                 
         </camel:route>
         
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>             
-            <camel:to uri="direct:OceansLogisticRegressionRoute"/>                                   
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                                   
         </camel:route>
 -->        
     </camel:routeContext>

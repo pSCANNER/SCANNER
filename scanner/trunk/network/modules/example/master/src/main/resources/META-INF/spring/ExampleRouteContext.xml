@@ -13,12 +13,12 @@
        
         <camel:route>
             <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
-            <camel:to uri="direct:DefaultRoute"/>
+            <camel:to uri="direct:edu.isi.misd.scanner.network.base.master.routes.DefaultRoute"/>
         </camel:route>
                          
         <camel:route>
             <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
-            <camel:to uri="direct:IterationRoute"/>
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.example.IterationRoute"/>
         </camel:route>
         
     </camel:routeContext>

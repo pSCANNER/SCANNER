@@ -13,21 +13,21 @@
     
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:GloreRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.glore.GloreRoute"/>                     
         </camel:route>
         
 <!-- these additional route entries can be used to simulate multiple nodes on one host -->
 <!--
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:GloreRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.glore.GloreRoute"/>                     
         </camel:route>
         
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:GloreRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.glore.GloreRoute"/>                     
         </camel:route>                                                                                                                                                                                                                                                                    
--->        
+-->       
     </camel:routeContext>
     
 </beans>

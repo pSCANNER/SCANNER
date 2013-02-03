@@ -46,7 +46,7 @@ public class DefaultRoute extends RouteBuilder
      * @return
      */
     protected String getRouteName() {
-        return getClass().getSimpleName();
+        return getClass().getName();
     }
     
     /**
@@ -137,7 +137,7 @@ public class DefaultRoute extends RouteBuilder
     public void configure() throws Exception 
     {    
         jaxb.setFragment(true);
-        jaxb.setPrettyPrint(true);        
+        jaxb.setPrettyPrint(false);        
         jaxb.setIgnoreJAXBElement(false);
         jaxb.setContextPath(getJAXBContext());               
         json.setUnmarshalType(Class.forName(getJSONUnmarshallType()));
@@ -186,7 +186,6 @@ public class DefaultRoute extends RouteBuilder
     {
         from("direct:" + getAggregatorRouteName()).
             recipientList(getRecipientList()).          
-                streaming().
                 parallelProcessing().
                 aggregationStrategyRef(getAggregationStrategyRef()).
                 //stopOnException().  // handled downstream in aggregator 

@@ -19,7 +19,7 @@ public class DefaultRoute extends RouteBuilder
      * @return
      */
     protected String getRouteName() {
-        return this.getClass().getSimpleName();
+        return this.getClass().getName();
     }
     
     /**
@@ -35,7 +35,7 @@ public class DefaultRoute extends RouteBuilder
      * @return
      */
     protected String getCacheReadProcessorRef() {
-        return "BaseCacheReadProcessor";
+        return "BaseWorkerCacheReadProcessor";
     }
 
     /**
@@ -43,7 +43,7 @@ public class DefaultRoute extends RouteBuilder
      * @return
      */
     protected String getCacheWriteProcessorRef() {
-        return "BaseCacheWriteProcessor";
+        return "BaseWorkerCacheWriteProcessor";
     }
     
     /**

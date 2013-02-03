@@ -1,0 +1,4 @@
+{
+    "dependentVariableName":"Outcome",
+    "independentVariableNames":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"]
+}

@@ -10,10 +10,10 @@
     <bean id="BaseComputeProcessor" 
           class="edu.isi.misd.scanner.network.base.worker.processors.BaseComputeProcessor"/> 
                 
-    <bean id="BaseCacheReadProcessor" 
+    <bean id="BaseWorkerCacheReadProcessor" 
           class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheReadProcessor"/>        
     
-    <bean id="BaseCacheWriteProcessor" 
+    <bean id="BaseWorkerCacheWriteProcessor" 
           class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheWriteProcessor"/>  
         
     <camel:errorHandler id="deadLetterErrorHandler" 
