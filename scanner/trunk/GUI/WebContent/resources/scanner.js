@@ -814,14 +814,14 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 	div.html('');
 	renderSelectTable();
 	var studyDiv = $('#studyDiv');
-	var studies = [];
-	$.each(data, function(i, lib) {
-		studies.push(lib['rname']);
+	var names = [];
+	$.each(data, function(name, value) {
+		names.push(name);
 	});
-	studies.sort(compareIgnoreCase);
+	names.sort(compareIgnoreCase);
 	var table = $('<table>');
 	studyDiv.append(table);
-	$.each(studies, function(i, name) {
+	$.each(names, function(i, name) {
 		var tr = $('<tr>');
 		table.append(tr);
 		var td = $('<td>');
@@ -830,7 +830,7 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 		input.attr({
 			'type': 'radio',
 			'name': 'studies',
-			'value': name
+			'value': data[name]
 		});
 		input.click(function(event) {renderAvailableDatasets();});
 		td.append(input);

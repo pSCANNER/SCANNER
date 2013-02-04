@@ -70,7 +70,7 @@ public class Utils {
     
     public static boolean login(HttpServletRequest request, HttpServletResponse response, String user, String password) {
     	boolean ret = false;
-    	if (user.equals("serban") && password.equals("just4me")) {
+    	if (user.equals("guest") && password.equals("just4you")) {
     		ret = true;
     	}
     	return ret;
