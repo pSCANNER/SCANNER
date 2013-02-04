@@ -62,7 +62,7 @@ public class Login extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
-		System.out.println("User: " + username + ", password: " + password + " logged in.");
+		System.out.println("User: " + username + " logged in.");
 		HttpSession session = request.getSession(true);
 		if (session.isNew() == false) {
 			session.invalidate();

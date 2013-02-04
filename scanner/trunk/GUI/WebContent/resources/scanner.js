@@ -529,8 +529,6 @@ function valueToString(val) {
 		return objectToString(val);
 	} else if ($.isNumeric(val)) {
 		return val;
-	} else if ($.isEmptyObject(val)) {
-		return '"EmptyObject"';
 	} else if ($.isFunction(val)) {
 		return '"Function"';
 	} else if($.isWindow(val)) {
