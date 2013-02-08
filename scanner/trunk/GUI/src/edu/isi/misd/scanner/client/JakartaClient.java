@@ -42,6 +42,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
@@ -195,6 +196,51 @@ public class JakartaClient {
 		}
 		httppost.setEntity(entity);
 		return execute(httppost, null);
+    }
+    
+    /**
+     * Execute a login request.
+     * If success, it will get a cookie
+     * 
+     * @param url
+     *            the query url
+     * @return the HTTP Response
+     * @throws JSONException 
+     */
+    public ClientURLResponse postResource(String url, String cookie) {
+    	ClientURLResponse response = null;
+        HttpPost httppost = new HttpPost(url);
+        httppost.setHeader("Accept", "text/uri-list");
+        httppost.setHeader("Content-Type", "charset=UTF-8");
+		List<NameValuePair> formparams = new ArrayList<NameValuePair>();
+		formparams.add(new BasicNameValuePair("action", "post"));
+		UrlEncodedFormEntity entity = null;
+		try {
+			entity = new UrlEncodedFormEntity(formparams, "UTF-8");
+			httppost.setEntity(entity);
+			response = execute(httppost, cookie);
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return response;
+    }
+    
+    /**
+     * Execute a PUT request.
+     * If success, it will get a cookie
+     * 
+     * @param url
+     *            the query url
+     * @return the HTTP Response
+     * @throws JSONException 
+     */
+    public ClientURLResponse putResource(String url, String cookie) {
+    	ClientURLResponse response = null;
+		HttpPut httpput = new HttpPut(url);
+    	httpput.setHeader("Content-Type", "charset=UTF-8");
+    	response = execute(httpput, cookie);
+		return response;
     }
     
     /**

@@ -25,6 +25,12 @@ var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
 var HOME;
 
+var urlMap = {
+		'Oceans': 'oceans',
+		'GLORE': 'glore',
+		'Logistic Regression': 'lr'
+};
+
 var oTable = null;
 
 function initScanner() {
@@ -35,6 +41,893 @@ function initScanner() {
 	}
 	HOME = val;
 	renderLogin();
+}
+
+/**
+ * @return the value of the selected study
+ */
+function getSelectedStudy() {
+	return $('input:radio[name=studies]:checked').val();
+}
+
+/**
+ * @return the value of the selected dataset
+ */
+function getSelectedDataset() {
+	return $('input:radio[name=datasets]:checked').val();
+}
+
+/**
+ * @return the value of the selected library
+ */
+function getSelectedLibrary() {
+	return $('input:radio[name=libs]:checked').val();
+}
+
+/**
+ * @return the value of the selected functions
+ */
+function getSelectedFunction() {
+	return $('input:radio[name=funcs]:checked').val();
+}
+
+/**
+ * @return the value of the selected site
+ */
+function getSelectedSite() {
+	return $('input:radio[name=sites]:checked').val();
+}
+
+/**
+ * @return the value of the selected study
+ */
+function getSelectedStudyDisplayName() {
+	return $('input:radio[name=studies]:checked').parent().next().html();
+}
+
+/**
+ * @return the value of the selected dataset
+ */
+function getSelectedDatasetDisplayName() {
+	return $('input:radio[name=datasets]:checked').parent().next().html();
+}
+
+/**
+ * @return the value of the selected library
+ */
+function getSelectedLibraryDisplayName() {
+	return $('input:radio[name=libs]:checked').parent().next().html();
+}
+
+/**
+ * @return the value of the selected functions
+ */
+function getSelectedFunctionDisplayName() {
+	return $('input:radio[name=funcs]:checked').parent().next().html();
+}
+
+/**
+ * @return the value of the selected functions
+ */
+function getSelectedSiteDisplayName() {
+	return $('input:radio[name=sites]:checked').parent().next().html();
+}
+
+/**
+ * @return the string representing the JSONObject of the selected parameters
+ * Example: 
+   {
+    "dependentVariableName":"Outcome",
+    "independentVariableNames":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"]
+   }
+ */
+function getSelectedParameters() {
+	var params = {};
+	$.each($('input:checked', $('#paramsDiv')), function(i, elem) {
+		var param = $(elem);
+		var name = param.attr('parName');
+		var value = param.attr('parValue');
+		var minOccurs = param.attr('minOccurs');
+		var maxOccurs = param.attr('maxOccurs');
+		if (minOccurs == 1 && maxOccurs == 1) {
+			params[name] = value;
+		} else {
+			if (params[name] == null) {
+				params[name] = [];
+			}
+			params[name].push(value);
+		}
+	});
+	return valueToString(params);
+}
+
+/**
+ * Send the request to get the available studies
+ */
+function renderAvailableStudies() {
+	// some clean up
+	$('#studyDiv').html('');
+	$('#datasetDiv').html('');
+	$('#libDiv').html('');
+	$('#funcDiv').html('');
+	$('#siteDiv').html('');
+	$('#paramsDiv').remove();
+	$('#buttonsDiv').remove();
+	$('#resultDiv').remove();
+	
+	// send the request
+	var url = HOME + '/query?action=getStudies';
+	scanner.GET(url, true, postRenderAvailableStudies, null, null, 0);
+}
+
+/**
+ * Render the available studies
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject having as keys the display names)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ * Example of the format of the received data:
+   {"Study1":"Study1"}
+ */
+function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
+	var div = $('#ui');
+	div.html('');
+	renderSelectTable();
+	var studyDiv = $('#studyDiv');
+	var names = [];
+	$.each(data, function(name, value) {
+		names.push(name);
+	});
+	names.sort(compareIgnoreCase);
+	var table = $('<table>');
+	studyDiv.append(table);
+	$.each(names, function(i, name) {
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'studies',
+			'value': data[name]
+		});
+		input.click(function(event) {renderAvailableDatasets();});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(name);
+	});
+}
+
+/**
+ * Send the request to get the available datasets
+ */
+function renderAvailableDatasets() {
+	// some clean up
+	$('#datasetDiv').html('');
+	$('#libDiv').html('');
+	$('#funcDiv').html('');
+	$('#siteDiv').html('');
+	$('#paramsDiv').remove();
+	$('#buttonsDiv').remove();
+	$('#resultDiv').remove();
+
+	// send the request
+	var study = getSelectedStudy();
+	if (study != '') {
+		var url = HOME + '/query?action=getDatasets&study=' + encodeSafeURIComponent(study);
+		scanner.GET(url, true, postRenderAvailableDatasets, null, null, 0);
+	}
+}
+
+/**
+ * Render the available datasets
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject having as keys the display names)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ * Example of the format of the received data:
+   {"Dataset1":"Study1_Dataset1"}
+ */
+function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
+	var datasetDiv = $('#datasetDiv');
+	var table = $('<table>');
+	datasetDiv.append(table);
+	var datasets = [];
+	$.each(data, function(dataset, name) {
+		datasets.push(dataset);
+	});
+	datasets.sort(compareIgnoreCase);
+	$.each(datasets, function(i, name) {
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'datasets',
+			'value': data[name]
+		});
+		input.click(function(event) {renderAvailableLibraries();});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(name);
+	});
+}
+
+/**
+ * Send the request to get the available libraries
+ */
+function renderAvailableLibraries() {
+	// some clean up
+	$('#libDiv').html('');
+	$('#funcDiv').html('');
+	$('#siteDiv').html('');
+	$('#paramsDiv').remove();
+	$('#buttonsDiv').remove();
+	$('#resultDiv').remove();
+
+	// send the request
+	var dataset = getSelectedDataset();
+	if (dataset != '') {
+		var url = HOME + '/query?action=getLibraries&dataset=' + encodeSafeURIComponent(dataset);
+		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
+	}
+}
+
+/**
+ * Render the available libraries
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject having as keys the display names)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ * Example of the format of the received data:
+   {"Oceans":"Study1_Dataset1_oceans",
+    "GLORE":"Study1_Dataset1_glore"}
+ */
+function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
+	var libDiv = $('#libDiv');
+	var table = $('<table>');
+	libDiv.append(table);
+	var names = [];
+	$.each(data, function(name, value) {
+		names.push(name);
+	});
+	names.sort(compareIgnoreCase);
+	$.each(names, function(i, name) {
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'libs',
+			'value': data[name]
+		});
+		input.click(function(event) {renderAvailableFunctions();});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(name);
+	});
+}
+
+/**
+ * Send the request to get the available functions
+ */
+function renderAvailableFunctions() {
+	// some clean up
+	$('#funcDiv').html('');
+	$('#siteDiv').html('');
+	$('#paramsDiv').remove();
+	$('#buttonsDiv').remove();
+	$('#resultDiv').remove();
+	
+	// send the request
+	var lib = getSelectedLibrary();
+	if (lib != '') {
+		var url = HOME + '/query?action=getFunctions&lib=' + encodeSafeURIComponent(lib);
+		scanner.GET(url, true, postRenderAvailableFunctions, null, null, 0);
+	}
+}
+
+/**
+ * Render the available functions
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject having as keys the display names)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ * Example of the format of the received data:
+   {"Logistic Regression":"Study1_Dataset1_oceans_lr"}
+ */
+function postRenderAvailableFunctions(data, textStatus, jqXHR, param) {
+	var funcDiv = $('#funcDiv');
+	var table = $('<table>');
+	funcDiv.append(table);
+	var names = [];
+	$.each(data, function(name, value) {
+		names.push(name);
+	});
+	names.sort(compareIgnoreCase);
+	$.each(names, function(i, name) {
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'funcs',
+			'value': data[name]
+		});
+		input.click(function(event) {renderAvailableSites(); renderAvailableParameters();});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(name);
+	});
+}
+
+/**
+ * Send the request to get the available parameters
+ */
+function renderAvailableParameters() {
+	// some clean up
+	$('#paramsDiv').remove();
+	$('#buttonsDiv').remove();
+	$('#resultDiv').remove();
+	
+	// send the request
+	var func = getSelectedFunction();
+	if (func != '') {
+		var url = HOME + '/query?action=getParameters&func=' + encodeSafeURIComponent(func);
+		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
+	}
+}
+
+/**
+ * Render the available parameters
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONArray)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ * Example of the format of the received data:
+   [{"Study1_Dataset1_oceans_lr_dependentVariableName":{"resourceMinOccurs":1,
+                                                      "resourceValues":["Outcome"],
+                                                      "resourceDisplayName":"dependentVariableName",
+                                                      "resourceMaxOccurs":1}},
+     {"Study1_Dataset1_oceans_lr_independentVariableNames":{"resourceMinOccurs":0,
+                                                         "resourceValues":["Age","CAD","Creatinine","Diabetes","LOS","Race_Cat"],
+                                                         "resourceDisplayName":"independentVariableNames",
+                                                         "resourceMaxOccurs":-1}}
+   ]
+ */
+function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
+	var uidiv = $('#ui');
+	var paramsDiv = $('<div>');
+	paramsDiv.attr({'id': 'paramsDiv'});
+	uidiv.append(paramsDiv);
+	var h1 = $('<h1>');
+	paramsDiv.append(h1);
+	h1.html('Request Parameters');
+	$.each(data, function(i, param) {
+		$.each(param, function(key, res) {
+			var h2 = $('<h2>');
+			paramsDiv.append(h2);
+			h2.html(res['resourceDisplayName']);
+			var value = res['resourceValues'];
+			var minOccurs = res['resourceMinOccurs'];
+			var maxOccurs = res['resourceMaxOccurs'];
+			$.each(value, function(j, val) {
+				var div = $('<div>');
+				paramsDiv.append(div);
+				var input = $('<input>');
+				input.attr({'type': 'checkbox',
+					'checked': 'checked',
+					'parName': res['resourceDisplayName'],
+					'parValue': val,
+					'minOccurs': minOccurs,
+					'maxOccurs': maxOccurs});
+				if (minOccurs == 1 && maxOccurs == 1) {
+					input.attr('disabled', 'disabled');
+				}
+				div.append(input);
+				var label = $('<label>');
+				div.append(label);
+				label.html(val);
+			});
+		});
+		var h2 = $('<h2>');
+	});
+	
+	paramsDiv.append('<br>');
+	paramsDiv.append('<br>');
+	var buttonsDiv = $('<div>');
+	buttonsDiv.attr({'id': 'buttonsDiv'});
+	uidiv.append(buttonsDiv);
+	var input = $('<input>');
+	input.attr({'type': 'button',
+		'value': 'Submit'});
+	input.val('Submit');
+	input.click(function(event) {submitQuery();});
+	buttonsDiv.append(input);
+	var input = $('<input>');
+	input.attr({'type': 'button',
+		'value': 'Clear'});
+	input.val('Clear');
+	input.click(function(event) {renderAvailableStudies();});
+	buttonsDiv.append(input);
+	buttonsDiv.append('<br>');
+	buttonsDiv.append('<br>');
+}
+
+/**
+ * Send the request to get the available sites
+ */
+function renderAvailableSites() {
+	var url = HOME + '/query?action=getSites' +
+			'&study=' + encodeSafeURIComponent(getSelectedStudyDisplayName()) +
+			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetDisplayName()) +
+			'&lib=' + encodeSafeURIComponent(getSelectedLibraryDisplayName()) +
+			'&func=' + encodeSafeURIComponent(getSelectedFunctionDisplayName());
+	scanner.GET(url, true, postRenderSites, null, null, 0);
+}
+
+/**
+ * Render the available sites
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject having as keys the display names)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ * Example of the format of the received data:
+   {"Dataset1":"Study1_Dataset1"}
+ */
+function postRenderSites(data, textStatus, jqXHR, param) {
+	var siteDiv = $('#siteDiv');
+	var table = $('<table>');
+	siteDiv.append(table);
+	var names = [];
+	$.each(data, function(name, value) {
+		names.push(name);
+	});
+	names.sort(compareIgnoreCase);
+	$.each(names, function(i, name) {
+		var tr = $('<tr>');
+		table.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var input = $('<input>');
+		input.attr({
+			'type': 'radio',
+			'name': 'sites',
+			'value': data[name],
+			'onchange': "$('#resultDiv').remove();"
+		});
+		td.append(input);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(name);
+	});
+}
+
+/**
+ * Send the request to get the data from the SCANNER
+ */
+function submitQuery() {
+	if (getSelectedSite() == null) {
+		alert('Please select a site.');
+		return;
+	}
+	var params = getSelectedParameters();
+	var obj = {};
+	obj['params'] = params;
+	obj['action'] = 'getResults';
+	obj['lib'] = getSelectedLibrary();
+	obj['func'] = getSelectedFunction();
+	obj['master'] = getSelectedSite();
+	var url = HOME + '/query';
+	$('*', $('#paramsDiv')).css('cursor', 'wait');
+	$('*', $('#buttonsDiv')).css('cursor', 'wait');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, obj, true, postSubmitQuery, null, null, 0);
+}
+
+/**
+ * Render the available studies
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ */
+function postSubmitQuery(data, textStatus, jqXHR, param) {
+	$('*', $('#paramsDiv')).css('cursor', 'default');
+	$('*', $('#buttonsDiv')).css('cursor', 'default');
+	document.body.style.cursor = "default";
+	data = $.parseJSON(data);
+	if (getSelectedLibraryDisplayName() == 'Oceans') {
+		buildDataTable(data);
+	} else {
+		buildTreeResult(data);
+	}
+}
+
+function createResourceURL(name, displayName, action) {
+	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
+			'&displayName=' + encodeSafeURIComponent(displayName) +
+			'&action=' + encodeSafeURIComponent(action);
+	return url;
+}
+
+function addResourceURL(name, parentName, action) {
+	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
+			'&parent=' + encodeSafeURIComponent(parentName) +
+			'&action=' + encodeSafeURIComponent(action);
+	return url;
+}
+
+function deleteResourceURL(name, action) {
+	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
+			'&action=' + encodeSafeURIComponent(action);
+	return url;
+}
+
+function createStudy(name, displayName) {
+	createResource(name, displayName, 'createStudy');
+}
+
+function createDataset(name, displayName) {
+	createResource(name, displayName, 'createDataset');
+}
+
+function createLibrary(name, displayName) {
+	createResource(name, displayName, 'createLibrary');
+}
+
+function createFunction(name, displayName) {
+	createResource(name, displayName, 'createFunction');
+}
+
+function createMaster(name, url, study, dataset, lib, func) {
+	var req_url = createResourceURL(name, name, 'createMaster');
+	req_url += '&resourceStudy=' + encodeSafeURIComponent(study) +
+			'&resourceDataset=' + encodeSafeURIComponent(dataset) +
+			'&resourceURL=' + encodeSafeURIComponent(url) +
+			'&resourceLibrary=' + encodeSafeURIComponent(lib) +
+			'&resourceFunction=' + encodeSafeURIComponent(func);
+	document.body.style.cursor = "wait";
+	scanner.POST(req_url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createWorker(name, url, dataSource) {
+	var req_url = createResourceURL(name, name, 'createWorker');
+	req_url += '&resourceURL=' + encodeSafeURIComponent(url) + '&resourceData=' + encodeSafeURIComponent(dataSource);
+	document.body.style.cursor = "wait";
+	scanner.POST(req_url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createParameter(name, displayName, minOccurs, maxOccurs, values) {
+	var url = createResourceURL(name, displayName, 'createParameter');
+	url += '&resourceMinOccurs=' + minOccurs + '&resourceMaxOccurs=' + maxOccurs;
+	if (values != null && values.length > 0) {
+		url += '&resourceValues=';
+		var resourceValues = arrayToString(values);
+		url += encodeSafeURIComponent(resourceValues);
+	}
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addDataset(dataset, study) {
+	var url = addResourceURL(dataset, study, 'addDataset');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addDatasets(datasets, study) {
+	var url = addResourceURL(arrayToString(datasets), study, 'addDatasets');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addLibrary(lib, dataset) {
+	var url = addResourceURL(lib, dataset, 'addLibrary');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addLibraries(libs, dataset) {
+	var url = addResourceURL(arrayToString(libs), dataset, 'addLibraries');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addFunction(func, lib) {
+	var url = addResourceURL(func, lib, 'addFunction');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addFunctions(funcs, lib) {
+	var url = addResourceURL(arrayToString(funcs), lib, 'addFunctions');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addMaster(master, func) {
+	var url = addResourceURL(master, func, 'addMaster');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addParameter(param, func) {
+	var url = addResourceURL(param, func, 'addParameter');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addParameters(params, func) {
+	var url = addResourceURL(arrayToString(params), func, 'addParameters');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addWorker(worker, master) {
+	var url = addResourceURL(worker, master, 'addWorker');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function addWorkers(workers, master) {
+	var url = addResourceURL(arrayToString(workers), master, 'addWorkers');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteFunctionParameter(param, func) {
+	var url = addResourceURL(param, func, 'deleteFunctionParameter');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteFunctionParameters(params, func) {
+	var url = addResourceURL(arrayToString(params), func, 'deleteFunctionParameters');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteMasterWorker(worker, master) {
+	var url = addResourceURL(worker, master, 'deleteMasterWorker');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteMasterWorkers(workers, master) {
+	var url = addResourceURL(arrayToString(workers), master, 'deleteMasterWorkers');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteLibraryFunction(func, lib) {
+	var url = addResourceURL(func, lib, 'deleteLibraryFunction');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteLibraryFunctions(funcs, lib) {
+	var url = addResourceURL(arrayToString(funcs), lib, 'deleteLibraryFunctions');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteDatasetLibrary(lib, dataset) {
+	var url = addResourceURL(lib, dataset, 'deleteDatasetLibrary');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteDatasetLibraries(libs, dataset) {
+	var url = addResourceURL(arrayToString(libs), dataset, 'deleteDatasetLibraries');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteStudyDataset(dataset, study) {
+	var url = addResourceURL(dataset, study, 'deleteStudyDataset');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteStudyDatasets(datasets, study) {
+	var url = addResourceURL(arrayToString(datasets), study, 'deleteStudyDatasets');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteWorker(worker) {
+	var url = deleteResourceURL(worker, 'deleteWorker');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteParameter(param) {
+	var url = deleteResourceURL(param, 'deleteParameter');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteMaster(master) {
+	var url = deleteResourceURL(master, 'deleteMaster');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteFunction(func) {
+	var url = deleteResourceURL(func, 'deleteFunction');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteLibrary(lib) {
+	var url = deleteResourceURL(lib, 'deleteLibrary');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteDataset(dataset) {
+	var url = deleteResourceURL(dataset, 'deleteDataset');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteStudy(study) {
+	var url = deleteResourceURL(study, 'deleteStudy');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function modifyLibrary(name, displayName, urlPath) {
+	var url = createResourceURL(name, displayName, 'modifyLibrary');
+	url += '&resourcePath=' + encodeSafeURIComponent(urlPath);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function modifyFunction(name, displayName, urlPath) {
+	var url = createResourceURL(name, displayName, 'modifyFunction');
+	url += '&resourcePath=' + encodeSafeURIComponent(urlPath);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function modifyMaster(name, urlPath, study, dataset, lib, func) {
+	var url = createResourceURL(name, name, 'modifyMaster');
+	url += '&resourceURL=' + encodeSafeURIComponent(urlPath) +
+		'&resourceDataset=' + encodeSafeURIComponent(dataset) +
+		'&resourceStudy=' + encodeSafeURIComponent(study) +
+		'&resourceLibrary=' + encodeSafeURIComponent(lib) +
+		'&resourceFunction=' + encodeSafeURIComponent(func);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function modifyWorker(name, urlPath, dataSource) {
+	var url = createResourceURL(name, name, 'modifyWorker');
+	url += '&resourceURL=' + encodeSafeURIComponent(urlPath) + '&resourceData=' + encodeSafeURIComponent(dataSource);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function modifyParameter(name, displayName, minOccurs, maxOccurs, values) {
+	var url = createResourceURL(name, displayName, 'modifyParameter');
+	url += '&resourceMinOccurs=' + minOccurs + '&resourceMaxOccurs=' + maxOccurs + '&resourceValues=' + encodeSafeURIComponent(arrayToString(values));
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function getMasters(study, dataset, lib, func) {
+	var url = createResourceURL(name, name, 'getMasters');
+	url += '&resourceDataset=' + encodeSafeURIComponent(dataset) +
+	'&resourceStudy=' + encodeSafeURIComponent(study) +
+	'&resourceLibrary=' + encodeSafeURIComponent(lib) +
+	'&resourceFunction=' + encodeSafeURIComponent(func);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function getStudy(name) {
+	var url = createResourceURL(name, name, 'getStudy');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function getDataset(name) {
+	var url = createResourceURL(name, name, 'getDataset');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function getLibrary(name) {
+	var url = createResourceURL(name, name, 'getLibrary');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function getFunction(name) {
+	var url = createResourceURL(name, name, 'getFunction');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function getMaster(name) {
+	var url = createResourceURL(name, name, 'getMaster');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function getParameter(name) {
+	var url = createResourceURL(name, name, 'getParameter');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function getWorker(name) {
+	var url = createResourceURL(name, name, 'getWorker');
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createResource(name, displayName, action) {
+	var url = createResourceURL(name, displayName, action);
+	if (action == 'createLibrary' || action == 'createFunction') {
+		url += '&resourcePath=' + encodeSafeURIComponent(urlMap[displayName]);
+	}
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function postResourceAction(data, textStatus, jqXHR, param) {
+	document.body.style.cursor = "default";
+	var res = $.parseJSON(data);
+	alert(res.status);
 }
 
 function getTableColumns(res) {
@@ -586,46 +1479,6 @@ function encodeSafeURIComponent(value) {
 	});
 	return ret;
 }
-function renderAvailableFunctions() {
-	$('#funcDiv').html('');
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-	var lib = $('input:radio[name=libs]:checked').val();
-	if (lib != '') {
-		var url = HOME + '/query?action=getFunctions&lib=' + encodeSafeURIComponent(lib);
-		scanner.GET(url, true, postRenderAvailableFunctions, null, null, 0);
-	}
-}
-
-function postRenderAvailableFunctions(data, textStatus, jqXHR, param) {
-	var funcDiv = $('#funcDiv');
-	var table = $('<table>');
-	funcDiv.append(table);
-	var names = [];
-	$.each(data, function(name, value) {
-		names.push(name);
-	});
-	names.sort(compareIgnoreCase);
-	$.each(names, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'radio',
-			'name': 'funcs',
-			'value': data[name]
-		});
-		input.click(function(event) {renderAvailableParameters();});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
-}
-
 /**
  * Compares two strings lexicographically, ignoring case differences.
  */
@@ -638,100 +1491,6 @@ function compareIgnoreCase(str1, str2) {
 		return -1;
 	} else {
 		return 1;
-	}
-}
-
-function submitQuery() {
-	var params = getSelectedParameters();
-	var obj = {};
-	obj['params'] = params;
-	obj['action'] = 'getResults';
-	obj['lib'] = $('input:radio[name=libs]:checked').val();
-	obj['func'] = $('input:radio[name=funcs]:checked').val();
-	var url = HOME + '/query';
-	$('*', $('#paramsDiv')).css('cursor', 'wait');
-	$('*', $('#buttonsDiv')).css('cursor', 'wait');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, obj, true, postSubmitQuery, null, null, 0);
-}
-
-function postSubmitQuery(data, textStatus, jqXHR, param) {
-	$('*', $('#paramsDiv')).css('cursor', 'default');
-	$('*', $('#buttonsDiv')).css('cursor', 'default');
-	document.body.style.cursor = "default";
-	data = $.parseJSON(data);
-	if ($('input:radio[name=libs]:checked').parent().next().html() == 'Oceans') {
-		buildDataTable(data);
-	} else {
-		buildTreeResult(data);
-	}
-}
-
-function renderAvailableDatasets() {
-	$('#datasetsDiv').html('');
-	$('#libDiv').html('');
-	$('#funcDiv').html('');
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-
-	var study = $('input:radio[name=studies]:checked').val();
-	if (study != '') {
-		var url = HOME + '/query?action=getDatasets&study=' + encodeSafeURIComponent(study);
-		scanner.GET(url, true, postRenderAvailableDatasets, null, null, 0);
-	}
-}
-
-function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
-	var datasetDiv = $('#datasetDiv');
-	var table = $('<table>');
-	datasetDiv.append(table);
-	var datasets = [];
-	$.each(data, function(dataset, name) {
-		datasets.push(dataset);
-	});
-	datasets.sort(compareIgnoreCase);
-	$.each(datasets, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'radio',
-			'name': 'datasets',
-			'value': data[name]
-		});
-		input.click(function(event) {renderAvailableLibraries();});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
-}
-
-function renderAvailableStudies() {
-	$('#studiesDiv').html('');
-	$('#datasetsDiv').html('');
-	$('#libDiv').html('');
-	$('#funcDiv').html('');
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-	var url = HOME + '/query?action=getStudies';
-	scanner.GET(url, true, postRenderAvailableStudies, null, null, 0);
-}
-
-function renderAvailableLibraries() {
-	$('#libDiv').html('');
-	$('#funcDiv').html('');
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-	var dataset = $('input:radio[name=datasets]:checked').val();
-	if (dataset != '') {
-		var url = HOME + '/query?action=getLibraries&dataset=' + encodeSafeURIComponent(dataset);
-		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
 	}
 }
 
@@ -771,6 +1530,11 @@ function renderSelectTable() {
 	});
 	tr.append(th);
 	th.html('Functions');
+	var th = $('<th>');
+	th.css({'border': '1px solid black'
+	});
+	tr.append(th);
+	th.html('Sites');
 	var tbody = $('<tbody>');
 	table.append(tbody);
 	var tr = $('<tr>');
@@ -803,162 +1567,20 @@ function renderSelectTable() {
 	var funcDiv = $('<div>');
 	funcDiv.attr({'id': 'funcDiv'});
 	td.append(funcDiv);
+	var td = $('<td>');
+	td.css({'border': '1px solid black'
+	});
+	tr.append(td);
+	var siteDiv = $('<div>');
+	siteDiv.attr({'id': 'siteDiv'});
+	td.append(siteDiv);
 	tableDiv.append($('<br>'));
 	tableDiv.append($('<br>'));
-}
-
-function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
-	var div = $('#ui');
-	div.html('');
-	renderSelectTable();
-	var studyDiv = $('#studyDiv');
-	var names = [];
-	$.each(data, function(name, value) {
-		names.push(name);
-	});
-	names.sort(compareIgnoreCase);
-	var table = $('<table>');
-	studyDiv.append(table);
-	$.each(names, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'radio',
-			'name': 'studies',
-			'value': data[name]
-		});
-		input.click(function(event) {renderAvailableDatasets();});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
-}
-
-function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
-	var libDiv = $('#libDiv');
-	var table = $('<table>');
-	libDiv.append(table);
-	var names = [];
-	$.each(data, function(name, value) {
-		names.push(name);
-	});
-	names.sort(compareIgnoreCase);
-	$.each(names, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'radio',
-			'name': 'libs',
-			'value': data[name]
-		});
-		input.click(function(event) {renderAvailableFunctions();});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
-}
-
-function renderAvailableParameters() {
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-	var func = $('input:radio[name=funcs]:checked').val();
-	if (func != '') {
-		var url = HOME + '/query?action=getParameters&func=' + encodeSafeURIComponent(func);
-		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
-	}
-}
-
-function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
-	var uidiv = $('#ui');
-	var paramsDiv = $('<div>');
-	paramsDiv.attr({'id': 'paramsDiv'});
-	uidiv.append(paramsDiv);
-	var h1 = $('<h1>');
-	paramsDiv.append(h1);
-	h1.html('Request Parameters');
-	$.each(data, function(i, param) {
-		$.each(param, function(key, res) {
-			var h2 = $('<h2>');
-			paramsDiv.append(h2);
-			h2.html(res['resourceDisplayName']);
-			var value = res['resourceValues'];
-			var minOccurs = res['resourceMinOccurs'];
-			var maxOccurs = res['resourceMaxOccurs'];
-			$.each(value, function(j, val) {
-				var div = $('<div>');
-				paramsDiv.append(div);
-				var input = $('<input>');
-				input.attr({'type': 'checkbox',
-					'checked': 'checked',
-					'parName': res['resourceDisplayName'],
-					'parValue': val,
-					'minOccurs': minOccurs,
-					'maxOccurs': maxOccurs});
-				if (minOccurs == 1 && maxOccurs == 1) {
-					input.attr('disabled', 'disabled');
-				}
-				div.append(input);
-				var label = $('<label>');
-				div.append(label);
-				label.html(val);
-			});
-		});
-		var h2 = $('<h2>');
-	});
-	
-	paramsDiv.append('<br>');
-	paramsDiv.append('<br>');
-	var buttonsDiv = $('<div>');
-	buttonsDiv.attr({'id': 'buttonsDiv'});
-	uidiv.append(buttonsDiv);
-	var input = $('<input>');
-	input.attr({'type': 'button',
-		'value': 'Submit'});
-	input.val('Submit');
-	input.click(function(event) {submitQuery();});
-	buttonsDiv.append(input);
-	var input = $('<input>');
-	input.attr({'type': 'button',
-		'value': 'Clear'});
-	input.val('Clear');
-	input.click(function(event) {renderAvailableStudies();});
-	buttonsDiv.append(input);
-	buttonsDiv.append('<br>');
-	buttonsDiv.append('<br>');
 }
 
 function expandAll() {
 	$('#navigation').find('div.hitarea.expandable-hitarea').click();
 	//$('#navigation').find('div.hitarea.tree-hitarea.expandable-hitarea').click();
-}
-
-function getSelectedParameters() {
-	var params = {};
-	$.each($('input:checked', $('#paramsDiv')), function(i, elem) {
-		var param = $(elem);
-		var name = param.attr('parName');
-		var value = param.attr('parValue');
-		var minOccurs = param.attr('minOccurs');
-		var maxOccurs = param.attr('maxOccurs');
-		if (minOccurs == 1 && maxOccurs == 1) {
-			params[name] = value;
-		} else {
-			if (params[name] == null) {
-				params[name] = [];
-			}
-			params[name].push(value);
-		}
-	});
-	return valueToString(params);
 }
 
 function buildTreeResult(res) {

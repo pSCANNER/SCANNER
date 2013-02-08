@@ -31,6 +31,18 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
+  <context-param>
+    <param-name>tagfilerURL</param-name>
+    <param-value>https://serbancentos.isi.edu/tagfiler</param-value>
+  </context-param>
+  <context-param>
+    <param-name>tagfilerUser</param-name>
+    <param-value>guest</param-value>
+  </context-param>
+  <context-param>
+    <param-name>tagfilerPassword</param-name>
+    <param-value>just4demo</param-value>
+  </context-param>
   <servlet>
     <servlet-name>Login</servlet-name>
     <servlet-class>edu.isi.misd.scanner.servlets.Login</servlet-class>
@@ -42,21 +54,17 @@
   <servlet>
     <servlet-name>Query</servlet-name>
     <servlet-class>edu.isi.misd.scanner.servlets.Query</servlet-class>
-    <init-param>
-      <param-name>tagfilerURL</param-name>
-      <param-value>https://serbancentos.isi.edu/tagfiler</param-value>
-    </init-param>
-    <init-param>
-      <param-name>tagfilerUser</param-name>
-      <param-value>guest</param-value>
-    </init-param>
-    <init-param>
-      <param-name>tagfilerPassword</param-name>
-      <param-value>just4demo</param-value>
-    </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>Query</servlet-name>
     <url-pattern>/query</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>Registry</servlet-name>
+    <servlet-class>edu.isi.misd.scanner.servlets.Registry</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Registry</servlet-name>
+    <url-pattern>/registry</url-pattern>
   </servlet-mapping>
 </web-app>

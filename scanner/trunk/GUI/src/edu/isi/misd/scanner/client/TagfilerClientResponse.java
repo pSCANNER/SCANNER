@@ -41,7 +41,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public int getStatus() {
-		// TODO Auto-generated method stub
 		return response.getStatus();
 	}
 
@@ -50,7 +49,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String getEntityString() {
-		// TODO Auto-generated method stub
 		return response.getEntityString();
 	}
 
@@ -59,7 +57,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String getErrorMessage() {
-		// TODO Auto-generated method stub
 		return response.getErrorMessage();
 	}
 
@@ -68,7 +65,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public void release() {
-		// TODO Auto-generated method stub
 		response.release();
 
 	}
@@ -78,10 +74,10 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String toStudies() {
-		// TODO Auto-generated method stub
 		String result = null;
 		try {
 			String res = response.getEntityString();
+			System.out.println("Entity: " + res);
 			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
@@ -90,7 +86,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return result;
@@ -101,7 +96,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String toDatasets() {
-		// TODO Auto-generated method stub
 		return toStudies();
 	}
 
@@ -110,7 +104,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String toLibraries() {
-		// TODO Auto-generated method stub
 		return toStudies();
 	}
 
@@ -119,16 +112,29 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String toFunctions() {
-		// TODO Auto-generated method stub
 		return toStudies();
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toFunctions()
+	 */
+	@Override
+	public String toMasters() {
+		return toStudies();
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toWorkers()
+	 */
+	@Override
+	public String toWorkers() {
+		return response.getEntityString();
+	}
 	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toParameters()
 	 */
 	@Override
 	public String toParameters() {
-		// TODO Auto-generated method stub
 		String result = null;
 		try {
 			String res = response.getEntityString();
@@ -152,38 +158,54 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return result;
 	}
+	
+	String toResource() {
+		String ret = null;
+		try {
+			JSONObject obj = (new JSONArray(response.getEntityString())).getJSONObject(0);
+			ret = obj.toString();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
 
 	@Override
-	public String toFunction() {
-		// TODO Auto-generated method stub
-		return response.getEntityString();
+	public String toStudy() {
+		return toResource();
+	}
+	@Override
+	public String toDataset() {
+		return toResource();
 	}
 	@Override
 	public String toLibrary() {
-		// TODO Auto-generated method stub
-		return response.getEntityString();
+		return toResource();
+	}
+	@Override
+	public String toFunction() {
+		return toResource();
 	}
 	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toMaster()
 	 */
 	@Override
 	public String toMaster() {
-		// TODO Auto-generated method stub
-		return response.getEntityString();
+		return toResource();
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toWorkers()
-	 */
 	@Override
-	public String toWorkers() {
-		// TODO Auto-generated method stub
-		return response.getEntityString();
+	public String toWorker() {
+		return toResource();
+	}
+	@Override
+	public String toParameter() {
+		return toResource();
 	}
 
 }

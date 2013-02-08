@@ -72,11 +72,29 @@ public interface RegistryClientResponse {
      */
     public String toFunctions();
 
+
+    /**
+     * Return the list of functions representing a JSONArray for the AJAX client 
+     * 
+     */
+    public String toMasters();
     /**
      * Return the list of parameters representing a JSONArray for the AJAX client 
      * 
      */
     public String toParameters();
+
+    /**
+     * Return the list of functions representing a JSONArray for the AJAX client 
+     * 
+     */
+    public String toStudy();
+
+    /**
+     * Return the list of functions representing a JSONArray for the AJAX client 
+     * 
+     */
+    public String toDataset();
 
     /**
      * Return the list of functions representing a JSONArray for the AJAX client 
@@ -95,6 +113,18 @@ public interface RegistryClientResponse {
      * 
      */
     public String toMaster();
+
+    /**
+     * Return a string representing a JSONObject for the AJAX client 
+     * 
+     */
+    public String toWorker();
+
+    /**
+     * Return a string representing a JSONObject for the AJAX client 
+     * 
+     */
+    public String toParameter();
 
     /**
      * Return a string representing a JSONArray for the AJAX client 

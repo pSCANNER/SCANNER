@@ -65,9 +65,9 @@ public class Query extends HttpServlet {
 	public void init(ServletConfig config)  throws ServletException {
 		super.init(config);
 		servletConfig = config;
-		tagfilerURL = servletConfig.getInitParameter("tagfilerURL");
-		tagfilerUser = servletConfig.getInitParameter("tagfilerUser");
-		tagfilerPassword = servletConfig.getInitParameter("tagfilerPassword");
+		tagfilerURL = servletConfig.getServletContext().getInitParameter("tagfilerURL");
+		tagfilerUser = servletConfig.getServletContext().getInitParameter("tagfilerUser");
+		tagfilerPassword = servletConfig.getServletContext().getInitParameter("tagfilerPassword");
 	}
 
 	/**
@@ -82,40 +82,51 @@ public class Query extends HttpServlet {
 		httpClient.setCookieValue(cookie);
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		if (action.equals("getStudies")) {
-			RegistryClientResponse clientResponse = registryClient.getStudies(cookie);
+			RegistryClientResponse clientResponse = registryClient.getStudies();
 			String ret = clientResponse.toStudies();
 			System.out.println("Get Studies:\n"+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getDatasets")) {
 			String study = request.getParameter("study");
-			RegistryClientResponse clientResponse = registryClient.getDatasets(study, cookie);
+			RegistryClientResponse clientResponse = registryClient.getDatasets(study);
 			String ret = clientResponse.toDatasets();
 			System.out.println("Get Datasets: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getLibraries")) {
 			String dataset = request.getParameter("dataset");
-			RegistryClientResponse clientResponse = registryClient.getLibraries(dataset, cookie);
+			RegistryClientResponse clientResponse = registryClient.getLibraries(dataset);
 			String ret = clientResponse.toLibraries();
 			System.out.println("Get Libraries: "+ret.toString());
 			PrintWriter out = response.getWriter();
 			out.print(ret.toString());
 		} else if (action.equals("getFunctions")) {
 			String lib = request.getParameter("lib");
-			RegistryClientResponse clientResponse = registryClient.getFunctions(lib, cookie);
+			RegistryClientResponse clientResponse = registryClient.getFunctions(lib);
 			String ret = clientResponse.toFunctions();
 			System.out.println("Get Functions: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getParameters")) {
 			String func = request.getParameter("func");
-			RegistryClientResponse clientResponse = registryClient.getParameters(func, cookie);
+			RegistryClientResponse clientResponse = registryClient.getParameters(func);
 			String ret = clientResponse.toParameters();
 			System.out.println("Get Parameters:\n"+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
+		} else if (action.equals("getSites")) {
+			String study = request.getParameter("study");
+			String dataset = request.getParameter("dataset");
+			String lib = request.getParameter("lib");
+			String func = request.getParameter("func");
+			RegistryClientResponse clientResponse = registryClient.getMasters(study, dataset, lib, func);
+			String ret = clientResponse.toMasters();
+			System.out.println("Get Sites:\n"+ret);
+			PrintWriter out = response.getWriter();
+			out.print(ret);
 		}
+
 	}
 
 	/**
@@ -134,7 +145,7 @@ public class Query extends HttpServlet {
 				if (rsp != null) {
 					//rsp.debug();
 					session.setAttribute("tagfilerCookie", httpClient.getCookieValue());
-					RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL);
+					RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue());
 					session.setAttribute("registryClient", registryClient);
 				} else {
 					// to handle this case
@@ -168,23 +179,22 @@ public class Query extends HttpServlet {
 				try {
 					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 					String params = request.getParameter("params");
+					String master = request.getParameter("master");
 					String lib = request.getParameter("lib");
 					String func = request.getParameter("func");
-					String cookie = (String) session.getAttribute("tagfilerCookie");
-					RegistryClientResponse clientResponse = registryClient.getFunction(func, cookie);
+					RegistryClientResponse clientResponse = registryClient.getFunction(func);
 					String res = clientResponse.toFunction();
-					JSONObject temp = (new JSONArray(res)).getJSONObject(0);
-					String master = temp.getString("resourceMaster");
+					JSONObject temp = new JSONObject(res);
 					String funcPath = temp.getString("resourcePath");
-					clientResponse = registryClient.getLibrary(lib, cookie);
+					clientResponse = registryClient.getLibrary(lib);
 					res = clientResponse.toLibrary();
-					temp = (new JSONArray(res)).getJSONObject(0);
+					temp = new JSONObject(res);
 					String libPath = temp.getString("resourcePath");
-					clientResponse = registryClient.getMaster(master, cookie);
+					clientResponse = registryClient.getMaster(master);
 					res = clientResponse.toMaster();
-					temp = (new JSONArray(res)).getJSONObject(0);
+					temp = new JSONObject(res);
 					String masterURL = temp.getString("resourceURL");
-					clientResponse = registryClient.getWorkers(master, cookie);
+					clientResponse = registryClient.getWorkers(master);
 					res = clientResponse.toWorkers();
 					StringBuffer buff = new StringBuffer();
 					JSONArray targets= new JSONArray(res);
