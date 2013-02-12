@@ -9,12 +9,13 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  *
  */
-public class EchoIntegrationTest extends BaseIntegrationTest 
+public class SecureEchoIntegrationTest extends BaseIntegrationTest 
 { 
     @Override
-    protected AbstractXmlApplicationContext createApplicationContext() {
+    protected AbstractXmlApplicationContext createApplicationContext() 
+    {
         return new ClassPathXmlApplicationContext(
-            "edu/isi/misd/scanner/network/modules/test/example/echo/EchoIntegrationTestContext.xml");
+            "edu/isi/misd/scanner/network/modules/test/example/echo/SecureEchoIntegrationTestContext.xml");
     }
 
     @Override
@@ -38,9 +39,9 @@ public class EchoIntegrationTest extends BaseIntegrationTest
     @Override
     protected String getMasterUrl() throws Exception
     {
-        String targets 
-            =  context.resolvePropertyPlaceholders(
-                "http4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/echo");
+        String targets =
+            context.resolvePropertyPlaceholders(
+                "https4://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/example/echo?sslContextParametersRef=sslContextParametersClient");
         return targets;
     }
     
@@ -49,15 +50,15 @@ public class EchoIntegrationTest extends BaseIntegrationTest
     {
         String targets =
             context.resolvePropertyPlaceholders(
-            "http4://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo,"+
-            "http4://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo,"+
-            "http4://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo,"+
-            "http4://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo");
+                "https4://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sslContextParametersRef=sslContextParametersMaster");
         return targets;
     } 
     
-    @Test       
-    public void testEchoXML() throws Exception 
+        @Test       
+    public void testSecureEchoXML() throws Exception 
     {
         doPost("application/xml",
                "EchoIntegrationTestInput.xml",
@@ -66,7 +67,7 @@ public class EchoIntegrationTest extends BaseIntegrationTest
     }
    
     @Test    
-    public void testEchoJSON() throws Exception 
+    public void testSecureEchoJSON() throws Exception 
     {
         doPost("application/json",
                "EchoIntegrationTestInput.json",

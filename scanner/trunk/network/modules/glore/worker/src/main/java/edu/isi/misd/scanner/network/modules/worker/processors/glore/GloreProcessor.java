@@ -234,7 +234,7 @@ public class GloreProcessor implements Processor
     protected static GloreStateData getState(Exchange exchange)
     {
         String key = 
-            exchange.getIn().getHeader(Exchange.HTTP_URL).toString() + "/id/" +
+            exchange.getFromEndpoint().getEndpointKey() + "/id/" +
             (String)exchange.getIn().getHeader(BaseConstants.ID);
         GloreStateData state = (GloreStateData)dataStore.get(key);
         if (state == null) {
@@ -252,7 +252,7 @@ public class GloreProcessor implements Processor
     protected static GloreStateData removeState(Exchange exchange)
     {
         String key = 
-            exchange.getIn().getHeader(Exchange.HTTP_URL).toString() + "/id/" +
+            exchange.getFromEndpoint().getEndpointKey() + "/id/" +
             (String)exchange.getIn().getHeader(BaseConstants.ID);
             return (GloreStateData)dataStore.remove(key);
     }

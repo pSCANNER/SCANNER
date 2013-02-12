@@ -82,6 +82,7 @@ public class DefaultRoute extends RouteBuilder
                     stop().
                 end().                 
                 processRef(getCacheWriteProcessorRef()).
+            stop().
         end();
     }    
 }

@@ -47,6 +47,7 @@ public class BaseRecipientList
                 continue;
             }
         }
+        log.debug("Recipient list created: " + results);
         return results;
     }    
 }

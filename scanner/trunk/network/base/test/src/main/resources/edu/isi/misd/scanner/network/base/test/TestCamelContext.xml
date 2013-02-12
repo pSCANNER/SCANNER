@@ -32,8 +32,8 @@
     
     <bean id="BaseWorkerCacheWriteProcessor" 
           class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheWriteProcessor"/> 
-        
-
+            
+    <!-- error handler -->      
     <camel:errorHandler id="testErrorHandler"
                         type="DefaultErrorHandler">
         
@@ -43,7 +43,54 @@
                                 logStackTrace="true"                                 
                                 logRetryStackTrace="false" 
                                 logRetryAttempted="false"/> 
-    </camel:errorHandler>   
+    </camel:errorHandler>  
     
+    <camel:sslContextParameters id="sslContextParametersClient">
+      <camel:keyManagers keyPassword="client">
+        <camel:keyStore  
+            type="PKCS12"
+            resource="edu/isi/misd/scanner/network/base/test/scanner-test-client.p12"
+            password="client"/>
+      </camel:keyManagers>
+      <camel:trustManagers>
+        <camel:keyStore  
+            type="JKS"
+            resource="edu/isi/misd/scanner/network/base/test/scanner-test-ca-cert.jks"
+            password="scannertest"/>
+      </camel:trustManagers>
+    </camel:sslContextParameters>
+      
+    <camel:sslContextParameters id="sslContextParametersMaster">
+      <camel:keyManagers keyPassword="master">
+        <camel:keyStore  
+            type="PKCS12"
+            resource="edu/isi/misd/scanner/network/base/test/scanner-test-master.p12"
+            password="master"/>
+      </camel:keyManagers>
+      <camel:trustManagers>
+        <camel:keyStore  
+            type="JKS"
+            resource="edu/isi/misd/scanner/network/base/test/scanner-test-ca-cert.jks"
+            password="scannertest"/>
+      </camel:trustManagers>
+      <camel:serverParameters clientAuthentication="REQUIRE"/>
+    </camel:sslContextParameters>
+          
+    <camel:sslContextParameters id="sslContextParametersWorker">
+      <camel:keyManagers keyPassword="worker">
+        <camel:keyStore  
+            type="PKCS12"
+            resource="edu/isi/misd/scanner/network/base/test/scanner-test-worker.p12"
+            password="worker"/>
+      </camel:keyManagers>
+      <camel:trustManagers>
+        <camel:keyStore  
+            type="JKS"
+            resource="edu/isi/misd/scanner/network/base/test/scanner-test-ca-cert.jks"
+            password="scannertest"/>
+      </camel:trustManagers>
+      <camel:serverParameters clientAuthentication="REQUIRE"/>
+    </camel:sslContextParameters>
+              
 </beans>
 

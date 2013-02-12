@@ -25,33 +25,33 @@
             <camel:excludes>**.*Excluded*</camel:excludes>
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
-                    
+
         <camel:route>
-            <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
+            <camel:from uri="jetty:https://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersMaster&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>          
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.example.IterationRoute"/>
             <camel:to uri="mock:result"/>            
         </camel:route>
                     
         <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute"/>                     
         </camel:route>
 
         <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute"/>                     
         </camel:route>
         
         <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute"/>                     
         </camel:route>
         
         <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.ssl.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute"/>                     
         </camel:route>
-
+                                                                          
     </camel:camelContext>
     
 </beans>

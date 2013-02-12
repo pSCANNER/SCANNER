@@ -198,7 +198,7 @@ public class DefaultRoute extends RouteBuilder
                         when().simple(JSON_CONTENT_TYPE_CLAUSE).
                             marshal(xmlToJson).
                     endChoice().
-            end().
+                end().
         end();
     }
         

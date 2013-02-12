@@ -61,7 +61,7 @@ public class FileUtils
      */
     public static void writeFile(Exchange exchange, String baseDir)
         throws Exception
-    {
+    {      
         String path = MessageUtils.getPathFromMessageURL(exchange.getIn());
         int idIndex = path.lastIndexOf("/" + BaseConstants.ID + "/");
         String dirName = 

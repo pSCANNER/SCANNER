@@ -9,12 +9,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  *
  */
-public class GloreIntegrationTest extends BaseIntegrationTest 
+public class SecureGloreIntegrationTest extends BaseIntegrationTest 
 {   
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
         return new ClassPathXmlApplicationContext(
-            "edu/isi/misd/scanner/network/modules/test/glore/GloreIntegrationTestContext.xml");
+            "edu/isi/misd/scanner/network/modules/test/glore/SecureGloreIntegrationTestContext.xml");
     }
 
     @Override
@@ -38,25 +38,25 @@ public class GloreIntegrationTest extends BaseIntegrationTest
     @Override
     protected String getMasterUrl() throws Exception
     {
-        String targets =             
+        String targets = 
              context.resolvePropertyPlaceholders(
-                "http4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/glore/lr");
+                "https4://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/glore/lr?sslContextParametersRef=sslContextParametersClient");            
         return targets;
     }
     
     @Override
     protected String getWorkerUrls() throws Exception
     {
-        String targets =              
+        String targets =  
             context.resolvePropertyPlaceholders(
-            "http4://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part1.csv,"+
-            "http4://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part2.csv,"+
-            "http4://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part3.csv");
+            "https4://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part1.csv&sslContextParametersRef=sslContextParametersMaster,"+
+            "https4://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part2.csv&sslContextParametersRef=sslContextParametersMaster,"+
+            "https4://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part3.csv&sslContextParametersRef=sslContextParametersMaster");
         return targets;
     }  
     
     @Test
-    public void testGloreLogisticRegressionXML() throws Exception 
+    public void testSecureGloreLogisticRegressionXML() throws Exception 
     {
         doPost("application/xml",
                "GloreIntegrationTestInput.xml",
@@ -65,7 +65,7 @@ public class GloreIntegrationTest extends BaseIntegrationTest
     }
     
     @Test
-    public void testGloreLogisticRegressionJSON() throws Exception 
+    public void testSecureGloreLogisticRegressionJSON() throws Exception 
     {
         doPost("application/json",
                "GloreIntegrationTestInput.json",

@@ -9,12 +9,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  *
  */
-public class OceansIntegrationTest extends BaseIntegrationTest 
+public class SecureOceansIntegrationTest extends BaseIntegrationTest 
 {
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
         return new ClassPathXmlApplicationContext(
-            "edu/isi/misd/scanner/network/modules/test/oceans/OceansIntegrationTestContext.xml");
+            "edu/isi/misd/scanner/network/modules/test/oceans/SecureOceansIntegrationTestContext.xml");
     }
 
     @Override
@@ -40,7 +40,7 @@ public class OceansIntegrationTest extends BaseIntegrationTest
     {
         String targets =             
              context.resolvePropertyPlaceholders(
-                "http4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr");
+                "https4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?sslContextParametersRef=sslContextParametersClient");
         return targets;
     }
     
@@ -49,10 +49,10 @@ public class OceansIntegrationTest extends BaseIntegrationTest
     {
         String targets =              
             context.resolvePropertyPlaceholders(
-                "http4://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka1.csv,"+
-                "http4://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka2.csv,"+
-                "http4://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka3.csv,"+
-                "http4://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka4.csv");
+                "https4://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka1.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka2.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka3.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka4.csv&sslContextParametersRef=sslContextParametersMaster");
         return targets;
     }  
     

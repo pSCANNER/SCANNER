@@ -5,6 +5,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.TypeConverter;
@@ -166,6 +167,11 @@ public class MessageUtils
             path.substring(idIndex + BaseConstants.ID.length()+2) : "");
     }
    
+    public static String parseIdFromMessageURL(Message message) throws Exception
+    {
+        return parseIdFromUrlPath(getPathFromMessageURL(message));
+    }
+    
     /**
      *
      * @param message
@@ -174,11 +180,9 @@ public class MessageUtils
      */
     public static String getHostFromMessageURL(Message message) 
         throws Exception
-    {
-            URL url = 
-                new URL(
-                    message.getHeader(Exchange.HTTP_URL).toString());  
-            return url.getHost();
+    {      
+        HttpServletRequest req = message.getBody(HttpServletRequest.class);  
+        return req.getLocalName();
     }
     
     /**
@@ -190,10 +194,8 @@ public class MessageUtils
     public static int getPortFromMessageURL(Message message) 
         throws Exception
     {
-            URL url = 
-                new URL(
-                    message.getHeader(Exchange.HTTP_URL).toString());  
-            return url.getPort();
+        HttpServletRequest req = message.getBody(HttpServletRequest.class);  
+        return req.getLocalPort();        
     }
     
     /**
@@ -205,10 +207,8 @@ public class MessageUtils
     public static String getPathFromMessageURL(Message message) 
         throws Exception
     {
-            URL url = 
-                new URL(
-                    message.getHeader(Exchange.HTTP_URL).toString());  
-            return url.getPath();
+        HttpServletRequest req = message.getBody(HttpServletRequest.class);  
+        return req.getPathInfo();         
     }
     
 }

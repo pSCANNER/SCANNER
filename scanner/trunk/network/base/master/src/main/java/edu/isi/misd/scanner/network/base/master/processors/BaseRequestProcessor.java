@@ -61,10 +61,7 @@ public class BaseRequestProcessor implements Processor
         else if ("GET".equalsIgnoreCase(httpMethod)) 
         {                       
             if (id == null) { 
-                id = MessageUtils.parseIdFromUrlPath(
-                    new URL(
-                        exchange.getIn().getHeader(
-                            Exchange.HTTP_URL).toString()).getPath());
+                id = MessageUtils.parseIdFromMessageURL(exchange.getIn());
                 if (id.isEmpty()) {
                     IllegalArgumentException iae = 
                         new IllegalArgumentException("ID cannot be null");

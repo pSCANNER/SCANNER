@@ -10,14 +10,14 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  *
  */
-public class IterationIntegrationTest extends BaseIntegrationTest 
-{       
+public class SecureIterationIntegrationTest extends BaseIntegrationTest 
+{
     @Override
     protected AbstractXmlApplicationContext createApplicationContext() {
         return new ClassPathXmlApplicationContext(
-            "edu/isi/misd/scanner/network/modules/test/example/iteration/IterationIntegrationTestContext.xml");
-    }
-
+            "edu/isi/misd/scanner/network/modules/test/example/iteration/SecureIterationIntegrationTestContext.xml");
+    }   
+    
     @Override
     public void setUp() throws Exception
     {
@@ -33,16 +33,15 @@ public class IterationIntegrationTest extends BaseIntegrationTest
             "direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute";        
         assertNotNull(
             "Endpoint not present: " + workerRoute,
-            context.hasEndpoint(workerRoute));
-                            
+            context.hasEndpoint(workerRoute));                            
     }
     
     @Override
     protected String getMasterUrl() throws Exception
-    {        
+    {
         String targets = 
             context.resolvePropertyPlaceholders(
-                "http4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration");
+                "https4://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersClient");
         return targets;
     }
     
@@ -51,10 +50,10 @@ public class IterationIntegrationTest extends BaseIntegrationTest
     {
         String targets = 
             context.resolvePropertyPlaceholders(
-                "http4://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration,"+
-                "http4://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration,"+
-                "http4://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration,"+
-                "http4://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration");
+                "https4://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sslContextParametersRef=sslContextParametersMaster");
         return targets;
     }    
 
@@ -67,17 +66,16 @@ public class IterationIntegrationTest extends BaseIntegrationTest
     } 
     
     @Test
-    public void testIterationXML() throws Exception 
+    public void testSecureIterationXML() throws Exception 
     {
         doPost("application/xml","IterationIntegrationTestInput.xml");
         checkOutput();
     }
         
     @Test
-    public void testIterationJSON() throws Exception 
+    public void testSecureIterationJSON() throws Exception 
     {
         doPost("application/json","IterationIntegrationTestInput.json");
         checkOutput();       
-    }  
-    
+    }           
 }
