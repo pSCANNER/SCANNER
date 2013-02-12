@@ -74,10 +74,11 @@ public interface RegistryClientResponse {
 
 
     /**
-     * Return the list of functions representing a JSONArray for the AJAX client 
+     * Return the list of sites representing a JSONArray for the AJAX client 
      * 
      */
-    public String toMasters();
+    public String toSites();
+    
     /**
      * Return the list of parameters representing a JSONArray for the AJAX client 
      * 
@@ -85,51 +86,64 @@ public interface RegistryClientResponse {
     public String toParameters();
 
     /**
-     * Return the list of functions representing a JSONArray for the AJAX client 
+     * Return a string representing a JSONArray for the AJAX client 
+     * 
+     */
+    public String toWorkers();
+
+    /**
+     * Return the study representing a JSONObject for the AJAX client 
      * 
      */
     public String toStudy();
 
     /**
-     * Return the list of functions representing a JSONArray for the AJAX client 
+     * Return the dataset representing a JSONObject for the AJAX client 
      * 
      */
     public String toDataset();
 
     /**
-     * Return the list of functions representing a JSONArray for the AJAX client 
+     * Return the library representing a JSONObject for the AJAX client 
      * 
      */
     public String toLibrary();
 
     /**
-     * Return a string representing a JSONObject for the AJAX client 
+     * Return the function representing a JSONObject for the AJAX client 
      * 
      */
     public String toFunction();
 
     /**
-     * Return a string representing a JSONObject for the AJAX client 
+     * Return the master representing a JSONObject for the AJAX client 
      * 
      */
     public String toMaster();
 
     /**
-     * Return a string representing a JSONObject for the AJAX client 
+     * Return the worker representing a JSONObject for the AJAX client 
      * 
      */
     public String toWorker();
 
     /**
-     * Return a string representing a JSONObject for the AJAX client 
+     * Return the parameter representing a JSONObject for the AJAX client 
      * 
      */
     public String toParameter();
 
     /**
-     * Return a string representing a JSONArray for the AJAX client 
-     * 
+     * Return the unique id of the resource in the registry
+     * The method will be called for a RegistryClientResponse from one of the following requests:
+     * 		- getStudy(String name)
+     * 		- getDataset(String name, String study)
+     * 		- getLibrary(String name)
+     * 		- getFunction(String name, String lib)
+     * 		- getMaster()
+     * 		- getParameter(String name, String func, String lib)
+     * 		- getWorker(String study, String dataset, String lib, String func, String site)
      */
-    public String toWorkers();
+    public String getResourceId();
 
 }

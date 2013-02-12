@@ -29,80 +29,65 @@ public interface RegistryClient {
     /**
      * Creates an entry of "study" type in the registry
      * 
-     * @param study
+     * @param name
      *            the name of the study
-     * @param displayName
-     *            the display name of the study
      * @return the Client Response
      */
-	public RegistryClientResponse createStudy(String study, String displayName);
+	public RegistryClientResponse createStudy(String name);
 	
     /**
      * Creates an entry of "dataset" type in the registry
      * 
-     * @param dataset
+     * @param name
      *            the name of the dataset
-     * @param displayName
-     *            the display name of the dataset
+     * @param study
+     *            the study the dataset belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse createDataset(String dataset, String displayName);
+	public RegistryClientResponse createDataset(String name, String study);
 	
     /**
      * Creates an entry of "library" type in the registry
      * 
      * @param name
      *            the name of the library
-     * @param displayName
-     *            the name of the library to be displayed
      * @param urlPath
      *            the path to be used in the URL
      * @return the Client Response
      */
-	public RegistryClientResponse createLibrary(String name, String displayName, String urlPath);
+	public RegistryClientResponse createLibrary(String name, String urlPath);
 	
     /**
      * Creates an entry of "function" type in the registry
      * 
      * @param name
      *            the name of the function
-     * @param displayName
-     *            the name of the function to be displayed
+     * @param lib
+     *            the library the function belongs to
      * @param urlPath
      *            the path to be used in the URL
      * @return the Client Response
      */
-	public RegistryClientResponse createFunction(String name, String displayName, String urlPath);
+	public RegistryClientResponse createFunction(String name, String lib, String urlPath);
 	
     /**
      * Creates an entry of "master" type in the registry
      * 
-     * @param name
-     *            the name of the master
-     * @param displayName
-     *            the name of the function to be displayed
      * @param url
      *            the url of the master
-     * @param study
-     *            the study of the master
-     * @param dataset
-     *            the dataset of the master
-     * @param lib
-     *            the library of the master
-     * @param func
-     *            the function of the master
      * @return the Client Response
      */
-	public RegistryClientResponse createMaster(String name, String displayName, String url,
-			String study, String dataset, String lib, String func);
+	public RegistryClientResponse createMaster(String url);
 	
     /**
      * Creates an entry of "parameter" type in the registry
      * 
      * @param name
      *            the name of the parameter
-     * @param displayName
-     *            the name of the parameter to be displayed
+     * @param func
+     *            the function the parameter belongs to
+     * @param lib
+     *            the library the parameter belongs to
      * @param minOccurs
      *            the minimum occurrences of the parameter
      * @param maxOccurs
@@ -111,148 +96,48 @@ public interface RegistryClient {
      *            the list of the parameter values
      * @return the Client Response
      */
-	public RegistryClientResponse createParameter(String name, String displayName, int minOccurs, int maxOccurs, List<String> values);
+	public RegistryClientResponse createParameter(String name, String func, String lib, int minOccurs, int maxOccurs, List<String> values);
 	
     /**
      * Creates an entry of "worker" type in the registry
      * 
-     * @param name
-     *            the name of the worker
+     * @param study
+     *            the study the worker belongs to
+     * @param dataset
+     *            the dataset the worker belongs to
+     * @param lib
+     *            the library the worker belongs to
+     * @param func
+     *            the function the worker belongs to
+     * @param site
+     *            the site the worker belongs to
      * @param sourceData
      *            the data source
      * @param url
      *            the url of the worker
      * @return the Client Response
      */
-	public RegistryClientResponse createWorker(String name, String sourceData, String url);
-	
-    /**
-     * Add a dataset to a study
-     * 
-     * @param dataset
-     *            the name of the dataset
-     * @param study
-     *            the name of the study
-     * @return the Client Response
-     */
-	public RegistryClientResponse addDataset(String dataset, String study);
-	
-    /**
-     * Add a list of datasets to a study
-     * 
-     * @param dataset
-     *            the list of the datasets
-     * @param study
-     *            the name of the study
-     * @return the Client Response
-     */
-	public RegistryClientResponse addDataset(List<String> dataset, String study);
-	
-    /**
-     * Add a library to a dataset
-     * 
-     * @param lib
-     *            the name of the library
-     * @param dataset
-     *            the name of the dataset
-     * @return the Client Response
-     */
-	public RegistryClientResponse addLibrary(String lib, String dataset);
-	
-    /**
-     * Add a list of libraries to a dataset
-     * 
-     * @param lib
-     *            the list of the libraries
-     * @param dataset
-     *            the name of the dataset
-     * @return the Client Response
-     */
-	public RegistryClientResponse addLibrary(List<String> lib, String dataset);
-	
-    /**
-     * Add a function to a library
-     * 
-     * @param func
-     *            the name of the function
-     * @param lib
-     *            the name of the library
-     * @return the Client Response
-     */
-	public RegistryClientResponse addFunction(String func, String lib);
-	
-    /**
-     * Add a list of functions to a library
-     * 
-     * @param func
-     *            the list of the functions
-     * @param lib
-     *            the name of the library
-     * @return the Client Response
-     */
-	public RegistryClientResponse addFunction(List<String> func, String lib);
-	
-    /**
-     * Add a parameter to a function
-     * 
-     * @param param
-     *            the name of the parameter
-     * @param func
-     *            the name of the function
-     * @return the Client Response
-     */
-	public RegistryClientResponse addParameter(String param, String func);
-	
-    /**
-     * Add a list of parameters to a function
-     * 
-     * @param param
-     *            the list of the parameters
-     * @param func
-     *            the name of the function
-     * @return the Client Response
-     */
-	public RegistryClientResponse addParameter(List<String> param, String func);
-	
-    /**
-     * Add a worker to a master
-     * 
-     * @param worker
-     *            the name of the worker
-     * @param master
-     *            the name of the master
-     * @return the Client Response
-     */
-	public RegistryClientResponse addWorker(String worker, String master);
-	
-    /**
-     * Add a list of workers to a master
-     * 
-     * @param worker
-     *            the list of the workers
-     * @param master
-     *            the name of the master
-     * @return the Client Response
-     */
-	public RegistryClientResponse addWorker(List<String> worker, String master);
+	public RegistryClientResponse createWorker(String study, String dataset, String lib, String func, String site, String sourceData, String url);
 	
     /**
      * Deletes a study from the registry
      * 
-     * @param study
+     * @param name
      *            the name of the study
      * @return the Client Response
      */
-	public RegistryClientResponse deleteStudy(String study);
+	public RegistryClientResponse deleteStudy(String name);
 	
     /**
-     * Deletes a dataset from the registry
+     * Delete a dataset from the registry
      * 
-     * @param dataset
+     * @param name
      *            the name of the dataset
+     * @param study
+     *            the study the dataset belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse deleteDataset(String dataset);
+	public RegistryClientResponse deleteDataset(String name, String study);
 	
     /**
      * Delete a library from the registry
@@ -268,180 +153,88 @@ public interface RegistryClient {
      * 
      * @param name
      *            the name of the function
-    * @return the Client Response
-     */
-	public RegistryClientResponse deleteFunction(String name);
-	
-    /**
-     * Delete a master from the registry
-     * 
-     * @param name
-     *            the name of the master
+     * @param lib
+     *            the library the function belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse deleteMaster(String name);
+	public RegistryClientResponse deleteFunction(String name, String lib);
+	
+    /**
+     * Delete the master from the registry
+     * 
+     * @return the Client Response
+     */
+	public RegistryClientResponse deleteMaster();
 	
     /**
      * Delete a parameter from the registry
      * 
      * @param name
      *            the name of the parameter
+     * @param func
+     *            the function the parameter belongs to
+     * @param lib
+     *            the library the parameter belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse deleteParameter(String name);
+	public RegistryClientResponse deleteParameter(String name, String func, String lib);
 	
     /**
      * Delete a worker from the registry
      * 
-     * @param name
-     *            the name of the worker
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteWorker(String name);
-	
-    /**
-     * Delete a parameter from a function
-     * 
-     * @param name
-     *            the name of the parameter
-     * @param func
-     *            the name of the function
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteParameter(String name, String func);
-	
-    /**
-     * Delete a list of parameters from a function
-     * 
-     * @param name
-     *            the list of the parameter
-     * @param func
-     *            the name of the function
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteParameter(List<String> name, String func);
-	
-    /**
-     * Delete a worker from a master
-     * 
-     * @param name
-     *            the name of the worker
-     * @param master
-     *            the name of the master
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteWorker(String name, String master);
-	
-    /**
-     * Delete a list of workers from a master
-     * 
-     * @param name
-     *            the list of the workers
-     * @param master
-     *            the name of the master
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteWorker(List<String> name, String master);
-	
-    /**
-     * Delete a function from a library
-     * 
-     * @param name
-     *            the name of the function
-     * @param lib
-     *            the name of the library
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteFunction(String name, String lib);
-	
-    /**
-     * Delete a list of functions from a library
-     * 
-     * @param name
-     *            the list of the function
-     * @param lib
-     *            the name of the library
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteFunction(List<String> name, String lib);
-	
-    /**
-     * Delete a library from a dataset
-     * 
-     * @param name
-     *            the name of the library
-     * @param dataset
-     *            the name of the dataset
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteLibrary(String name, String dataset);
-	
-    /**
-     * Delete a list of libraries from a dataset
-     * 
-     * @param name
-     *            the list of the libraries
-     * @param dataset
-     *            the name of the dataset
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteLibrary(List<String> name, String dataset);
-	
-    /**
-     * Delete a dataset from a study
-     * 
-     * @param name
-     *            the name of the dataset
      * @param study
-     *            the name of the study
+     *            the study the worker belongs to
+     * @param dataset
+     *            the dataset the worker belongs to
+     * @param lib
+     *            the library the worker belongs to
+     * @param func
+     *            the function the worker belongs to
+     * @param site
+     *            the site the worker belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse deleteDataset(String name, String study);
+	public RegistryClientResponse deleteWorker(String study, String dataset, String lib, String func, String site);
 	
     /**
-     * Delete a list of datasets from a study
+     * Update a library 
      * 
+     * @param id
+     *            the library id in the registry
      * @param name
-     *            the list of the datasets
-     * @param study
-     *            the name of the study
-     * @return the Client Response
-     */
-	public RegistryClientResponse deleteDataset(List<String> name, String study);
-	
-    /**
-     * Modify a library 
-     * 
-     * @param name
-     *            the name of the library
-     * @param displayName
-     *            the new name of the library to be displayed
+     *            the new name of the library
      * @param urlPath
      *            the new path to be used in the URL
      * @return the Client Response
      */
-	public RegistryClientResponse modifyLibrary(String name, String displayName, String urlPath);
+	public RegistryClientResponse updateLibrary(String id, String name, String urlPath);
 	
     /**
-     * Modify a function 
+     * Update a function
      * 
+     * @param id
+     *            the id of the function in the registry
      * @param name
-     *            the name of the function
-     * @param displayName
-     *            the new name of the function to be displayed
+     *            the new name of the function
+     * @param lib
+     *            the new library the function belongs to
      * @param urlPath
      *            the new path to be used in the URL
      * @return the Client Response
      */
-	public RegistryClientResponse modifyFunction(String name, String displayName, String urlPath);
+	public RegistryClientResponse updateFunction(String id, String name, String lib, String urlPath);
 	
     /**
-     * Modify a parameter 
+     * Update a parameter 
      * 
+     * @param id
+     *            the id of the parameter in the registry
      * @param name
-     *            the name of the parameter
-     * @param displayName
-     *            the new name of the parameter to be displayed
+     *            the new name of the parameter
+     * @param func
+     *            the new function the parameter belongs to
+     * @param lib
+     *            the new library the parameter belongs to
      * @param minOccurs
      *            the new minimum occurrences of the parameter
      * @param maxOccurs
@@ -450,39 +243,39 @@ public interface RegistryClient {
      *            the new list of the parameter values
      * @return the Client Response
      */
-	public RegistryClientResponse modifyParameter(String name, String displayName, int minOccurs, int maxOccurs, List<String> values);
+	public RegistryClientResponse updateParameter(String id, String name, String func, String lib, int minOccurs, int maxOccurs, List<String> values);
 	
     /**
-     * Modify a master 
+     * Update the master 
      * 
-     * @param name
-     *            the name of the master
      * @param url
      *            the new url of the master
-     * @param study
-     *            the new study of the master
-     * @param dataset
-     *            the new dataset of the master
-     * @param lib
-     *            the new library of the master
-     * @param func
-     *            the new function of the master
      * @return the Client Response
      */
-	public RegistryClientResponse modifyMaster(String name, String url, String study, String dataset, String lib, String func);
+	public RegistryClientResponse updateMaster(String url);
 	
     /**
      * Modify a worker 
      * 
-     * @param name
-     *            the name of the worker
+     * @param id
+     *            the id of the worker in the registry
+     * @param study
+     *            the new study the worker belongs to
+     * @param dataset
+     *            the new dataset the worker belongs to
+     * @param lib
+     *            the new library the worker belongs to
+     * @param func
+     *            the new function the worker belongs to
+     * @param site
+     *            the new site the worker belongs to
      * @param sourceData
      *            the new data source
      * @param url
      *            the new url of the worker
      * @return the Client Response
      */
-	public RegistryClientResponse modifyWorker(String name, String sourceData, String url);
+	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, String sourceData, String url);
 	
     /**
      * Get the studies 
@@ -525,10 +318,10 @@ public interface RegistryClient {
      *            the name of the function
      * @return the Client Response
      */
-	public RegistryClientResponse getParameters(String func);
+	public RegistryClientResponse getParameters(String func, String lib);
 	
     /**
-     * Get the masters for a given study, dataset, library and function 
+     * Get the sites for a given study, dataset, library and function 
      * 
      * @param study
      *            the study name
@@ -540,34 +333,36 @@ public interface RegistryClient {
      *            the function name
      * @return the Client Response
      */
-	public RegistryClientResponse getMasters(String study, String dataset, String lib, String func);
+	public RegistryClientResponse getSites(String study, String dataset, String lib, String func);
 	
     /**
-     * Get the workers of a master 
+     * Get the workers  for a given study, dataset, library, function and sites
      * 
      * @param master
      *            the name of the master
      * @return the Client Response
      */
-	public RegistryClientResponse getWorkers(String master);
+	public RegistryClientResponse getWorkers(String study, String dataset, String lib, String func, List<String> sites);
 	
     /**
      * Get a study from the registry
      * 
-     * @param study
+     * @param name
      *            the name of the study
      * @return the Client Response
      */
-	public RegistryClientResponse getStudy(String study);
+	public RegistryClientResponse getStudy(String name);
 	
     /**
      * Get a dataset from the registry
      * 
-     * @param dataset
+     * @param name
      *            the name of the dataset
+     * @param study
+     *            the study the dataset belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse getDataset(String dataset);
+	public RegistryClientResponse getDataset(String name, String study);
 	
     /**
      * Get a library from the registry
@@ -583,36 +378,50 @@ public interface RegistryClient {
      * 
      * @param name
      *            the name of the function
+     * @param lib
+     *            the library the function belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse getFunction(String name);
+	public RegistryClientResponse getFunction(String name, String lib);
 	
     /**
-     * Get a master from the registry
+     * Get the master from the registry
      * 
      * @param name
      *            the name of the master
      * @return the Client Response
      */
-	public RegistryClientResponse getMaster(String name);
+	public RegistryClientResponse getMaster();
 	
     /**
      * Get a parameter from the registry
      * 
      * @param name
      *            the name of the parameter
+     * @param func
+     *            the function the parameter belongs to
+     * @param lib
+     *            the library the parameter belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse getParameter(String name);
+	public RegistryClientResponse getParameter(String name, String func, String lib);
 	
     /**
      * Get a worker from the registry
      * 
-     * @param name
-     *            the name of the worker
+     * @param study
+     *            the study the worker belongs to
+     * @param dataset
+     *            the dataset the worker belongs to
+     * @param lib
+     *            the library the worker belongs to
+     * @param func
+     *            the function the worker belongs to
+     * @param site
+     *            the site the worker belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse getWorker(String name);
+	public RegistryClientResponse getWorker(String study, String dataset, String lib, String func, String site);
 	
 
 }

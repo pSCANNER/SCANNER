@@ -82,7 +82,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				ret.put(obj.getString("resourceDisplayName"), obj.getString("rname"));
+				ret.put(obj.getString("cname"), obj.getString("id"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -119,8 +119,22 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toFunctions()
 	 */
 	@Override
-	public String toMasters() {
-		return toStudies();
+	public String toSites() {
+		String result = null;
+		try {
+			String res = response.getEntityString();
+			System.out.println("Entity: " + res);
+			JSONArray arr = new JSONArray(res);
+			JSONObject ret = new JSONObject();
+			for (int i=0; i < arr.length(); i++) {
+				JSONObject obj = arr.getJSONObject(i);
+				ret.put(obj.getString("site"), obj.getString("id"));
+			}
+			result = ret.toString();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -142,16 +156,16 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			JSONArray ret = new JSONArray();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				String name = obj.getString("rname");
-				String resourceDisplayName = obj.getString("resourceDisplayName");
-				JSONArray resourceValues = obj.getJSONArray("resourceValues");
-				int resourceMaxOccurs = obj.getInt("resourceMaxOccurs");
-				int resourceMinOccurs = obj.getInt("resourceMinOccurs");
+				String name = obj.getString("id");
+				String cname = obj.getString("cname");
+				JSONArray resourceValues = obj.getJSONArray("values");
+				int resourceMaxOccurs = obj.getInt("maxOccurs");
+				int resourceMinOccurs = obj.getInt("minOccurs");
 				JSONObject value = new JSONObject();
-				value.put("resourceDisplayName", resourceDisplayName);
-				value.put("resourceValues", resourceValues);
-				value.put("resourceMaxOccurs", resourceMaxOccurs);
-				value.put("resourceMinOccurs", resourceMinOccurs);
+				value.put("cname", cname);
+				value.put("values", resourceValues);
+				value.put("maxOccurs", resourceMaxOccurs);
+				value.put("minOccurs", resourceMinOccurs);
 				JSONObject temp = new JSONObject();
 				temp.put(name, value);
 				ret.put(temp);
@@ -169,7 +183,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			JSONObject obj = (new JSONArray(response.getEntityString())).getJSONObject(0);
 			ret = obj.toString();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -206,6 +219,17 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	@Override
 	public String toParameter() {
 		return toResource();
+	}
+	@Override
+	public String getResourceId() {
+		String ret = null;
+		try {
+			JSONObject obj = (new JSONArray(response.getEntityString())).getJSONObject(0);
+			ret = obj.getString("id");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 }

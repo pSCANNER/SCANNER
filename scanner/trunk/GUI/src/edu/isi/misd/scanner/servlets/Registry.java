@@ -80,56 +80,56 @@ public class Registry extends HttpServlet {
 		HttpSession session = request.getSession(false);
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		JSONObject obj = new JSONObject();
-		String name = request.getParameter("name");
-		String displayName = request.getParameter("displayName");
-		String parent = request.getParameter("parent");
+		String id = request.getParameter("id");
+		String name = request.getParameter("cname");
+		String study = request.getParameter("study");
+		String rpath = request.getParameter("rpath");
+		String lib = request.getParameter("library");
+		String rURL = request.getParameter("rURL");
+		String datasource = request.getParameter("datasource");
+		String dataset = request.getParameter("dataset");
+		String func = request.getParameter("function");
+		String site = request.getParameter("site");
+		String resourceValues = request.getParameter("values"); 
+		String sourceData = request.getParameter("sourcedata");
 		RegistryClientResponse clientResponse = null;
 		if (action.equals("createStudy")) {
-			clientResponse = registryClient.createStudy(name, displayName);
+			clientResponse = registryClient.createStudy(name);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("createDataset")) {
-			clientResponse = registryClient.createDataset(name, displayName);
+			clientResponse = registryClient.createDataset(name, study);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("createLibrary")) {
-			String resourcePath = request.getParameter("resourcePath");
-			clientResponse = registryClient.createLibrary(name, displayName, resourcePath);
+			clientResponse = registryClient.createLibrary(name, rpath);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("createFunction")) {
-			String resourcePath = request.getParameter("resourcePath");
-			clientResponse = registryClient.createFunction(name, displayName, resourcePath);
+			clientResponse = registryClient.createFunction(name, lib, rpath);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("createMaster")) {
-			String resourceURL = request.getParameter("resourceURL");
-			String resourceStudy = request.getParameter("resourceStudy");
-			String resourceDataset = request.getParameter("resourceDataset");
-			String resourceLibrary = request.getParameter("resourceLibrary");
-			String resourceFunction = request.getParameter("resourceFunction");
-			clientResponse = registryClient.createMaster(name, displayName, resourceURL, resourceStudy, resourceDataset, resourceLibrary, resourceFunction);
+			clientResponse = registryClient.createMaster(rURL);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("createWorker")) {
-			String resourceURL = request.getParameter("resourceURL");
-			String resourceData = request.getParameter("resourceData");
-			clientResponse = registryClient.createWorker(name, resourceData, resourceURL);
+			clientResponse = registryClient.createWorker(study, dataset, lib, func, site, datasource, rURL);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
@@ -139,7 +139,6 @@ public class Registry extends HttpServlet {
 			try {
 				int minOccurs = Integer.parseInt(request.getParameter("resourceMinOccurs")); 
 				int maxOccurs = Integer.parseInt(request.getParameter("resourceMaxOccurs")); 
-				String resourceValues = request.getParameter("resourceValues"); 
 				ArrayList<String> values = null;
 				if (resourceValues != null) {
 					JSONArray arr = new JSONArray(resourceValues);
@@ -150,197 +149,28 @@ public class Registry extends HttpServlet {
 						}
 					}
 				}
-				clientResponse = registryClient.createParameter(name, displayName, minOccurs, maxOccurs, values);
+				clientResponse = registryClient.createParameter(name, func, lib, minOccurs, maxOccurs, values);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("addDataset")) {
-			clientResponse = registryClient.addDataset(name, parent);
+		} else if (action.equals("deleteFunction")) {
+			clientResponse = registryClient.deleteFunction(name, lib);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("addDatasets")) {
-			try {
-				JSONArray datasets = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < datasets.length(); i++) {
-					names.add(datasets.getString(i));
-				}
-				clientResponse = registryClient.addDataset(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("addLibrary")) {
-			clientResponse = registryClient.addLibrary(name, parent);
+		} else if (action.equals("deleteLibrary")) {
+			clientResponse = registryClient.deleteLibrary(name);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("addLibraries")) {
+		} else if (action.equals("deleteDataset")) {
+			clientResponse = registryClient.deleteDataset(name, study);
 			try {
-				JSONArray libs = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < libs.length(); i++) {
-					names.add(libs.getString(i));
-				}
-				clientResponse = registryClient.addLibrary(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("addFunction")) {
-			clientResponse = registryClient.addFunction(name, parent);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("addFunctions")) {
-			try {
-				JSONArray funcs = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < funcs.length(); i++) {
-					names.add(funcs.getString(i));
-				}
-				clientResponse = registryClient.addFunction(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("addParameter")) {
-			clientResponse = registryClient.addParameter(name, parent);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("addParameters")) {
-			try {
-				JSONArray params = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < params.length(); i++) {
-					names.add(params.getString(i));
-				}
-				clientResponse = registryClient.addParameter(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("addWorker")) {
-			clientResponse = registryClient.addWorker(name, parent);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("addWorkers")) {
-			try {
-				JSONArray workers = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < workers.length(); i++) {
-					names.add(workers.getString(i));
-				}
-				clientResponse = registryClient.addWorker(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteFunctionParameter")) {
-			clientResponse = registryClient.deleteParameter(name, parent);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteFunctionParameters")) {
-			try {
-				JSONArray params = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < params.length(); i++) {
-					names.add(params.getString(i));
-				}
-				clientResponse = registryClient.deleteParameter(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteMasterWorker")) {
-			clientResponse = registryClient.deleteWorker(name, parent);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteMasterWorkers")) {
-			try {
-				JSONArray workers = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < workers.length(); i++) {
-					names.add(workers.getString(i));
-				}
-				clientResponse = registryClient.deleteWorker(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteLibraryFunction")) {
-			clientResponse = registryClient.deleteFunction(name, parent);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteLibraryFunctions")) {
-			try {
-				JSONArray funcs = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < funcs.length(); i++) {
-					names.add(funcs.getString(i));
-				}
-				clientResponse = registryClient.deleteFunction(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteDatasetLibrary")) {
-			clientResponse = registryClient.deleteLibrary(name, parent);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteDatasetLibraries")) {
-			try {
-				JSONArray libs = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < libs.length(); i++) {
-					names.add(libs.getString(i));
-				}
-				clientResponse = registryClient.deleteLibrary(names, parent);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteStudyDataset")) {
-			clientResponse = registryClient.deleteDataset(name, parent);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteStudyDatasets")) {
-			try {
-				JSONArray datasets = new JSONArray(name);
-				ArrayList<String> names = new ArrayList<String>();
-				for (int i=0; i < datasets.length(); i++) {
-					names.add(datasets.getString(i));
-				}
-				clientResponse = registryClient.deleteDataset(names, parent);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -352,90 +182,59 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("deleteDataset")) {
-			try {
-				clientResponse = registryClient.deleteDataset(name);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteLibrary")) {
-			try {
-				clientResponse = registryClient.deleteLibrary(name);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteFunction")) {
-			try {
-				clientResponse = registryClient.deleteFunction(name);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
 		} else if (action.equals("deleteMaster")) {
 			try {
-				clientResponse = registryClient.deleteMaster(name);
+				clientResponse = registryClient.deleteMaster();
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("deleteParameter")) {
 			try {
-				clientResponse = registryClient.deleteParameter(name);
+				clientResponse = registryClient.deleteParameter(name, func, lib);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("deleteWorker")) {
 			try {
-				clientResponse = registryClient.deleteWorker(name);
+				clientResponse = registryClient.deleteWorker(study, dataset, lib, func, site);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("modifyLibrary")) {
+		} else if (action.equals("updateLibrary")) {
 			try {
-				String resourcePath = request.getParameter("resourcePath");
-				clientResponse = registryClient.modifyLibrary(name, displayName, resourcePath);
+				clientResponse = registryClient.updateLibrary(id, name, rpath);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("modifyFunction")) {
+		} else if (action.equals("updateFunction")) {
 			try {
-				String resourcePath = request.getParameter("resourcePath");
-				clientResponse = registryClient.modifyFunction(name, displayName, resourcePath);
+				clientResponse = registryClient.updateFunction(id, name, lib, rpath);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("modifyMaster")) {
+		} else if (action.equals("updateMaster")) {
 			try {
-				String resourceURL = request.getParameter("resourceURL");
-				String resourceStudy = request.getParameter("resourceStudy");
-				String resourceDataset = request.getParameter("resourceDataset");
-				String resourceLibrary = request.getParameter("resourceLibrary");
-				String resourceFunction = request.getParameter("resourceFunction");
-				clientResponse = registryClient.modifyMaster(name, resourceURL, resourceStudy, resourceDataset, resourceLibrary, resourceFunction);
+				clientResponse = registryClient.updateMaster(rURL);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("modifyWorker")) {
+		} else if (action.equals("updateWorker")) {
 			try {
-				String resourceURL = request.getParameter("resourceURL");
-				String resourceData = request.getParameter("resourceData");
-				clientResponse = registryClient.modifyWorker(name, resourceData, resourceURL);
+				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, sourceData, rURL);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("modifyParameter")) {
+		} else if (action.equals("updateParameter")) {
 			try {
 				int minOccurs = Integer.parseInt(request.getParameter("resourceMinOccurs")); 
 				int maxOccurs = Integer.parseInt(request.getParameter("resourceMaxOccurs")); 
-				String resourceValues = request.getParameter("resourceValues"); 
 				ArrayList<String> values = null;
 				if (resourceValues != null) {
 					JSONArray arr = new JSONArray(resourceValues);
@@ -446,19 +245,7 @@ public class Registry extends HttpServlet {
 						}
 					}
 				}
-				clientResponse = registryClient.modifyParameter(name, displayName, minOccurs, maxOccurs, values);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("getMasters")) {
-			try {
-				String resourceStudy = request.getParameter("resourceStudy");
-				String resourceDataset = request.getParameter("resourceDataset");
-				String resourceLibrary = request.getParameter("resourceLibrary");
-				String resourceFunction = request.getParameter("resourceFunction");
-				clientResponse = registryClient.getMasters(resourceStudy, resourceDataset, resourceLibrary, resourceFunction);
-				//System.out.println("Masters: " + clientResponse.toMasters());
+				clientResponse = registryClient.updateParameter(id, name, func, lib, minOccurs, maxOccurs, values);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -473,7 +260,7 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("getDataset")) {
 			try {
-				clientResponse = registryClient.getDataset(name);
+				clientResponse = registryClient.getDataset(name, study);
 				//System.out.println("Dataset: " + clientResponse.toDataset());
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
@@ -489,7 +276,7 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("getFunction")) {
 			try {
-				clientResponse = registryClient.getFunction(name);
+				clientResponse = registryClient.getFunction(name, lib);
 				//System.out.println("Function: " + clientResponse.toFunction());
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
@@ -497,7 +284,7 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("getMaster")) {
 			try {
-				clientResponse = registryClient.getMaster(name);
+				clientResponse = registryClient.getMaster();
 				//System.out.println("Master: " + clientResponse.toMaster());
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
@@ -505,7 +292,7 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("getParameter")) {
 			try {
-				clientResponse = registryClient.getParameter(name);
+				clientResponse = registryClient.getParameter(name, func, lib);
 				//System.out.println("Parameter: " + clientResponse.toParameter());
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
@@ -513,7 +300,7 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("getWorker")) {
 			try {
-				clientResponse = registryClient.getWorker(name);
+				clientResponse = registryClient.getWorker(study, dataset, lib, func, site);
 				//System.out.println("Worker: " + clientResponse.toWorker());
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {

@@ -18,6 +18,7 @@ package edu.isi.misd.scanner.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -110,7 +111,8 @@ public class Query extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getParameters")) {
 			String func = request.getParameter("func");
-			RegistryClientResponse clientResponse = registryClient.getParameters(func);
+			String lib = request.getParameter("lib");
+			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib);
 			String ret = clientResponse.toParameters();
 			System.out.println("Get Parameters:\n"+ret);
 			PrintWriter out = response.getWriter();
@@ -120,8 +122,8 @@ public class Query extends HttpServlet {
 			String dataset = request.getParameter("dataset");
 			String lib = request.getParameter("lib");
 			String func = request.getParameter("func");
-			RegistryClientResponse clientResponse = registryClient.getMasters(study, dataset, lib, func);
-			String ret = clientResponse.toMasters();
+			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset, lib, func);
+			String ret = clientResponse.toSites();
 			System.out.println("Get Sites:\n"+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
@@ -179,22 +181,34 @@ public class Query extends HttpServlet {
 				try {
 					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 					String params = request.getParameter("params");
-					String master = request.getParameter("master");
+					String sites = request.getParameter("sites");
 					String lib = request.getParameter("lib");
 					String func = request.getParameter("func");
-					RegistryClientResponse clientResponse = registryClient.getFunction(func);
-					String res = clientResponse.toFunction();
+					String study = request.getParameter("study");
+					String dataset = request.getParameter("dataset");
+					RegistryClientResponse clientResponse = registryClient.getMaster();
+					String res = clientResponse.toMaster();
 					JSONObject temp = new JSONObject(res);
-					String funcPath = temp.getString("resourcePath");
+					String masterURL = temp.getString("rURL");
+					clientResponse = registryClient.getFunction(func, lib);
+					res = clientResponse.toFunction();
+					temp = new JSONObject(res);
+					String funcPath = temp.getString("rpath");
 					clientResponse = registryClient.getLibrary(lib);
 					res = clientResponse.toLibrary();
 					temp = new JSONObject(res);
-					String libPath = temp.getString("resourcePath");
-					clientResponse = registryClient.getMaster(master);
-					res = clientResponse.toMaster();
-					temp = new JSONObject(res);
-					String masterURL = temp.getString("resourceURL");
-					clientResponse = registryClient.getWorkers(master);
+					String libPath = temp.getString("rpath");
+					ArrayList<String> values = null;
+					if (sites != null) {
+						JSONArray arr = new JSONArray(sites);
+						if (arr.length() > 0) {
+							values = new ArrayList<String>();
+							for (int i=0; i < arr.length(); i++) {
+								values.add(arr.getString(i));
+							}
+						}
+					}
+					clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
 					res = clientResponse.toWorkers();
 					StringBuffer buff = new StringBuffer();
 					JSONArray targets= new JSONArray(res);
@@ -203,8 +217,8 @@ public class Query extends HttpServlet {
 							buff.append(",");
 						}
 						temp = targets.getJSONObject(i);
-						String dataSource = temp.getString("resourceData");
-						buff.append(temp.getString("resourceURL")).append("/dataset/").append(libPath).append("/").append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
+						String dataSource = temp.getString("datasource");
+						buff.append(temp.getString("rURL")).append("/dataset/").append(libPath).append("/").append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
 					}
 					String targetsURLs = buff.toString();
 					buff = new StringBuffer();

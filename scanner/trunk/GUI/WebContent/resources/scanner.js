@@ -74,43 +74,51 @@ function getSelectedFunction() {
 /**
  * @return the value of the selected site
  */
-function getSelectedSite() {
-	return $('input:radio[name=sites]:checked').val();
+function getSelectedSites() {
+	var sites = [];
+	$.each($('input:checkbox[name=sites]:checked'), function(i, inp) {
+		sites.push($(inp).val());
+	});
+	return sites;
 }
 
 /**
  * @return the value of the selected study
  */
-function getSelectedStudyDisplayName() {
+function getSelectedStudyName() {
 	return $('input:radio[name=studies]:checked').parent().next().html();
 }
 
 /**
  * @return the value of the selected dataset
  */
-function getSelectedDatasetDisplayName() {
+function getSelectedDatasetName() {
 	return $('input:radio[name=datasets]:checked').parent().next().html();
 }
 
 /**
  * @return the value of the selected library
  */
-function getSelectedLibraryDisplayName() {
+function getSelectedLibraryName() {
 	return $('input:radio[name=libs]:checked').parent().next().html();
 }
 
 /**
  * @return the value of the selected functions
  */
-function getSelectedFunctionDisplayName() {
+function getSelectedFunctionName() {
 	return $('input:radio[name=funcs]:checked').parent().next().html();
 }
 
 /**
  * @return the value of the selected functions
  */
-function getSelectedSiteDisplayName() {
-	return $('input:radio[name=sites]:checked').parent().next().html();
+function getSelectedSitesNames() {
+	var sites = [];
+	$.each($('input:checkbox[name=sites]:checked'), function(i, inp) {
+		sites.push($(inp).parent().next().html());
+	});
+	return sites;
 }
 
 /**
@@ -219,7 +227,7 @@ function renderAvailableDatasets() {
 	$('#resultDiv').remove();
 
 	// send the request
-	var study = getSelectedStudy();
+	var study = getSelectedStudyName();
 	if (study != '') {
 		var url = HOME + '/query?action=getDatasets&study=' + encodeSafeURIComponent(study);
 		scanner.GET(url, true, postRenderAvailableDatasets, null, null, 0);
@@ -281,8 +289,8 @@ function renderAvailableLibraries() {
 	$('#resultDiv').remove();
 
 	// send the request
-	var dataset = getSelectedDataset();
-	if (dataset != '') {
+	var dataset = getSelectedDatasetName();
+	if (dataset != null) {
 		var url = HOME + '/query?action=getLibraries&dataset=' + encodeSafeURIComponent(dataset);
 		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
 	}
@@ -343,8 +351,8 @@ function renderAvailableFunctions() {
 	$('#resultDiv').remove();
 	
 	// send the request
-	var lib = getSelectedLibrary();
-	if (lib != '') {
+	var lib = getSelectedLibraryName();
+	if (lib != null) {
 		var url = HOME + '/query?action=getFunctions&lib=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableFunctions, null, null, 0);
 	}
@@ -402,9 +410,10 @@ function renderAvailableParameters() {
 	$('#resultDiv').remove();
 	
 	// send the request
-	var func = getSelectedFunction();
+	var func = getSelectedFunctionName();
+	var lib = getSelectedLibraryName();
 	if (func != '') {
-		var url = HOME + '/query?action=getParameters&func=' + encodeSafeURIComponent(func);
+		var url = HOME + '/query?action=getParameters&func=' + encodeSafeURIComponent(func) + '&lib=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -421,14 +430,14 @@ function renderAvailableParameters() {
  * @param param
  * 	the parameters to be used by the callback success function
  * Example of the format of the received data:
-   [{"Study1_Dataset1_oceans_lr_dependentVariableName":{"resourceMinOccurs":1,
-                                                      "resourceValues":["Outcome"],
-                                                      "resourceDisplayName":"dependentVariableName",
-                                                      "resourceMaxOccurs":1}},
-     {"Study1_Dataset1_oceans_lr_independentVariableNames":{"resourceMinOccurs":0,
-                                                         "resourceValues":["Age","CAD","Creatinine","Diabetes","LOS","Race_Cat"],
-                                                         "resourceDisplayName":"independentVariableNames",
-                                                         "resourceMaxOccurs":-1}}
+   [{"Study1_Dataset1_oceans_lr_dependentVariableName":{"minOccurs":1,
+                                                      "values":["Outcome"],
+                                                      "cname":"dependentVariableName",
+                                                      "maxOccurs":1}},
+     {"Study1_Dataset1_oceans_lr_independentVariableNames":{"minOccurs":0,
+                                                         "values":["Age","CAD","Creatinine","Diabetes","LOS","Race_Cat"],
+                                                         "cname":"independentVariableNames",
+                                                         "maxOccurs":-1}}
    ]
  */
 function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
@@ -443,17 +452,17 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 		$.each(param, function(key, res) {
 			var h2 = $('<h2>');
 			paramsDiv.append(h2);
-			h2.html(res['resourceDisplayName']);
-			var value = res['resourceValues'];
-			var minOccurs = res['resourceMinOccurs'];
-			var maxOccurs = res['resourceMaxOccurs'];
+			h2.html(res['cname']);
+			var value = res['values'];
+			var minOccurs = res['minOccurs'];
+			var maxOccurs = res['maxOccurs'];
 			$.each(value, function(j, val) {
 				var div = $('<div>');
 				paramsDiv.append(div);
 				var input = $('<input>');
 				input.attr({'type': 'checkbox',
 					'checked': 'checked',
-					'parName': res['resourceDisplayName'],
+					'parName': res['cname'],
 					'parValue': val,
 					'minOccurs': minOccurs,
 					'maxOccurs': maxOccurs});
@@ -495,10 +504,10 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
  */
 function renderAvailableSites() {
 	var url = HOME + '/query?action=getSites' +
-			'&study=' + encodeSafeURIComponent(getSelectedStudyDisplayName()) +
-			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetDisplayName()) +
-			'&lib=' + encodeSafeURIComponent(getSelectedLibraryDisplayName()) +
-			'&func=' + encodeSafeURIComponent(getSelectedFunctionDisplayName());
+			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName()) +
+			'&lib=' + encodeSafeURIComponent(getSelectedLibraryName()) +
+			'&func=' + encodeSafeURIComponent(getSelectedFunctionName());
 	scanner.GET(url, true, postRenderSites, null, null, 0);
 }
 
@@ -532,10 +541,10 @@ function postRenderSites(data, textStatus, jqXHR, param) {
 		tr.append(td);
 		var input = $('<input>');
 		input.attr({
-			'type': 'radio',
+			'type': 'checkbox',
 			'name': 'sites',
-			'value': data[name],
-			'onchange': "$('#resultDiv').remove();"
+			'checked': 'checked',
+			'value': data[name]
 		});
 		td.append(input);
 		var td = $('<td>');
@@ -548,17 +557,20 @@ function postRenderSites(data, textStatus, jqXHR, param) {
  * Send the request to get the data from the SCANNER
  */
 function submitQuery() {
-	if (getSelectedSite() == null) {
-		alert('Please select a site.');
+	var sites = getSelectedSitesNames();
+	if (sites.length == 0) {
+		alert('Please select the sites.');
 		return;
 	}
 	var params = getSelectedParameters();
 	var obj = {};
 	obj['params'] = params;
 	obj['action'] = 'getResults';
-	obj['lib'] = getSelectedLibrary();
-	obj['func'] = getSelectedFunction();
-	obj['master'] = getSelectedSite();
+	obj['study'] = getSelectedStudyName();
+	obj['dataset'] = getSelectedDatasetName();
+	obj['lib'] = getSelectedLibraryName();
+	obj['func'] = getSelectedFunctionName();
+	obj['sites'] = valueToString(sites);
 	var url = HOME + '/query';
 	$('*', $('#paramsDiv')).css('cursor', 'wait');
 	$('*', $('#buttonsDiv')).css('cursor', 'wait');
@@ -583,7 +595,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	$('*', $('#buttonsDiv')).css('cursor', 'default');
 	document.body.style.cursor = "default";
 	data = $.parseJSON(data);
-	if (getSelectedLibraryDisplayName() == 'Oceans') {
+	if (getSelectedLibraryName() == 'Oceans') {
 		buildDataTable(data);
 	} else {
 		buildTreeResult(data);
@@ -592,7 +604,6 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 
 function createResourceURL(name, displayName, action) {
 	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
-			'&displayName=' + encodeSafeURIComponent(displayName) +
 			'&action=' + encodeSafeURIComponent(action);
 	return url;
 }
@@ -628,9 +639,9 @@ function createFunction(name, displayName) {
 
 function createMaster(name, url, study, dataset, lib, func) {
 	var req_url = createResourceURL(name, name, 'createMaster');
-	req_url += '&resourceStudy=' + encodeSafeURIComponent(study) +
+	req_url += '&study=' + encodeSafeURIComponent(study) +
 			'&resourceDataset=' + encodeSafeURIComponent(dataset) +
-			'&resourceURL=' + encodeSafeURIComponent(url) +
+			'&rURL=' + encodeSafeURIComponent(url) +
 			'&resourceLibrary=' + encodeSafeURIComponent(lib) +
 			'&resourceFunction=' + encodeSafeURIComponent(func);
 	document.body.style.cursor = "wait";
@@ -639,18 +650,18 @@ function createMaster(name, url, study, dataset, lib, func) {
 
 function createWorker(name, url, dataSource) {
 	var req_url = createResourceURL(name, name, 'createWorker');
-	req_url += '&resourceURL=' + encodeSafeURIComponent(url) + '&resourceData=' + encodeSafeURIComponent(dataSource);
+	req_url += '&rURL=' + encodeSafeURIComponent(url) + '&resourceData=' + encodeSafeURIComponent(dataSource);
 	document.body.style.cursor = "wait";
 	scanner.POST(req_url, {}, true, postResourceAction, null, null, 0);
 }
 
 function createParameter(name, displayName, minOccurs, maxOccurs, values) {
 	var url = createResourceURL(name, displayName, 'createParameter');
-	url += '&resourceMinOccurs=' + minOccurs + '&resourceMaxOccurs=' + maxOccurs;
+	url += '&minOccurs=' + minOccurs + '&maxOccurs=' + maxOccurs;
 	if (values != null && values.length > 0) {
-		url += '&resourceValues=';
-		var resourceValues = arrayToString(values);
-		url += encodeSafeURIComponent(resourceValues);
+		url += '&values=';
+		var values = arrayToString(values);
+		url += encodeSafeURIComponent(values);
 	}
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
@@ -840,9 +851,9 @@ function modifyFunction(name, displayName, urlPath) {
 
 function modifyMaster(name, urlPath, study, dataset, lib, func) {
 	var url = createResourceURL(name, name, 'modifyMaster');
-	url += '&resourceURL=' + encodeSafeURIComponent(urlPath) +
+	url += '&rURL=' + encodeSafeURIComponent(urlPath) +
 		'&resourceDataset=' + encodeSafeURIComponent(dataset) +
-		'&resourceStudy=' + encodeSafeURIComponent(study) +
+		'&study=' + encodeSafeURIComponent(study) +
 		'&resourceLibrary=' + encodeSafeURIComponent(lib) +
 		'&resourceFunction=' + encodeSafeURIComponent(func);
 	document.body.style.cursor = "wait";
@@ -851,14 +862,14 @@ function modifyMaster(name, urlPath, study, dataset, lib, func) {
 
 function modifyWorker(name, urlPath, dataSource) {
 	var url = createResourceURL(name, name, 'modifyWorker');
-	url += '&resourceURL=' + encodeSafeURIComponent(urlPath) + '&resourceData=' + encodeSafeURIComponent(dataSource);
+	url += '&rURL=' + encodeSafeURIComponent(urlPath) + '&resourceData=' + encodeSafeURIComponent(dataSource);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
 function modifyParameter(name, displayName, minOccurs, maxOccurs, values) {
 	var url = createResourceURL(name, displayName, 'modifyParameter');
-	url += '&resourceMinOccurs=' + minOccurs + '&resourceMaxOccurs=' + maxOccurs + '&resourceValues=' + encodeSafeURIComponent(arrayToString(values));
+	url += '&minOccurs=' + minOccurs + '&maxOccurs=' + maxOccurs + '&values=' + encodeSafeURIComponent(arrayToString(values));
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
@@ -866,7 +877,7 @@ function modifyParameter(name, displayName, minOccurs, maxOccurs, values) {
 function getMasters(study, dataset, lib, func) {
 	var url = createResourceURL(name, name, 'getMasters');
 	url += '&resourceDataset=' + encodeSafeURIComponent(dataset) +
-	'&resourceStudy=' + encodeSafeURIComponent(study) +
+	'&study=' + encodeSafeURIComponent(study) +
 	'&resourceLibrary=' + encodeSafeURIComponent(lib) +
 	'&resourceFunction=' + encodeSafeURIComponent(func);
 	document.body.style.cursor = "wait";
