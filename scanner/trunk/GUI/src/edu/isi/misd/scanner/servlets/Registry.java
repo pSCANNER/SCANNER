@@ -137,8 +137,8 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("createParameter")) {
 			try {
-				int minOccurs = Integer.parseInt(request.getParameter("resourceMinOccurs")); 
-				int maxOccurs = Integer.parseInt(request.getParameter("resourceMaxOccurs")); 
+				int minOccurs = Integer.parseInt(request.getParameter("minOccurs")); 
+				int maxOccurs = Integer.parseInt(request.getParameter("maxOccurs")); 
 				ArrayList<String> values = null;
 				if (resourceValues != null) {
 					JSONArray arr = new JSONArray(resourceValues);
@@ -233,8 +233,8 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("updateParameter")) {
 			try {
-				int minOccurs = Integer.parseInt(request.getParameter("resourceMinOccurs")); 
-				int maxOccurs = Integer.parseInt(request.getParameter("resourceMaxOccurs")); 
+				int minOccurs = Integer.parseInt(request.getParameter("minOccurs")); 
+				int maxOccurs = Integer.parseInt(request.getParameter("maxOccurs")); 
 				ArrayList<String> values = null;
 				if (resourceValues != null) {
 					JSONArray arr = new JSONArray(resourceValues);

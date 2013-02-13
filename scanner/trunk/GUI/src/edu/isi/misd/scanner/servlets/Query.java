@@ -147,7 +147,7 @@ public class Query extends HttpServlet {
 				if (rsp != null) {
 					//rsp.debug();
 					session.setAttribute("tagfilerCookie", httpClient.getCookieValue());
-					RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue());
+					RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue(), request);
 					session.setAttribute("registryClient", registryClient);
 				} else {
 					// to handle this case

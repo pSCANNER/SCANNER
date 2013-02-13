@@ -25,12 +25,6 @@ var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
 var HOME;
 
-var urlMap = {
-		'Oceans': 'oceans',
-		'GLORE': 'glore',
-		'Logistic Regression': 'lr'
-};
-
 var oTable = null;
 
 function initScanner() {
@@ -602,6 +596,74 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	}
 }
 
+function createStudy(name) {
+	var url = HOME + '/registry?action=createStudy' +
+				'&cname=' + encodeSafeURIComponent(name);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createDataset(name, study) {
+	var url = HOME + '/registry?action=createDataset' +
+			'&study=' + encodeSafeURIComponent(study) +
+			'&cname=' + encodeSafeURIComponent(name);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createLibrary(name, rpath) {
+	var url = HOME + '/registry?action=createLibrary' +
+			'&rpath=' + encodeSafeURIComponent(rpath) +
+			'&cname=' + encodeSafeURIComponent(name);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createFunction(name, lib, rpath) {
+	var url = HOME + '/registry?action=createFunction' +
+					'&rpath=' + encodeSafeURIComponent(rpath) +
+					'&cname=' + encodeSafeURIComponent(name) +
+					'&library=' + encodeSafeURIComponent(lib);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createMaster(rURL) {
+	var url = HOME + '/registry?action=createMaster&rURL=' + encodeSafeURIComponent(rURL);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createWorker(study, dataset, lib, func, site, datasource, rURL) {
+	var url = HOME + '/registry?action=createWorker' +
+					'&study=' + encodeSafeURIComponent(study) +
+					'&dataset=' + encodeSafeURIComponent(dataset) +
+					'&library=' + encodeSafeURIComponent(lib) +
+					'&function=' + encodeSafeURIComponent(func) +
+					'&site=' + encodeSafeURIComponent(site) +
+					'&datasource=' + encodeSafeURIComponent(datasource) +
+					'&rURL=' + encodeSafeURIComponent(rURL);
+					
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function createParameter(name, func, lib, minOccurs, maxOccurs, values) {
+	var url = HOME + '/registry?action=createParameter' +
+					'&cname=' + encodeSafeURIComponent(name) +
+					'&function=' + encodeSafeURIComponent(func) +
+					'&library=' + encodeSafeURIComponent(lib) +
+					'&minOccurs=' + minOccurs +
+					'&maxOccurs=' + maxOccurs;
+	if (values != null && values.length > 0) {
+		url += '&values=';
+		var values = arrayToString(values);
+		url += encodeSafeURIComponent(values);
+	}
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
 function createResourceURL(name, displayName, action) {
 	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
 			'&action=' + encodeSafeURIComponent(action);
@@ -619,178 +681,6 @@ function deleteResourceURL(name, action) {
 	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
 			'&action=' + encodeSafeURIComponent(action);
 	return url;
-}
-
-function createStudy(name, displayName) {
-	createResource(name, displayName, 'createStudy');
-}
-
-function createDataset(name, displayName) {
-	createResource(name, displayName, 'createDataset');
-}
-
-function createLibrary(name, displayName) {
-	createResource(name, displayName, 'createLibrary');
-}
-
-function createFunction(name, displayName) {
-	createResource(name, displayName, 'createFunction');
-}
-
-function createMaster(name, url, study, dataset, lib, func) {
-	var req_url = createResourceURL(name, name, 'createMaster');
-	req_url += '&study=' + encodeSafeURIComponent(study) +
-			'&resourceDataset=' + encodeSafeURIComponent(dataset) +
-			'&rURL=' + encodeSafeURIComponent(url) +
-			'&resourceLibrary=' + encodeSafeURIComponent(lib) +
-			'&resourceFunction=' + encodeSafeURIComponent(func);
-	document.body.style.cursor = "wait";
-	scanner.POST(req_url, {}, true, postResourceAction, null, null, 0);
-}
-
-function createWorker(name, url, dataSource) {
-	var req_url = createResourceURL(name, name, 'createWorker');
-	req_url += '&rURL=' + encodeSafeURIComponent(url) + '&resourceData=' + encodeSafeURIComponent(dataSource);
-	document.body.style.cursor = "wait";
-	scanner.POST(req_url, {}, true, postResourceAction, null, null, 0);
-}
-
-function createParameter(name, displayName, minOccurs, maxOccurs, values) {
-	var url = createResourceURL(name, displayName, 'createParameter');
-	url += '&minOccurs=' + minOccurs + '&maxOccurs=' + maxOccurs;
-	if (values != null && values.length > 0) {
-		url += '&values=';
-		var values = arrayToString(values);
-		url += encodeSafeURIComponent(values);
-	}
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addDataset(dataset, study) {
-	var url = addResourceURL(dataset, study, 'addDataset');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addDatasets(datasets, study) {
-	var url = addResourceURL(arrayToString(datasets), study, 'addDatasets');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addLibrary(lib, dataset) {
-	var url = addResourceURL(lib, dataset, 'addLibrary');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addLibraries(libs, dataset) {
-	var url = addResourceURL(arrayToString(libs), dataset, 'addLibraries');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addFunction(func, lib) {
-	var url = addResourceURL(func, lib, 'addFunction');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addFunctions(funcs, lib) {
-	var url = addResourceURL(arrayToString(funcs), lib, 'addFunctions');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addMaster(master, func) {
-	var url = addResourceURL(master, func, 'addMaster');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addParameter(param, func) {
-	var url = addResourceURL(param, func, 'addParameter');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addParameters(params, func) {
-	var url = addResourceURL(arrayToString(params), func, 'addParameters');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addWorker(worker, master) {
-	var url = addResourceURL(worker, master, 'addWorker');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function addWorkers(workers, master) {
-	var url = addResourceURL(arrayToString(workers), master, 'addWorkers');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteFunctionParameter(param, func) {
-	var url = addResourceURL(param, func, 'deleteFunctionParameter');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteFunctionParameters(params, func) {
-	var url = addResourceURL(arrayToString(params), func, 'deleteFunctionParameters');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteMasterWorker(worker, master) {
-	var url = addResourceURL(worker, master, 'deleteMasterWorker');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteMasterWorkers(workers, master) {
-	var url = addResourceURL(arrayToString(workers), master, 'deleteMasterWorkers');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteLibraryFunction(func, lib) {
-	var url = addResourceURL(func, lib, 'deleteLibraryFunction');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteLibraryFunctions(funcs, lib) {
-	var url = addResourceURL(arrayToString(funcs), lib, 'deleteLibraryFunctions');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteDatasetLibrary(lib, dataset) {
-	var url = addResourceURL(lib, dataset, 'deleteDatasetLibrary');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteDatasetLibraries(libs, dataset) {
-	var url = addResourceURL(arrayToString(libs), dataset, 'deleteDatasetLibraries');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteStudyDataset(dataset, study) {
-	var url = addResourceURL(dataset, study, 'deleteStudyDataset');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteStudyDatasets(datasets, study) {
-	var url = addResourceURL(arrayToString(datasets), study, 'deleteStudyDatasets');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
 function deleteWorker(worker) {
@@ -835,22 +725,22 @@ function deleteStudy(study) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function modifyLibrary(name, displayName, urlPath) {
-	var url = createResourceURL(name, displayName, 'modifyLibrary');
+function updateLibrary(name, displayName, urlPath) {
+	var url = createResourceURL(name, displayName, 'updateLibrary');
 	url += '&resourcePath=' + encodeSafeURIComponent(urlPath);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function modifyFunction(name, displayName, urlPath) {
-	var url = createResourceURL(name, displayName, 'modifyFunction');
+function updateFunction(name, displayName, urlPath) {
+	var url = createResourceURL(name, displayName, 'updateFunction');
 	url += '&resourcePath=' + encodeSafeURIComponent(urlPath);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function modifyMaster(name, urlPath, study, dataset, lib, func) {
-	var url = createResourceURL(name, name, 'modifyMaster');
+function updateMaster(name, urlPath, study, dataset, lib, func) {
+	var url = createResourceURL(name, name, 'updateMaster');
 	url += '&rURL=' + encodeSafeURIComponent(urlPath) +
 		'&resourceDataset=' + encodeSafeURIComponent(dataset) +
 		'&study=' + encodeSafeURIComponent(study) +
@@ -860,15 +750,15 @@ function modifyMaster(name, urlPath, study, dataset, lib, func) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function modifyWorker(name, urlPath, dataSource) {
-	var url = createResourceURL(name, name, 'modifyWorker');
+function updateWorker(name, urlPath, dataSource) {
+	var url = createResourceURL(name, name, 'updateWorker');
 	url += '&rURL=' + encodeSafeURIComponent(urlPath) + '&resourceData=' + encodeSafeURIComponent(dataSource);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function modifyParameter(name, displayName, minOccurs, maxOccurs, values) {
-	var url = createResourceURL(name, displayName, 'modifyParameter');
+function updateParameter(name, displayName, minOccurs, maxOccurs, values) {
+	var url = createResourceURL(name, displayName, 'updateParameter');
 	url += '&minOccurs=' + minOccurs + '&maxOccurs=' + maxOccurs + '&values=' + encodeSafeURIComponent(arrayToString(values));
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
@@ -922,15 +812,6 @@ function getParameter(name) {
 
 function getWorker(name) {
 	var url = createResourceURL(name, name, 'getWorker');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function createResource(name, displayName, action) {
-	var url = createResourceURL(name, displayName, action);
-	if (action == 'createLibrary' || action == 'createFunction') {
-		url += '&resourcePath=' + encodeSafeURIComponent(urlMap[displayName]);
-	}
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }

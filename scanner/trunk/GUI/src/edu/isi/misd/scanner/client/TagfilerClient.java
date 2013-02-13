@@ -1,7 +1,13 @@
 package edu.isi.misd.scanner.client;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 import edu.isi.misd.scanner.utils.Utils;
@@ -33,12 +39,46 @@ public class TagfilerClient implements RegistryClient {
 	String tagfilerURL;
 	String tagfilerCreateURL;
 	String cookie;
+	List<String> roles;
 
-	public TagfilerClient(JakartaClient client, String tagfilerURL, String cookie) {
+	public TagfilerClient(JakartaClient client, String tagfilerURL, String cookie, HttpServletRequest request) {
 		this.client = client;
 		this.tagfilerURL = tagfilerURL;
 		this.cookie = cookie;
 		tagfilerCreateURL = tagfilerURL + "/subject/?read+users=*&write+users=*&rtype=";
+		String url = tagfilerURL + "/query/rtype=worker(users)";
+		ClientURLResponse rsp = client.get(url, cookie);
+		RegistryClientResponse clientResponse = new TagfilerClientResponse(rsp);
+		List<String> res = new ArrayList<String>();
+		try {
+			JSONArray arr = new JSONArray(clientResponse.getEntityString());
+			for (int i=0; i < arr.length(); i++) {
+				JSONArray values = arr.getJSONObject(i).getJSONArray("users");
+				for (int j=0; j < values.length(); j++) {
+					String role = values.getString(j);
+					if (!res.contains(role)) {
+						res.add(role);
+					}
+				}
+			}
+			System.out.println("Workers roles: ");
+			for (int i=0; i < res.size(); i++) {
+				System.out.println(res.get(i));
+			}
+			roles = new ArrayList<String>();
+			for (int i=0; i < res.size(); i++) {
+				String role = res.get(i);
+				if (request.isUserInRole(role)) {
+					roles.add(role);
+				}
+			}
+			System.out.println("User roles:");
+			for (int i=0; i < roles.size(); i++) {
+				System.out.println(roles.get(i));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClient#createStudy(java.lang.String, java.lang.String)
@@ -426,10 +466,38 @@ public class TagfilerClient implements RegistryClient {
 	 */
 	@Override
 	public RegistryClientResponse getStudies() {
-		client.setCookieValue(cookie);
-		String url = tagfilerURL + "/query/rtype=study(id;cname)";
-		ClientURLResponse rsp = client.get(url, cookie);
-		return new TagfilerClientResponse(rsp);
+		RegistryClientResponse ret = null;
+		try {
+			client.setCookieValue(cookie);
+			String url = tagfilerURL + "/query/rtype=worker(study)";
+			ClientURLResponse rsp = client.get(url, cookie);
+			JSONArray arr = new JSONArray(rsp.getEntityString());
+			ArrayList<String> studies = new ArrayList<String>();
+			for (int i=0; i < arr.length(); i++) {
+				String study = arr.getJSONObject(i).getString("study");
+				if (!studies.contains(study)) {
+					studies.add(study);
+				}
+			}
+			String cname = "cname=";
+			for (int i=0; i < studies.size(); i++) {
+				if (i != 0) {;
+					cname += ",";
+				}
+				cname += Utils.urlEncode(studies.get(i));
+			}
+			System.out.println("cname: "+cname);
+			url = tagfilerURL + "/query/rtype=study;" + cname + "(id;cname)";
+			rsp = client.get(url, cookie);
+			ret = new TagfilerClientResponse(rsp);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 	/* (non-Javadoc)
