@@ -15,46 +15,12 @@
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                     
         </camel:route>
-
-<!-- these additional route entries can be used to simulate multiple nodes on one host -->
-<!--
-        <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                  
-        </camel:route>
-        
-        <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                    
-        </camel:route>
-        
-        <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                    
-        </camel:route>
--->                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                              
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute"/>                     
         </camel:route>
-
-<!-- these additional route entries can be used to simulate multiple nodes on one host -->
-<!--
-        <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>             
-            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute"/>                        
-        </camel:route>        
-                                                                                                                                                                                                                                                                                 
-        <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>             
-            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute"/>                              
-        </camel:route>
-        
-        <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>             
-            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute"/>                                     
-        </camel:route>
--->        
+              
     </camel:routeContext>
     
 </beans>

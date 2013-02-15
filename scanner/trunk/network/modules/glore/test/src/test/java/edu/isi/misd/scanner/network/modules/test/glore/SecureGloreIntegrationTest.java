@@ -49,9 +49,9 @@ public class SecureGloreIntegrationTest extends BaseIntegrationTest
     {
         String targets =  
             context.resolvePropertyPlaceholders(
-            "https4://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part1.csv&sslContextParametersRef=sslContextParametersMaster,"+
-            "https4://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part2.csv&sslContextParametersRef=sslContextParametersMaster,"+
-            "https4://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part3.csv&sslContextParametersRef=sslContextParametersMaster");
+                "https4://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part1.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part2.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/glore/lr?dataSource=ca_part3.csv&sslContextParametersRef=sslContextParametersMaster");
         return targets;
     }  
     

@@ -33,7 +33,7 @@ public class SecureIterationIntegrationTest extends BaseIntegrationTest
             "direct:edu.isi.misd.scanner.network.modules.worker.routes.example.IterationRoute";        
         assertNotNull(
             "Endpoint not present: " + workerRoute,
-            context.hasEndpoint(workerRoute));                            
+            context.hasEndpoint(workerRoute));   
     }
     
     @Override

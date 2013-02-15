@@ -40,7 +40,7 @@ public class SecureOceansIntegrationTest extends BaseIntegrationTest
     {
         String targets =             
              context.resolvePropertyPlaceholders(
-                "https4://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?sslContextParametersRef=sslContextParametersClient");
+                "https4://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?sslContextParametersRef=sslContextParametersClient");
         return targets;
     }
     
@@ -49,15 +49,15 @@ public class SecureOceansIntegrationTest extends BaseIntegrationTest
     {
         String targets =              
             context.resolvePropertyPlaceholders(
-                "https4://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka1.csv&sslContextParametersRef=sslContextParametersMaster,"+
-                "https4://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka2.csv&sslContextParametersRef=sslContextParametersMaster,"+
-                "https4://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka3.csv&sslContextParametersRef=sslContextParametersMaster,"+
-                "https4://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka4.csv&sslContextParametersRef=sslContextParametersMaster");
+                "https4://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka1.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka2.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka3.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port4}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?dataSource=OutcomePredictionWeka4.csv&sslContextParametersRef=sslContextParametersMaster");
         return targets;
     }  
     
     @Test
-    public void testOceansLogisticRegressionXML() throws Exception 
+    public void testSecureOceansLogisticRegressionXML() throws Exception 
     {
         doPost("application/xml",
                "OceansLogisticRegressionIntegrationTestInput.xml",
@@ -66,7 +66,7 @@ public class SecureOceansIntegrationTest extends BaseIntegrationTest
     }
     
     @Test
-    public void testOceansLogisticRegressionJSON() throws Exception 
+    public void testSecureOceansLogisticRegressionJSON() throws Exception 
     {
         doPost("application/json",
                "OceansLogisticRegressionIntegrationTestInput.json",

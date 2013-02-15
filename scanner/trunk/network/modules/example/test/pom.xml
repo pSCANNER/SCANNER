@@ -154,6 +154,7 @@
                   <exclude>**/*SecureIterationIntegrationTest*</exclude>
               </excludes>
 -->
+            <argLine>-Djava.security.auth.login.config=etc/login.config</argLine>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
             <childDelegation>false</childDelegation>

@@ -123,6 +123,7 @@
       <groupId>Weka</groupId>
       <artifactId>Weka</artifactId>
       <version>3.6.5</version>
+      <type>jar</type> 
     </dependency>
 
   </dependencies>

@@ -14,6 +14,12 @@
     <bean id="OceansLogisticRegressionProcessor"
           class="edu.isi.misd.scanner.network.modules.worker.processors.oceans.OceansLogisticRegressionProcessor"/>  
     
+    <bean id="masterSecurityHandler" parent="baseSecurityHandler"/>    
+    <bean id="worker1SecurityHandler" parent="baseSecurityHandler"/>     
+    <bean id="worker2SecurityHandler" parent="baseSecurityHandler"/>
+    <bean id="worker3SecurityHandler" parent="baseSecurityHandler"/>
+    <bean id="worker4SecurityHandler" parent="baseSecurityHandler"/>
+                    
     <camel:camelContext id="OceansIntegrationTestContext" errorHandlerRef="testErrorHandler">
                 
         <camel:propertyPlaceholder id="properties" 
@@ -27,28 +33,28 @@
         </camel:packageScan>
 
         <camel:route>
-            <camel:from uri="jetty:https://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?sslContextParametersRef=sslContextParametersMaster&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>          
+            <camel:from uri="jetty:https://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?handlers=masterSecurityHandler&amp;sslContextParametersRef=sslContextParametersMaster&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>                    
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.oceans.OceansLogisticRegressionRoute"/>
             <camel:to uri="mock:result"/>
         </camel:route>
                                         
         <camel:route>
-            <camel:from uri="jetty:https://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?handlers=worker1SecurityHandler&amp;sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                       
         </camel:route>
 
         <camel:route>
-            <camel:from uri="jetty:https://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>             
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?handlers=worker2SecurityHandler&amp;sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>             
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                          
         </camel:route>        
                                                                                                                                                                                                                                                                                  
         <camel:route>
-            <camel:from uri="jetty:https://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>             
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?handlers=worker3SecurityHandler&amp;sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>             
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                                 
         </camel:route>
         
         <camel:route>
-            <camel:from uri="jetty:https://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>             
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.ssl.port4}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?handlers=worker4SecurityHandler&amp;sslContextParametersRef=sslContextParametersWorker&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>             
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                                   
         </camel:route>        
                                                     

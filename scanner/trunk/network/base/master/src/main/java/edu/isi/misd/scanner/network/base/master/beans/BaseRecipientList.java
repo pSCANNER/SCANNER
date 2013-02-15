@@ -39,6 +39,12 @@ public class BaseRecipientList
             try {
                 target = target.trim();
                 URI uri = new URI(target);
+                String protocol = uri.getScheme();
+                if ("http".equalsIgnoreCase(protocol)) {
+                    target = target.replaceFirst("http://", "http4://");
+                } else if ("https".equalsIgnoreCase(protocol)) {
+                    target = target.replaceFirst("https://", "https4://");                    
+                }
                 String queryParams = uri.getQuery();
                 target += ((queryParams == null) ? "?" : "&") + options;
                 results.add(target);                

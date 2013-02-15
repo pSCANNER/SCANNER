@@ -3,18 +3,24 @@ package edu.isi.misd.scanner.network.base.test;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
 import org.apache.commons.io.IOUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public abstract class BaseIntegrationTest extends CamelSpringTestSupport
 {
-  
+    private static final transient Logger log = 
+        LoggerFactory.getLogger(BaseIntegrationTest.class);
+    
     protected abstract String getMasterUrl() throws Exception;
     
     protected abstract String getWorkerUrls() throws Exception;
@@ -48,17 +54,24 @@ public abstract class BaseIntegrationTest extends CamelSpringTestSupport
         HashMap headers = new HashMap();
         headers.put(Exchange.HTTP_METHOD, "POST");
         headers.put(Exchange.CONTENT_TYPE, contentType);
-
+        resultEndpoint.expectedHeaderReceived(Exchange.CONTENT_TYPE, contentType); 
+        
         String targets = this.getWorkerUrls();
         headers.put(BaseConstants.TARGETS, targets);
 
-        sendBody(this.getMasterUrl(),input,headers);
+        try {
+            template.sendBodyAndHeaders(
+                this.getMasterUrl(),input,headers);
+        } catch (CamelExecutionException e) {
+            log.error(e.getCause().getMessage());
+        }
         
         // Validate the headers.
-        Exchange exchange = resultEndpoint.getReceivedExchanges().get(0);
+        List<Exchange> exchanges = resultEndpoint.getReceivedExchanges();
+        assertFalse("No response data received", exchanges.isEmpty());
+        Exchange exchange = exchanges.get(0);
         String id = (String)exchange.getIn().getHeader(BaseConstants.ID);
-        assertNotNull("Header " + BaseConstants.ID + " is null",id);
-        resultEndpoint.expectedHeaderReceived(Exchange.CONTENT_TYPE, contentType);            
+        assertNotNull("Header " + BaseConstants.ID + " is null",id);           
     }     
     
 }

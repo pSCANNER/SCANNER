@@ -120,7 +120,7 @@
       <artifactId>camel-jackson</artifactId>
       <version>2.10.1</version>
     </dependency>
-        
+                 
   </dependencies>   
 
   <build>
@@ -143,6 +143,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.13</version>          
           <configuration>
+            <argLine>-Djava.security.auth.login.config=etc/login.config</argLine>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
             <childDelegation>false</childDelegation>
