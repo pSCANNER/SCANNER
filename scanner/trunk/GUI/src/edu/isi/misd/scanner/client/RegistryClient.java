@@ -296,11 +296,9 @@ public interface RegistryClient {
     /**
      * Get the libraries of a dataset 
      * 
-     * @param dataset
-     *            the name of the dataset
      * @return the Client Response
      */
-	public RegistryClientResponse getLibraries(String dataset);
+	public RegistryClientResponse getLibraries();
 	
     /**
      * Get the functions of a library 

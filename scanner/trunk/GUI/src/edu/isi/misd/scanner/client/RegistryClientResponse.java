@@ -49,86 +49,146 @@ public interface RegistryClientResponse {
     public void release();
 
     /**
-     * Return the list of studies representing a JSONArray for the AJAX client 
+     * Returns a string representing a JSONObject for the studies
+     * 		- the keys are the studies names
+     * 		- the values are the studies id
+     *   
+     * Example: {"Study1":196}
      * 
      */
     public String toStudies();
 
     /**
-     * Return the list of datasets representing a JSONArray for the AJAX client 
+     * Returns a string representing a JSONObject for the datasets
+     * 		- the keys are the datasets names
+     * 		- the values are the datasets id
+     *   
+     * Example: {"Dataset1":195}
      * 
      */
     public String toDatasets();
 
     /**
-     * Return the list of libraries representing a JSONArray for the AJAX client 
+     * Returns a string representing a JSONObject for the libraries
+     * 		- the keys are the libraries names
+     * 		- the values are the libraries id
+     *   
+     * Example: {"Oceans":193,"GLORE":194}
      * 
      */
     public String toLibraries();
 
     /**
-     * Return the list of functions representing a JSONArray for the AJAX client 
+     * Returns a string representing a JSONObject for the functions
+     * 		- the keys are the functions names
+     * 		- the values are the functions id
+     *   
+     * Example: {"Logistic Regression":191}
      * 
      */
     public String toFunctions();
 
 
     /**
-     * Return the list of sites representing a JSONArray for the AJAX client 
+     * Returns a string representing a JSONObject for the sites
+     * 		- the keys are the sites names
+     * 		- the values are the ids of their workers
+     *   
+     * Example: {"ISI":182,"UCSD":184,"SDSC":181,"USC":183}
      * 
      */
     public String toSites();
     
     /**
-     * Return the list of parameters representing a JSONArray for the AJAX client 
+     * Returns a string representing a JSONArray for the parameters
+     * 		- each array element is a string representing a JSONObject of the parameter
+     * 			- the keys are the parameters ids 
+     *   
+     * Example: [	{"188":	{"values":["Age","CAD","Creatinine","Diabetes","LOS","Race_Cat"],"maxOccurs":-1,
+     * 							"cname":"independentVariableNames","minOccurs":0
+     * 						}
+     * 				},
+     * 				{"189":	{"values":["Outcome"],"maxOccurs":1,"cname":"dependentVariableName","minOccurs":1
+     * 						}
+     * 				}
+     * 			]
      * 
      */
     public String toParameters();
 
     /**
-     * Return a string representing a JSONArray for the AJAX client 
+     * Returns a string representing a JSONArray for the workers
+     * 		- each array element is a string representing a JSONObject of the worker 
+     *   
+     * Example: [	{"function":"Logistic Regression","study":"Study1","site":"ISI","library":"GLORE",
+     * 					"dataset":"Dataset1","datasource":"ca_part3","rURL":"http://scanner.misd.isi.edu:8886/scanner",
+     * 					"id":185
+     * 				},
+     * 				{"function":"Logistic Regression","study":"Study1","site":"UCSD","library":"GLORE",
+     * 					"dataset":"Dataset1","datasource":"ca_part1","rURL":"http://scanner.misd.isi.edu:8888/scanner",
+     * 					"id":187
+     * 				}
+     * 			]
      * 
      */
     public String toWorkers();
 
     /**
-     * Return the study representing a JSONObject for the AJAX client 
+     * Returns a string representing a JSONObject for the study
+     *   
+     * Example: {"id":196,"cname":"Study1"}
      * 
      */
     public String toStudy();
 
     /**
-     * Return the dataset representing a JSONObject for the AJAX client 
+     * Returns a string representing a JSONObject for the dataset
+     *   
+     * Example: {"id":195,"study":"Study1","cname":"Dataset1"}
      * 
      */
     public String toDataset();
 
     /**
-     * Return the library representing a JSONObject for the AJAX client 
+     * Returns a string representing a JSONObject for the library
+     *   
+     * Example: {"id":193,"rpath":"oceans","cname":"Oceans"}
      * 
      */
     public String toLibrary();
 
     /**
-     * Return the function representing a JSONObject for the AJAX client 
+     * Returns a string representing a JSONObject for the function
+     *   
+     * Example: {"id":191,"rpath":"lr","library":"Oceans","cname":"Logistic Regression"}
      * 
      */
     public String toFunction();
 
     /**
-     * Return the master representing a JSONObject for the AJAX client 
+     * Returns a string representing a JSONObject for the master
+     *   
+     * Example: {"id":180,"rURL":"http://scanner.misd.isi.edu:9999/scanner"}
      * 
      */
     public String toMaster();
 
     /**
-     * Return the worker representing a JSONObject for the AJAX client 
+     * Returns a string representing a JSONObject for the worker
+     *   
+     * Example: {"id":187,"site":"UCSD","rURL":"http://scanner.misd.isi.edu:8888/scanner",
+     * 			"dataset":"Dataset1","library":"GLORE","study":"Study1","datasource":"ca_part1",
+     * 			"function":"Logistic Regression"}
      * 
      */
     public String toWorker();
 
     /**
-     * Return the parameter representing a JSONObject for the AJAX client 
+     * Returns a string representing a JSONObject for the parameter
+     *   
+     * Example: {"id":188,"values":["Age","CAD","Creatinine","Diabetes","LOS","Race_Cat"],
+     * 			"maxOccurs":-1,"library":"Oceans","cname":"independentVariableNames","minOccurs":0,
+     * 			"function":"Logistic Regression"}
      * 
      */
     public String toParameter();

@@ -70,6 +70,88 @@ public class Registry extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action = request.getParameter("action");
+		HttpSession session = request.getSession(false);
+		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
+		String res = "";
+		String name = request.getParameter("cname");
+		String study = request.getParameter("study");
+		String lib = request.getParameter("library");
+		String dataset = request.getParameter("dataset");
+		String func = request.getParameter("function");
+		String site = request.getParameter("site");
+		String sites = request.getParameter("sites");
+		RegistryClientResponse clientResponse = null;
+		if  (action.equals("getStudy")) {
+			clientResponse = registryClient.getStudy(name);
+			res= clientResponse.toStudy();
+		} else if (action.equals("getDataset")) {
+			clientResponse = registryClient.getDataset(name, study);
+			res= clientResponse.toDataset();
+		} else if (action.equals("getLibrary")) {
+			clientResponse = registryClient.getLibrary(name);
+			res= clientResponse.toLibrary();
+		} else if (action.equals("getFunction")) {
+			clientResponse = registryClient.getFunction(name, lib);
+			res= clientResponse.toFunction();
+		} else if (action.equals("getMaster")) {
+			clientResponse = registryClient.getMaster();
+			res= clientResponse.toMaster();
+		} else if (action.equals("getParameter")) {
+			clientResponse = registryClient.getParameter(name, func, lib);
+			res= clientResponse.toParameter();
+		} else if (action.equals("getWorker")) {
+			clientResponse = registryClient.getWorker(study, dataset, lib, func, site);
+			res= clientResponse.toWorker();
+		} else if (action.equals("getStudies")) {
+			clientResponse = registryClient.getStudies();
+			res= clientResponse.toStudies();
+		} else if (action.equals("getDatasets")) {
+			clientResponse = registryClient.getDatasets(study);
+			res= clientResponse.toDatasets();
+		} else if (action.equals("getLibraries")) {
+			clientResponse = registryClient.getLibraries();
+			res= clientResponse.toLibraries();
+		} else if (action.equals("getFunctions")) {
+			clientResponse = registryClient.getFunctions(lib);
+			res= clientResponse.toFunctions();
+		} else if (action.equals("getParameters")) {
+			clientResponse = registryClient.getParameters(func, lib);
+			res= clientResponse.toParameters();
+		} else if (action.equals("getSites")) {
+			clientResponse = registryClient.getSites(study, dataset, lib, func);
+			res= clientResponse.toSites();
+		} else if (action.equals("getWorkers")) {
+			ArrayList<String> values = null;
+			if (sites != null) {
+				try {
+					JSONArray arr = new JSONArray(sites);
+					if (arr.length() > 0) {
+						values = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							values.add(arr.getString(i));
+						}
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
+			res= clientResponse.toWorkers();
+		}
+
+
+
+
+
+
+
+		if (clientResponse != null) {
+			clientResponse.release();
+		}
+		PrintWriter out = response.getWriter();
+		out.print(res);
 	}
 
 	/**
@@ -91,7 +173,6 @@ public class Registry extends HttpServlet {
 		String func = request.getParameter("function");
 		String site = request.getParameter("site");
 		String resourceValues = request.getParameter("values"); 
-		String sourceData = request.getParameter("sourcedata");
 		RegistryClientResponse clientResponse = null;
 		if (action.equals("createStudy")) {
 			clientResponse = registryClient.createStudy(name);
@@ -226,7 +307,7 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("updateWorker")) {
 			try {
-				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, sourceData, rURL);
+				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, datasource, rURL);
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -246,62 +327,6 @@ public class Registry extends HttpServlet {
 					}
 				}
 				clientResponse = registryClient.updateParameter(id, name, func, lib, minOccurs, maxOccurs, values);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("getStudy")) {
-			try {
-				clientResponse = registryClient.getStudy(name);
-				//System.out.println("Study: " + clientResponse.toStudy());
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("getDataset")) {
-			try {
-				clientResponse = registryClient.getDataset(name, study);
-				//System.out.println("Dataset: " + clientResponse.toDataset());
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("getLibrary")) {
-			try {
-				clientResponse = registryClient.getLibrary(name);
-				//System.out.println("Library: " + clientResponse.toLibrary());
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("getFunction")) {
-			try {
-				clientResponse = registryClient.getFunction(name, lib);
-				//System.out.println("Function: " + clientResponse.toFunction());
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("getMaster")) {
-			try {
-				clientResponse = registryClient.getMaster();
-				//System.out.println("Master: " + clientResponse.toMaster());
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("getParameter")) {
-			try {
-				clientResponse = registryClient.getParameter(name, func, lib);
-				//System.out.println("Parameter: " + clientResponse.toParameter());
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("getWorker")) {
-			try {
-				clientResponse = registryClient.getWorker(study, dataset, lib, func, site);
-				//System.out.println("Worker: " + clientResponse.toWorker());
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
 				e.printStackTrace();

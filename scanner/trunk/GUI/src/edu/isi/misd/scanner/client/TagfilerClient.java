@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 import edu.isi.misd.scanner.utils.Utils;
@@ -42,10 +43,7 @@ public class TagfilerClient implements RegistryClient {
 	List<String> roles;
 
 	public TagfilerClient(JakartaClient client, String tagfilerURL, String cookie, HttpServletRequest request) {
-		this.client = client;
-		this.tagfilerURL = tagfilerURL;
-		this.cookie = cookie;
-		tagfilerCreateURL = tagfilerURL + "/subject/?read+users=*&write+users=*&rtype=";
+		this(client, tagfilerURL, cookie);
 		String url = tagfilerURL + "/query/rtype=worker(users)";
 		ClientURLResponse rsp = client.get(url, cookie);
 		RegistryClientResponse clientResponse = new TagfilerClientResponse(rsp);
@@ -80,6 +78,14 @@ public class TagfilerClient implements RegistryClient {
 			e.printStackTrace();
 		}
 	}
+	
+	public TagfilerClient(JakartaClient client, String tagfilerURL, String cookie) {
+		this.client = client;
+		this.tagfilerURL = tagfilerURL;
+		this.cookie = cookie;
+		tagfilerCreateURL = tagfilerURL + "/subject/?read+users=*&write+users=*&rtype=";
+	}
+	
 	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClient#createStudy(java.lang.String, java.lang.String)
 	 */
@@ -232,7 +238,6 @@ public class TagfilerClient implements RegistryClient {
 			ClientURLResponse rsp = client.delete(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -250,7 +255,6 @@ public class TagfilerClient implements RegistryClient {
 			ClientURLResponse rsp = client.delete(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -284,7 +288,6 @@ public class TagfilerClient implements RegistryClient {
 			ClientURLResponse rsp = client.delete(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -308,7 +311,6 @@ public class TagfilerClient implements RegistryClient {
 			ClientURLResponse rsp = client.delete(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -326,7 +328,6 @@ public class TagfilerClient implements RegistryClient {
 			ClientURLResponse rsp = client.delete(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -343,7 +344,6 @@ public class TagfilerClient implements RegistryClient {
 			ClientURLResponse rsp = client.delete(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -356,13 +356,23 @@ public class TagfilerClient implements RegistryClient {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(" +
+			String url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(cname)";
+			ClientURLResponse rsp = client.get(url, cookie);
+			JSONObject obj = (new JSONArray(rsp.getEntityString())).getJSONObject(0);
+			String libName = obj.getString("cname");
+			if (!libName.equals(name)) {
+				url = tagfilerURL + "/tags/rtype=function,worker,parameter;library=" + Utils.urlEncode(libName) + "(library=" + Utils.urlEncode(name) + ")";
+				client.putResource(url, cookie);
+			}
+			url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(" +
 					"cname=" + Utils.urlEncode(name) +
 					";rpath=" + Utils.urlEncode(urlPath) +
 					")";
-			ClientURLResponse rsp = client.putResource(url, cookie);
+			rsp = client.putResource(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -376,14 +386,25 @@ public class TagfilerClient implements RegistryClient {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(" +
+			String url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(cname;library)";
+			ClientURLResponse rsp = client.get(url, cookie);
+			JSONObject obj = (new JSONArray(rsp.getEntityString())).getJSONObject(0);
+			String funcName = obj.getString("cname");
+			String libName = obj.getString("library");
+			if (!libName.equals(lib) || !funcName.equals(name)) {
+				url = tagfilerURL + "/tags/rtype=worker,parameter;library=" + Utils.urlEncode(libName) + ";function=" + Utils.urlEncode(funcName) + "(library=" + Utils.urlEncode(lib) + ";function=" + Utils.urlEncode(name) + ")";
+				client.putResource(url, cookie);
+			}
+			url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(" +
 					"cname=" + Utils.urlEncode(name) +
-					"library=" + Utils.urlEncode(lib) +
+					";library=" + Utils.urlEncode(lib) +
 					";rpath=" + Utils.urlEncode(urlPath) +
 					")";
-			ClientURLResponse rsp = client.putResource(url, cookie);
+			rsp = client.putResource(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -399,13 +420,15 @@ public class TagfilerClient implements RegistryClient {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
+			String url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(values)";
+			ClientURLResponse rsp = client.delete(url, cookie);
 			for (int i=0; i < values.size(); i++) {
 				if (i != 0) {
 					buff.append(",");
 				}
 				buff.append(Utils.urlEncode(values.get(i)));
 			}
-			String url = tagfilerURL + "/tags/id=" + Utils.urlEncode(name) +  "(" +
+			url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(" +
 					"cname=" + Utils.urlEncode(name) +
 					";function=" + Utils.urlEncode(func) +
 					";library=" + Utils.urlEncode(lib) +
@@ -413,7 +436,7 @@ public class TagfilerClient implements RegistryClient {
 					";maxOccurs=" + maxOccurs +
 					";values=" + buff.toString() +
 					")";
-			ClientURLResponse rsp = client.putResource(url, cookie);
+			rsp = client.putResource(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -486,15 +509,12 @@ public class TagfilerClient implements RegistryClient {
 				}
 				cname += Utils.urlEncode(studies.get(i));
 			}
-			System.out.println("cname: "+cname);
 			url = tagfilerURL + "/query/rtype=study;" + cname + "(id;cname)";
 			rsp = client.get(url, cookie);
 			ret = new TagfilerClientResponse(rsp);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -521,7 +541,7 @@ public class TagfilerClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getLibraries(java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse getLibraries(String dataset) {
+	public RegistryClientResponse getLibraries() {
 		RegistryClientResponse clientResponse = null;
 		client.setCookieValue(cookie);
 		String url = tagfilerURL + "/query/rtype=library(id;cname)";

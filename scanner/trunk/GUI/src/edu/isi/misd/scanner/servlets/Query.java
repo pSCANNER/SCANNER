@@ -96,22 +96,21 @@ public class Query extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getLibraries")) {
-			String dataset = request.getParameter("dataset");
-			RegistryClientResponse clientResponse = registryClient.getLibraries(dataset);
+			RegistryClientResponse clientResponse = registryClient.getLibraries();
 			String ret = clientResponse.toLibraries();
 			System.out.println("Get Libraries: "+ret.toString());
 			PrintWriter out = response.getWriter();
 			out.print(ret.toString());
 		} else if (action.equals("getFunctions")) {
-			String lib = request.getParameter("lib");
+			String lib = request.getParameter("library");
 			RegistryClientResponse clientResponse = registryClient.getFunctions(lib);
 			String ret = clientResponse.toFunctions();
 			System.out.println("Get Functions: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getParameters")) {
-			String func = request.getParameter("func");
-			String lib = request.getParameter("lib");
+			String func = request.getParameter("function");
+			String lib = request.getParameter("library");
 			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib);
 			String ret = clientResponse.toParameters();
 			System.out.println("Get Parameters:\n"+ret);
@@ -120,8 +119,8 @@ public class Query extends HttpServlet {
 		} else if (action.equals("getSites")) {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
-			String lib = request.getParameter("lib");
-			String func = request.getParameter("func");
+			String lib = request.getParameter("library");
+			String func = request.getParameter("function");
 			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset, lib, func);
 			String ret = clientResponse.toSites();
 			System.out.println("Get Sites:\n"+ret);
@@ -147,7 +146,8 @@ public class Query extends HttpServlet {
 				if (rsp != null) {
 					//rsp.debug();
 					session.setAttribute("tagfilerCookie", httpClient.getCookieValue());
-					RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue(), request);
+					//RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue(), request);
+					RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue());
 					session.setAttribute("registryClient", registryClient);
 				} else {
 					// to handle this case
@@ -180,10 +180,10 @@ public class Query extends HttpServlet {
 			} else if (action.equals("getResults")) {
 				try {
 					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
-					String params = request.getParameter("params");
+					String params = request.getParameter("parameters");
 					String sites = request.getParameter("sites");
-					String lib = request.getParameter("lib");
-					String func = request.getParameter("func");
+					String lib = request.getParameter("library");
+					String func = request.getParameter("function");
 					String study = request.getParameter("study");
 					String dataset = request.getParameter("dataset");
 					RegistryClientResponse clientResponse = registryClient.getMaster();

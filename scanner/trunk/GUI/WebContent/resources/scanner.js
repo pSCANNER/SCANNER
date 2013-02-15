@@ -285,7 +285,7 @@ function renderAvailableLibraries() {
 	// send the request
 	var dataset = getSelectedDatasetName();
 	if (dataset != null) {
-		var url = HOME + '/query?action=getLibraries&dataset=' + encodeSafeURIComponent(dataset);
+		var url = HOME + '/query?action=getLibraries';
 		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
 	}
 }
@@ -347,7 +347,7 @@ function renderAvailableFunctions() {
 	// send the request
 	var lib = getSelectedLibraryName();
 	if (lib != null) {
-		var url = HOME + '/query?action=getFunctions&lib=' + encodeSafeURIComponent(lib);
+		var url = HOME + '/query?action=getFunctions&library=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableFunctions, null, null, 0);
 	}
 }
@@ -407,7 +407,7 @@ function renderAvailableParameters() {
 	var func = getSelectedFunctionName();
 	var lib = getSelectedLibraryName();
 	if (func != '') {
-		var url = HOME + '/query?action=getParameters&func=' + encodeSafeURIComponent(func) + '&lib=' + encodeSafeURIComponent(lib);
+		var url = HOME + '/query?action=getParameters&function=' + encodeSafeURIComponent(func) + '&library=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -500,8 +500,8 @@ function renderAvailableSites() {
 	var url = HOME + '/query?action=getSites' +
 			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
 			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName()) +
-			'&lib=' + encodeSafeURIComponent(getSelectedLibraryName()) +
-			'&func=' + encodeSafeURIComponent(getSelectedFunctionName());
+			'&library=' + encodeSafeURIComponent(getSelectedLibraryName()) +
+			'&function=' + encodeSafeURIComponent(getSelectedFunctionName());
 	scanner.GET(url, true, postRenderSites, null, null, 0);
 }
 
@@ -558,12 +558,12 @@ function submitQuery() {
 	}
 	var params = getSelectedParameters();
 	var obj = {};
-	obj['params'] = params;
+	obj['parameters'] = params;
 	obj['action'] = 'getResults';
 	obj['study'] = getSelectedStudyName();
 	obj['dataset'] = getSelectedDatasetName();
-	obj['lib'] = getSelectedLibraryName();
-	obj['func'] = getSelectedFunctionName();
+	obj['library'] = getSelectedLibraryName();
+	obj['function'] = getSelectedFunctionName();
 	obj['sites'] = valueToString(sites);
 	var url = HOME + '/query';
 	$('*', $('#paramsDiv')).css('cursor', 'wait');
@@ -664,162 +664,243 @@ function createParameter(name, func, lib, minOccurs, maxOccurs, values) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function createResourceURL(name, displayName, action) {
-	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
-			'&action=' + encodeSafeURIComponent(action);
-	return url;
-}
-
-function addResourceURL(name, parentName, action) {
-	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
-			'&parent=' + encodeSafeURIComponent(parentName) +
-			'&action=' + encodeSafeURIComponent(action);
-	return url;
-}
-
-function deleteResourceURL(name, action) {
-	var url = HOME + '/registry?name=' + encodeSafeURIComponent(name) + 
-			'&action=' + encodeSafeURIComponent(action);
-	return url;
-}
-
-function deleteWorker(worker) {
-	var url = deleteResourceURL(worker, 'deleteWorker');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteParameter(param) {
-	var url = deleteResourceURL(param, 'deleteParameter');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteMaster(master) {
-	var url = deleteResourceURL(master, 'deleteMaster');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteFunction(func) {
-	var url = deleteResourceURL(func, 'deleteFunction');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteLibrary(lib) {
-	var url = deleteResourceURL(lib, 'deleteLibrary');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteDataset(dataset) {
-	var url = deleteResourceURL(dataset, 'deleteDataset');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function deleteStudy(study) {
-	var url = deleteResourceURL(study, 'deleteStudy');
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function updateLibrary(name, displayName, urlPath) {
-	var url = createResourceURL(name, displayName, 'updateLibrary');
-	url += '&resourcePath=' + encodeSafeURIComponent(urlPath);
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function updateFunction(name, displayName, urlPath) {
-	var url = createResourceURL(name, displayName, 'updateFunction');
-	url += '&resourcePath=' + encodeSafeURIComponent(urlPath);
-	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
-}
-
-function updateMaster(name, urlPath, study, dataset, lib, func) {
-	var url = createResourceURL(name, name, 'updateMaster');
-	url += '&rURL=' + encodeSafeURIComponent(urlPath) +
-		'&resourceDataset=' + encodeSafeURIComponent(dataset) +
+function deleteWorker(study, dataset, lib, func, site) {
+	var url = HOME + '/registry?action=deleteWorker' +
 		'&study=' + encodeSafeURIComponent(study) +
-		'&resourceLibrary=' + encodeSafeURIComponent(lib) +
-		'&resourceFunction=' + encodeSafeURIComponent(func);
+		'&dataset=' + encodeSafeURIComponent(dataset) +
+		'&library=' + encodeSafeURIComponent(lib) +
+		'&function=' + encodeSafeURIComponent(func) +
+		'&site=' + encodeSafeURIComponent(site);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function updateWorker(name, urlPath, dataSource) {
-	var url = createResourceURL(name, name, 'updateWorker');
-	url += '&rURL=' + encodeSafeURIComponent(urlPath) + '&resourceData=' + encodeSafeURIComponent(dataSource);
+function deleteParameter(name, func, lib) {
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=deleteParameter' +
+		'&library=' + encodeSafeURIComponent(lib) +
+		'&function=' + encodeSafeURIComponent(func);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function updateParameter(name, displayName, minOccurs, maxOccurs, values) {
-	var url = createResourceURL(name, displayName, 'updateParameter');
-	url += '&minOccurs=' + minOccurs + '&maxOccurs=' + maxOccurs + '&values=' + encodeSafeURIComponent(arrayToString(values));
+function deleteMaster() {
+	var url = HOME + '/registry?action=deleteMaster';
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function getMasters(study, dataset, lib, func) {
-	var url = createResourceURL(name, name, 'getMasters');
-	url += '&resourceDataset=' + encodeSafeURIComponent(dataset) +
-	'&study=' + encodeSafeURIComponent(study) +
-	'&resourceLibrary=' + encodeSafeURIComponent(lib) +
-	'&resourceFunction=' + encodeSafeURIComponent(func);
+function deleteFunction(name, lib) {
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=deleteFunction' +
+		'&library=' + encodeSafeURIComponent(lib);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteLibrary(name) {
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=deleteLibrary';
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteDataset(name, study) {
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=deleteDataset' +
+		'&study=' + encodeSafeURIComponent(study);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function deleteStudy(name) {
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=deleteStudy';
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function updateLibrary(id, name, rpath) {
+	var url = HOME + '/registry?action=updateLibrary' +
+		'&rpath=' + encodeSafeURIComponent(rpath) +
+		'&id=' + encodeSafeURIComponent(id) +
+		'&cname=' + encodeSafeURIComponent(name);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function updateFunction(id, name, lib, rpath) {
+	var url = HOME + '/registry?action=updateFunction' +
+		'&rpath=' + encodeSafeURIComponent(rpath) +
+		'&id=' + encodeSafeURIComponent(id) +
+		'&cname=' + encodeSafeURIComponent(name) +
+		'&library=' + encodeSafeURIComponent(lib);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function updateMaster(rURL) {
+	var url = HOME + '/registry?rURL=' + encodeSafeURIComponent(rURL) + 
+		'&action=updateMaster';
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function updateWorker(id, study, dataset, lib, func, site, datasource, rURL) {
+	var url = HOME + '/registry?action=updateWorker' +
+		'&study=' + encodeSafeURIComponent(study) +
+		'&id=' + encodeSafeURIComponent(id) +
+		'&dataset=' + encodeSafeURIComponent(dataset) +
+		'&library=' + encodeSafeURIComponent(lib) +
+		'&function=' + encodeSafeURIComponent(func) +
+		'&site=' + encodeSafeURIComponent(site) +
+		'&datasource=' + encodeSafeURIComponent(datasource) +
+		'&rURL=' + encodeSafeURIComponent(rURL);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+function updateParameter(id, name, func, lib, minOccurs, maxOccurs, values) {
+	var url = HOME + '/registry?action=updateParameter' +
+		'&cname=' + encodeSafeURIComponent(name) +
+		'&id=' + encodeSafeURIComponent(id) +
+		'&function=' + encodeSafeURIComponent(func) +
+		'&library=' + encodeSafeURIComponent(lib) +
+		'&minOccurs=' + minOccurs +
+		'&maxOccurs=' + maxOccurs;
+	if (values != null && values.length > 0) {
+		url += '&values=';
+		var values = arrayToString(values);
+		url += encodeSafeURIComponent(values);
+	}
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
 function getStudy(name) {
-	var url = createResourceURL(name, name, 'getStudy');
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=getStudy';
 	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
-function getDataset(name) {
-	var url = createResourceURL(name, name, 'getDataset');
+function getDataset(name, study) {
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=getDataset' +
+		'&study=' + encodeSafeURIComponent(study);
 	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
 function getLibrary(name) {
-	var url = createResourceURL(name, name, 'getLibrary');
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=getLibrary';
 	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
-function getFunction(name) {
-	var url = createResourceURL(name, name, 'getFunction');
+function getFunction(name, lib) {
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=getFunction' +
+		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
-function getMaster(name) {
-	var url = createResourceURL(name, name, 'getMaster');
+function getMaster() {
+	var url = HOME + '/registry?action=getMaster';
 	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
-function getParameter(name) {
-	var url = createResourceURL(name, name, 'getParameter');
+function getParameter(name, func, lib) {
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=getParameter' +
+		'&function=' + encodeSafeURIComponent(func) +
+		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
-function getWorker(name) {
-	var url = createResourceURL(name, name, 'getWorker');
+function getWorker(study, dataset, lib, func, site) {
+	var url = HOME + '/registry?study=' + encodeSafeURIComponent(study) + 
+		'&action=getWorker' +
+		'&dataset=' + encodeSafeURIComponent(dataset) +
+		'&function=' + encodeSafeURIComponent(func) +
+		'&site=' + encodeSafeURIComponent(site) +
+		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
-	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+function getStudies() {
+	var url = HOME + '/registry?action=getStudies';
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+function getDatasets(study) {
+	var url = HOME + '/registry?action=getDatasets' +
+		'&study=' + encodeSafeURIComponent(study);
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+function getLibraries() {
+	var url = HOME + '/registry?action=getLibraries';
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+function getFunctions(lib) {
+	var url = HOME + '/registry?action=getFunctions' +
+		'&library=' + encodeSafeURIComponent(lib);
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+function getParameters(func, lib) {
+	var url = HOME + '/registry?action=getParameters' +
+		'&function=' + encodeSafeURIComponent(func) +
+		'&library=' + encodeSafeURIComponent(lib);
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+function getSites(study, dataset, lib, func) {
+	var url = HOME + '/registry?action=getSites' +
+		'&study=' + encodeSafeURIComponent(study) +
+		'&dataset=' + encodeSafeURIComponent(dataset) +
+		'&library=' + encodeSafeURIComponent(lib) +
+		'&function=' + encodeSafeURIComponent(func);
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+function getWorkers(study, dataset, lib, func, sites) {
+	var url = HOME + '/registry?study=' + encodeSafeURIComponent(study) + 
+		'&action=getWorkers' +
+		'&dataset=' + encodeSafeURIComponent(dataset) +
+		'&function=' + encodeSafeURIComponent(func) +
+		'&library=' + encodeSafeURIComponent(lib);
+	if (sites != null && sites.length > 0) {
+		url += '&sites=';
+		var values = arrayToString(sites);
+		url += encodeSafeURIComponent(values);
+	}
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
 function postResourceAction(data, textStatus, jqXHR, param) {
 	document.body.style.cursor = "default";
 	var res = $.parseJSON(data);
 	alert(res.status);
+}
+
+function postGetResourceAction(data, textStatus, jqXHR, param) {
+	document.body.style.cursor = "default";
+	alert(valueToString(data));
 }
 
 function getTableColumns(res) {
