@@ -721,53 +721,82 @@ function deleteStudy(name) {
 }
 
 function updateLibrary(id, name, rpath) {
-	var url = HOME + '/registry?action=updateLibrary' +
-		'&rpath=' + encodeSafeURIComponent(rpath) +
-		'&id=' + encodeSafeURIComponent(id) +
-		'&cname=' + encodeSafeURIComponent(name);
+	var url = HOME + '/registry?action=updateLibrary&id=' + encodeSafeURIComponent(id);
+	if (name != null) {
+		url += '&cname=' + encodeSafeURIComponent(name);
+	}
+	if (rpath != null) {
+		url += '&rpath=' + encodeSafeURIComponent(rpath);
+	}
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
 function updateFunction(id, name, lib, rpath) {
-	var url = HOME + '/registry?action=updateFunction' +
-		'&rpath=' + encodeSafeURIComponent(rpath) +
-		'&id=' + encodeSafeURIComponent(id) +
-		'&cname=' + encodeSafeURIComponent(name) +
-		'&library=' + encodeSafeURIComponent(lib);
+	var url = HOME + '/registry?action=updateFunction&id=' + encodeSafeURIComponent(id);
+	if (name != null) {
+		url += '&cname=' + encodeSafeURIComponent(name);
+	}
+	if (rpath != null) {
+		url += '&rpath=' + encodeSafeURIComponent(rpath);
+	}
+	if (lib != null) {
+		url += '&library=' + encodeSafeURIComponent(lib);
+	}
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
 function updateMaster(rURL) {
-	var url = HOME + '/registry?rURL=' + encodeSafeURIComponent(rURL) + 
-		'&action=updateMaster';
+	var url = HOME + '/registry?rURL=' + encodeSafeURIComponent(rURL) + '&action=updateMaster';
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
 function updateWorker(id, study, dataset, lib, func, site, datasource, rURL) {
-	var url = HOME + '/registry?action=updateWorker' +
-		'&study=' + encodeSafeURIComponent(study) +
-		'&id=' + encodeSafeURIComponent(id) +
-		'&dataset=' + encodeSafeURIComponent(dataset) +
-		'&library=' + encodeSafeURIComponent(lib) +
-		'&function=' + encodeSafeURIComponent(func) +
-		'&site=' + encodeSafeURIComponent(site) +
-		'&datasource=' + encodeSafeURIComponent(datasource) +
-		'&rURL=' + encodeSafeURIComponent(rURL);
+	var url = HOME + '/registry?action=updateWorker&id=' + encodeSafeURIComponent(id);
+	if (study != null) {
+		url += '&study=' + encodeSafeURIComponent(study);
+	}
+	if (dataset != null) {
+		url += '&dataset=' + encodeSafeURIComponent(dataset);
+	}
+	if (lib != null) {
+		url += '&library=' + encodeSafeURIComponent(lib);
+	}
+	if (func != null) {
+		url += '&function=' + encodeSafeURIComponent(func);
+	}
+	if (site != null) {
+		url += '&site=' + encodeSafeURIComponent(site);
+	}
+	if (datasource != null) {
+		url += '&datasource=' + encodeSafeURIComponent(datasource);
+	}
+	if (rURL != null) {
+		url += '&rURL=' + encodeSafeURIComponent(rURL);
+	}
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
 function updateParameter(id, name, func, lib, minOccurs, maxOccurs, values) {
-	var url = HOME + '/registry?action=updateParameter' +
-		'&cname=' + encodeSafeURIComponent(name) +
-		'&id=' + encodeSafeURIComponent(id) +
-		'&function=' + encodeSafeURIComponent(func) +
-		'&library=' + encodeSafeURIComponent(lib) +
-		'&minOccurs=' + minOccurs +
-		'&maxOccurs=' + maxOccurs;
+	var url = HOME + '/registry?action=updateParameter&id=' + encodeSafeURIComponent(id);
+	if (name != null) {
+		url += '&cname=' + encodeSafeURIComponent(name);
+	}
+	if (func != null) {
+		url += '&function=' + encodeSafeURIComponent(func);
+	}
+	if (lib != null) {
+		url += '&library=' + encodeSafeURIComponent(lib);
+	}
+	if (minOccurs != null) {
+		url += '&minOccurs=' + minOccurs;
+	}
+	if (maxOccurs != null) {
+		url += '&maxOccurs=' + maxOccurs;
+	}
 	if (values != null && values.length > 0) {
 		url += '&values=';
 		var values = arrayToString(values);

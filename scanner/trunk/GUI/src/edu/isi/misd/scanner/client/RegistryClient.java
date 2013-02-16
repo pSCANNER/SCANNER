@@ -243,7 +243,7 @@ public interface RegistryClient {
      *            the new list of the parameter values
      * @return the Client Response
      */
-	public RegistryClientResponse updateParameter(String id, String name, String func, String lib, int minOccurs, int maxOccurs, List<String> values);
+	public RegistryClientResponse updateParameter(String id, String name, String func, String lib, Integer minOccurs, Integer maxOccurs, List<String> values);
 	
     /**
      * Update the master 

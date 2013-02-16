@@ -173,6 +173,14 @@ public class Registry extends HttpServlet {
 		String func = request.getParameter("function");
 		String site = request.getParameter("site");
 		String resourceValues = request.getParameter("values"); 
+		Integer minOccurs = null; 
+		Integer maxOccurs = null; 
+		if (request.getParameter("minOccurs") != null) {
+			minOccurs = Integer.parseInt(request.getParameter("minOccurs"));
+		}
+		if (request.getParameter("maxOccurs") != null) {
+			maxOccurs = Integer.parseInt(request.getParameter("maxOccurs"));
+		}
 		RegistryClientResponse clientResponse = null;
 		if (action.equals("createStudy")) {
 			clientResponse = registryClient.createStudy(name);
@@ -218,8 +226,6 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("createParameter")) {
 			try {
-				int minOccurs = Integer.parseInt(request.getParameter("minOccurs")); 
-				int maxOccurs = Integer.parseInt(request.getParameter("maxOccurs")); 
 				ArrayList<String> values = null;
 				if (resourceValues != null) {
 					JSONArray arr = new JSONArray(resourceValues);
@@ -287,14 +293,22 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("updateLibrary")) {
 			try {
 				clientResponse = registryClient.updateLibrary(id, name, rpath);
-				obj.put("status", clientResponse.getStatus());
+				if (clientResponse != null) {
+					obj.put("status", clientResponse.getStatus());
+				} else {
+					obj.put("status", "No library update");
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("updateFunction")) {
 			try {
 				clientResponse = registryClient.updateFunction(id, name, lib, rpath);
-				obj.put("status", clientResponse.getStatus());
+				if (clientResponse != null) {
+					obj.put("status", clientResponse.getStatus());
+				} else {
+					obj.put("status", "No function update");
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -308,14 +322,16 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("updateWorker")) {
 			try {
 				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, datasource, rURL);
-				obj.put("status", clientResponse.getStatus());
+				if (clientResponse != null) {
+					obj.put("status", clientResponse.getStatus());
+				} else {
+					obj.put("status", "No worker update");
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("updateParameter")) {
 			try {
-				int minOccurs = Integer.parseInt(request.getParameter("minOccurs")); 
-				int maxOccurs = Integer.parseInt(request.getParameter("maxOccurs")); 
 				ArrayList<String> values = null;
 				if (resourceValues != null) {
 					JSONArray arr = new JSONArray(resourceValues);
@@ -327,7 +343,11 @@ public class Registry extends HttpServlet {
 					}
 				}
 				clientResponse = registryClient.updateParameter(id, name, func, lib, minOccurs, maxOccurs, values);
-				obj.put("status", clientResponse.getStatus());
+				if (clientResponse != null) {
+					obj.put("status", clientResponse.getStatus());
+				} else {
+					obj.put("status", "No parameter update");
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
