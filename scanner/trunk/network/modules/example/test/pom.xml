@@ -123,46 +123,86 @@
                         
   </dependencies>   
 
-  <build>
-    <defaultGoal>test</defaultGoal>
+  <profiles>
+    <profile>
+        <id>default</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+       <build>
+          <defaultGoal>test</defaultGoal>
+          <plugins> 
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                  <source>1.6</source>
+                  <target>1.6</target>
+                </configuration>
+              </plugin>
 
-    <plugins> 
-        
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.5.1</version>
-          <configuration>
-            <source>1.6</source>
-            <target>1.6</target>
-          </configuration>
-        </plugin>
-                
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId> 
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.13</version>          
-          <configuration>
-<!-- 
+              <plugin>         
+                <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.13</version>          
+                <configuration>
+                  <argLine>-Djava.security.auth.login.config=etc/login.config</argLine>
+                  <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                  <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
+                  <childDelegation>false</childDelegation>
+                  <useFile>true</useFile>
+                </configuration>
+              </plugin>          
+          </plugins>                    
+       </build>
+    </profile>
+          
+    <profile>
+        <id>windows</id>
+        <activation>
+          <os>
+              <family>windows</family>
+          </os>
+        </activation>
+       <build>
+          <defaultGoal>test</defaultGoal>
+          <plugins> 
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                  <source>1.6</source>
+                  <target>1.6</target>
+                </configuration>
+              </plugin>
+
+              <plugin>         
+                <groupId>org.apache.maven.plugins</groupId> 
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.13</version>          
+                <configuration>
+                  <argLine>-Djava.security.auth.login.config=etc/login.config</argLine>
+                  <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                  <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
+                  <childDelegation>false</childDelegation>
+                  <useFile>true</useFile>
+<!--
      The SecureIterationIntegrationTest can create a lot of socket connections 
-     and can take a while on some systems (depending on the number of iterations,
-     which is essentially random), so it can be excluded by uncommenting the 
+     and can take a while on Windows (depending on the number of iterations,
+     which is essentially random), so it can be excluded by using the 
      lines below. 
 -->              
-<!--              
-              <excludes>
-                  <exclude>**/*SecureIterationIntegrationTest*</exclude>
-              </excludes>
--->
-            <argLine>-Djava.security.auth.login.config=etc/login.config</argLine>
-            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-            <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
-            <childDelegation>false</childDelegation>
-            <useFile>true</useFile>
-          </configuration>
-        </plugin>          
-                           
-    </plugins>                    
-  </build>
+                  <excludes>
+                      <exclude>**/*SecureIterationIntegrationTest*</exclude>
+                  </excludes>                  
+                </configuration>
+            </plugin>          
+          </plugins>                    
+       </build>
+    </profile>
+    
+  </profiles>
 
 </project>

@@ -18,4 +18,13 @@
         
     </camel:routeContext>
     
+    <camel:routeContext id="OceansSecureRouteContext">
+ 
+        <camel:route>
+            <camel:from uri="jetty:https://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?handlers=securityHandler&amp;sslContextParametersRef=sslContextParameters&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>          
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.oceans.OceansLogisticRegressionRoute"/>
+        </camel:route>
+        
+    </camel:routeContext>
+    
 </beans>

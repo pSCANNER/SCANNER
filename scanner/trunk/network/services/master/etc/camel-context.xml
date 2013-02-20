@@ -7,7 +7,8 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-    <import resource="file:etc/TestRouteContext.xml"/>                  
+    <import resource="file:etc/samples/TestRouteContext.xml"/> 
+    <import resource="file:etc/security/security-config.xml"/>                 
     <import resource="classpath:META-INF/spring/ExampleRouteContext.xml"/>                                                
     <import resource="classpath:META-INF/spring/OceansRouteContext.xml"/> 
     <import resource="classpath:META-INF/spring/GloreRouteContext.xml"/>     
@@ -29,7 +30,12 @@
         <camel:routeContextRef ref="OceansRouteContext"/>                
         <camel:routeContextRef ref="GloreRouteContext"/>            
         <!--<camel:routeContextRef ref="TestRouteContext"/>-->
-                
+
+        <!--
+        <camel:routeContextRef ref="OceansSecureRouteContext"/>                
+        <camel:routeContextRef ref="GloreSecureRouteContext"/>
+        <camel:routeContextRef ref="ExampleSecureRouteContext"/>        
+        -->                                
     </camel:camelContext>
 
 </beans>

@@ -133,13 +133,6 @@
       <version>2.10.1</version>
     </dependency>
 
-    <!-- security -->
-    <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-jaas</artifactId>
-        <version>5.7.0</version>
-    </dependency>
-
   </dependencies>
 
   <build>
@@ -155,12 +148,37 @@
             <target>1.6</target>
           </configuration>
         </plugin>
-                    
+
+        <!-- Allows the example to be run via 'mvn exec:java' -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <configuration>
+                <mainClass>edu.isi.misd.scanner.network.worker.Worker</mainClass>
+                <includePluginDependencies>false</includePluginDependencies>
+                <systemProperties>
+                    <property>
+                        <key>java.security.auth.login.config</key>
+                        <value>etc/security/login.config</value>
+                    </property>   
+                </systemProperties>
+            </configuration>
+        </plugin>
+                                                    
         <!-- allows the route to be ran via 'mvn camel:run' -->
         <plugin>
           <groupId>org.apache.camel</groupId>
           <artifactId>camel-maven-plugin</artifactId>
           <version>2.10.1</version>
+          <configuration>
+              <systemProperties>
+                <property>
+                    <key>java.security.auth.login.config</key>
+                    <value>etc/security/login.config</value>
+                </property>                  
+              </systemProperties>
+          </configuration>
         </plugin>        
     </plugins>                    
   </build>
