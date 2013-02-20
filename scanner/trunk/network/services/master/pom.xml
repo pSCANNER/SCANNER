@@ -153,15 +153,37 @@
           </configuration>
         </plugin>
                      
+        <!-- Allows the example to be run via 'mvn exec:java' -->
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.2.1</version>
+            <configuration>
+                <mainClass>edu.isi.misd.scanner.network.master.Master</mainClass>
+                <includePluginDependencies>false</includePluginDependencies>
+                <systemProperties>
+                    <property>
+                        <key>java.security.auth.login.config</key>
+                        <value>etc/security/login.config</value>
+                    </property>   
+                </systemProperties>
+            </configuration>
+        </plugin>
+                                                    
         <!-- allows the route to be ran via 'mvn camel:run' -->
         <plugin>
           <groupId>org.apache.camel</groupId>
           <artifactId>camel-maven-plugin</artifactId>
           <version>2.10.1</version>
           <configuration>
-              <arguments>-Djava.security.auth.login.config=etc/login.config</arguments>
-          </configuration>          
-        </plugin>  
+              <systemProperties>
+                <property>
+                    <key>java.security.auth.login.config</key>
+                    <value>etc/security/login.config</value>
+                </property>                  
+              </systemProperties>
+          </configuration>
+        </plugin>        
               
     </plugins>  
                       
