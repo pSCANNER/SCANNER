@@ -108,15 +108,15 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toFunctions()
+	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toMethods()
 	 */
 	@Override
-	public String toFunctions() {
+	public String toMethods() {
 		return toStudies();
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toFunctions()
+	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toMethods()
 	 */
 	@Override
 	public String toSites() {
@@ -201,7 +201,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 		return toResource();
 	}
 	@Override
-	public String toFunction() {
+	public String toMethod() {
 		return toResource();
 	}
 	/* (non-Javadoc)

@@ -59,9 +59,9 @@ function getSelectedLibrary() {
 }
 
 /**
- * @return the value of the selected functions
+ * @return the value of the selected method
  */
-function getSelectedFunction() {
+function getSelectedMethod() {
 	return $('input:radio[name=funcs]:checked').val();
 }
 
@@ -98,14 +98,14 @@ function getSelectedLibraryName() {
 }
 
 /**
- * @return the value of the selected functions
+ * @return the value of the selected method
  */
-function getSelectedFunctionName() {
+function getSelectedMethodName() {
 	return $('input:radio[name=funcs]:checked').parent().next().html();
 }
 
 /**
- * @return the value of the selected functions
+ * @return the value of the selected sites
  */
 function getSelectedSitesNames() {
 	var sites = [];
@@ -325,7 +325,7 @@ function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
 			'name': 'libs',
 			'value': data[name]
 		});
-		input.click(function(event) {renderAvailableFunctions();});
+		input.click(function(event) {renderAvailableMethods();});
 		td.append(input);
 		var td = $('<td>');
 		tr.append(td);
@@ -334,9 +334,9 @@ function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
 }
 
 /**
- * Send the request to get the available functions
+ * Send the request to get the available methods
  */
-function renderAvailableFunctions() {
+function renderAvailableMethods() {
 	// some clean up
 	$('#funcDiv').html('');
 	$('#siteDiv').html('');
@@ -347,13 +347,13 @@ function renderAvailableFunctions() {
 	// send the request
 	var lib = getSelectedLibraryName();
 	if (lib != null) {
-		var url = HOME + '/query?action=getFunctions&library=' + encodeSafeURIComponent(lib);
-		scanner.GET(url, true, postRenderAvailableFunctions, null, null, 0);
+		var url = HOME + '/query?action=getMethods&library=' + encodeSafeURIComponent(lib);
+		scanner.GET(url, true, postRenderAvailableMethods, null, null, 0);
 	}
 }
 
 /**
- * Render the available functions
+ * Render the available methods
  * 
  * @param data
  * 	the data returned from the server (a JSONObject having as keys the display names)
@@ -366,7 +366,7 @@ function renderAvailableFunctions() {
  * Example of the format of the received data:
    {"Logistic Regression":"Study1_Dataset1_oceans_lr"}
  */
-function postRenderAvailableFunctions(data, textStatus, jqXHR, param) {
+function postRenderAvailableMethods(data, textStatus, jqXHR, param) {
 	var funcDiv = $('#funcDiv');
 	var table = $('<table>');
 	funcDiv.append(table);
@@ -404,10 +404,10 @@ function renderAvailableParameters() {
 	$('#resultDiv').remove();
 	
 	// send the request
-	var func = getSelectedFunctionName();
+	var func = getSelectedMethodName();
 	var lib = getSelectedLibraryName();
 	if (func != '') {
-		var url = HOME + '/query?action=getParameters&function=' + encodeSafeURIComponent(func) + '&library=' + encodeSafeURIComponent(lib);
+		var url = HOME + '/query?action=getParameters&method=' + encodeSafeURIComponent(func) + '&library=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -501,7 +501,7 @@ function renderAvailableSites() {
 			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
 			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName()) +
 			'&library=' + encodeSafeURIComponent(getSelectedLibraryName()) +
-			'&function=' + encodeSafeURIComponent(getSelectedFunctionName());
+			'&method=' + encodeSafeURIComponent(getSelectedMethodName());
 	scanner.GET(url, true, postRenderSites, null, null, 0);
 }
 
@@ -563,7 +563,7 @@ function submitQuery() {
 	obj['study'] = getSelectedStudyName();
 	obj['dataset'] = getSelectedDatasetName();
 	obj['library'] = getSelectedLibraryName();
-	obj['function'] = getSelectedFunctionName();
+	obj['method'] = getSelectedMethodName();
 	obj['sites'] = valueToString(sites);
 	var url = HOME + '/query';
 	$('*', $('#paramsDiv')).css('cursor', 'wait');
@@ -596,14 +596,40 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	}
 }
 
+/**
+ * Create a study entry
+ * 
+ * @param name
+ * 	the name of the study
+ */
 function createStudy(name) {
+	if (name == null) {
+		alert('Please provide a name for the study.');
+		return;
+	}
 	var url = HOME + '/registry?action=createStudy' +
 				'&cname=' + encodeSafeURIComponent(name);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Create a dataset entry
+ * 
+ * @param name
+ * 	the name of the dataset
+ * @param study
+ * 	the study of the dataset
+ */
 function createDataset(name, study) {
+	if (name == null) {
+		alert('Please provide a name for the dataset.');
+		return;
+	}
+	if (study == null) {
+		alert('Please provide a study for the dataset.');
+		return;
+	}
 	var url = HOME + '/registry?action=createDataset' +
 			'&study=' + encodeSafeURIComponent(study) +
 			'&cname=' + encodeSafeURIComponent(name);
@@ -611,7 +637,23 @@ function createDataset(name, study) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Create a library entry
+ * 
+ * @param name
+ * 	the name of the library
+ * @param rpath
+ * 	the URL path of the library
+ */
 function createLibrary(name, rpath) {
+	if (name == null) {
+		alert('Please provide a name for the library.');
+		return;
+	}
+	if (rpath == null) {
+		alert('Please provide a URL path for the library.');
+		return;
+	}
 	var url = HOME + '/registry?action=createLibrary' +
 			'&rpath=' + encodeSafeURIComponent(rpath) +
 			'&cname=' + encodeSafeURIComponent(name);
@@ -619,8 +661,30 @@ function createLibrary(name, rpath) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function createFunction(name, lib, rpath) {
-	var url = HOME + '/registry?action=createFunction' +
+/**
+ * Create a method entry
+ * 
+ * @param name
+ * 	the name of the method
+ * @param rpath
+ * 	the URL path of the method
+ * @param lib
+ * 	the library of the method
+ */
+function createMethod(name, lib, rpath) {
+	if (name == null) {
+		alert('Please provide a name for the method.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide a library for the method.');
+		return;
+	}
+	if (rpath == null) {
+		alert('Please provide a URL path for the method.');
+		return;
+	}
+	var url = HOME + '/registry?action=createMethod' +
 					'&rpath=' + encodeSafeURIComponent(rpath) +
 					'&cname=' + encodeSafeURIComponent(name) +
 					'&library=' + encodeSafeURIComponent(lib);
@@ -628,18 +692,74 @@ function createFunction(name, lib, rpath) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Create a master entry
+ * 
+ * @param rURL
+ * 	the URL of the master
+ */
 function createMaster(rURL) {
+	if (rURL == null) {
+		alert('Please provide a URL for the master node.');
+		return;
+	}
 	var url = HOME + '/registry?action=createMaster&rURL=' + encodeSafeURIComponent(rURL);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Create a worker entry
+ * 
+ * @param study
+ * 	the study of the worker
+ * @param dataset
+ * 	the dataset of the worker
+ * @param lib
+ * 	the library of the worker
+ * @param func
+ * 	the method of the worker
+ * @param site
+ * 	the site of the worker
+ * @param datasource
+ * 	the data source of the worker
+ * @param rURL
+ * 	the URL of the worker
+ */
 function createWorker(study, dataset, lib, func, site, datasource, rURL) {
+	if (study == null) {
+		alert('Please provide a study for the worker.');
+		return;
+	}
+	if (dataset == null) {
+		alert('Please provide a dataset for the worker.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide a library for the worker.');
+		return;
+	}
+	if (func == null) {
+		alert('Please provide a method for the worker.');
+		return;
+	}
+	if (site == null) {
+		alert('Please provide a site for the worker.');
+		return;
+	}
+	if (datasource == null) {
+		alert('Please provide a data source for the worker.');
+		return;
+	}
+	if (rURL == null) {
+		alert('Please provide a URL for the worker.');
+		return;
+	}
 	var url = HOME + '/registry?action=createWorker' +
 					'&study=' + encodeSafeURIComponent(study) +
 					'&dataset=' + encodeSafeURIComponent(dataset) +
 					'&library=' + encodeSafeURIComponent(lib) +
-					'&function=' + encodeSafeURIComponent(func) +
+					'&method=' + encodeSafeURIComponent(func) +
 					'&site=' + encodeSafeURIComponent(site) +
 					'&datasource=' + encodeSafeURIComponent(datasource) +
 					'&rURL=' + encodeSafeURIComponent(rURL);
@@ -648,10 +768,44 @@ function createWorker(study, dataset, lib, func, site, datasource, rURL) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Create a parameter entry
+ * 
+ * @param name
+ * 	the name of the parameter
+ * @param func
+ * 	the method of the parameter
+ * @param lib
+ * 	the library of the parameter
+ * @param minOccurs
+ * 	the minOccurs of the parameter (default is 1)
+ * @param maxOccurs
+ * 	the maxOccurs of the parameter (default is 1)
+ * @param values
+ * 	the values of the parameter
+ */
 function createParameter(name, func, lib, minOccurs, maxOccurs, values) {
+	if (name == null) {
+		alert('Please provide a name for the parameter.');
+		return;
+	}
+	if (func == null) {
+		alert('Please provide a method for the parameter.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide a library for the parameter.');
+		return;
+	}
+	if (minOccurs == null) {
+		minOccurs = 1;
+	}
+	if (maxOccurs == null) {
+		maxOccurs = 1;
+	}
 	var url = HOME + '/registry?action=createParameter' +
 					'&cname=' + encodeSafeURIComponent(name) +
-					'&function=' + encodeSafeURIComponent(func) +
+					'&method=' + encodeSafeURIComponent(func) +
 					'&library=' + encodeSafeURIComponent(lib) +
 					'&minOccurs=' + minOccurs +
 					'&maxOccurs=' + maxOccurs;
@@ -664,48 +818,150 @@ function createParameter(name, func, lib, minOccurs, maxOccurs, values) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Delete a worker entry
+ * 
+ * @param study
+ * 	the study of the worker
+ * @param dataset
+ * 	the dataset of the worker
+ * @param lib
+ * 	the library of the worker
+ * @param func
+ * 	the method of the worker
+ * @param site
+ * 	the site of the worker
+ */
 function deleteWorker(study, dataset, lib, func, site) {
+	if (study == null) {
+		alert('Please provide a study for the worker.');
+		return;
+	}
+	if (dataset == null) {
+		alert('Please provide a dataset for the worker.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide a library for the worker.');
+		return;
+	}
+	if (func == null) {
+		alert('Please provide a method for the worker.');
+		return;
+	}
+	if (site == null) {
+		alert('Please provide a site for the worker.');
+		return;
+	}
 	var url = HOME + '/registry?action=deleteWorker' +
 		'&study=' + encodeSafeURIComponent(study) +
 		'&dataset=' + encodeSafeURIComponent(dataset) +
 		'&library=' + encodeSafeURIComponent(lib) +
-		'&function=' + encodeSafeURIComponent(func) +
+		'&method=' + encodeSafeURIComponent(func) +
 		'&site=' + encodeSafeURIComponent(site);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Delete a parameter entry
+ * 
+ * @param name
+ * 	the name of the parameter
+ * @param func
+ * 	the method of the parameter
+ * @param lib
+ * 	the library of the parameter
+ */
 function deleteParameter(name, func, lib) {
+	if (name == null) {
+		alert('Please provide a name for the parameter.');
+		return;
+	}
+	if (func == null) {
+		alert('Please provide a method for the parameter.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide a library for the parameter.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
 		'&action=deleteParameter' +
 		'&library=' + encodeSafeURIComponent(lib) +
-		'&function=' + encodeSafeURIComponent(func);
+		'&method=' + encodeSafeURIComponent(func);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Delete a master entry
+ * 
+ */
 function deleteMaster() {
 	var url = HOME + '/registry?action=deleteMaster';
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function deleteFunction(name, lib) {
+/**
+ * Delete a method entry
+ * 
+ * @param name
+ * 	the name of the method
+ * @param lib
+ * 	the library of the method
+ */
+function deleteMethod(name, lib) {
+	if (name == null) {
+		alert('Please provide a name for the method.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide a library for the method.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
-		'&action=deleteFunction' +
+		'&action=deleteMethod' +
 		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Delete a library entry
+ * 
+ * @param name
+ * 	the name of the library
+ */
 function deleteLibrary(name) {
+	if (name == null) {
+		alert('Please provide a name for the library.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
 		'&action=deleteLibrary';
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Delete a dataset entry
+ * 
+ * @param name
+ * 	the name of the dataset
+ * @param study
+ * 	the study of the dataset
+ */
 function deleteDataset(name, study) {
+	if (name == null) {
+		alert('Please provide a name for the dataset.');
+		return;
+	}
+	if (study == null) {
+		alert('Please provide a study for the dataset.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
 		'&action=deleteDataset' +
 		'&study=' + encodeSafeURIComponent(study);
@@ -713,14 +969,38 @@ function deleteDataset(name, study) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Delete a study entry
+ * 
+ * @param name
+ * 	the name of the study
+ */
 function deleteStudy(name) {
+	if (name == null) {
+		alert('Please provide a name for the study.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
 		'&action=deleteStudy';
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Update a library entry
+ * 
+ * @param id
+ * 	the id of the library
+ * @param name
+ * 	the name of the library
+ * @param rpath
+ * 	the URL path of the library
+ */
 function updateLibrary(id, name, rpath) {
+	if (id == null) {
+		alert('Please provide the library id.');
+		return;
+	}
 	var url = HOME + '/registry?action=updateLibrary&id=' + encodeSafeURIComponent(id);
 	if (name != null) {
 		url += '&cname=' + encodeSafeURIComponent(name);
@@ -732,8 +1012,24 @@ function updateLibrary(id, name, rpath) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
-function updateFunction(id, name, lib, rpath) {
-	var url = HOME + '/registry?action=updateFunction&id=' + encodeSafeURIComponent(id);
+/**
+ * Update a method entry
+ * 
+ * @param id
+ * 	the id of the method
+ * @param name
+ * 	the name of the method
+ * @param lib
+ * 	the library of the method
+ * @param rpath
+ * 	the URL path of the method
+ */
+function updateMethod(id, name, lib, rpath) {
+	if (id == null) {
+		alert('Please provide the method id.');
+		return;
+	}
+	var url = HOME + '/registry?action=updateMethod&id=' + encodeSafeURIComponent(id);
 	if (name != null) {
 		url += '&cname=' + encodeSafeURIComponent(name);
 	}
@@ -747,13 +1043,47 @@ function updateFunction(id, name, lib, rpath) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Update a master entry
+ * 
+ * @param rURL
+ * 	the URL of the master
+ */
 function updateMaster(rURL) {
+	if (rURL == null) {
+		alert('Please provide the master URL.');
+		return;
+	}
 	var url = HOME + '/registry?rURL=' + encodeSafeURIComponent(rURL) + '&action=updateMaster';
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Update a worker entry
+ * 
+ * @param id
+ * 	the id of the worker
+ * @param study
+ * 	the study of the worker
+ * @param dataset
+ * 	the dataset of the worker
+ * @param lib
+ * 	the library of the worker
+ * @param func
+ * 	the method of the worker
+ * @param site
+ * 	the site of the worker
+ * @param datasource
+ * 	the data source of the worker
+ * @param rURL
+ * 	the URL of the worker
+ */
 function updateWorker(id, study, dataset, lib, func, site, datasource, rURL) {
+	if (id == null) {
+		alert('Please provide the worker id.');
+		return;
+	}
 	var url = HOME + '/registry?action=updateWorker&id=' + encodeSafeURIComponent(id);
 	if (study != null) {
 		url += '&study=' + encodeSafeURIComponent(study);
@@ -765,7 +1095,7 @@ function updateWorker(id, study, dataset, lib, func, site, datasource, rURL) {
 		url += '&library=' + encodeSafeURIComponent(lib);
 	}
 	if (func != null) {
-		url += '&function=' + encodeSafeURIComponent(func);
+		url += '&method=' + encodeSafeURIComponent(func);
 	}
 	if (site != null) {
 		url += '&site=' + encodeSafeURIComponent(site);
@@ -780,13 +1110,35 @@ function updateWorker(id, study, dataset, lib, func, site, datasource, rURL) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Update a parameter entry
+ * 
+ * @param id
+ * 	the id of the parameter
+ * @param name
+ * 	the name of the parameter
+ * @param func
+ * 	the method of the parameter
+ * @param lib
+ * 	the library of the parameter
+ * @param minOccurs
+ * 	the minOccurs of the parameter
+ * @param maxOccurs
+ * 	the maxOccurs of the parameter
+ * @param values
+ * 	the values of the parameter
+ */
 function updateParameter(id, name, func, lib, minOccurs, maxOccurs, values) {
+	if (id == null) {
+		alert('Please provide the parameter id.');
+		return;
+	}
 	var url = HOME + '/registry?action=updateParameter&id=' + encodeSafeURIComponent(id);
 	if (name != null) {
 		url += '&cname=' + encodeSafeURIComponent(name);
 	}
 	if (func != null) {
-		url += '&function=' + encodeSafeURIComponent(func);
+		url += '&method=' + encodeSafeURIComponent(func);
 	}
 	if (lib != null) {
 		url += '&library=' + encodeSafeURIComponent(lib);
@@ -806,14 +1158,40 @@ function updateParameter(id, name, func, lib, minOccurs, maxOccurs, values) {
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }
 
+/**
+ * Get a study entry
+ * 
+ * @param name
+ * 	the name of the study
+ */
 function getStudy(name) {
+	if (name == null) {
+		alert('Please provide the name of the study.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
 		'&action=getStudy';
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get a dataset entry
+ * 
+ * @param name
+ * 	the name of the dataset
+ * @param study
+ * 	the study of the dataset
+ */
 function getDataset(name, study) {
+	if (name == null) {
+		alert('Please provide the name of the dataset.');
+		return;
+	}
+	if (study == null) {
+		alert('Please provide the study of the dataset.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
 		'&action=getDataset' +
 		'&study=' + encodeSafeURIComponent(study);
@@ -821,102 +1199,313 @@ function getDataset(name, study) {
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get a library entry
+ * 
+ * @param name
+ * 	the name of the dataset
+ */
 function getLibrary(name) {
+	if (name == null) {
+		alert('Please provide the name of the library.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
 		'&action=getLibrary';
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
-function getFunction(name, lib) {
+/**
+ * Get a method entry
+ * 
+ * @param name
+ * 	the name of the method
+ * @param lib
+ * 	the library of the method
+ */
+function getMethod(name, lib) {
+	if (name == null) {
+		alert('Please provide the name of the method.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide the library of the method.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
-		'&action=getFunction' +
+		'&action=getMethod' +
 		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get the master entry
+ */
 function getMaster() {
 	var url = HOME + '/registry?action=getMaster';
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get a parameter entry
+ * 
+ * @param name
+ * 	the name of the parameter
+ * @param func
+ * 	the method of the parameter
+ * @param lib
+ * 	the library of the parameter
+ */
 function getParameter(name, func, lib) {
+	if (name == null) {
+		alert('Please provide the name of the parameter.');
+		return;
+	}
+	if (func == null) {
+		alert('Please provide the method of the parameter.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide the library of the parameter.');
+		return;
+	}
 	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
 		'&action=getParameter' +
-		'&function=' + encodeSafeURIComponent(func) +
+		'&method=' + encodeSafeURIComponent(func) +
 		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get a worker entry
+ * 
+ * @param study
+ * 	the study of the worker
+ * @param dataset
+ * 	the dataset of the worker
+ * @param lib
+ * 	the library of the worker
+ * @param func
+ * 	the method of the worker
+ * @param site
+ * 	the site of the worker
+ */
 function getWorker(study, dataset, lib, func, site) {
+	if (study == null) {
+		alert('Please provide the study of the worker.');
+		return;
+	}
+	if (dataset == null) {
+		alert('Please provide the dataset of the worker.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide the library of the worker.');
+		return;
+	}
+	if (func == null) {
+		alert('Please provide the method of the worker.');
+		return;
+	}
+	if (site == null) {
+		alert('Please provide the site of the worker.');
+		return;
+	}
 	var url = HOME + '/registry?study=' + encodeSafeURIComponent(study) + 
 		'&action=getWorker' +
 		'&dataset=' + encodeSafeURIComponent(dataset) +
-		'&function=' + encodeSafeURIComponent(func) +
+		'&method=' + encodeSafeURIComponent(func) +
 		'&site=' + encodeSafeURIComponent(site) +
 		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get all the studies
+ * 
+ */
 function getStudies() {
 	var url = HOME + '/registry?action=getStudies';
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get all the datasets of a study 
+ * 
+ * @param study
+ * 	the study of the dataset
+ */
 function getDatasets(study) {
+	if (study == null) {
+		alert('Please provide the study of the datasets.');
+		return;
+	}
 	var url = HOME + '/registry?action=getDatasets' +
 		'&study=' + encodeSafeURIComponent(study);
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get all the libraries 
+ * 
+ */
 function getLibraries() {
 	var url = HOME + '/registry?action=getLibraries';
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
-function getFunctions(lib) {
-	var url = HOME + '/registry?action=getFunctions' +
+/**
+ * Get all the methods of a library 
+ * 
+ * @param lib
+ * 	the library of the methods
+ */
+function getMethods(lib) {
+	if (lib == null) {
+		alert('Please provide the library of the methods.');
+		return;
+	}
+	var url = HOME + '/registry?action=getMethods' +
 		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get all the parameters of a method 
+ * 
+ * @param func
+ * 	the method of the parameters
+ * @param lib
+ * 	the library of the parameters
+ */
 function getParameters(func, lib) {
+	if (func == null) {
+		alert('Please provide the method of the parameters.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide the library of the parameters.');
+		return;
+	}
 	var url = HOME + '/registry?action=getParameters' +
-		'&function=' + encodeSafeURIComponent(func) +
+		'&method=' + encodeSafeURIComponent(func) +
 		'&library=' + encodeSafeURIComponent(lib);
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
 function getSites(study, dataset, lib, func) {
+	if (study == null) {
+		alert('Please provide the study of the sites.');
+		return;
+	}
+	if (dataset == null) {
+		alert('Please provide the dataset of the sites.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide the library of the sites.');
+		return;
+	}
+	if (func == null) {
+		alert('Please provide the method of the sites.');
+		return;
+	}
 	var url = HOME + '/registry?action=getSites' +
 		'&study=' + encodeSafeURIComponent(study) +
 		'&dataset=' + encodeSafeURIComponent(dataset) +
 		'&library=' + encodeSafeURIComponent(lib) +
-		'&function=' + encodeSafeURIComponent(func);
+		'&method=' + encodeSafeURIComponent(func);
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
 function getWorkers(study, dataset, lib, func, sites) {
+	if (study == null) {
+		alert('Please provide the study of the workers.');
+		return;
+	}
+	if (dataset == null) {
+		alert('Please provide the dataset of the workers.');
+		return;
+	}
+	if (lib == null) {
+		alert('Please provide the library of the workers.');
+		return;
+	}
+	if (func == null) {
+		alert('Please provide the method of the workers.');
+		return;
+	}
 	var url = HOME + '/registry?study=' + encodeSafeURIComponent(study) + 
 		'&action=getWorkers' +
 		'&dataset=' + encodeSafeURIComponent(dataset) +
-		'&function=' + encodeSafeURIComponent(func) +
+		'&method=' + encodeSafeURIComponent(func) +
 		'&library=' + encodeSafeURIComponent(lib);
 	if (sites != null && sites.length > 0) {
 		url += '&sites=';
 		var values = arrayToString(sites);
 		url += encodeSafeURIComponent(values);
 	}
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+/**
+ * Get all the libraries of a site
+ * 
+ */
+function getNodeLibraries(site) {
+	if (site == null) {
+		alert('Please provide a site name.');
+		return;
+	}
+	var url = HOME + '/registry?action=getNodeLibraries' +
+		'&site=' + encodeSafeURIComponent(site);
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+/**
+ * Get all the datasets of a site 
+ * 
+ */
+function getNodeExtracts(site) {
+	if (site == null) {
+		alert('Please provide a site name.');
+		return;
+	}
+	var url = HOME + '/registry?action=getNodeExtracts' +
+		'&site=' + encodeSafeURIComponent(site);
+	document.body.style.cursor = "wait";
+	scanner.GET(url, true, postGetResourceAction, null, null, 0);
+}
+
+/**
+ * Get all the sites of a dataset 
+ * 
+ */
+function getDatasetSites(study, dataset) {
+	if (study == null) {
+		alert('Please provide the study of the sites.');
+		return;
+	}
+	if (dataset == null) {
+		alert('Please provide the dataset of the sites.');
+		return;
+	}
+	var url = HOME + '/registry?action=getDatasetSites' +
+		'&study=' + encodeSafeURIComponent(study) +
+		'&dataset=' + encodeSafeURIComponent(dataset);
 	document.body.style.cursor = "wait";
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
@@ -1531,7 +2120,7 @@ function renderSelectTable() {
 	th.css({'border': '1px solid black'
 	});
 	tr.append(th);
-	th.html('Functions');
+	th.html('Methods');
 	var th = $('<th>');
 	th.css({'border': '1px solid black'
 	});

@@ -79,14 +79,14 @@ public interface RegistryClientResponse {
     public String toLibraries();
 
     /**
-     * Returns a string representing a JSONObject for the functions
-     * 		- the keys are the functions names
-     * 		- the values are the functions id
+     * Returns a string representing a JSONObject for the methods
+     * 		- the keys are the methods names
+     * 		- the values are the methods id
      *   
      * Example: {"Logistic Regression":191}
      * 
      */
-    public String toFunctions();
+    public String toMethods();
 
 
     /**
@@ -120,11 +120,11 @@ public interface RegistryClientResponse {
      * Returns a string representing a JSONArray for the workers
      * 		- each array element is a string representing a JSONObject of the worker 
      *   
-     * Example: [	{"function":"Logistic Regression","study":"Study1","site":"ISI","library":"GLORE",
+     * Example: [	{"method":"Logistic Regression","study":"Study1","site":"ISI","library":"GLORE",
      * 					"dataset":"Dataset1","datasource":"ca_part3","rURL":"http://scanner.misd.isi.edu:8886/scanner",
      * 					"id":185
      * 				},
-     * 				{"function":"Logistic Regression","study":"Study1","site":"UCSD","library":"GLORE",
+     * 				{"method":"Logistic Regression","study":"Study1","site":"UCSD","library":"GLORE",
      * 					"dataset":"Dataset1","datasource":"ca_part1","rURL":"http://scanner.misd.isi.edu:8888/scanner",
      * 					"id":187
      * 				}
@@ -158,12 +158,12 @@ public interface RegistryClientResponse {
     public String toLibrary();
 
     /**
-     * Returns a string representing a JSONObject for the function
+     * Returns a string representing a JSONObject for the method
      *   
      * Example: {"id":191,"rpath":"lr","library":"Oceans","cname":"Logistic Regression"}
      * 
      */
-    public String toFunction();
+    public String toMethod();
 
     /**
      * Returns a string representing a JSONObject for the master
@@ -178,7 +178,7 @@ public interface RegistryClientResponse {
      *   
      * Example: {"id":187,"site":"UCSD","rURL":"http://scanner.misd.isi.edu:8888/scanner",
      * 			"dataset":"Dataset1","library":"GLORE","study":"Study1","datasource":"ca_part1",
-     * 			"function":"Logistic Regression"}
+     * 			"method":"Logistic Regression"}
      * 
      */
     public String toWorker();
@@ -188,7 +188,7 @@ public interface RegistryClientResponse {
      *   
      * Example: {"id":188,"values":["Age","CAD","Creatinine","Diabetes","LOS","Race_Cat"],
      * 			"maxOccurs":-1,"library":"Oceans","cname":"independentVariableNames","minOccurs":0,
-     * 			"function":"Logistic Regression"}
+     * 			"method":"Logistic Regression"}
      * 
      */
     public String toParameter();
@@ -199,7 +199,7 @@ public interface RegistryClientResponse {
      * 		- getStudy(String name)
      * 		- getDataset(String name, String study)
      * 		- getLibrary(String name)
-     * 		- getFunction(String name, String lib)
+     * 		- getMethod(String name, String lib)
      * 		- getMaster()
      * 		- getParameter(String name, String func, String lib)
      * 		- getWorker(String study, String dataset, String lib, String func, String site)

@@ -58,17 +58,17 @@ public interface RegistryClient {
 	public RegistryClientResponse createLibrary(String name, String urlPath);
 	
     /**
-     * Creates an entry of "function" type in the registry
+     * Creates an entry of "method" type in the registry
      * 
      * @param name
-     *            the name of the function
+     *            the name of the method
      * @param lib
-     *            the library the function belongs to
+     *            the library the method belongs to
      * @param urlPath
      *            the path to be used in the URL
      * @return the Client Response
      */
-	public RegistryClientResponse createFunction(String name, String lib, String urlPath);
+	public RegistryClientResponse createMethod(String name, String lib, String urlPath);
 	
     /**
      * Creates an entry of "master" type in the registry
@@ -85,7 +85,7 @@ public interface RegistryClient {
      * @param name
      *            the name of the parameter
      * @param func
-     *            the function the parameter belongs to
+     *            the method the parameter belongs to
      * @param lib
      *            the library the parameter belongs to
      * @param minOccurs
@@ -108,7 +108,7 @@ public interface RegistryClient {
      * @param lib
      *            the library the worker belongs to
      * @param func
-     *            the function the worker belongs to
+     *            the method the worker belongs to
      * @param site
      *            the site the worker belongs to
      * @param sourceData
@@ -149,15 +149,15 @@ public interface RegistryClient {
 	public RegistryClientResponse deleteLibrary(String name);
 	
     /**
-     * Delete a function from the registry
+     * Delete a method from the registry
      * 
      * @param name
-     *            the name of the function
+     *            the name of the method
      * @param lib
-     *            the library the function belongs to
+     *            the library the method belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse deleteFunction(String name, String lib);
+	public RegistryClientResponse deleteMethod(String name, String lib);
 	
     /**
      * Delete the master from the registry
@@ -172,7 +172,7 @@ public interface RegistryClient {
      * @param name
      *            the name of the parameter
      * @param func
-     *            the function the parameter belongs to
+     *            the method the parameter belongs to
      * @param lib
      *            the library the parameter belongs to
      * @return the Client Response
@@ -189,7 +189,7 @@ public interface RegistryClient {
      * @param lib
      *            the library the worker belongs to
      * @param func
-     *            the function the worker belongs to
+     *            the method the worker belongs to
      * @param site
      *            the site the worker belongs to
      * @return the Client Response
@@ -210,19 +210,19 @@ public interface RegistryClient {
 	public RegistryClientResponse updateLibrary(String id, String name, String urlPath);
 	
     /**
-     * Update a function
+     * Update a method
      * 
      * @param id
-     *            the id of the function in the registry
+     *            the id of the method in the registry
      * @param name
-     *            the new name of the function
+     *            the new name of the method
      * @param lib
-     *            the new library the function belongs to
+     *            the new library the method belongs to
      * @param urlPath
      *            the new path to be used in the URL
      * @return the Client Response
      */
-	public RegistryClientResponse updateFunction(String id, String name, String lib, String urlPath);
+	public RegistryClientResponse updateMethod(String id, String name, String lib, String urlPath);
 	
     /**
      * Update a parameter 
@@ -232,7 +232,7 @@ public interface RegistryClient {
      * @param name
      *            the new name of the parameter
      * @param func
-     *            the new function the parameter belongs to
+     *            the new method the parameter belongs to
      * @param lib
      *            the new library the parameter belongs to
      * @param minOccurs
@@ -266,7 +266,7 @@ public interface RegistryClient {
      * @param lib
      *            the new library the worker belongs to
      * @param func
-     *            the new function the worker belongs to
+     *            the new method the worker belongs to
      * @param site
      *            the new site the worker belongs to
      * @param sourceData
@@ -301,25 +301,25 @@ public interface RegistryClient {
 	public RegistryClientResponse getLibraries();
 	
     /**
-     * Get the functions of a library 
+     * Get the methods of a library 
      * 
      * @param lib
      *            the name of the library
      * @return the Client Response
      */
-	public RegistryClientResponse getFunctions(String lib);
+	public RegistryClientResponse getMethods(String lib);
 	
     /**
-     * Get the parameters of a function 
+     * Get the parameters of a method 
      * 
      * @param func
-     *            the name of the function
+     *            the name of the method
      * @return the Client Response
      */
 	public RegistryClientResponse getParameters(String func, String lib);
 	
     /**
-     * Get the sites for a given study, dataset, library and function 
+     * Get the sites for a given study, dataset, library and method 
      * 
      * @param study
      *            the study name
@@ -328,13 +328,13 @@ public interface RegistryClient {
      * @param lib
      *            the library name
      * @param func
-     *            the function name
+     *            the method name
      * @return the Client Response
      */
 	public RegistryClientResponse getSites(String study, String dataset, String lib, String func);
 	
     /**
-     * Get the workers  for a given study, dataset, library, function and sites
+     * Get the workers  for a given study, dataset, library, method and sites
      * 
      * @param master
      *            the name of the master
@@ -372,15 +372,15 @@ public interface RegistryClient {
 	public RegistryClientResponse getLibrary(String name);
 	
     /**
-     * Get a function from the registry
+     * Get a method from the registry
      * 
      * @param name
-     *            the name of the function
+     *            the name of the method
      * @param lib
-     *            the library the function belongs to
+     *            the library the method belongs to
      * @return the Client Response
      */
-	public RegistryClientResponse getFunction(String name, String lib);
+	public RegistryClientResponse getMethod(String name, String lib);
 	
     /**
      * Get the master from the registry
@@ -397,7 +397,7 @@ public interface RegistryClient {
      * @param name
      *            the name of the parameter
      * @param func
-     *            the function the parameter belongs to
+     *            the method the parameter belongs to
      * @param lib
      *            the library the parameter belongs to
      * @return the Client Response
@@ -414,12 +414,41 @@ public interface RegistryClient {
      * @param lib
      *            the library the worker belongs to
      * @param func
-     *            the function the worker belongs to
+     *            the method the worker belongs to
      * @param site
      *            the site the worker belongs to
      * @return the Client Response
      */
 	public RegistryClientResponse getWorker(String study, String dataset, String lib, String func, String site);
+	
+    /**
+     * Get the libraries of a site
+     * 
+     * @param site
+     *            the site name
+     * @return the Client Response
+     */
+	public RegistryClientResponse getNodeLibraries(String site);
+	
+    /**
+     * Get the extracts of a node
+     * 
+     * @param site
+     *            the site the worker belongs to
+     * @return the Client Response
+     */
+	public RegistryClientResponse getNodeExtracts(String site);
+	
+    /**
+     * Get the sites of a dataset
+     * 
+     * @param study
+     *            the study the worker belongs to
+     * @param dataset
+     *            the dataset the worker belongs to
+     * @return the Client Response
+     */
+	public RegistryClientResponse getDatasetSites(String study, String dataset);
 	
 
 }

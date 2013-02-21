@@ -78,7 +78,7 @@ public class Registry extends HttpServlet {
 		String study = request.getParameter("study");
 		String lib = request.getParameter("library");
 		String dataset = request.getParameter("dataset");
-		String func = request.getParameter("function");
+		String func = request.getParameter("method");
 		String site = request.getParameter("site");
 		String sites = request.getParameter("sites");
 		RegistryClientResponse clientResponse = null;
@@ -91,9 +91,9 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("getLibrary")) {
 			clientResponse = registryClient.getLibrary(name);
 			res= clientResponse.toLibrary();
-		} else if (action.equals("getFunction")) {
-			clientResponse = registryClient.getFunction(name, lib);
-			res= clientResponse.toFunction();
+		} else if (action.equals("getMethod")) {
+			clientResponse = registryClient.getMethod(name, lib);
+			res= clientResponse.toMethod();
 		} else if (action.equals("getMaster")) {
 			clientResponse = registryClient.getMaster();
 			res= clientResponse.toMaster();
@@ -112,9 +112,9 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("getLibraries")) {
 			clientResponse = registryClient.getLibraries();
 			res= clientResponse.toLibraries();
-		} else if (action.equals("getFunctions")) {
-			clientResponse = registryClient.getFunctions(lib);
-			res= clientResponse.toFunctions();
+		} else if (action.equals("getMethods")) {
+			clientResponse = registryClient.getMethods(lib);
+			res= clientResponse.toMethods();
 		} else if (action.equals("getParameters")) {
 			clientResponse = registryClient.getParameters(func, lib);
 			res= clientResponse.toParameters();
@@ -139,14 +139,17 @@ public class Registry extends HttpServlet {
 			}
 			clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
 			res= clientResponse.toWorkers();
+		} else if (action.equals("getNodeLibraries")) {
+			clientResponse = registryClient.getNodeLibraries(site);
+			res= clientResponse.toLibraries();
+		} else if (action.equals("getNodeExtracts")) {
+			clientResponse = registryClient.getNodeExtracts(site);
+			res= clientResponse.toDatasets();
+		} else if (action.equals("getDatasetSites")) {
+			clientResponse = registryClient.getDatasetSites(study, dataset);
+			res= clientResponse.toSites();
 		}
-
-
-
-
-
-
-
+		
 		if (clientResponse != null) {
 			clientResponse.release();
 		}
@@ -170,7 +173,7 @@ public class Registry extends HttpServlet {
 		String rURL = request.getParameter("rURL");
 		String datasource = request.getParameter("datasource");
 		String dataset = request.getParameter("dataset");
-		String func = request.getParameter("function");
+		String func = request.getParameter("method");
 		String site = request.getParameter("site");
 		String resourceValues = request.getParameter("values"); 
 		Integer minOccurs = null; 
@@ -203,8 +206,8 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("createFunction")) {
-			clientResponse = registryClient.createFunction(name, lib, rpath);
+		} else if (action.equals("createMethod")) {
+			clientResponse = registryClient.createMethod(name, lib, rpath);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
@@ -241,8 +244,8 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("deleteFunction")) {
-			clientResponse = registryClient.deleteFunction(name, lib);
+		} else if (action.equals("deleteMethod")) {
+			clientResponse = registryClient.deleteMethod(name, lib);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
@@ -301,13 +304,13 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-		} else if (action.equals("updateFunction")) {
+		} else if (action.equals("updateMethod")) {
 			try {
-				clientResponse = registryClient.updateFunction(id, name, lib, rpath);
+				clientResponse = registryClient.updateMethod(id, name, lib, rpath);
 				if (clientResponse != null) {
 					obj.put("status", clientResponse.getStatus());
 				} else {
-					obj.put("status", "No function update");
+					obj.put("status", "No method update");
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();

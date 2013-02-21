@@ -101,15 +101,15 @@ public class Query extends HttpServlet {
 			System.out.println("Get Libraries: "+ret.toString());
 			PrintWriter out = response.getWriter();
 			out.print(ret.toString());
-		} else if (action.equals("getFunctions")) {
+		} else if (action.equals("getMethods")) {
 			String lib = request.getParameter("library");
-			RegistryClientResponse clientResponse = registryClient.getFunctions(lib);
-			String ret = clientResponse.toFunctions();
-			System.out.println("Get Functions: "+ret);
+			RegistryClientResponse clientResponse = registryClient.getMethods(lib);
+			String ret = clientResponse.toMethods();
+			System.out.println("Get Methods: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getParameters")) {
-			String func = request.getParameter("function");
+			String func = request.getParameter("method");
 			String lib = request.getParameter("library");
 			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib);
 			String ret = clientResponse.toParameters();
@@ -120,7 +120,7 @@ public class Query extends HttpServlet {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
 			String lib = request.getParameter("library");
-			String func = request.getParameter("function");
+			String func = request.getParameter("method");
 			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset, lib, func);
 			String ret = clientResponse.toSites();
 			System.out.println("Get Sites:\n"+ret);
@@ -183,15 +183,15 @@ public class Query extends HttpServlet {
 					String params = request.getParameter("parameters");
 					String sites = request.getParameter("sites");
 					String lib = request.getParameter("library");
-					String func = request.getParameter("function");
+					String func = request.getParameter("method");
 					String study = request.getParameter("study");
 					String dataset = request.getParameter("dataset");
 					RegistryClientResponse clientResponse = registryClient.getMaster();
 					String res = clientResponse.toMaster();
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("rURL");
-					clientResponse = registryClient.getFunction(func, lib);
-					res = clientResponse.toFunction();
+					clientResponse = registryClient.getMethod(func, lib);
+					res = clientResponse.toMethod();
 					temp = new JSONObject(res);
 					String funcPath = temp.getString("rpath");
 					clientResponse = registryClient.getLibrary(lib);
