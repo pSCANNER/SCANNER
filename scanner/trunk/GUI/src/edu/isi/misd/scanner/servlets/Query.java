@@ -19,6 +19,7 @@ package edu.isi.misd.scanner.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -208,6 +209,14 @@ public class Query extends HttpServlet {
 							}
 						}
 					}
+					clientResponse = registryClient.getSite(values);
+					res = clientResponse.toSite();
+					HashMap<String, String> sitesMap = new HashMap<String, String>();
+					JSONArray tempArray = new JSONArray(res);
+					for (int i=0; i < tempArray.length(); i++) {
+						temp = tempArray.getJSONObject(i);
+						sitesMap.put(temp.getString("cname"), temp.getString("rURL"));
+					}
 					clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
 					res = clientResponse.toWorkers();
 					StringBuffer buff = new StringBuffer();
@@ -218,7 +227,7 @@ public class Query extends HttpServlet {
 						}
 						temp = targets.getJSONObject(i);
 						String dataSource = temp.getString("datasource");
-						buff.append(temp.getString("rURL")).append("/dataset/").append(libPath).append("/").append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
+						buff.append(sitesMap.get(temp.getString("site"))).append("/dataset/").append(libPath).append("/").append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
 					}
 					String targetsURLs = buff.toString();
 					buff = new StringBuffer();

@@ -80,6 +80,17 @@ public interface RegistryClient {
 	public RegistryClientResponse createMaster(String url);
 	
     /**
+     * Creates an entry of "site" type in the registry
+     * 
+     * @param name
+     *            the name of the site
+     * @param url
+     *            the url of the site
+     * @return the Client Response
+     */
+	public RegistryClientResponse createSite(String name, String url);
+	
+    /**
      * Creates an entry of "parameter" type in the registry
      * 
      * @param name
@@ -113,11 +124,9 @@ public interface RegistryClient {
      *            the site the worker belongs to
      * @param sourceData
      *            the data source
-     * @param url
-     *            the url of the worker
      * @return the Client Response
      */
-	public RegistryClientResponse createWorker(String study, String dataset, String lib, String func, String site, String sourceData, String url);
+	public RegistryClientResponse createWorker(String study, String dataset, String lib, String func, String site, String sourceData);
 	
     /**
      * Deletes a study from the registry
@@ -165,6 +174,15 @@ public interface RegistryClient {
      * @return the Client Response
      */
 	public RegistryClientResponse deleteMaster();
+	
+    /**
+     * Delete a site from the registry
+     * 
+     * @param name
+     *            the name of the site
+     * @return the Client Response
+     */
+	public RegistryClientResponse deleteSite(String name);
 	
     /**
      * Delete a parameter from the registry
@@ -255,6 +273,19 @@ public interface RegistryClient {
 	public RegistryClientResponse updateMaster(String url);
 	
     /**
+     * Update the site 
+     * 
+     * @param id
+     *            the id of the site
+     * @param url
+     *            the new url of the site
+     * @param name
+     *            the new name of the site
+     * @return the Client Response
+     */
+	public RegistryClientResponse updateSite(String id, String name, String url);
+	
+    /**
      * Modify a worker 
      * 
      * @param id
@@ -275,7 +306,7 @@ public interface RegistryClient {
      *            the new url of the worker
      * @return the Client Response
      */
-	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, String sourceData, String url);
+	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, String sourceData);
 	
     /**
      * Get the studies 
@@ -314,6 +345,8 @@ public interface RegistryClient {
      * 
      * @param func
      *            the name of the method
+     * @param lib
+     *            the name of the library
      * @return the Client Response
      */
 	public RegistryClientResponse getParameters(String func, String lib);
@@ -336,8 +369,16 @@ public interface RegistryClient {
     /**
      * Get the workers  for a given study, dataset, library, method and sites
      * 
-     * @param master
-     *            the name of the master
+     * @param study
+     *            the study name
+     * @param dataset
+     *            the dataset name
+     * @param lib
+     *            the library name
+     * @param func
+     *            the method name
+     * @param sites
+     *            the sites names
      * @return the Client Response
      */
 	public RegistryClientResponse getWorkers(String study, String dataset, String lib, String func, List<String> sites);
@@ -420,6 +461,15 @@ public interface RegistryClient {
      * @return the Client Response
      */
 	public RegistryClientResponse getWorker(String study, String dataset, String lib, String func, String site);
+	
+    /**
+     * Get the site(s)
+     * 
+     * @param sites
+     *            the name of the sites; if null or empty; get all the sites
+     * @return the Client Response
+     */
+	public RegistryClientResponse getSite(List<String> sites);
 	
     /**
      * Get the libraries of a site

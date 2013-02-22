@@ -709,6 +709,30 @@ function createMaster(rURL) {
 }
 
 /**
+ * Create a site entry
+ * 
+ * @param name
+ * 	the name of the site
+ * @param rURL
+ * 	the URL of the site
+ */
+function createSite(name, rURL) {
+	if (name == null) {
+		alert('Please provide a name for the site.');
+		return;
+	}
+	if (rURL == null) {
+		alert('Please provide a URL for the site.');
+		return;
+	}
+	var url = HOME + '/registry?action=createSite' +
+			'&rURL=' + encodeSafeURIComponent(rURL) +
+			'&cname=' + encodeSafeURIComponent(name);
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+/**
  * Create a worker entry
  * 
  * @param study
@@ -946,6 +970,23 @@ function deleteLibrary(name) {
 }
 
 /**
+ * Delete a site entry
+ * 
+ * @param name
+ * 	the name of the site
+ */
+function deleteSite(name) {
+	if (name == null) {
+		alert('Please provide a name for the site.');
+		return;
+	}
+	var url = HOME + '/registry?cname=' + encodeSafeURIComponent(name) + 
+		'&action=deleteSite';
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+/**
  * Delete a dataset entry
  * 
  * @param name
@@ -1055,6 +1096,32 @@ function updateMaster(rURL) {
 		return;
 	}
 	var url = HOME + '/registry?rURL=' + encodeSafeURIComponent(rURL) + '&action=updateMaster';
+	document.body.style.cursor = "wait";
+	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
+}
+
+/**
+ * Update a site entry
+ * 
+ * @param id
+ * 	the id of the site
+ * @param name
+ * 	the name of the site
+ * @param rpath
+ * 	the URL path of the site
+ */
+function updateSite(id, name, rURL) {
+	if (id == null) {
+		alert('Please provide the site id.');
+		return;
+	}
+	var url = HOME + '/registry?action=updateSite&id=' + encodeSafeURIComponent(id);
+	if (name != null) {
+		url += '&cname=' + encodeSafeURIComponent(name);
+	}
+	if (rURL != null) {
+		url += '&rURL=' + encodeSafeURIComponent(rURL);
+	}
 	document.body.style.cursor = "wait";
 	scanner.POST(url, {}, true, postResourceAction, null, null, 0);
 }

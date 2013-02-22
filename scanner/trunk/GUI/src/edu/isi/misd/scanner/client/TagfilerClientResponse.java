@@ -128,7 +128,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				ret.put(obj.getString("site"), obj.getString("id"));
+				ret.put(obj.getString("cname"), obj.getString("id"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -230,6 +230,10 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			e.printStackTrace();
 		}
 		return ret;
+	}
+	@Override
+	public String toSite() {
+		return response.getEntityString();
 	}
 
 }

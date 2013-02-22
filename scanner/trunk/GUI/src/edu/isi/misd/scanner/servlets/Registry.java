@@ -32,8 +32,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.client.RegistryClient;
 import edu.isi.misd.scanner.client.RegistryClientResponse;
+import edu.isi.misd.scanner.client.TagfilerClient;
+import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
+import edu.isi.misd.scanner.utils.Utils;
 
 /**
  * Servlet implementation class Registry
@@ -72,6 +76,11 @@ public class Registry extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
 		HttpSession session = request.getSession(false);
+		if (session == null) {
+			PrintWriter out = response.getWriter();
+			out.print("Not logged in.\n");
+			return;
+		}
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		String res = "";
 		String name = request.getParameter("cname");
@@ -103,6 +112,24 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("getWorker")) {
 			clientResponse = registryClient.getWorker(study, dataset, lib, func, site);
 			res= clientResponse.toWorker();
+		}  else if (action.equals("getSite")) {
+			ArrayList<String> values = null;
+			if (sites != null) {
+				try {
+					JSONArray arr = new JSONArray(sites);
+					if (arr.length() > 0) {
+						values = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							values.add(arr.getString(i));
+						}
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			clientResponse = registryClient.getSite(values);
+			res= clientResponse.toSite();
 		} else if (action.equals("getStudies")) {
 			clientResponse = registryClient.getStudies();
 			res= clientResponse.toStudies();
@@ -162,6 +189,38 @@ public class Registry extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
+		if (action.equals("login")) {
+			HttpSession session = request.getSession(true);
+			if (session.isNew() == false) {
+				session.invalidate();
+				session = request.getSession(true);
+			}  
+			String username = request.getParameter("username");
+			String password = request.getParameter("password");
+			boolean valid = Utils.login(request, response, username, password);
+			if (valid) {
+				session.setAttribute("user", username);
+				JakartaClient client = new JakartaClient(4, 8192, 120000);
+				session.setAttribute("httpClient", client);
+				ClientURLResponse rsp = client.login(tagfilerURL + "/session", tagfilerUser, tagfilerPassword);
+				if (rsp != null) {
+					//rsp.debug();
+					session.setAttribute("tagfilerCookie", client.getCookieValue());
+					//RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue(), request);
+					RegistryClient registryClient = new TagfilerClient(client, tagfilerURL, client.getCookieValue());
+					session.setAttribute("registryClient", registryClient);
+					PrintWriter out = response.getWriter();
+					out.print(client.getCookieValue() + "\n");
+				} else {
+					PrintWriter out = response.getWriter();
+					out.print("Can not access registry service.\n");
+				}
+			} else {
+				PrintWriter out = response.getWriter();
+				out.print("Invalid username or password.\n");
+			}
+			return;
+		}
 		HttpSession session = request.getSession(false);
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		JSONObject obj = new JSONObject();
@@ -221,7 +280,14 @@ public class Registry extends HttpServlet {
 				e.printStackTrace();
 			}
 		} else if (action.equals("createWorker")) {
-			clientResponse = registryClient.createWorker(study, dataset, lib, func, site, datasource, rURL);
+			clientResponse = registryClient.createWorker(study, dataset, lib, func, site, datasource);
+			try {
+				obj.put("status", clientResponse.getStatus());
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("createSite")) {
+			clientResponse = registryClient.createSite(name, rURL);
 			try {
 				obj.put("status", clientResponse.getStatus());
 			} catch (JSONException e) {
@@ -279,6 +345,13 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		}  else if (action.equals("deleteSite")) {
+			clientResponse = registryClient.deleteSite(name);
+			try {
+				obj.put("status", clientResponse.getStatus());
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("deleteParameter")) {
 			try {
 				clientResponse = registryClient.deleteParameter(name, func, lib);
@@ -322,9 +395,20 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		}  else if (action.equals("updateSite")) {
+			try {
+				clientResponse = registryClient.updateSite(id, name, rURL);
+				if (clientResponse != null) {
+					obj.put("status", clientResponse.getStatus());
+				} else {
+					obj.put("status", "No site update");
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("updateWorker")) {
 			try {
-				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, datasource, rURL);
+				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, datasource);
 				if (clientResponse != null) {
 					obj.put("status", clientResponse.getStatus());
 				} else {

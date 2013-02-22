@@ -121,11 +121,11 @@ public interface RegistryClientResponse {
      * 		- each array element is a string representing a JSONObject of the worker 
      *   
      * Example: [	{"method":"Logistic Regression","study":"Study1","site":"ISI","library":"GLORE",
-     * 					"dataset":"Dataset1","datasource":"ca_part3","rURL":"http://scanner.misd.isi.edu:8886/scanner",
+     * 					"dataset":"Dataset1","datasource":"ca_part3",
      * 					"id":185
      * 				},
      * 				{"method":"Logistic Regression","study":"Study1","site":"UCSD","library":"GLORE",
-     * 					"dataset":"Dataset1","datasource":"ca_part1","rURL":"http://scanner.misd.isi.edu:8888/scanner",
+     * 					"dataset":"Dataset1","datasource":"ca_part1",
      * 					"id":187
      * 				}
      * 			]
@@ -176,7 +176,7 @@ public interface RegistryClientResponse {
     /**
      * Returns a string representing a JSONObject for the worker
      *   
-     * Example: {"id":187,"site":"UCSD","rURL":"http://scanner.misd.isi.edu:8888/scanner",
+     * Example: {"id":187,"site":"UCSD",
      * 			"dataset":"Dataset1","library":"GLORE","study":"Study1","datasource":"ca_part1",
      * 			"method":"Logistic Regression"}
      * 
@@ -192,6 +192,19 @@ public interface RegistryClientResponse {
      * 
      */
     public String toParameter();
+
+    /**
+     * Returns a string representing a JSONArray for the sites
+     * 		- each array element is a string representing a JSONObject of the site having as keys the cname, rURL and id
+     *   
+     * Example: [	{"rURL":"http://scanner.misd.isi.edu:8885/scanner","cname":"SDSC","id":152},
+     * 				{"rURL":"http://scanner.misd.isi.edu:8886/scanner","cname":"ISI","id":153},
+     * 				{"rURL":"http://scanner.misd.isi.edu:8887/scanner","cname":"USC","id":154},
+     * 				{"rURL":"http://scanner.misd.isi.edu:8888/scanner","cname":"UCSD","id":155},
+     * 			]
+     * 
+     */
+    public String toSite();
 
     /**
      * Return the unique id of the resource in the registry
