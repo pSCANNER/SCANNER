@@ -13,7 +13,7 @@
     <import resource="classpath:META-INF/spring/OceansRouteContext.xml"/> 
     <import resource="classpath:META-INF/spring/GloreRouteContext.xml"/>     
                 
-    <camel:camelContext id="camelContext"
+    <camel:camelContext id="masterCamelContext"
                         errorHandlerRef="deadLetterErrorHandler">
                                                   
         <camel:propertyPlaceholder id="properties" 
@@ -22,20 +22,20 @@
         <camel:packageScan>
             <camel:package>edu.isi.misd.scanner.network.base.master</camel:package>
             <camel:package>edu.isi.misd.scanner.network.modules.master</camel:package>
-            <camel:excludes>**.*Excluded*</camel:excludes>
+            <camel:excludes>**.*example*</camel:excludes>
+            <camel:excludes>**.*Default*</camel:excludes>            
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
         
-        <camel:routeContextRef ref="ExampleRouteContext"/>          
-        <camel:routeContextRef ref="OceansRouteContext"/>                
-        <camel:routeContextRef ref="GloreRouteContext"/>            
+        <!--<camel:routeContextRef ref="ExampleRouteContext"/>-->          
+        <!--<camel:routeContextRef ref="OceansRouteContext"/>-->                
+        <!--<camel:routeContextRef ref="GloreRouteContext"/>-->            
         <!--<camel:routeContextRef ref="TestRouteContext"/>-->
 
-        <!--
+        <!--<camel:routeContextRef ref="ExampleSecureRouteContext"/>-->        
         <camel:routeContextRef ref="OceansSecureRouteContext"/>                
         <camel:routeContextRef ref="GloreSecureRouteContext"/>
-        <camel:routeContextRef ref="ExampleSecureRouteContext"/>        
-        -->                                
+                              
     </camel:camelContext>
 
 </beans>

@@ -21,6 +21,8 @@ public class BaseRecipientList
         LoggerFactory.getLogger(BaseRecipientList.class); 
     
     private static String options = "bridgeEndpoint=true";
+    private static String sslOptions = 
+        "sslContextParametersRef=sslContextParameters";
     
     /**
      *
@@ -39,14 +41,17 @@ public class BaseRecipientList
             try {
                 target = target.trim();
                 URI uri = new URI(target);
+                String queryParams = uri.getQuery();
+                target += ((queryParams == null) ? "?" : "&") + options;
                 String protocol = uri.getScheme();
                 if ("http".equalsIgnoreCase(protocol)) {
                     target = target.replaceFirst("http://", "http4://");
                 } else if ("https".equalsIgnoreCase(protocol)) {
-                    target = target.replaceFirst("https://", "https4://");                    
-                }
-                String queryParams = uri.getQuery();
-                target += ((queryParams == null) ? "?" : "&") + options;
+                    target = target.replaceFirst("https://", "https4://"); 
+                    if (target.indexOf("sslContextParametersRef=")==-1) {
+                        target += "&" + sslOptions;
+                    }
+                }                
                 results.add(target);                
             } catch (URISyntaxException e) {
                 log.warn("Invalid URI syntax: " + target,e);

@@ -9,27 +9,36 @@
     <!-- 
         The following sslContextParameters block is used to configure SSL 
         authentication.  Any route which references this object id via the URI 
-        parameter sslContextParametersRef will use this configuration.
+        parameter "sslContextParametersRef=sslContextParameters" will use this 
+        configuration.
         
-        It should be edited with the test cert samples below being replaced with
-        legitimate certificate references.
-    -->              
+        The actual parameters used to configure the SSL Context
+        may be edited via the worker.properties configuration file, so the 
+        addition of other sslContextParameters should not be necessary.
+    -->       
     <camel:sslContextParameters id="sslContextParameters">
-      <camel:keyManagers keyPassword="worker">
-        <camel:keyStore  
-            type="PKCS12"
-            resource="etc/security/scanner-test-worker.p12"
-            password="worker"/>
+      <camel:keyManagers 
+            id="worker.keyManagerParameters"
+            camelContextId="workerCamelContext"
+            keyPassword="{{worker.keyManagerParameters.password}}">
+        <camel:keyStore 
+            id="worker.keyStoreParameters"
+            camelContextId="workerCamelContext"
+            type="{{worker.keyStoreParameters.type}}"
+            resource="{{worker.keyStoreParameters.resource}}"
+            password="{{worker.keyStoreParamerers.password}}"/>
       </camel:keyManagers>
       <camel:trustManagers>
         <camel:keyStore  
-            type="JKS"
-            resource="etc/security/scanner-test-ca-cert.jks"
-            password="scannertest"/>
+            id="worker.trustStoreParameters"
+            camelContextId="workerCamelContext"            
+            type="{{worker.trustStoreParameters.type}}"
+            resource="{{worker.trustStoreParameters.resource}}"
+            password="{{worker.trustStoreParamerers.password}}"/>
       </camel:trustManagers>
       <camel:serverParameters clientAuthentication="REQUIRE"/>
     </camel:sslContextParameters>
-
+        
     <!-- 
          The following bean definitions are used for SSL certificate-based 
          authorization in Jetty via JAAS.  They should not be modified unless 
