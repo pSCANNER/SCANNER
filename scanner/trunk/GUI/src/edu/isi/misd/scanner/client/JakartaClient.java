@@ -439,17 +439,19 @@ public class JakartaClient {
          * 
          */
         public String getEntityString() {
-        	try {
-    			String result = EntityUtils.toString(response.getEntity());
-    			return result;
-    		} catch (ParseException e1) {
-    			// TODO Auto-generated catch block
-    			e1.printStackTrace();
-    		} catch (IOException e1) {
-    			// TODO Auto-generated catch block
-    			e1.printStackTrace();
-    		}
-    		return null;
+        	if (response.getEntity() != null) {
+               	try {
+        			String result = EntityUtils.toString(response.getEntity());
+        			return result;
+        		} catch (ParseException e1) {
+        			// TODO Auto-generated catch block
+        			e1.printStackTrace();
+        		} catch (IOException e1) {
+        			// TODO Auto-generated catch block
+        			e1.printStackTrace();
+        		}
+        	}
+     		return null;
     	}
 
         

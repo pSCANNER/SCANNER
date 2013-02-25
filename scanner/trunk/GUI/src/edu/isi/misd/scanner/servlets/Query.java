@@ -16,6 +16,7 @@ package edu.isi.misd.scanner.servlets;
  * limitations under the License.
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 import edu.isi.misd.scanner.client.RegistryClient;
 import edu.isi.misd.scanner.client.RegistryClientResponse;
+import edu.isi.misd.scanner.client.ScannerClient;
 import edu.isi.misd.scanner.client.TagfilerClient;
 import edu.isi.misd.scanner.utils.Utils;
 
@@ -54,6 +56,12 @@ public class Query extends HttpServlet {
 	private String tagfilerURL;
 	private String tagfilerUser;
 	private String tagfilerPassword;
+	private String trustStoreType;
+	private String trustPassword;
+	private String trustFile;
+	private String keyStoreType;
+	private String keyPassword;
+	private String keyFile;
        
        
     /**
@@ -70,6 +78,19 @@ public class Query extends HttpServlet {
 		tagfilerURL = servletConfig.getServletContext().getInitParameter("tagfilerURL");
 		tagfilerUser = servletConfig.getServletContext().getInitParameter("tagfilerUser");
 		tagfilerPassword = servletConfig.getServletContext().getInitParameter("tagfilerPassword");
+		trustStoreType = servletConfig.getServletContext().getInitParameter("trustStoreType");
+		trustPassword = servletConfig.getServletContext().getInitParameter("trustPassword");
+		trustFile = servletConfig.getServletContext().getInitParameter("trustFile");
+		keyStoreType = servletConfig.getServletContext().getInitParameter("keyStoreType");
+		keyPassword = servletConfig.getServletContext().getInitParameter("keyPassword");
+		keyFile = servletConfig.getServletContext().getInitParameter("keyFile");
+		String path = servletConfig.getServletContext().getRealPath("/index.html");
+		int index = path.lastIndexOf(File.separator) + 1;
+		path = path.substring(0, index);
+		trustFile = path + trustFile;
+		keyFile = path + keyFile;
+		System.out.println("trustFile: " + trustFile);
+		System.out.println("keyFile: " + keyFile);
 	}
 
 	/**
@@ -154,6 +175,10 @@ public class Query extends HttpServlet {
 					// to handle this case
 					System.out.println("Response is null");
 				}
+				ScannerClient scannerClient = new ScannerClient(4, 8192, 120000,
+						trustStoreType, trustPassword, trustFile,
+						keyStoreType, keyPassword, keyFile);
+				session.setAttribute("scannerClient", scannerClient);
 				obj.put("status", "success");
 			} else if (action.equals("file")) {
 				obj.put("status", "download error");

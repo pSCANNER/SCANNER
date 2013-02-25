@@ -222,6 +222,11 @@ public class Registry extends HttpServlet {
 			return;
 		}
 		HttpSession session = request.getSession(false);
+		if (session == null) {
+			PrintWriter out = response.getWriter();
+			out.print("Not logged in.\n");
+			return;
+		}
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		JSONObject obj = new JSONObject();
 		String id = request.getParameter("id");
@@ -244,55 +249,28 @@ public class Registry extends HttpServlet {
 			maxOccurs = Integer.parseInt(request.getParameter("maxOccurs"));
 		}
 		RegistryClientResponse clientResponse = null;
+		String responseBody = null;
 		if (action.equals("createStudy")) {
 			clientResponse = registryClient.createStudy(name);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.extractId(clientResponse.getEntityString());
 		} else if (action.equals("createDataset")) {
 			clientResponse = registryClient.createDataset(name, study);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.extractId(clientResponse.getEntityString());
 		} else if (action.equals("createLibrary")) {
 			clientResponse = registryClient.createLibrary(name, rpath);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.extractId(clientResponse.getEntityString());
 		} else if (action.equals("createMethod")) {
 			clientResponse = registryClient.createMethod(name, lib, rpath);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.extractId(clientResponse.getEntityString());
 		} else if (action.equals("createMaster")) {
 			clientResponse = registryClient.createMaster(rURL);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.extractId(clientResponse.getEntityString());
 		} else if (action.equals("createWorker")) {
 			clientResponse = registryClient.createWorker(study, dataset, lib, func, site, datasource);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.extractId(clientResponse.getEntityString());
 		} else if (action.equals("createSite")) {
 			clientResponse = registryClient.createSite(name, rURL);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.extractId(clientResponse.getEntityString());
 		} else if (action.equals("createParameter")) {
 			try {
 				ArrayList<String> values = null;
@@ -306,116 +284,64 @@ public class Registry extends HttpServlet {
 					}
 				}
 				clientResponse = registryClient.createParameter(name, func, lib, minOccurs, maxOccurs, values);
-				obj.put("status", clientResponse.getStatus());
+				responseBody = Utils.extractId(clientResponse.getEntityString());
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("deleteMethod")) {
 			clientResponse = registryClient.deleteMethod(name, lib);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		} else if (action.equals("deleteLibrary")) {
 			clientResponse = registryClient.deleteLibrary(name);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		} else if (action.equals("deleteDataset")) {
 			clientResponse = registryClient.deleteDataset(name, study);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		} else if (action.equals("deleteStudy")) {
-			try {
-				clientResponse = registryClient.deleteStudy(name);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			clientResponse = registryClient.deleteStudy(name);
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		} else if (action.equals("deleteMaster")) {
-			try {
-				clientResponse = registryClient.deleteMaster();
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			clientResponse = registryClient.deleteMaster();
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		}  else if (action.equals("deleteSite")) {
 			clientResponse = registryClient.deleteSite(name);
-			try {
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		} else if (action.equals("deleteParameter")) {
-			try {
-				clientResponse = registryClient.deleteParameter(name, func, lib);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			clientResponse = registryClient.deleteParameter(name, func, lib);
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		} else if (action.equals("deleteWorker")) {
-			try {
-				clientResponse = registryClient.deleteWorker(study, dataset, lib, func, site);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			clientResponse = registryClient.deleteWorker(study, dataset, lib, func, site);
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		} else if (action.equals("updateLibrary")) {
-			try {
-				clientResponse = registryClient.updateLibrary(id, name, rpath);
-				if (clientResponse != null) {
-					obj.put("status", clientResponse.getStatus());
-				} else {
-					obj.put("status", "No library update");
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
+			clientResponse = registryClient.updateLibrary(id, name, rpath);
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				responseBody = "No library update\n";
 			}
 		} else if (action.equals("updateMethod")) {
-			try {
-				clientResponse = registryClient.updateMethod(id, name, lib, rpath);
-				if (clientResponse != null) {
-					obj.put("status", clientResponse.getStatus());
-				} else {
-					obj.put("status", "No method update");
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
+			clientResponse = registryClient.updateMethod(id, name, lib, rpath);
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				responseBody = "No method update\n";
 			}
 		} else if (action.equals("updateMaster")) {
-			try {
-				clientResponse = registryClient.updateMaster(rURL);
-				obj.put("status", clientResponse.getStatus());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			clientResponse = registryClient.updateMaster(rURL);
+			responseBody = Utils.getEntity(clientResponse.getEntityString());
 		}  else if (action.equals("updateSite")) {
-			try {
-				clientResponse = registryClient.updateSite(id, name, rURL);
-				if (clientResponse != null) {
-					obj.put("status", clientResponse.getStatus());
-				} else {
-					obj.put("status", "No site update");
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
+			clientResponse = registryClient.updateSite(id, name, rURL);
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				responseBody = "No site update\n";
 			}
 		} else if (action.equals("updateWorker")) {
-			try {
-				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, datasource);
-				if (clientResponse != null) {
-					obj.put("status", clientResponse.getStatus());
-				} else {
-					obj.put("status", "No worker update");
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
+			clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, datasource);
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				responseBody = "No worker update\n";
 			}
 		} else if (action.equals("updateParameter")) {
 			try {
@@ -431,9 +357,9 @@ public class Registry extends HttpServlet {
 				}
 				clientResponse = registryClient.updateParameter(id, name, func, lib, minOccurs, maxOccurs, values);
 				if (clientResponse != null) {
-					obj.put("status", clientResponse.getStatus());
+					responseBody = Utils.getEntity(clientResponse.getEntityString());
 				} else {
-					obj.put("status", "No parameter update");
+					responseBody = "No parameter update\n";
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -443,7 +369,7 @@ public class Registry extends HttpServlet {
 			clientResponse.release();
 		}
 		PrintWriter out = response.getWriter();
-		String text = obj.toString();
+		String text = (responseBody != null) ? responseBody : obj.toString();
 		out.print(text);
 	}
 

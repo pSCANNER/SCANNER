@@ -75,6 +75,19 @@ public class Utils {
     	}
     	return ret;
     }
+    
+    public static String extractId(String value) {
+		String ret = value;
+    	int index = value.lastIndexOf("/");
+		if (index != -1) {
+			ret = ret.substring(index+1);
+		}
+		return ret;
+    }
+
+    public static String getEntity(String value) {
+		return (value != null) ? value : "";
+    }
 
     public static String oceansResult = "" +
     "{" +
