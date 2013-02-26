@@ -46,14 +46,12 @@ public class Login extends HttpServlet {
      * Default constructor. 
      */
     public Login() {
-        // TODO Auto-generated constructor stub
     }
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -82,7 +80,6 @@ public class Login extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(obj.toString());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

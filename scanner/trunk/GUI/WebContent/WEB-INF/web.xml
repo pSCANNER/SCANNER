@@ -33,7 +33,7 @@
   </welcome-file-list>
   <context-param>
     <param-name>tagfilerURL</param-name>
-    <param-value>https://serbancentos.isi.edu/tagfiler</param-value>
+    <param-value>https://scanner.misd.isi.edu/tagfiler</param-value>
   </context-param>
   <context-param>
     <param-name>tagfilerUser</param-name>
@@ -48,11 +48,11 @@
     <param-value>JKS</param-value>
   </context-param>
   <context-param>
-    <param-name>trustPassword</param-name>
+    <param-name>trustStorePassword</param-name>
     <param-value>scannertest</param-value>
   </context-param>
   <context-param>
-    <param-name>trustFile</param-name>
+    <param-name>trustStoreResource</param-name>
     <param-value>etc/security/scanner-test-ca-cert.jks</param-value>
   </context-param>
   <context-param>
@@ -60,12 +60,16 @@
     <param-value>PKCS12</param-value>
   </context-param>
   <context-param>
-    <param-name>keyPassword</param-name>
-    <param-value>master</param-value>
+    <param-name>keyStorePassword</param-name>
+    <param-value>scannertest</param-value>
   </context-param>
   <context-param>
-    <param-name>keyFile</param-name>
-    <param-value>etc/security/scanner-test-master.p12</param-value>
+    <param-name>keyStoreResource</param-name>
+    <param-value>etc/security/scanner.misd.isi.edu.p12</param-value>
+  </context-param>
+  <context-param>
+    <param-name>keyManagerPassword</param-name>
+    <param-value>scannertest</param-value>
   </context-param>
   <servlet>
     <servlet-name>Login</servlet-name>

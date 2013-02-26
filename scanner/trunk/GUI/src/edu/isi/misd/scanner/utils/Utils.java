@@ -62,7 +62,6 @@ public class Utils {
 			param.put("maxOccurs", "unbounded");
 			ret.put(param);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;

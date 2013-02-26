@@ -744,7 +744,6 @@ public class TagfilerClient implements RegistryClient {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;

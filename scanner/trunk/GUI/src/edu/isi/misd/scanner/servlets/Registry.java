@@ -30,7 +30,6 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.client.RegistryClient;
@@ -124,7 +123,6 @@ public class Registry extends HttpServlet {
 						}
 					}
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -160,7 +158,6 @@ public class Registry extends HttpServlet {
 						}
 					}
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -228,7 +225,6 @@ public class Registry extends HttpServlet {
 			return;
 		}
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
-		JSONObject obj = new JSONObject();
 		String id = request.getParameter("id");
 		String name = request.getParameter("cname");
 		String study = request.getParameter("study");
@@ -369,7 +365,7 @@ public class Registry extends HttpServlet {
 			clientResponse.release();
 		}
 		PrintWriter out = response.getWriter();
-		String text = (responseBody != null) ? responseBody : obj.toString();
+		String text = (responseBody != null) ? responseBody : "";
 		out.print(text);
 	}
 

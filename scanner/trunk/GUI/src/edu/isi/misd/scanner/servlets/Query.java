@@ -56,20 +56,20 @@ public class Query extends HttpServlet {
 	private String tagfilerURL;
 	private String tagfilerUser;
 	private String tagfilerPassword;
+	
 	private String trustStoreType;
-	private String trustPassword;
-	private String trustFile;
+	private String trustStorePassword;
+	private String trustStoreResource;
 	private String keyStoreType;
-	private String keyPassword;
-	private String keyFile;
-       
+	private String keyStorePassword;
+	private String keyStoreResource;
+	private String keyManagerPassword;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
     public Query() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	public void init(ServletConfig config)  throws ServletException {
@@ -79,25 +79,25 @@ public class Query extends HttpServlet {
 		tagfilerUser = servletConfig.getServletContext().getInitParameter("tagfilerUser");
 		tagfilerPassword = servletConfig.getServletContext().getInitParameter("tagfilerPassword");
 		trustStoreType = servletConfig.getServletContext().getInitParameter("trustStoreType");
-		trustPassword = servletConfig.getServletContext().getInitParameter("trustPassword");
-		trustFile = servletConfig.getServletContext().getInitParameter("trustFile");
+		trustStorePassword = servletConfig.getServletContext().getInitParameter("trustStorePassword");
+		trustStoreResource = servletConfig.getServletContext().getInitParameter("trustStoreResource");
 		keyStoreType = servletConfig.getServletContext().getInitParameter("keyStoreType");
-		keyPassword = servletConfig.getServletContext().getInitParameter("keyPassword");
-		keyFile = servletConfig.getServletContext().getInitParameter("keyFile");
+		keyStorePassword = servletConfig.getServletContext().getInitParameter("keyStorePassword");
+		keyStoreResource = servletConfig.getServletContext().getInitParameter("keyStoreResource");
+		keyManagerPassword = servletConfig.getServletContext().getInitParameter("keyManagerPassword");
 		String path = servletConfig.getServletContext().getRealPath("/index.html");
 		int index = path.lastIndexOf(File.separator) + 1;
 		path = path.substring(0, index);
-		trustFile = path + trustFile;
-		keyFile = path + keyFile;
-		System.out.println("trustFile: " + trustFile);
-		System.out.println("keyFile: " + keyFile);
+		trustStoreResource = path + trustStoreResource;
+		keyStoreResource = path + keyStoreResource;
+		System.out.println("trustStoreResource: " + trustStoreResource);
+		System.out.println("keyStoreResource: " + keyStoreResource);
 	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		String action = request.getParameter("action");
 		HttpSession session = request.getSession(false);
 		JakartaClient httpClient = (JakartaClient) session.getAttribute("httpClient");
@@ -156,12 +156,12 @@ public class Query extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		JSONObject obj = new JSONObject();
 		try {
 			String action = request.getParameter("action");
 			HttpSession session = request.getSession(false);
 			JakartaClient httpClient = (JakartaClient) session.getAttribute("httpClient");
+			ScannerClient scannerClient = (ScannerClient) session.getAttribute("scannerClient");
 			if (action.equals("loginRegistry")) {
 				obj.put("status", "login error");
 				ClientURLResponse rsp = httpClient.login(tagfilerURL + "/session", tagfilerUser, tagfilerPassword);
@@ -175,9 +175,9 @@ public class Query extends HttpServlet {
 					// to handle this case
 					System.out.println("Response is null");
 				}
-				ScannerClient scannerClient = new ScannerClient(4, 8192, 120000,
-						trustStoreType, trustPassword, trustFile,
-						keyStoreType, keyPassword, keyFile);
+				scannerClient = new ScannerClient(4, 8192, 120000,
+						trustStoreType, trustStorePassword, trustStoreResource,
+						keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
 				session.setAttribute("scannerClient", scannerClient);
 				obj.put("status", "success");
 			} else if (action.equals("file")) {
@@ -259,7 +259,7 @@ public class Query extends HttpServlet {
 					buff.append(masterURL).append("/query/").append(libPath).append("/").append(funcPath);
 					String url = buff.toString();
 					System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nParams: "+params);
-					ClientURLResponse rsp = httpClient.postScannerQuery(url, targetsURLs, params);
+					ClientURLResponse rsp = scannerClient.postScannerQuery(url, targetsURLs, params);
 					res = rsp.getEntityString();
 					System.out.println("Response Body: \n"+res);
 					PrintWriter out = response.getWriter();
@@ -271,13 +271,11 @@ public class Query extends HttpServlet {
 					//out.print(obj.toString());
 					//return;
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		PrintWriter out = response.getWriter();

@@ -60,7 +60,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
 
 /**
  * Class to implement an HTTP Client
@@ -69,10 +68,7 @@ import org.json.JSONException;
  */
 public class JakartaClient {
     // client used to connect with the tagfiler server
-	private DefaultHttpClient httpclient;
-	
-    // client used to connect with the tagfiler server
-	protected boolean browser = true;
+	protected DefaultHttpClient httpclient;
 	
 	// error description header
 	private static final String error_description_header = "X-Error-Description";
@@ -93,17 +89,24 @@ public class JakartaClient {
 	protected String connectException;
 	protected String clientProtocolException;
 	protected String ioException;
+	
+	public JakartaClient() {
+		
+	}
 	/**
      * Constructor
      * 
      * @param connections
      *            the maximum number of HTTP connections
+     * @param socketBufferSize
+     *            the socket buffer size
+     * @param socketTimeout
+     *            the socket buffer timeout
      */
 	public JakartaClient(int maxConnections, int socketBufferSize, int socketTimeout) {
 		try {
 			init(maxConnections, socketBufferSize, socketTimeout);
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -182,7 +185,6 @@ public class JakartaClient {
      * @return the HTTP Response
      */
     public ClientURLResponse login(String url, String user, String password) {
-		browser = false;
         HttpPost httppost = new HttpPost(url);
 		List<NameValuePair> formparams = new ArrayList<NameValuePair>();
 		formparams.add(new BasicNameValuePair("username", user));
@@ -191,7 +193,6 @@ public class JakartaClient {
 		try {
 			entity = new UrlEncodedFormEntity(formparams, "UTF-8");
 		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		httppost.setEntity(entity);
@@ -205,7 +206,6 @@ public class JakartaClient {
      * @param url
      *            the query url
      * @return the HTTP Response
-     * @throws JSONException 
      */
     public ClientURLResponse postResource(String url, String cookie) {
     	ClientURLResponse response = null;
@@ -220,7 +220,6 @@ public class JakartaClient {
 			httppost.setEntity(entity);
 			response = execute(httppost, cookie);
 		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		return response;
@@ -233,7 +232,6 @@ public class JakartaClient {
      * @param url
      *            the query url
      * @return the HTTP Response
-     * @throws JSONException 
      */
     public ClientURLResponse putResource(String url, String cookie) {
     	ClientURLResponse response = null;
@@ -244,17 +242,15 @@ public class JakartaClient {
     }
     
     /**
-     * Execute a login request.
-     * If success, it will get a cookie
+     * Execute a SCANNER network request.
      * 
      * @param url
      *            the query url
-     * @param user
-     *            the userid
-     * @param password
-     *            the password
+     * @param targets
+     *            the targets in the request header 
+     * @param body
+     *            the request body
      * @return the HTTP Response
-     * @throws JSONException 
      */
     public ClientURLResponse postScannerQuery(String url, String targets, String body) {
         HttpPost httppost = new HttpPost(url);
@@ -266,7 +262,6 @@ public class JakartaClient {
 				StringEntity entity = new StringEntity(body, "UTF-8");
 	    		httppost.setEntity(entity);
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         }
@@ -335,7 +330,6 @@ public class JakartaClient {
         			}
     			}
     		} catch (ClientProtocolException e) {
-    			// TODO Auto-generated catch block
     			synchronized (this) {
         			if (clientProtocolException == null || !clientProtocolException.equals(e.getMessage())) {
             			System.err.println("ClientProtocolException");
@@ -366,7 +360,6 @@ public class JakartaClient {
 				try {
 					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -444,10 +437,8 @@ public class JakartaClient {
         			String result = EntityUtils.toString(response.getEntity());
         			return result;
         		} catch (ParseException e1) {
-        			// TODO Auto-generated catch block
         			e1.printStackTrace();
         		} catch (IOException e1) {
-        			// TODO Auto-generated catch block
         			e1.printStackTrace();
         		}
         	}
@@ -464,10 +455,8 @@ public class JakartaClient {
         	try {
         		inputStream = response.getEntity().getContent();
     		} catch (IllegalStateException e) {
-    			// TODO Auto-generated catch block
     			e.printStackTrace();
     		} catch (IOException e) {
-    			// TODO Auto-generated catch block
     			e.printStackTrace();
     		}
     		
@@ -487,7 +476,6 @@ public class JakartaClient {
         		try {
 					errormessage = URLDecoder.decode(header.getValue(),  "UTF-8");
 				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
         	} 
@@ -526,7 +514,6 @@ public class JakartaClient {
             	try {
     				response.getEntity().consumeContent();
     			} catch (IOException e) {
-    				// TODO Auto-generated catch block
     				e.printStackTrace();
     			}
             }
@@ -540,7 +527,6 @@ public class JakartaClient {
     				res = URLDecoder.decode(response.getFirstHeader("Set-Cookie").getValue(), "UTF-8");
        		}
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return res;
@@ -557,7 +543,6 @@ public class JakartaClient {
     	        	try {
     					System.out.println(headers[i].getName()+": "+URLDecoder.decode(headers[i].getValue(), "UTF-8"));
     				} catch (UnsupportedEncodingException e) {
-    					// TODO Auto-generated catch block
     					e.printStackTrace();
     				}
     	        }

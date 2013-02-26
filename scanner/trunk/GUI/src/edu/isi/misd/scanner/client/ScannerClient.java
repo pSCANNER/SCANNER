@@ -1,5 +1,21 @@
 package edu.isi.misd.scanner.client;
 
+/* 
+ * Copyright 2012 University of Southern California
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import java.io.FileInputStream;
 import java.security.KeyStore;
 
@@ -22,24 +38,45 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 
-public class ScannerClient {
-    // client used to connect with the tagfiler server
-	private DefaultHttpClient httpclient;
+
+/**
+ * Class to implement an HTTPS Client
+ * @author Serban Voinea
+ *
+ */
+public class ScannerClient extends JakartaClient {
 	/**
      * Constructor
      * 
      * @param connections
      *            the maximum number of HTTP connections
+     * @param socketBufferSize
+     *            the socket buffer size
+     * @param socketTimeout
+     *            the socket buffer timeout
+     * @param trustStoreType
+     *            the TrustStore type
+     * @param trustStorePassword
+     *            the Trust Store password
+     * @param trustStoreResource
+     *            the Trust Store file
+     * @param keyStoreType
+     *            the KeyStore type
+     * @param keyStorePassword
+     *            the KeyStore password
+     * @param keyStoreResource
+     *            the KeyStore file
+     * @param keyManagerPassword
+     *            the KeyManager password
      */
 	public ScannerClient(int maxConnections, int socketBufferSize, int socketTimeout,
-			String trustStoreType, String trustPassword, String trustFile,
-			String keyStoreType, String keyPassword, String keyFile) {
+			String trustStoreType, String trustStorePassword, String trustStoreResource,
+			String keyStoreType, String keyStorePassword, String keyStoreResource, String keyManagerPassword) {
 		try {
 			init(maxConnections, socketBufferSize, socketTimeout,
-					trustStoreType, trustPassword, trustFile,
-					keyStoreType, keyPassword, keyFile);
+					trustStoreType, trustStorePassword, trustStoreResource,
+					keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -53,35 +90,59 @@ public class ScannerClient {
      *            the socket buffer size
      * @param socketTimeout
      *            the socket buffer timeout
+     * @param trustStoreType
+     *            the TrustStore type
+     * @param trustStorePassword
+     *            the Trust Store password
+     * @param trustStoreResource
+     *            the Trust Store file
+     * @param keyStoreType
+     *            the KeyStore type
+     * @param keyStorePassword
+     *            the KeyStore password
+     * @param keyStoreResource
+     *            the KeyStore file
+     * @param keyManagerPassword
+     *            the KeyManager password
      */
 	private void init(int maxConnections, int socketBufferSize, int socketTimeout,
-			String trustStoreType, String trustPassword, String trustFile,
-			String keyStoreType, String keyPassword, String keyFile) throws Throwable {
-		//trustStoreType = "JKS"
-		//trustPassword = "scannertest"
-		//trustFile = "etc/security/scanner-test-ca-cert.jks"
-		//keyStoreType = "PKCS12"
-		//keyPassword = "master"
-		//keyFile = "etc/security/scanner-test-master.p12"
+			String trustStoreType, String trustStorePassword, String trustStoreResource,
+			String keyStoreType, String keyStorePassword, String keyStoreResource, String keyManagerPassword) throws Throwable {
+		//keyManagerPassword: scannertest
+		//keyStoreType: PKCS12
+		//keyStoreResource: etc/security/scanner.misd.isi.edu.p12
+		//keyStorePassword: scannertest
+		//trustStoreType: JKS
+		//trustStoreResource: etc/security/scanner-test-ca-cert.jks
+		//trustStorePassword: scannertest
+		
+		/*
+		System.out.println("keyManagerPassword: "+keyManagerPassword +
+				"\nkeyStoreType: "+keyStoreType +
+				"\nkeyStoreResource: "+keyStoreResource +
+				"\nkeyStorePassword: "+keyStorePassword +
+				"\ntrustStoreType: "+trustStoreType +
+				"\ntrustStoreResource: "+trustStoreResource +
+				"\ntrustStorePassword: "+trustStorePassword);
+		*/
+
+		
 		KeyStore trustKeyStore = KeyStore.getInstance(trustStoreType);
-		FileInputStream fis = new FileInputStream(trustFile);
-		trustKeyStore.load(fis, trustPassword.toCharArray());
+		FileInputStream fis = new FileInputStream(trustStoreResource);
+		trustKeyStore.load(fis, trustStorePassword.toCharArray());
 		fis.close();
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		tmf.init(trustKeyStore);
 		TrustManager[] tm = tmf.getTrustManagers();
 		
 		KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-		fis = new FileInputStream(keyFile);
-		keyStore.load(fis, keyPassword.toCharArray());
+		fis = new FileInputStream(keyStoreResource);
+		keyStore.load(fis, keyStorePassword.toCharArray());
 		fis.close();
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		kmf.init(keyStore, keyPassword.toCharArray());
+		kmf.init(keyStore, keyManagerPassword.toCharArray());
 		KeyManager[] km = kmf.getKeyManagers();
 
-		//SSLContext sslcontext = SSLContext.getInstance("TLS");
-		//SSLContext sslcontext = SSLContext.getInstance("SSL");
-		//sslcontext.init(null, new TrustManager[] { easyTrustManager }, null);
 		SSLContext sslcontext = SSLContext.getInstance("SSL");
 		sslcontext.init(km, tm, null);
 		SSLSocketFactory sf = new SSLSocketFactory(sslcontext); 
@@ -109,6 +170,5 @@ public class ScannerClient {
     	
     	System.out.println("Scanner Client was successfully initialized");
 	}
-
 
 }
