@@ -1,11 +1,14 @@
 package edu.isi.misd.scanner.network.base.security;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -18,6 +21,8 @@ import javax.security.auth.spi.LoginModule;
 import org.eclipse.jetty.plus.jaas.JAASPrincipal;
 import org.eclipse.jetty.plus.jaas.JAASRole;
 import org.eclipse.jetty.plus.jaas.callback.ObjectCallback;
+import org.eclipse.jetty.server.HttpConnection;
+import org.eclipse.jetty.server.Request;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +44,9 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
     private JAASUserInfo currentUser;
     private Subject subject;
     private Map<String,?> options;
-    
+    private static final String HOST_AUTHZ = 
+        "edu.isi.misd.scanner.network.base.security.HostAuthorization";   
+
     public class JAASUserInfo
     {
         private String userName;
@@ -151,6 +158,72 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
         return callbacks;
     }
     
+    private String getCommonNameFromDN(String dn)
+    {
+        String cn = "CN=";
+        StringTokenizer tokenizer = new StringTokenizer(dn, ",");
+        String result = null;
+        while (tokenizer.hasMoreTokens())
+        {
+            int len = cn.length();
+
+            String token = (String) tokenizer.nextToken();
+            if (token.toUpperCase().startsWith(cn))
+            {
+                // Make sure the token actually contains something
+                if (token.length() <= len) {
+                    return null;
+                }
+                result = token.substring(len);
+                break;
+            }
+        }
+        return result;
+    }
+    
+    protected void doHostAuthorization(String subjectDN) throws Exception
+    {
+        if (this.getOptions() == null) {
+            return;
+        }
+        if (!Boolean.parseBoolean((String)options.get(HOST_AUTHZ))) {
+            return;
+        }            
+            
+        HttpConnection connection = HttpConnection.getCurrentConnection();
+        Request request = (connection == null? null : connection.getRequest());
+        if (request != null)
+        {
+            String remoteHost = request.getRemoteHost();
+            String remoteAddress = request.getRemoteAddr();                
+            /* do a reverse lookup to get the hostname */
+            try {
+                InetAddress i = InetAddress.getByName(remoteHost);
+                remoteHost =
+                    InetAddress.getByName(
+                        i.getHostAddress()).getCanonicalHostName();
+            } catch (UnknownHostException e) {
+                throw new Exception(
+                    "Unable to resolve hostname " + 
+                    remoteHost + " " + e.toString());
+            }                
+            log.info("Attempting to authorize request from host " +
+                     remoteHost + " (" + remoteAddress + ")" + 
+                     " using certificate DN: " + subjectDN); 
+            String certCN = this.getCommonNameFromDN(subjectDN);
+            if (certCN == null) {
+                throw new LoginException(
+                    "Unable to parse CN from DN: " + subjectDN);
+            }
+            if (!certCN.equalsIgnoreCase(remoteHost)) {
+                throw new LoginException(
+                    "Client certificate hostname (" + certCN + 
+                    ") does not match remote host name of client (" + 
+                    remoteHost + ")");
+            }
+        }         
+    }
+    
     /** 
      * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject, javax.security.auth.callback.CallbackHandler, java.util.Map, java.util.Map)
      * @param subject
@@ -164,7 +237,7 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
     {
         this.callbackHandler = callbackHandler;
         this.subject = subject;
-        this.options = options;
+        this.options = options;       
     }
     
     /** 
@@ -215,26 +288,30 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
             Callback[] callbacks = configureCallbacks();
             callbackHandler.handle(callbacks);
 
-            String userName = ((NameCallback)callbacks[0]).getName();
+            String subjectDN = ((NameCallback)callbacks[0]).getName();
             Object credential = ((ObjectCallback)callbacks[1]).getObject(); 
             if (credential == null)
             {
-                setAuthenticated(false);
-                return isAuthenticated();
-            }
+                throw new LoginException ("No credential supplied");
+            }         
+ 
+            this.doHostAuthorization(subjectDN);
             
-            List<String> roleNames = getRolesForUser(userName);
-            
+            List<String> roleNames = getRolesForUser(subjectDN);            
             if (roleNames == null)
             {
-                setAuthenticated(false);
-                return isAuthenticated();
+                throw new LoginException(
+                    "Unable to determine any configured roles for: " + subjectDN);
             }
             
-            currentUser = new JAASUserInfo(userName, roleNames);
+            currentUser = new JAASUserInfo(subjectDN, roleNames);
             setAuthenticated(true);
             return isAuthenticated();
         }
+        catch (LoginException e)
+        {
+            throw e;
+        }         
         catch (IOException e)
         {
             throw new LoginException (e.toString());
@@ -242,7 +319,7 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
         catch (UnsupportedCallbackException e)
         {
             throw new LoginException (e.toString());
-        }
+        }       
         catch (Exception e)
         {
             throw new LoginException (e.toString());
