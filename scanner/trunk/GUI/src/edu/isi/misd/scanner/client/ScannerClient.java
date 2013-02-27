@@ -146,7 +146,7 @@ public class ScannerClient extends JakartaClient {
 		SSLContext sslcontext = SSLContext.getInstance("SSL");
 		sslcontext.init(km, tm, null);
 		SSLSocketFactory sf = new SSLSocketFactory(sslcontext); 
-		sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		sf.setHostnameVerifier(SSLSocketFactory.STRICT_HOSTNAME_VERIFIER);
 		
 		BasicHttpParams params = new BasicHttpParams();
 		params.setParameter("http.protocol.handle-redirects", false);
