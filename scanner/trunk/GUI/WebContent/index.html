@@ -25,42 +25,164 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-  <meta content="text/html;charset=UTF-8" http-equiv="Content-Type">
-  <title>Scanner</title>
-  <link rel="stylesheet" type="text/css" href="resources/jquery-ui.css">
-  <link rel="stylesheet" type="text/css" href="resources/css/demo_page.css">
-  <link rel="stylesheet" type="text/css" href="resources/css/demo_table.css">
-  <link rel="stylesheet" type="text/css" href="resources/jquery.treeview.css">
-  <link rel="stylesheet" type="text/css" href="resources/css/scanner.css">
-  <script type="text/javascript" src="resources/jquery.js"></script>
-  <script type="text/javascript" src="resources/jquery-ui.js"></script>
-  <script type="text/javascript" language="javascript" src="resources/jquery.dataTables.js"></script>
-  <script type="text/javascript" language="javascript" src="resources/jquery.treeview.js"></script>
-  <script type="text/javascript" src="resources/scanner.js"></script>
+<meta content="text/html;charset=UTF-8" http-equiv="Content-Type">
+<title>Scanner</title>
+<link rel="stylesheet" type="text/css" href="resources/jquery-ui.css">
+<link rel="stylesheet" type="text/css"
+	href="resources/css/demo_page.css">
+<link rel="stylesheet" type="text/css"
+	href="resources/css/demo_table.css">
+<link rel="stylesheet" type="text/css"
+	href="resources/jquery.treeview.css">
+<link rel="stylesheet" type="text/css" href="resources/css/scanner.css">
+<link rel="stylesheet" type="text/css"
+	href="resources/dojo-release-1.8.3/dojo/../dijit/themes/claro/claro.css">
+<script type="text/javascript" src="resources/jquery.js"></script>
+<script type="text/javascript" src="resources/jquery-ui.js"></script>
+<script type="text/javascript" src="resources/jquery.dataTables.js"></script>
+<script type="text/javascript" src="resources/jquery.treeview.js"></script>
+<script type="text/javascript">
+	dojoConfig = {
+		async : true,
+		parseOnLoad : true
+	}
+</script>
+<script type="text/javascript"
+	src='resources/dojo-release-1.8.3/dojo/dojo.js'></script>
+<script type="text/javascript">
+	require([ "dojo/parser", "dijit/layout/TabContainer",
+			"dijit/layout/ContentPane" ]);
+</script>
+<script type="text/javascript" src="resources/scanner.js"></script>
 </head>
 
 <body>
-<div id="wrapper">
-<div id="tophead"><div id="login"></div></div>
-<div id="content">
-<div id="welcome">
-<h3>Welcome to SCANNER</h3>
-<p>You have reached a restricted access portal. Please use the login box below to access the resource of your interest. </p>
-<p>Note that access control to data in SCANNER is delegated to the site that is providing the data. Furthermore, access to each data set is limited to study investigators as specified in an Institutional Review Board (IRB) approvals database, and the user must belong to one of the study sites and be authenticated by that site's enterprise authentication services.
-</p>
-</div>
-<div id="ui" >
-</div>
-</div>
-<div id="footer">
-SCANNER is supported by the Agency for Healthcare Research and Quality (AHRQ) through the American Recovery &amp; Reinvestment Act of 2009, Grant R01 HS19913-01. 
-</div>
-<script type="text/javascript">
-$(document).ready(function () { 
-	initScanner();
-});
-</script>
+	<div id="wrapper">
+		<div id="tophead">
+			<div id="login"></div>
+		</div>
+		<div id="content">
+			<div id="welcome" style="display: none;">
+				<h3>Welcome to SCANNER</h3>
+				<p>You have reached a restricted access portal. Please use the
+					login box below to access the resource of your interest.</p>
+				<p>Note that access control to data in SCANNER is delegated to
+					the site that is providing the data. Furthermore, access to each
+					data set is limited to study investigators as specified in an
+					Institutional Review Board (IRB) approvals database, and the user
+					must belong to one of the study sites and be authenticated by that
+					site's enterprise authentication services.</p>
+			</div>
+			<div id="loginForm" style="display: none;">
+				<h2>Log In</h2>
+				<fieldset>
+					<legend>Login</legend>
+					<table>
+						<tr>
+							<td>Username: <input type="text" id="username"
+								name="username" size="15">
+							</td>
+						</tr>
+						<tr>
+							<td>Password: <input type="password" id="password"
+								name="password" size="15">
+							</td>
+						</tr>
+						<tr>
+							<td><input type="button" value="Login"
+								onclick="submitLogin();">
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</div>
 
+			<div id="ui" style="visibility: hidden;">
+				<div style="width: 60%; height: 300px; float: left" class="claro">
+					<div id="queryTabContainer"
+						data-dojo-type="dijit/layout/TabContainer"
+						style="width: 100%; height: 100%">
+						<div data-dojo-type="dijit/layout/ContentPane" title="Query"
+							data-dojo-props="selected:true">
+							<table>
+								<tbody>
+									<tr>
+										<td>Studies</td>
+										<td>Datasets</td>
+										<td>Libraries</td>
+										<td>Methods</td>
+										<td>Sites</td>
+									</tr>
+									<tr>
+										<td valign="top"><select id="selectStudies"></select>
+										</td>
+										<td valign="top"><select id="selectDatasets"></select>
+										</td>
+										<td valign="top"><select id="selectLibraries"></select>
+										</td>
+										<td valign="top"><select id="selectMethods"></select>
+										</td>
+										<td valign="top"><select id="selectSites"></select>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div data-dojo-type="dijit/layout/ContentPane"
+							title="Query History">Not yet implemented...</div>
+						<div data-dojo-type="dijit/layout/ContentPane" title="Profile">
+							Not yet implemented...</div>
+					</div>
+				</div>
+				<div id="queryHelp" style="width: 35%; float: right;">
+					<span class="double_bottom_border"> Quick Help </span> <br />
+					<br /> <span>Select study, dataset, library, method and
+						sites on the left</span> <br />
+					<br /> <span id="studyHelp"></span> <br />
+					<br /> <span id="datasetHelp"></span> <br />
+					<br /> <span id="libraryHelp"></span> <br />
+					<br /> <span id="methodHelp"></span> <br />
+					<br />
+
+				</div>
+				<br style="clear: left;" />
+				<br/><br/><br/>
+				
+				<p id="paramsTitle"></p>
+				<div id = "paramsDiv" style="width: 60%; float: left; display: none;" class="method_border">
+					<div id="paramsDivContent" class="method_margin">
+					</div>
+					<br/><br/>
+					<input type="button" value="Query" onclick="submitQuery();" class="method_margin">
+					<input type="button" value="Clear" onclick="renderAvailableStudies();">
+					<br/><br/>
+				</div>
+				<div id="paramsHelpDiv" style="width: 35%; float: right;">
+					<span class="double_bottom_border"> Quick Help </span>
+					<div id="paramsHelp" ></div>
+				</div>
+				<br style="clear: left;" />
+				<br/><br/><br/>
+			</div>
+		</div>
+		<div id="resultDiv" style="display: none;" >
+			<div id="resultDivContent">
+			</div>
+			<br/><br/><br/>
+		</div>
+
+
+		<div id="footer" style="display: none; float: left;">SCANNER is
+			supported by the Agency for Healthcare Research and Quality (AHRQ)
+			through the American Recovery &amp; Reinvestment Act of 2009, Grant
+			R01 HS19913-01.
+		</div>
+		<script type="text/javascript">
+		$(document).ready(function () { 
+			initScanner();
+		});
+		</script>
+	</div>
 </body>
 </html>
 

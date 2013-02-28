@@ -82,7 +82,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				ret.put(obj.getString("cname"), obj.getString("id"));
+				ret.put(obj.getString("cname"), obj.getString("description"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -158,11 +158,13 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 				JSONObject obj = arr.getJSONObject(i);
 				String name = obj.getString("id");
 				String cname = obj.getString("cname");
+				String description = obj.getString("description");
 				JSONArray resourceValues = obj.getJSONArray("values");
 				int resourceMaxOccurs = obj.getInt("maxOccurs");
 				int resourceMinOccurs = obj.getInt("minOccurs");
 				JSONObject value = new JSONObject();
 				value.put("cname", cname);
+				value.put("description", description);
 				value.put("values", resourceValues);
 				value.put("maxOccurs", resourceMaxOccurs);
 				value.put("minOccurs", resourceMinOccurs);

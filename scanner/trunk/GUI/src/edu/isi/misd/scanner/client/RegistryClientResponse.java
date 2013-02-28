@@ -51,9 +51,9 @@ public interface RegistryClientResponse {
     /**
      * Returns a string representing a JSONObject for the studies
      * 		- the keys are the studies names
-     * 		- the values are the studies id
+     * 		- the values are the studies description
      *   
-     * Example: {"Study1":196}
+     * Example: {"Study1": "Study1 - Designed to investigate the etiology and natural history of atherosclerosis"}
      * 
      */
     public String toStudies();
@@ -61,9 +61,9 @@ public interface RegistryClientResponse {
     /**
      * Returns a string representing a JSONObject for the datasets
      * 		- the keys are the datasets names
-     * 		- the values are the datasets id
+     * 		- the values are the datasets description
      *   
-     * Example: {"Dataset1":195}
+     * Example: {"Dataset1": "Dataset1 - Sitting blood pressure measurement among participants"}
      * 
      */
     public String toDatasets();
@@ -71,9 +71,10 @@ public interface RegistryClientResponse {
     /**
      * Returns a string representing a JSONObject for the libraries
      * 		- the keys are the libraries names
-     * 		- the values are the libraries id
+     * 		- the values are the libraries description
      *   
-     * Example: {"Oceans":193,"GLORE":194}
+     * Example: {"Oceans": "Oceans - Observational Cohort Event Analysis and Notification System",
+     * 			 "GLORE": "GLORE - Grid Binary LOgistic REgression"}
      * 
      */
     public String toLibraries();
@@ -81,9 +82,9 @@ public interface RegistryClientResponse {
     /**
      * Returns a string representing a JSONObject for the methods
      * 		- the keys are the methods names
-     * 		- the values are the methods id
+     * 		- the values are the methods description
      *   
-     * Example: {"Logistic Regression":191}
+     * Example: {"Logistic Regression": "Logistic Regression - Predicting the outcome of a categorical dependent variable"}
      * 
      */
     public String toMethods();

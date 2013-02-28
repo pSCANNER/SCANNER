@@ -42,3 +42,16 @@ div#wrapper {
     padding-top: 10px;
     padding-left: 165px;
 }
+
+.double_bottom_border {
+	border-bottom: 3px double;
+}
+
+.method_border {
+	border: 1px solid gray;
+}
+
+.method_margin {
+	margin: 5px;
+}
+

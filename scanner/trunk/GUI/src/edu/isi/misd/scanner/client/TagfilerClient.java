@@ -644,7 +644,7 @@ public class TagfilerClient implements RegistryClient {
 				}
 				cname += Utils.urlEncode(studies.get(i));
 			}
-			url = tagfilerURL + "/query/rtype=study;" + cname + "(id;cname)";
+			url = tagfilerURL + "/query/rtype=study;" + cname + "(description;cname)";
 			rsp = client.get(url, cookie);
 			ret = new TagfilerClientResponse(rsp);
 		} catch (JSONException e) {
@@ -663,7 +663,7 @@ public class TagfilerClient implements RegistryClient {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/query/rtype=dataset;study=" + Utils.urlEncode(study) + "(id;cname)";
+			String url = tagfilerURL + "/query/rtype=dataset;study=" + Utils.urlEncode(study) + "(description;cname)";
 			ClientURLResponse rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -679,7 +679,7 @@ public class TagfilerClient implements RegistryClient {
 	public RegistryClientResponse getLibraries() {
 		RegistryClientResponse clientResponse = null;
 		client.setCookieValue(cookie);
-		String url = tagfilerURL + "/query/rtype=library(id;cname)";
+		String url = tagfilerURL + "/query/rtype=library(description;cname)";
 		ClientURLResponse rsp = client.get(url, cookie);
 		clientResponse = new TagfilerClientResponse(rsp);
 		return clientResponse;
@@ -693,7 +693,7 @@ public class TagfilerClient implements RegistryClient {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/query/rtype=method;library=" + Utils.urlEncode(lib) + "(id;cname)";
+			String url = tagfilerURL + "/query/rtype=method;library=" + Utils.urlEncode(lib) + "(description;cname)";
 			ClientURLResponse rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -710,7 +710,7 @@ public class TagfilerClient implements RegistryClient {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;cname;minOccurs;maxOccurs;values)";
+			String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;cname;minOccurs;maxOccurs;values;description)";
 			ClientURLResponse rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {

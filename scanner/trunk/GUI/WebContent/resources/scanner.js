@@ -27,6 +27,26 @@ var HOME;
 
 var oTable = null;
 
+var selStudies = null;
+var selDatasets = null;
+var selLibraries = null;
+var selMethods = null;
+var selSites = null;
+var studiesMultiSelect = null;
+var datasetsMultiSelect = null;
+var librariesMultiSelect = null;
+var methodsMultiSelect = null;
+var sitesMultiSelect = null;
+
+var availableStudies = {};
+var availableDatasets = {};
+var availableLibraries = {};
+var availableMethods = {};
+var availableSites = {};
+var availableParameters = {};
+
+var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
+
 function initScanner() {
 	var val = '' + window.location;
 	var len = val.length - 1;
@@ -34,85 +54,49 @@ function initScanner() {
 		val = val.substr(0, len);
 	}
 	HOME = val;
-	renderLogin();
-}
-
-/**
- * @return the value of the selected study
- */
-function getSelectedStudy() {
-	return $('input:radio[name=studies]:checked').val();
-}
-
-/**
- * @return the value of the selected dataset
- */
-function getSelectedDataset() {
-	return $('input:radio[name=datasets]:checked').val();
-}
-
-/**
- * @return the value of the selected library
- */
-function getSelectedLibrary() {
-	return $('input:radio[name=libs]:checked').val();
-}
-
-/**
- * @return the value of the selected method
- */
-function getSelectedMethod() {
-	return $('input:radio[name=funcs]:checked').val();
-}
-
-/**
- * @return the value of the selected site
- */
-function getSelectedSites() {
-	var sites = [];
-	$.each($('input:checkbox[name=sites]:checked'), function(i, inp) {
-		sites.push($(inp).val());
+	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window", "dojo/parser", "dijit/layout/TabContainer", "dijit/layout/ContentPane"], function(ready) {
+		ready(function(){
+			$('#ui').css('display', 'none');
+			$('#welcome').css('display', '');
+			$('#loginForm').css('display', '');
+			$('#footer').css('display', '');
+		});
 	});
-	return sites;
 }
 
 /**
  * @return the value of the selected study
  */
 function getSelectedStudyName() {
-	return $('input:radio[name=studies]:checked').parent().next().html();
+	return studiesMultiSelect.get('value')[0];
 }
 
 /**
  * @return the value of the selected dataset
  */
 function getSelectedDatasetName() {
-	return $('input:radio[name=datasets]:checked').parent().next().html();
+	return datasetsMultiSelect.get('value')[0];
 }
 
 /**
  * @return the value of the selected library
  */
 function getSelectedLibraryName() {
-	return $('input:radio[name=libs]:checked').parent().next().html();
+	return librariesMultiSelect.get('value')[0];
 }
 
 /**
  * @return the value of the selected method
  */
 function getSelectedMethodName() {
-	return $('input:radio[name=funcs]:checked').parent().next().html();
+	return methodsMultiSelect.get('value')[0];
 }
 
 /**
  * @return the value of the selected sites
  */
 function getSelectedSitesNames() {
-	var sites = [];
-	$.each($('input:checkbox[name=sites]:checked'), function(i, inp) {
-		sites.push($(inp).parent().next().html());
-	});
-	return sites;
+	return sitesMultiSelect.get('value');
 }
 
 /**
@@ -125,7 +109,7 @@ function getSelectedSitesNames() {
  */
 function getSelectedParameters() {
 	var params = {};
-	$.each($('input:checked', $('#paramsDiv')), function(i, elem) {
+	$.each($('input:checked', $('#paramsDivContent')), function(i, elem) {
 		var param = $(elem);
 		var name = param.attr('parName');
 		var value = param.attr('parValue');
@@ -148,14 +132,14 @@ function getSelectedParameters() {
  */
 function renderAvailableStudies() {
 	// some clean up
-	$('#studyDiv').html('');
-	$('#datasetDiv').html('');
-	$('#libDiv').html('');
-	$('#funcDiv').html('');
-	$('#siteDiv').html('');
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
+	$('#studyHelp').html('');
+	$('#datasetHelp').html('');
+	$('#libraryHelp').html('');
+	$('#methodHelp').html('');
+	$('#paramsHelpDiv').css('display', 'none');
+	$('#paramsTitle').css('display', 'none');
+	$('#paramsDiv').css('display', 'none');
+	$('#resultDiv').css('display', 'none');
 	
 	// send the request
 	var url = HOME + '/query?action=getStudies';
@@ -177,51 +161,26 @@ function renderAvailableStudies() {
    {"Study1":"Study1"}
  */
 function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
-	var div = $('#ui');
-	div.html('');
-	renderSelectTable();
-	var studyDiv = $('#studyDiv');
+	availableStudies = data;
 	var names = [];
 	$.each(data, function(name, value) {
 		names.push(name);
 	});
 	names.sort(compareIgnoreCase);
-	var table = $('<table>');
-	studyDiv.append(table);
-	$.each(names, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'radio',
-			'name': 'studies',
-			'value': data[name]
-		});
-		input.click(function(event) {renderAvailableDatasets();});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
+	loadDatasets(emptyValue);
+	loadLibraries(emptyValue);
+	loadMethods(emptyValue);
+	loadSites(emptyValue, false);
+	loadStudies(names);
 }
 
 /**
  * Send the request to get the available datasets
  */
 function renderAvailableDatasets() {
-	// some clean up
-	$('#datasetDiv').html('');
-	$('#libDiv').html('');
-	$('#funcDiv').html('');
-	$('#siteDiv').html('');
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-
 	// send the request
 	var study = getSelectedStudyName();
+	$('#studyHelp').html(availableStudies[study]);
 	if (study != '') {
 		var url = HOME + '/query?action=getDatasets&study=' + encodeSafeURIComponent(study);
 		scanner.GET(url, true, postRenderAvailableDatasets, null, null, 0);
@@ -243,47 +202,22 @@ function renderAvailableDatasets() {
    {"Dataset1":"Study1_Dataset1"}
  */
 function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
-	var datasetDiv = $('#datasetDiv');
-	var table = $('<table>');
-	datasetDiv.append(table);
+	availableDatasets = data;
 	var datasets = [];
 	$.each(data, function(dataset, name) {
 		datasets.push(dataset);
 	});
 	datasets.sort(compareIgnoreCase);
-	$.each(datasets, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'radio',
-			'name': 'datasets',
-			'value': data[name]
-		});
-		input.click(function(event) {renderAvailableLibraries();});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
+	loadDatasets(datasets);
 }
 
 /**
  * Send the request to get the available libraries
  */
 function renderAvailableLibraries() {
-	// some clean up
-	$('#libDiv').html('');
-	$('#funcDiv').html('');
-	$('#siteDiv').html('');
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-
 	// send the request
 	var dataset = getSelectedDatasetName();
+	$('#datasetHelp').html(availableDatasets[dataset]);
 	if (dataset != null) {
 		var url = HOME + '/query?action=getLibraries';
 		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
@@ -306,46 +240,22 @@ function renderAvailableLibraries() {
     "GLORE":"Study1_Dataset1_glore"}
  */
 function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
-	var libDiv = $('#libDiv');
-	var table = $('<table>');
-	libDiv.append(table);
+	availableLibraries = data;
 	var names = [];
 	$.each(data, function(name, value) {
 		names.push(name);
 	});
 	names.sort(compareIgnoreCase);
-	$.each(names, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'radio',
-			'name': 'libs',
-			'value': data[name]
-		});
-		input.click(function(event) {renderAvailableMethods();});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
+	loadLibraries(names);
 }
 
 /**
  * Send the request to get the available methods
  */
 function renderAvailableMethods() {
-	// some clean up
-	$('#funcDiv').html('');
-	$('#siteDiv').html('');
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-	
 	// send the request
 	var lib = getSelectedLibraryName();
+	$('#libraryHelp').html(availableLibraries[lib]);
 	if (lib != null) {
 		var url = HOME + '/query?action=getMethods&library=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableMethods, null, null, 0);
@@ -367,42 +277,19 @@ function renderAvailableMethods() {
    {"Logistic Regression":"Study1_Dataset1_oceans_lr"}
  */
 function postRenderAvailableMethods(data, textStatus, jqXHR, param) {
-	var funcDiv = $('#funcDiv');
-	var table = $('<table>');
-	funcDiv.append(table);
+	availableMethods = data;
 	var names = [];
 	$.each(data, function(name, value) {
 		names.push(name);
 	});
 	names.sort(compareIgnoreCase);
-	$.each(names, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'radio',
-			'name': 'funcs',
-			'value': data[name]
-		});
-		input.click(function(event) {renderAvailableSites(); renderAvailableParameters();});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
+	loadMethods(names);
 }
 
 /**
  * Send the request to get the available parameters
  */
 function renderAvailableParameters() {
-	// some clean up
-	$('#paramsDiv').remove();
-	$('#buttonsDiv').remove();
-	$('#resultDiv').remove();
-	
 	// send the request
 	var func = getSelectedMethodName();
 	var lib = getSelectedLibraryName();
@@ -435,18 +322,21 @@ function renderAvailableParameters() {
    ]
  */
 function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
-	var uidiv = $('#ui');
-	var paramsDiv = $('<div>');
-	paramsDiv.attr({'id': 'paramsDiv'});
-	uidiv.append(paramsDiv);
-	var h1 = $('<h1>');
-	paramsDiv.append(h1);
-	h1.html('Request Parameters');
+	$('#paramsHelpDiv').css('display', '');
+	$('#paramsDiv').css('display', '');
+	var paramsTitle = $('#paramsTitle');
+	paramsTitle.css('display', '');
+	paramsTitle.html(getSelectedLibraryName() + '/' + getSelectedMethodName());
+	var paramsDiv = $('#paramsDivContent');
+	var paramsHelp = $('#paramsHelp');
+	paramsDiv.html('');
+	paramsHelp.html('');
 	$.each(data, function(i, param) {
 		$.each(param, function(key, res) {
 			var h2 = $('<h2>');
 			paramsDiv.append(h2);
 			h2.html(res['cname']);
+			paramsHelp.append($('<br/><br/>')).append(res['description']);
 			var value = res['values'];
 			var minOccurs = res['minOccurs'];
 			var maxOccurs = res['maxOccurs'];
@@ -469,34 +359,14 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 				label.html(val);
 			});
 		});
-		var h2 = $('<h2>');
 	});
-	
-	paramsDiv.append('<br>');
-	paramsDiv.append('<br>');
-	var buttonsDiv = $('<div>');
-	buttonsDiv.attr({'id': 'buttonsDiv'});
-	uidiv.append(buttonsDiv);
-	var input = $('<input>');
-	input.attr({'type': 'button',
-		'value': 'Submit'});
-	input.val('Submit');
-	input.click(function(event) {submitQuery();});
-	buttonsDiv.append(input);
-	var input = $('<input>');
-	input.attr({'type': 'button',
-		'value': 'Clear'});
-	input.val('Clear');
-	input.click(function(event) {renderAvailableStudies();});
-	buttonsDiv.append(input);
-	buttonsDiv.append('<br>');
-	buttonsDiv.append('<br>');
 }
 
 /**
  * Send the request to get the available sites
  */
 function renderAvailableSites() {
+	$('#methodHelp').html(availableMethods[getSelectedMethodName()]);
 	var url = HOME + '/query?action=getSites' +
 			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
 			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName()) +
@@ -520,31 +390,12 @@ function renderAvailableSites() {
    {"Dataset1":"Study1_Dataset1"}
  */
 function postRenderSites(data, textStatus, jqXHR, param) {
-	var siteDiv = $('#siteDiv');
-	var table = $('<table>');
-	siteDiv.append(table);
 	var names = [];
 	$.each(data, function(name, value) {
 		names.push(name);
 	});
 	names.sort(compareIgnoreCase);
-	$.each(names, function(i, name) {
-		var tr = $('<tr>');
-		table.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		var input = $('<input>');
-		input.attr({
-			'type': 'checkbox',
-			'name': 'sites',
-			'checked': 'checked',
-			'value': data[name]
-		});
-		td.append(input);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(name);
-	});
+	loadSites(names, true);
 }
 
 /**
@@ -567,13 +418,12 @@ function submitQuery() {
 	obj['sites'] = valueToString(sites);
 	var url = HOME + '/query';
 	$('*', $('#paramsDiv')).css('cursor', 'wait');
-	$('*', $('#buttonsDiv')).css('cursor', 'wait');
 	document.body.style.cursor = "wait";
 	scanner.POST(url, obj, true, postSubmitQuery, null, null, 0);
 }
 
 /**
- * Render the available studies
+ * Render the results
  * 
  * @param data
  * 	the data returned from the server (a JSONObject)
@@ -586,7 +436,6 @@ function submitQuery() {
  */
 function postSubmitQuery(data, textStatus, jqXHR, param) {
 	$('*', $('#paramsDiv')).css('cursor', 'default');
-	$('*', $('#buttonsDiv')).css('cursor', 'default');
 	document.body.style.cursor = "default";
 	data = $.parseJSON(data);
 	if (getSelectedLibraryName() == 'Oceans') {
@@ -1652,11 +1501,9 @@ function buildDataTable(res) {
 		$('#example').remove();
 		oTable = null;
 	}
-	$('#resultDiv').remove();
-	var div = $('#ui');
-	var resultDiv = $('<div>');
-	resultDiv.attr({'id': 'resultDiv'});
-	div.append(resultDiv);
+	$('#resultDiv').css('display', '');
+	var resultDiv = $('#resultDivContent');
+	resultDiv.html('');
 	var table = $('<table>');
 	resultDiv.append(table);
 	table.attr({	'cellpadding': '0',
@@ -1945,57 +1792,6 @@ var scanner = {
 		}
 };
 
-function renderLogin() {
-	var uiDiv = $('#ui');
-	uiDiv.html('');
-	var h2 = $('<h2>');
-	uiDiv.append(h2);
-	h2.html('Log In');
-	var fieldset = $('<fieldset>');
-	uiDiv.append(fieldset);
-	var legend = $('<legend>');
-	fieldset.append(legend);
-	legend.html('Login');
-	var table = $('<table>');
-	fieldset.append(table);
-	var tr = $('<tr>');
-	table.append(tr);
-	var td = $('<td>');
-	tr.append(td);
-	td.html('Username: ');
-	var input = $('<input>');
-	input.attr({'type': 'text',
-		'id': 'username',
-		'name': 'username',
-		'size': 15
-	});
-	td.append(input);
-	tr = $('<tr>');
-	table.append(tr);
-	td = $('<td>');
-	tr.append(td);
-	td.html('Password: ');
-	var input = $('<input>');
-	input.attr({'type': 'password',
-		'id': 'password',
-		'name': 'password',
-		'size': 15
-	});
-	td.append(input);
-	tr = $('<tr>');
-	table.append(tr);
-	td = $('<td>');
-	tr.append(td);
-	var input = $('<input>');
-	input.attr({'type': 'button',
-		'value': 'Login'
-	});
-	input.val('Login');
-	td.append(input);
-	input.click(function(event) {submitLogin();});
-	td.append(input);
-}
-
 function submitLogin() {
 	var user = $('#username').val();
 	var password = $('#password').val();
@@ -2010,13 +1806,13 @@ function submitLogin() {
 function postSubmitLogin(data, textStatus, jqXHR, param) {
 	document.body.style.cursor = "default";
 	var res = $.parseJSON(data);
-	var uiDiv = $('#ui');
+	var loginDiv = $('#loginForm');
 	$('#errorDiv').remove();
 	if (res['status'] == 'success') {
 		loginRegistry();
 	} else {
 		var errorDiv = $('<div>');
-		uiDiv.append(errorDiv);
+		loginDiv.append(errorDiv);
 		errorDiv.attr({
 			'id': 'errorDiv'
 		});
@@ -2040,6 +1836,9 @@ function loginRegistry() {
 function postLoginRegistry(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
+		$('#loginForm').css('display', 'none');
+		$('#ui').css('visibility', 'visible');
+		$('#ui').css('display', '');
 		renderAvailableStudies();
 	} else {
 		alert(res['status']);
@@ -2152,101 +1951,15 @@ function compareIgnoreCase(str1, str2) {
 	}
 }
 
-function renderSelectTable() {
-	var div = $('#ui');
-	var h1 = $('<h1>');
-	div.append(h1);
-	h1.html('Query Scope');
-	var tableDiv = $('<div>');
-	div.append(tableDiv);
-	var table = $('<table>');
-	tableDiv.append(table);
-	table.css({'border': '1px solid black',
-		'border-collapse': 'collapse'
-	});
-	var thead = $('<thead>');
-	table.append(thead);
-	var tr = $('<tr>');
-	thead.append(tr);
-	var th = $('<th>');
-	th.css({'border': '1px solid black'
-	});
-	tr.append(th);
-	th.html('Studies');
-	var th = $('<th>');
-	th.css({'border': '1px solid black'
-	});
-	tr.append(th);
-	th.html('Datasets');
-	var th = $('<th>');
-	th.css({'border': '1px solid black'
-	});
-	tr.append(th);
-	th.html('Libraries');
-	var th = $('<th>');
-	th.css({'border': '1px solid black'
-	});
-	tr.append(th);
-	th.html('Methods');
-	var th = $('<th>');
-	th.css({'border': '1px solid black'
-	});
-	tr.append(th);
-	th.html('Sites');
-	var tbody = $('<tbody>');
-	table.append(tbody);
-	var tr = $('<tr>');
-	tbody.append(tr);
-	var td = $('<td>');
-	td.css({'border': '1px solid black'
-	});
-	tr.append(td);
-	var studyDiv = $('<div>');
-	studyDiv.attr({'id': 'studyDiv'});
-	td.append(studyDiv);
-	var td = $('<td>');
-	td.css({'border': '1px solid black'
-	});
-	tr.append(td);
-	var datasetDiv = $('<div>');
-	datasetDiv.attr({'id': 'datasetDiv'});
-	td.append(datasetDiv);
-	var td = $('<td>');
-	td.css({'border': '1px solid black'
-	});
-	tr.append(td);
-	var libDiv = $('<div>');
-	libDiv.attr({'id': 'libDiv'});
-	td.append(libDiv);
-	var td = $('<td>');
-	td.css({'border': '1px solid black'
-	});
-	tr.append(td);
-	var funcDiv = $('<div>');
-	funcDiv.attr({'id': 'funcDiv'});
-	td.append(funcDiv);
-	var td = $('<td>');
-	td.css({'border': '1px solid black'
-	});
-	tr.append(td);
-	var siteDiv = $('<div>');
-	siteDiv.attr({'id': 'siteDiv'});
-	td.append(siteDiv);
-	tableDiv.append($('<br>'));
-	tableDiv.append($('<br>'));
-}
-
 function expandAll() {
 	$('#navigation').find('div.hitarea.expandable-hitarea').click();
 	//$('#navigation').find('div.hitarea.tree-hitarea.expandable-hitarea').click();
 }
 
 function buildTreeResult(res) {
-	$('#resultDiv').remove();
-	var div = $('#ui');
-	var resultDiv = $('<div>');
-	resultDiv.attr({'id': 'resultDiv'});
-	div.append(resultDiv);
+	$('#resultDiv').css('display', '');
+	var resultDiv = $('#resultDivContent');
+	resultDiv.html('');
 	var h1 = $('<h1>');
 	resultDiv.append(h1);
 	h1.html('Response Results');
@@ -2295,5 +2008,177 @@ function appendTreeItem(div, res) {
 		li.append(label);
 		label.html(res);
 	}
+}
+
+function loadStudies(values) {
+	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
+		ready(function(){
+			if (studiesMultiSelect != null) studiesMultiSelect.destroyRecursive(true);
+			selStudies = dom.byId('selectStudies');
+			selStudies.innerHTML = '';
+			$.each(values, function(i, val) {
+				var c = win.doc.createElement('option');
+				c.innerHTML = val;
+				c.value = val;
+				selStudies.appendChild(c);
+			});
+			studiesMultiSelect = new MultiSelect({ name: 'selectStudies', value: '' }, selStudies);
+			studiesMultiSelect.watch('value', function () {
+				loadDatasets(emptyValue);
+				loadLibraries(emptyValue);
+				loadMethods(emptyValue);
+				loadSites(emptyValue, false);
+				$('#studyHelp').html('');
+				$('#datasetHelp').html('');
+				$('#libraryHelp').html('');
+				$('#methodHelp').html('');
+				$('#paramsHelpDiv').css('display', 'none');
+				$('#paramsTitle').css('display', 'none');
+				$('#paramsDiv').css('display', 'none');
+				$('#resultDiv').css('display', 'none');
+				var selValues = studiesMultiSelect.get('value');
+				if (selValues != null) { 
+					if (selValues.length == 1) {
+						renderAvailableDatasets();
+					} else if (selValues.length > 1) {
+						studiesMultiSelect.set('value', '');
+					}
+				} 
+			});
+			studiesMultiSelect.startup();
+		});
+	});
+}
+
+function loadDatasets(values) {
+	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
+		ready(function(){
+			if (datasetsMultiSelect != null) datasetsMultiSelect.destroyRecursive(true);
+			selDatasets = dom.byId('selectDatasets');
+			selDatasets.innerHTML = '';
+			$.each(values, function(i, val) {
+				var c = win.doc.createElement('option');
+				c.innerHTML = val;
+				c.value = val;
+				selDatasets.appendChild(c);
+			});
+			datasetsMultiSelect = new MultiSelect({ name: 'selectDatasets', value: '' }, selDatasets);
+			datasetsMultiSelect.watch('value', function () { 
+				loadLibraries(emptyValue);
+				loadMethods(emptyValue);
+				loadSites(emptyValue, false);
+				$('#datasetHelp').html('');
+				$('#libraryHelp').html('');
+				$('#methodHelp').html('');
+				$('#paramsHelpDiv').css('display', 'none');
+				$('#paramsTitle').css('display', 'none');
+				$('#paramsDiv').css('display', 'none');
+				$('#resultDiv').css('display', 'none');
+				var selValues = datasetsMultiSelect.get('value');
+				if (selValues != null) { 
+					if (selValues.length == 1) {
+						renderAvailableLibraries();
+					} else if (selValues.length > 1) {
+						datasetsMultiSelect.set('value', '');
+					}
+				} 
+			});
+			datasetsMultiSelect.startup();
+		});
+	});
+}
+
+function loadLibraries(values) {
+	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
+		ready(function(){
+			if (librariesMultiSelect != null) librariesMultiSelect.destroyRecursive(true);
+			selLibraries = dom.byId('selectLibraries');
+			selLibraries.innerHTML = '';
+			$.each(values, function(i, val) {
+				var c = win.doc.createElement('option');
+				c.innerHTML = val;
+				c.value = val;
+				selLibraries.appendChild(c);
+			});
+			librariesMultiSelect = new MultiSelect({ name: 'selectLibraries', value: '' }, selLibraries);
+			librariesMultiSelect.watch('value', function () {
+				loadMethods(emptyValue);
+				loadSites(emptyValue, false);
+				$('#libraryHelp').html('');
+				$('#methodHelp').html('');
+				$('#paramsHelpDiv').css('display', 'none');
+				$('#paramsTitle').css('display', 'none');
+				$('#paramsDiv').css('display', 'none');
+				$('#resultDiv').css('display', 'none');
+				var selValues = librariesMultiSelect.get('value');
+				if (selValues != null) { 
+					if (selValues.length == 1) {
+						renderAvailableMethods();
+					} else if (selValues.length > 1) {
+						librariesMultiSelect.set('value', '');
+					}
+				} 
+			});
+			librariesMultiSelect.startup();
+		});
+	});
+}
+
+function loadMethods(values) {
+	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
+		ready(function(){
+			if (methodsMultiSelect != null) methodsMultiSelect.destroyRecursive(true);
+			selMethods = dom.byId('selectMethods');
+			selMethods.innerHTML = '';
+			$.each(values, function(i, val) {
+				var c = win.doc.createElement('option');
+				c.innerHTML = val;
+				c.value = val;
+				selMethods.appendChild(c);
+			});
+			methodsMultiSelect = new MultiSelect({ name: 'selectMethods', value: '' }, selMethods);
+			methodsMultiSelect.watch('value', function () {
+				loadSites(emptyValue, false);
+				var selValues = methodsMultiSelect.get('value');
+				$('#methodHelp').html('');
+				$('#paramsHelpDiv').css('display', 'none');
+				$('#paramsTitle').css('display', 'none');
+				$('#paramsDiv').css('display', 'none');
+				$('#resultDiv').css('display', 'none');
+				if (selValues != null) { 
+					if (selValues.length == 1) {
+						renderAvailableSites();
+						renderAvailableParameters();
+					} else if (selValues.length > 1) {
+						methodsMultiSelect.set('value', '');
+					}
+				} 
+			});
+			methodsMultiSelect.startup();
+		});
+	});
+}
+
+function loadSites(values, selectAll) {
+	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
+		ready(function(){
+			if (sitesMultiSelect != null) sitesMultiSelect.destroyRecursive(true);
+			selSites = dom.byId('selectSites');
+			selSites.innerHTML = '';
+			$.each(values, function(i, val) {
+				var c = win.doc.createElement('option');
+				c.innerHTML = val;
+				c.value = val;
+				selSites.appendChild(c);
+			});
+			sitesMultiSelect = new MultiSelect({ name: 'selectSites'}, selSites);
+			if (!selectAll) {
+				sitesMultiSelect.set('value', '');
+			} else {
+				sitesMultiSelect.set('value', values);
+			}
+			sitesMultiSelect.startup();
+		});
+	});
 }
 
