@@ -103,7 +103,7 @@
 						data-dojo-type="dijit/layout/TabContainer"
 						style="width: 100%; height: 100%">
 						<div data-dojo-type="dijit/layout/ContentPane" title="Query"
-							data-dojo-props="selected:true">
+							data-dojo-props="selected:true" onShow="showQuery();">
 							<table>
 								<tbody>
 									<tr>
@@ -129,48 +129,52 @@
 							</table>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Query History">Not yet implemented...</div>
-						<div data-dojo-type="dijit/layout/ContentPane" title="Profile">
+							title="Query History" onShow="hideQuery();">Not yet implemented...</div>
+						<div data-dojo-type="dijit/layout/ContentPane" title="Profile" onShow="hideQuery();">
 							Not yet implemented...</div>
 					</div>
 				</div>
-				<div id="queryHelp" style="width: 35%; float: right;">
-					<span class="double_bottom_border"> Quick Help </span> <br />
-					<br /> <span>Select study, dataset, library, method and
-						sites on the left</span> <br />
-					<br /> <span id="studyHelp"></span> <br />
-					<br /> <span id="datasetHelp"></span> <br />
-					<br /> <span id="libraryHelp"></span> <br />
-					<br /> <span id="methodHelp"></span> <br />
-					<br />
+				<div id="queryHelpWrapperDiv">
+					<div id="queryHelp" style="width: 35%; float: right;">
+						<span class="double_bottom_border"> Quick Help </span> <br /> <br />
+						<span>Select study, dataset, library, method and sites on
+							the left</span> <br /> <br /> <span id="studyHelp"></span> <br /> <br />
+						<span id="datasetHelp"></span> <br /> <br /> <span
+							id="libraryHelp"></span> <br /> <br /> <span id="methodHelp"></span>
+						<br /> <br />
 
-				</div>
-				<br style="clear: left;" />
-				<br/><br/><br/>
-				
-				<p id="paramsTitle"></p>
-				<div id = "paramsDiv" style="width: 60%; float: left; display: none;" class="method_border">
-					<div id="paramsDivContent" class="method_margin">
 					</div>
-					<div id="ajaxSpinnerContainer">
-						<img src="resources/images/ajax-loader.gif" id="ajaxSpinnerImage" title="Processing..." alt="Spinner"/>
+					<br style="clear: left;" /> <br /> <br /> <br />
+				</div>
+
+				<div id="paramsWrapperDiv">
+					<p id="paramsTitle"></p>
+					<div id="paramsDiv" style="width: 60%; float: left; display: none;"
+						class="method_border">
+						<div id="paramsDivContent" class="method_margin"></div>
+						<div id="ajaxSpinnerContainer">
+							<img src="resources/images/ajax-loader.gif" id="ajaxSpinnerImage"
+								title="Processing..." alt="Spinner" />
+						</div>
+						<input type="button" value="Query" onclick="submitQuery();"
+							class="method_margin"> <input type="button" value="Clear"
+							onclick="renderAvailableStudies();"> <br />
+						<br />
 					</div>
-					<input type="button" value="Query" onclick="submitQuery();" class="method_margin">
-					<input type="button" value="Clear" onclick="renderAvailableStudies();">
-					<br/><br/>
+					<div id="paramsHelpDiv" style="width: 35%; float: right;">
+						<span class="double_bottom_border"> Quick Help </span>
+						<div id="paramsHelp"></div>
+					</div>
+					<br style="clear: left;" /> <br /> <br /> <br />
 				</div>
-				<div id="paramsHelpDiv" style="width: 35%; float: right;">
-					<span class="double_bottom_border"> Quick Help </span>
-					<div id="paramsHelp" ></div>
-				</div>
-				<br style="clear: left;" />
-				<br/><br/><br/>
 			</div>
 		</div>
+		<div id="resultWrapperDiv">
 		<div id="resultDiv" style="display: none;" >
 			<div id="resultDivContent">
 			</div>
 			<br/><br/><br/>
+		</div>
 		</div>
 
 

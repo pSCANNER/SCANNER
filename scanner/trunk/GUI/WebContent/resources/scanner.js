@@ -2180,3 +2180,15 @@ function loadSites(values, selectAll) {
 	});
 }
 
+function showQuery() {
+	$('#queryHelpWrapperDiv').show();
+	$('#paramsWrapperDiv').show();
+	$('#resultWrapperDiv').show();
+}
+
+function hideQuery() {
+	$('#queryHelpWrapperDiv').hide();
+	$('#paramsWrapperDiv').hide();
+	$('#resultWrapperDiv').hide();
+}
+
