@@ -417,8 +417,7 @@ function submitQuery() {
 	obj['method'] = getSelectedMethodName();
 	obj['sites'] = valueToString(sites);
 	var url = HOME + '/query';
-	$('*', $('#paramsDiv')).css('cursor', 'wait');
-	document.body.style.cursor = "wait";
+	$('#ajaxSpinnerImage').show();
 	scanner.POST(url, obj, true, postSubmitQuery, null, null, 0);
 }
 
@@ -435,8 +434,7 @@ function submitQuery() {
  * 	the parameters to be used by the callback success function
  */
 function postSubmitQuery(data, textStatus, jqXHR, param) {
-	$('*', $('#paramsDiv')).css('cursor', 'default');
-	document.body.style.cursor = "default";
+	$('#ajaxSpinnerImage').hide();
 	data = $.parseJSON(data);
 	if (getSelectedLibraryName() == 'Oceans') {
 		buildDataTable(data);
