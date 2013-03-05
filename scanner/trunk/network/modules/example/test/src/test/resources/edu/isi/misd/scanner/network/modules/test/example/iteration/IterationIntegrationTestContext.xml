@@ -29,6 +29,7 @@
         <camel:route>
             <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.example.IterationRoute"/>
+            <camel:to uri="stream:out"/>             
             <camel:to uri="mock:result"/>            
         </camel:route>
                     

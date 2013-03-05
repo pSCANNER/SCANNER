@@ -2,10 +2,19 @@
 <xsd:schema version="1.0"
             targetNamespace="http://scanner.misd.isi.edu/network/types/glore"
             xmlns:tns="http://scanner.misd.isi.edu/network/types/glore"            
+            xmlns:base="http://scanner.misd.isi.edu/network/types/base"             
+            xmlns:regr="http://scanner.misd.isi.edu/network/types/regression"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            elementFormDefault="qualified">  
-      
-                   
+            elementFormDefault="qualified">
+    
+    <xsd:import 
+        schemaLocation="../../../../../../../../../base/common/src/main/resources/jaxb/base/BaseTypes/BaseTypes.xsd" 
+        namespace="http://scanner.misd.isi.edu/network/types/base"/>    
+          
+    <xsd:import 
+        schemaLocation="../../../../../../../../../base/common/src/main/resources/jaxb/regression/RegressionTypes/RegressionTypes.xsd" 
+        namespace="http://scanner.misd.isi.edu/network/types/regression"/>
+                 
     <xsd:element name="GloreData">
         <xsd:complexType>
             <xsd:annotation>
@@ -16,19 +25,19 @@
             <xsd:sequence>  
                
               <xsd:element name="Beta"
-                           type="tns:MatrixType"/>                 
+                           type="base:MatrixType"/>                 
               
               <xsd:element name="D"
-                           type="tns:MatrixType"/>   
+                           type="base:MatrixType"/>   
               
               <xsd:element name="E"
-                           type="tns:MatrixType"/>                                                                          
+                           type="base:MatrixType"/>                                                                          
               
               <xsd:element name="CovarianceMatrix"
-                           type="tns:MatrixType"/>  
+                           type="base:MatrixType"/>  
               
               <xsd:element name="SDMatrix"
-                           type="tns:MatrixType"/>                              
+                           type="base:MatrixType"/>                              
               
               <xsd:element name="iteration" 
                            type="xsd:int"/>
@@ -52,45 +61,31 @@
             <xsd:sequence>                                                                                        
               
               <xsd:element name="Beta"
-                           type="tns:MatrixType"/>     
+                           type="base:MatrixType"/>     
                               
               <xsd:element name="CovarianceMatrix"
-                           type="tns:MatrixType"/>  
+                           type="base:MatrixType"/>  
               
               <xsd:element name="SDMatrix"
-                           type="tns:MatrixType"/>                              
+                           type="base:MatrixType"/>                              
                                    
             </xsd:sequence>
         </xsd:complexType> 
     </xsd:element>    
-                 
-    <xsd:complexType name="DoubleArray">
-        <xsd:annotation>
-            <xsd:documentation>
-                An array of (one or more) doubles
-            </xsd:documentation>
-        </xsd:annotation>     
-        <xsd:sequence>
-            <xsd:element name="double" 
-                         type="xsd:double"
-                         minOccurs="1"
-                         maxOccurs="unbounded"/>
-        </xsd:sequence>
-    </xsd:complexType>
+       
+                   
+    <!-- temporary name until we phase out the old GloreResultData -->
+    <xsd:element name="NewGloreResultData">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
 
-    <xsd:complexType name="MatrixType">
-        <xsd:annotation>
-            <xsd:documentation>
-                An array of (one or more) arrays of doubles
-            </xsd:documentation>
-        </xsd:annotation>     
-        <xsd:sequence>
-            <xsd:element name="doubles" 
-                         type="tns:DoubleArray"
-                         minOccurs="1"
-                         maxOccurs="unbounded"/>                             
-        </xsd:sequence>
-    </xsd:complexType>
-
-                  
+               </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="regr:LogisticRegressionOutput"/>  
+            </xsd:complexContent>                          
+        </xsd:complexType> 
+    </xsd:element>   
+              
 </xsd:schema>

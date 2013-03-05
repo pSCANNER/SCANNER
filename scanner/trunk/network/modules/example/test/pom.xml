@@ -196,6 +196,7 @@
 -->              
                   <excludes>
                       <exclude>**/*SecureIterationIntegrationTest*</exclude>
+                      <exclude>**/*EchoIntegrationTest*</exclude>                      
                   </excludes>                  
                 </configuration>
             </plugin>          

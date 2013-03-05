@@ -375,7 +375,7 @@ Matrix values:
                          maxOccurs="1"/>
             <xsd:element ref="tns:cov.unscaled"
                          minOccurs="0"
-                         maxOccurs="1"/>                                                                                                                                                                                                               
+                         maxOccurs="1"/>
         </xsd:sequence>
     </xsd:complexType>
 

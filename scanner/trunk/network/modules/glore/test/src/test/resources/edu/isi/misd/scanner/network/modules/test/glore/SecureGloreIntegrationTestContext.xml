@@ -34,6 +34,7 @@
         <camel:route>
             <camel:from uri="jetty:https://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/glore/lr?handlers=masterSecurityHandler&amp;sslContextParametersRef=sslContextParametersMaster&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>          
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.glore.GloreRoute"/>
+            <camel:to uri="stream:out"/>             
             <camel:to uri="mock:result"/>
         </camel:route>
                                         

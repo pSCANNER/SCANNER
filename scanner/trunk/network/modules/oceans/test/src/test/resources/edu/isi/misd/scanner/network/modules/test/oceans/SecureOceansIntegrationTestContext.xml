@@ -35,6 +35,7 @@
         <camel:route>
             <camel:from uri="jetty:https://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?handlers=masterSecurityHandler&amp;sslContextParametersRef=sslContextParametersMaster&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>                    
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.oceans.OceansLogisticRegressionRoute"/>
+            <camel:to uri="stream:out"/>             
             <camel:to uri="mock:result"/>
         </camel:route>
                                         

@@ -1,16 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.isi.misd.scanner.network.glore.utils;
 
 import Jama.Matrix;
-import edu.isi.misd.scanner.network.types.glore.DoubleArray;
-import edu.isi.misd.scanner.network.types.glore.MatrixType;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.isi.misd.scanner.network.types.base.DoubleType;
+import edu.isi.misd.scanner.network.types.base.MatrixType;
+import edu.isi.misd.scanner.network.types.base.MatrixRowType;
 
 /**
  *
@@ -44,49 +42,52 @@ public class GloreUtils
         }
         return matrixStr;
     }
-    
-    /**
-     *
-     * @param matrixType
-     * @return
-     */
-    public static Matrix convertMatrixTypeToMatrix(MatrixType matrixType)
-    {
-        List<DoubleArray> doubleArrays = matrixType.getDoubles();
-        ArrayList<List<Double>> doubleList = new ArrayList<List<Double>>();
-        
-        for (DoubleArray doubleArray : doubleArrays) {
-            doubleList.add(doubleArray.getDouble());
-        }
-        
-        Matrix matrix = new Matrix(two_dim_list_to_arr(doubleList));
-        return matrix;
-    }
 
     /**
      *
      * @param matrix
      * @return
      */
-    public static MatrixType convertMatrixToMatrixType(Matrix matrix) 
+    public static MatrixType convertMatrixToMatrixType(Matrix matrix)
     {
-        ArrayList<DoubleArray> doubleArraysList = new ArrayList<DoubleArray>();        
+        ArrayList<MatrixRowType> matrixRowsList = new ArrayList<MatrixRowType>();        
         double[][] matrixArray = matrix.getArray();
         
         for (int i = 0; i < matrixArray.length; i++) 
         {
-            ArrayList<Double> doubleList = new ArrayList<Double>();
+            ArrayList<DoubleType> columnList = 
+                new ArrayList<DoubleType>();
             for (int j = 0; j < matrixArray[i].length; j++) {
-                doubleList.add(Double.valueOf(matrixArray[i][j]));
+                DoubleType columnType = new DoubleType();
+                columnType.setValue(Double.valueOf(matrixArray[i][j]));
+                columnType.setName(Integer.toString(j));
+                columnList.add(columnType);
             }
-            DoubleArray doubleArray = new DoubleArray();
-            doubleArray.getDouble().addAll(doubleList);
-            doubleArraysList.add(doubleArray);
+            MatrixRowType matrixRow = new MatrixRowType();
+            matrixRow.getMatrixColumn().addAll(columnList);
+            matrixRowsList.add(matrixRow);
         }
         
         MatrixType matrixType = new MatrixType();        
-        matrixType.getDoubles().addAll(doubleArraysList);
-        return matrixType;
+        matrixType.getMatrixRow().addAll(matrixRowsList);
+        return matrixType;    
+    }
+    
+    public static Matrix convertMatrixTypeToMatrix(MatrixType baseMatrixType)
+    {
+        List<MatrixRowType> rowArrays = baseMatrixType.getMatrixRow();
+        ArrayList<List<Double>> doubleList = new ArrayList<List<Double>>();
+        
+        for (MatrixRowType rowArray : rowArrays) {
+            ArrayList doubles = new ArrayList();            
+            for (DoubleType column : rowArray.getMatrixColumn()) {
+                doubles.add(column.getValue());             
+            }
+            doubleList.add(doubles);            
+        }
+        
+        Matrix matrix = new Matrix(two_dim_list_to_arr(doubleList));
+        return matrix;
     }
     
     /* Returns the absolute maximum of the elements in the two dimensional
