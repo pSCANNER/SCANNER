@@ -1,0 +1,404 @@
+<?xml version="1.0"?>
+<xsd:schema version="1.0"
+            targetNamespace="http://scanner.misd.isi.edu/network/types/regression"
+            xmlns:tns="http://scanner.misd.isi.edu/network/types/regression" 
+            xmlns:base="http://scanner.misd.isi.edu/network/types/base"             
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified">                   
+             
+    <xsd:import 
+        schemaLocation="../../base/BaseTypes/BaseTypes.xsd" 
+        namespace="http://scanner.misd.isi.edu/network/types/base"/>  
+      
+                    <!-- input types -->    
+                    
+    <xsd:complexType name="LogisticRegressionRequest">
+        <xsd:annotation>
+            <xsd:documentation>
+
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>          
+            <xsd:element name="RequestDescription" 
+                         type="tns:LogisticRegressionRequestDescription"
+                         minOccurs="0"
+                         maxOccurs="1"/>                 
+            <xsd:element name="RequestParameters" 
+                         type="tns:LogisticRegressionRequestParameters"
+                         minOccurs="1"
+                         maxOccurs="1"/>                                            
+        </xsd:sequence>
+    </xsd:complexType> 
+
+    <xsd:complexType name="LogisticRegressionRequestDescription">
+        <xsd:annotation>
+            <xsd:documentation>
+
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>          
+            <xsd:element name="ID" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>                 
+            <xsd:element name="Name" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>
+            <xsd:element name="Description" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="1"/>                                             
+        </xsd:sequence>
+    </xsd:complexType> 
+
+    <xsd:complexType name="LogisticRegressionRequestParameters">
+        <xsd:annotation>
+            <xsd:documentation>
+
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>          
+            <xsd:element name="DependentVariableName" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>
+            <xsd:element name="IndependentVariableName" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="unbounded"/>
+            <xsd:element name="CategoricalVariable" 
+                         type="tns:CategoricalVariableType"
+                         minOccurs="0"
+                         maxOccurs="1"/>                                              
+        </xsd:sequence>
+    </xsd:complexType>      
+
+    <xsd:complexType name="CategoricalVariableType">
+        <xsd:annotation>
+            <xsd:documentation>
+
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>          
+            <xsd:element name="VariableName" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>
+            <xsd:element name="ReferenceValue" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>       
+        </xsd:sequence>
+    </xsd:complexType>
+        
+                    <!-- output types -->                          
+<!-- 
+Scalar values:
+       
+    I:      iterations (int)       
+    N:      number of observations (int) 
+    K:      number of parameters  (int)    
+    df:     residual degrees of freedom
+    R2:     r-squared
+    R2p:    pseudo r-squared
+    ll:     log likelihood
+    aic:    Akaikes Information Criterion (minus twice the maximized log-likelihood plus twice the number of coefficients).
+    bic:    the Bayesian Information Criterion (minus twice the maximized log-likelihood plus the number of coefficients times log n).
+    chi2:   chi-squared
+    p:       model significance
+    
+Vector values:
+
+    Coefficients (vectors of length k, with each element corresponding to an independent variable)
+        name: string
+        intercept: (double)
+        B: parameter estimates for the independent variables. (double)
+        SE: standard errors for each param. estimate (double)
+        p-value: for each param est. (double)
+        t-statistics: or chi2-statistics param. estimate (double)
+
+Matrix values:
+
+    cov.scaled: a kXk matrix of scaled covariances. (each row and column corresponding to an independent variable)
+    cov.unscaled: a kXk matrix of unscaled covariances. (each row and column corresponding to an independent variable)
+-->               
+    <xsd:element name="N">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    Number of observations
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:IntegerType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="K">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    Number of parameters
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:IntegerType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="I">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    Number of iterations
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:IntegerType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+        
+    <xsd:element name="df">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    Residual degrees of freedom
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:DoubleType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+        
+    <xsd:element name="R2">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    r-squared
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:DoubleType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+     
+    <xsd:element name="R2p">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    pseudo r-squared
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:DoubleType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+         
+    <xsd:element name="ll">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    log likelihood
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:DoubleType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="aic">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    Akaikes Information Criterion (minus twice the maximized log-likelihood plus twice the number of coefficients).
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:DoubleType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="bic">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    Bayesian Information Criterion (minus twice the maximized log-likelihood plus the number of coefficients times log n).
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:DoubleType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="chi2">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    chi-squared
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:DoubleType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="p">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    model significance
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:DoubleType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="Coefficient">
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>
+                    A structure corresponding to the results coefficients of an independent variable
+                </xsd:documentation>
+            </xsd:annotation>     
+            <xsd:sequence>          
+                <xsd:element name="intercept" 
+                             type="xsd:double"
+                             minOccurs="1"
+                             maxOccurs="1"/>
+                <xsd:element name="B" 
+                             type="xsd:double"
+                             minOccurs="1"
+                             maxOccurs="1"/>
+                <xsd:element name="SE" 
+                             type="xsd:double"
+                             minOccurs="1"
+                             maxOccurs="1"/>
+                <xsd:element name="p-value" 
+                             type="xsd:double"
+                             minOccurs="1"
+                             maxOccurs="1"/>
+                <xsd:element name="t-statistics" 
+                             type="xsd:double"
+                             minOccurs="1"
+                             maxOccurs="1"/>                                                
+            </xsd:sequence>
+            <xsd:attribute name="name"
+                           type="xsd:string"
+                           use="optional"/>            
+        </xsd:complexType> 
+    </xsd:element>       
+            
+    <xsd:element name="cov.scaled">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                a kXk matrix of scaled covariances (each row and column corresponding to an independent variable).
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:MatrixType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+         
+    <xsd:element name="cov.unscaled">
+        <xsd:complexType>    
+            <xsd:annotation>
+                <xsd:documentation>
+                    a kXk matrix of unscaled covariances (each row and column corresponding to an independent variable).
+                </xsd:documentation>
+            </xsd:annotation>
+            <xsd:complexContent>
+                <xsd:extension base="base:MatrixType"/>  
+            </xsd:complexContent>                         
+        </xsd:complexType>
+    </xsd:element>
+                                           
+    <xsd:complexType name="LogisticRegressionResponse">
+        <xsd:annotation>
+            <xsd:documentation>
+                Represents the reponse of a logistic regression calculation
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>
+            <xsd:element ref="tns:N"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:K"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:I"
+                         minOccurs="0"
+                         maxOccurs="1"/>                
+            <xsd:element ref="tns:df"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:R2"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:R2p"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:ll"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:aic"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:bic"
+                         minOccurs="0"
+                         maxOccurs="1"/>  
+            <xsd:element ref="tns:chi2"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:p"
+                         minOccurs="0"
+                         maxOccurs="1"/>  
+            <xsd:element ref="tns:Coefficient" 
+                         minOccurs="0"
+                         maxOccurs="unbounded"/>    
+            <xsd:element ref="tns:cov.scaled"
+                         minOccurs="0"
+                         maxOccurs="1"/>
+            <xsd:element ref="tns:cov.unscaled"
+                         minOccurs="0"
+                         maxOccurs="1"/>                                                                                                                                                                                                               
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="LogisticRegressionOutput">
+        <xsd:annotation>
+            <xsd:documentation>
+                A structure representing a complete regression response, including the input request and dataset ID
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence> 
+            <xsd:element name="DatasetID" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="1"/>                     
+            <xsd:element name="Request" 
+                         type="tns:LogisticRegressionRequest"
+                         minOccurs="1"
+                         maxOccurs="1"/>                 
+            <xsd:element name="Response" 
+                         type="tns:LogisticRegressionResponse"
+                         minOccurs="1"
+                         maxOccurs="1"/>                                            
+        </xsd:sequence>
+    </xsd:complexType> 
+                
+</xsd:schema>

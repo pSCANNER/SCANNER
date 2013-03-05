@@ -99,7 +99,19 @@
               <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-BaseTypes.episode</episodeFile>
             </configuration>
             <id>jaxb-generate-BaseTypes</id>
-          </execution>              
+          </execution> 
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <schemaIncludes>
+                <include>jaxb/regression/RegressionTypes/*.xsd</include>
+              </schemaIncludes>
+              <episodeFile>${project.build.directory}/generated-sources/xjc/META-INF/jaxb-RegressionTypes.episode</episodeFile>
+            </configuration>
+            <id>jaxb-generate-RegressionTypes</id>
+          </execution>                        
         </executions>
         <configuration>
           <catalog>src/main/resources/jaxb/catalog.xml</catalog>

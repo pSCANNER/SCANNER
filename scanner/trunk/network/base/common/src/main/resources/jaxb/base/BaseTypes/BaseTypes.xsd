@@ -48,5 +48,90 @@
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
-                       
+           
+    <xsd:complexType name="IntegerType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An (optionally) named integer value
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>          
+            <xsd:element name="value" 
+                         type="xsd:integer"
+                         minOccurs="1"
+                         maxOccurs="1"/>
+        </xsd:sequence>
+        <xsd:attribute name="name"
+                       type="xsd:string"
+                       use="optional"/>            
+    </xsd:complexType>
+               
+    <xsd:complexType name="DoubleType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An (optionally) named double value 
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>          
+            <xsd:element name="value" 
+                         type="xsd:double"
+                         minOccurs="1"
+                         maxOccurs="1"/>
+        </xsd:sequence>
+        <xsd:attribute name="name"
+                       type="xsd:string"
+                       use="optional"/>            
+    </xsd:complexType>
+                 
+    <xsd:complexType name="MatrixRowType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An array of (one or more) DoubleTypes
+            </xsd:documentation>
+        </xsd:annotation>     
+        <xsd:sequence>          
+            <xsd:element name="MatrixColumn" 
+                         type="tns:DoubleType"
+                         minOccurs="1"
+                         maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name"
+                       type="xsd:string"
+                       use="optional"/>         
+    </xsd:complexType>
+
+    <xsd:complexType name="MatrixType">
+        <xsd:annotation>
+            <xsd:documentation>
+                An array of (one or more) arrays of MatrixRowTypes
+            </xsd:documentation>
+        </xsd:annotation>        
+        <xsd:sequence>
+            <xsd:element name="MatrixRow" 
+                         type="tns:MatrixRowType"
+                         minOccurs="1"
+                         maxOccurs="unbounded"/>                             
+        </xsd:sequence>
+        <xsd:attribute name="name"
+                       type="xsd:string"
+                       use="optional"/>              
+    </xsd:complexType>
+                   
+    <xsd:complexType name="MatrixTypeArray">
+        <xsd:annotation>
+            <xsd:documentation>
+                An array of (one or more) arrays of MatrixTypes
+            </xsd:documentation>
+        </xsd:annotation>        
+        <xsd:sequence>
+            <xsd:element name="Matrix" 
+                         type="tns:MatrixType"
+                         minOccurs="1"
+                         maxOccurs="unbounded"/>                             
+        </xsd:sequence>
+        <xsd:attribute name="name"
+                       type="xsd:string"
+                       use="optional"/>           
+    </xsd:complexType>
+        
 </xsd:schema>
