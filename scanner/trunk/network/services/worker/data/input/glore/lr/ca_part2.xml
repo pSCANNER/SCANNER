@@ -1,0 +1,36 @@
+<DataSet>
+
+
+    <DataSetName>synthetic_ca_part2</DataSetName>
+    <Unique_ID>glore_ca_part2</Unique_ID></Unique_ID>
+
+<Connection>
+<type>filesystem</type>
+<file_type>csv</file_type>
+<location>ca_part2.csv</location>
+</Connection>
+
+<Variables>
+
+<Variable>
+    <Name>g1</Name>
+    <Type>Continuous</Type>
+    <Description>Biomarkers CA-19</Description>
+</Variable>
+
+<Variable>
+    <Name>g2</Name>
+    <Type>Continuous</Type>
+    <Description>Biomarkers CA-125</Description>
+</Variable>
+
+<Variable>
+    <Name>target</Name>
+    <Type>Binary</Type>
+    <Description>Breast Cancer Status (1:Yes, 0 :No) </Description>
+</Variable>
+
+
+</Variables>
+
+</DataSet>

@@ -56,7 +56,14 @@ public class GloreProcessor implements Processor
         GloreData data = 
             (GloreData)exchange.getIn().getBody(GloreData.class); 
         GloreStateData state = getState(exchange);
-        
+
+
+        // added to be compatible for the new .xml schema
+//        GloreLogisticRegressionParameters request =
+//                (GloreLogisticRegressionParameters)
+//                        exchange.getIn().getBody(
+//                                GloreLogisticRegressionParameters.class);
+
         if (!state.dataLoaded) 
         {
             readDataFile(exchange);
@@ -185,6 +192,7 @@ public class GloreProcessor implements Processor
 
         // read file and populate X and Y matrices
         state.rows = 0;
+
         // get rid of the first line
         if ((file_line = file_br.readLine()) != null){
             // do nothing

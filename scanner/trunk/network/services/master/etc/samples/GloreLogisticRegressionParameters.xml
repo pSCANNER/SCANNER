@@ -1,0 +1,20 @@
+
+
+<LogisticRegressionRequest>
+
+<RequestDescription>
+    <name>Breast Cancer Outcome association on Biomarkers</name>
+    <description>Two Biomarkers hypothesised to be correlated with Breast Cancer
+        [1] Zou KH, Liu AI, Bandos AI, et al. Statistical evaluation of diagnostic performance: topics in ROC analysis.
+        Boca Raton, FL: : CRC Press, Chapman and Hall 2011.
+    </description>
+    <id>1234</id>
+</RequestDescription>
+
+<RequestParameters>
+    <dependentVariableName>target</dependentVariableName>
+    <independentVariableNames>g1</independentVariableNames>
+    <independentVariableNames>g2</independentVariableNames>
+</RequestParameters>
+
+</LogisticRegressionRequest>
