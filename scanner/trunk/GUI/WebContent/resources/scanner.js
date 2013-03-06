@@ -477,6 +477,7 @@ function submitQuery(div, replay) {
 		obj['sites'] = replay['sites'][0];
 	}
 	param['resultDiv'] = $('#' + div);
+	param['library'] = obj['library'];
 	param.spinner.show();
 	var url = HOME + '/query';
 	scanner.POST(url, obj, true, postSubmitQuery, param, null, 0);
@@ -498,7 +499,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	param.spinner.hide();
 	var resultDiv = param['resultDiv'];
 	data = $.parseJSON(data);
-	if (getSelectedLibraryName() == 'Oceans') {
+	if (param['library'] == 'Oceans') {
 		buildDataTable(data, resultDiv, param.tableId);
 	} else {
 		buildTreeResult(data, resultDiv, param.treeId);
@@ -2554,7 +2555,8 @@ function pushHistory(obj) {
  * 	the row index in the history table
  */
 function replayQuery(index) {
-	var item = historyDataStore.items[index];
+	var tableIndex = historyDataStore.items.length - index - 1;
+	var item = historyDataStore.items[tableIndex];
 	submitQuery('replayDivContent', item);
 }
 
