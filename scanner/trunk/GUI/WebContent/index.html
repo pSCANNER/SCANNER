@@ -27,6 +27,14 @@
 <head>
 <meta content="text/html;charset=UTF-8" http-equiv="Content-Type">
 <title>Scanner</title>
+<style type="text/css" title="currentStyle">
+@import
+	"resources/dojo-release-1.8.3/dojox/grid/resources/claroGrid.css";
+
+#historyGridDiv {
+	height: 20em;
+}
+</style>
 <link rel="stylesheet" type="text/css" href="resources/jquery-ui.css">
 <link rel="stylesheet" type="text/css"
 	href="resources/css/demo_page.css">
@@ -98,7 +106,7 @@
 			</div>
 
 			<div id="ui" style="visibility: hidden;">
-				<div style="width: 60%; height: 300px; float: left" class="claro">
+				<div style="width: 100%; height: 300px;" class="claro">
 					<div id="queryTabContainer"
 						data-dojo-type="dijit/layout/TabContainer"
 						style="width: 100%; height: 100%">
@@ -107,74 +115,134 @@
 							<table>
 								<tbody>
 									<tr>
-										<td>Studies</td>
-										<td>Datasets</td>
-										<td>Libraries</td>
-										<td>Methods</td>
-										<td>Sites</td>
-									</tr>
-									<tr>
-										<td valign="top"><select id="selectStudies"></select>
+										<td valign="top" style="width: 60%;">
+											<table>
+												<tbody>
+													<tr>
+														<td>Studies</td>
+														<td>Datasets</td>
+														<td>Libraries</td>
+														<td>Methods</td>
+														<td>Sites</td>
+													</tr>
+													<tr>
+														<td valign="top"><select id="selectStudies"></select>
+														</td>
+														<td valign="top"><select id="selectDatasets"></select>
+														</td>
+														<td valign="top"><select id="selectLibraries"></select>
+														</td>
+														<td valign="top"><select id="selectMethods"></select>
+														</td>
+														<td valign="top"><select id="selectSites"></select>
+														</td>
+													</tr>
+												</tbody>
+											</table>
 										</td>
-										<td valign="top"><select id="selectDatasets"></select>
-										</td>
-										<td valign="top"><select id="selectLibraries"></select>
-										</td>
-										<td valign="top"><select id="selectMethods"></select>
-										</td>
-										<td valign="top"><select id="selectSites"></select>
+										<td style="width: 35%;">
+											<div id="queryHelp">
+												<span class="double_bottom_border"> Quick Help </span> <br /> <br />
+												<span>Select study, dataset, library, method and sites on
+													the left</span> <br /> <br /> <span id="studyHelp"></span> <br /> <br />
+												<span id="datasetHelp"></span> <br /> <br /> <span
+													id="libraryHelp"></span> <br /> <br /> <span id="methodHelp"></span>
+											</div>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Query History" onShow="hideQuery();">Not yet implemented...</div>
-						<div data-dojo-type="dijit/layout/ContentPane" title="Profile" onShow="hideQuery();">
-							Not yet implemented...</div>
-					</div>
-				</div>
-				<div id="queryHelpWrapperDiv">
-					<div id="queryHelp" style="width: 35%; float: right;">
-						<span class="double_bottom_border"> Quick Help </span> <br /> <br />
-						<span>Select study, dataset, library, method and sites on
-							the left</span> <br /> <br /> <span id="studyHelp"></span> <br /> <br />
-						<span id="datasetHelp"></span> <br /> <br /> <span
-							id="libraryHelp"></span> <br /> <br /> <span id="methodHelp"></span>
-						<br /> <br />
-
-					</div>
-					<br style="clear: left;" /> <br /> <br /> <br />
-				</div>
-
-				<div id="paramsWrapperDiv">
-					<p id="paramsTitle"></p>
-					<div id="paramsDiv" style="width: 60%; float: left; display: none;"
-						class="method_border">
-						<div id="paramsDivContent" class="method_margin"></div>
-						<div id="ajaxSpinnerContainer">
-							<img src="resources/images/ajax-loader.gif" id="ajaxSpinnerImage"
-								title="Processing..." alt="Spinner" />
+							title="Query History" onShow="hideQuery();">
+							<div id="historyGridDiv"></div>
 						</div>
-						<input type="button" value="Query" onclick="submitQuery();"
-							class="method_margin"> <input type="button" value="Clear"
-							onclick="renderAvailableStudies();"> <br />
-						<br />
+						<div data-dojo-type="dijit/layout/ContentPane" title="Profile" onShow="hideQuery();">
+							<div id="profileDiv" class="method_border method_margin">
+								<table id="profileTable">
+									<tr>
+										<td>Identity</td>
+										<td id="profileIdentity"></td>
+										<td id="profileIdentityDescription"></td>
+									</tr>
+									<tr>
+										<td>Role</td>
+										<td id="profileRole"></td>
+										<td rowspan="3" id="profileRoleDescription"></td>
+									</tr>
+									<tr>
+										<td class="nowrap">Study count</td>
+										<td id="profileStudyCount"></td>
+									</tr>
+									<tr>
+										<td class="nowrap">Query count</td>
+										<td id="profileQueryCount"></td>
+									</tr>
+									<tr>
+										<td class="nowrap">Privacy budget</td>
+										<td id="profilePrivacyBudget"></td>
+										<td rowspan="2" id="profilePrivacyBudgetDescription"></td>
+									</tr>
+									<tr>
+										<td class="nowrap">Last activity</td>
+										<td class="nowrap" id="profileLastActivity"></td>
+									</tr>
+								</table>
+							</div>
+						</div>
 					</div>
-					<div id="paramsHelpDiv" style="width: 35%; float: right;">
-						<span class="double_bottom_border"> Quick Help </span>
-						<div id="paramsHelp"></div>
-					</div>
-					<br style="clear: left;" /> <br /> <br /> <br />
+				</div>
+
+				<div id="paramsWrapperDiv" style="width: 100%;">
+					<p id="paramsTitle"></p>
+					<table id="paramsTable">
+						<tbody>
+							<tr>
+								<td valign="top"style="width: 60%;">
+									<div id="paramsDiv" class="method_border" style="width: 100%; display: none;">
+										<div id="paramsDivContent" class="method_margin"></div>
+										<div id="ajaxSpinnerContainer">
+											<img src="resources/images/ajax-loader.gif" id="ajaxSpinnerImage"
+												title="Processing..." alt="Spinner" />
+										</div>
+										<input type="button" value="Query" onclick="submitQuery('resultDivContent', null);"
+											class="method_margin"> <input type="button" value="Clear"
+											onclick="renderAvailableStudies();"> <br />
+										<br />
+									</div>
+								</td>
+								<td style="width: 35%;" valign="top">
+									<div id="paramsHelpDiv">
+										<span class="double_bottom_border"> Quick Help </span>
+										<br/><br/>
+										<div id="paramsHelp"></div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<br/><br/>
 				</div>
 			</div>
 		</div>
 		<div id="resultWrapperDiv">
-		<div id="resultDiv" style="display: none;" >
-			<div id="resultDivContent">
+			<div id="resultDiv" style="display: none;" >
+				<div id="resultDivContent">
+				</div>
+				<br/><br/><br/>
 			</div>
-			<br/><br/><br/>
 		</div>
+		<div id="replayDivWrapper">
+			<br style="clear: left;" />
+			<div id="ajaxHistorySpinnerContainer">
+				<img src="resources/images/ajax-loader.gif" id="ajaxHistorySpinnerImage"
+					title="Processing..." alt="Spinner" />
+			</div>
+			<div id="replayDiv" style="display: none;" >
+				<div id="replayDivContent">
+				</div>
+				<br/><br/><br/>
+			</div>
 		</div>
 
 

@@ -25,7 +25,8 @@ var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
 var HOME;
 
-var oTable = null;
+var oQueryTable = null;
+var oHistoryTable = null;
 
 var selStudies = null;
 var selDatasets = null;
@@ -47,6 +48,39 @@ var availableParameters = {};
 
 var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
 
+var historyLayout = [[
+                      {'name': 'Date', 'field': 'date', 'width': '15%'},
+                      {'name': 'Study', 'field': 'study', 'width': '15%'},
+                      {'name': 'Dataset', 'field': 'dataset', 'width': '15%'},
+                      {'name': 'Library', 'field': 'library','width': '10%'},
+                      {'name': 'Method', 'field': 'method', 'width': '15%'},
+                      {'name': 'Options', 'field': 'options', 'width': '15%'},
+                      {'name': 'Privacy budget', 'field': 'budget', 'width': '15%'}
+                      ]];
+
+var historyDataStore = {
+		identifier: "id",
+		items: []
+};
+
+var historyGrid = null;
+var queriesCounter = 0;
+var studiesCounter = [];
+
+/**
+ * Method "contains" for the Array object
+ * returns true if an element is in the array, and false otherwise
+ */
+Array.prototype.contains = function (elem) {
+	for (i in this) {
+		if (this[i] == elem) return true;
+	}
+	return false;
+};
+
+/**
+ * Function called after the SCANNER page was loaded
+ */
 function initScanner() {
 	var val = '' + window.location;
 	var len = val.length - 1;
@@ -336,7 +370,7 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 			var h2 = $('<h2>');
 			paramsDiv.append(h2);
 			h2.html(res['cname']);
-			paramsHelp.append($('<br/><br/>')).append(res['description']);
+			paramsHelp.append(res['description']).append($('<br/><br/>'));
 			var value = res['values'];
 			var minOccurs = res['minOccurs'];
 			var maxOccurs = res['maxOccurs'];
@@ -401,24 +435,51 @@ function postRenderSites(data, textStatus, jqXHR, param) {
 /**
  * Send the request to get the data from the SCANNER
  */
-function submitQuery() {
-	var sites = getSelectedSitesNames();
-	if (sites.length == 0) {
-		alert('Please select the sites.');
-		return;
-	}
-	var params = getSelectedParameters();
+function submitQuery(div, replay) {
 	var obj = {};
-	obj['parameters'] = params;
+	var param = {};
+	if (replay == null) {
+		param.spinner = $('#ajaxSpinnerImage');
+		param.treeId = 'navigation';
+		param.tableId = 'queryExample';
+	} else {
+		param.spinner = $('#ajaxHistorySpinnerImage');
+		param.treeId = 'historyNavigation';
+		param.tableId = 'historyExample';
+	}
 	obj['action'] = 'getResults';
-	obj['study'] = getSelectedStudyName();
-	obj['dataset'] = getSelectedDatasetName();
-	obj['library'] = getSelectedLibraryName();
-	obj['method'] = getSelectedMethodName();
-	obj['sites'] = valueToString(sites);
+	if (replay == null) {
+		var sites = getSelectedSitesNames();
+		if (sites.length == 0) {
+			alert('Please select the sites.');
+			return;
+		}
+		var params = getSelectedParameters();
+		obj['parameters'] = params;
+		obj['study'] = getSelectedStudyName();
+		obj['dataset'] = getSelectedDatasetName();
+		obj['library'] = getSelectedLibraryName();
+		obj['method'] = getSelectedMethodName();
+		obj['sites'] = valueToString(sites);
+		$('#profileQueryCount').html('' + ++queriesCounter);
+		if (!studiesCounter.contains(obj['study'])) {
+			studiesCounter.push(obj['study']);
+			$('#profileStudyCount').html('' + studiesCounter.length);
+		}
+		$('#profileLastActivity').html(getDateString(new Date()));
+		pushHistory(obj);
+	} else {
+		obj['parameters'] = replay['parameters'][0];
+		obj['study'] = replay['study'][0];
+		obj['dataset'] = replay['dataset'][0];
+		obj['library'] = replay['library'][0];
+		obj['method'] = replay['method'][0];
+		obj['sites'] = replay['sites'][0];
+	}
+	param['resultDiv'] = $('#' + div);
+	param.spinner.show();
 	var url = HOME + '/query';
-	$('#ajaxSpinnerImage').show();
-	scanner.POST(url, obj, true, postSubmitQuery, null, null, 0);
+	scanner.POST(url, obj, true, postSubmitQuery, param, null, 0);
 }
 
 /**
@@ -434,12 +495,13 @@ function submitQuery() {
  * 	the parameters to be used by the callback success function
  */
 function postSubmitQuery(data, textStatus, jqXHR, param) {
-	$('#ajaxSpinnerImage').hide();
+	param.spinner.hide();
+	var resultDiv = param['resultDiv'];
 	data = $.parseJSON(data);
 	if (getSelectedLibraryName() == 'Oceans') {
-		buildDataTable(data);
+		buildDataTable(data, resultDiv, param.tableId);
 	} else {
-		buildTreeResult(data);
+		buildTreeResult(data, resultDiv, param.treeId);
 	}
 }
 
@@ -1317,6 +1379,18 @@ function getParameters(func, lib) {
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get all the sites of a query 
+ * 
+ * @param study
+ * 	the study of the query
+ * @param dataset
+ * 	the dataset of the query
+ * @param func
+ * 	the method of the query
+ * @param lib
+ * 	the library of the query
+ */
 function getSites(study, dataset, lib, func) {
 	if (study == null) {
 		alert('Please provide the study of the sites.');
@@ -1343,6 +1417,20 @@ function getSites(study, dataset, lib, func) {
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Get all the workers of a query 
+ * 
+ * @param study
+ * 	the study of the query
+ * @param dataset
+ * 	the dataset of the query
+ * @param func
+ * 	the method of the query
+ * @param lib
+ * 	the library of the query
+ * @param sites
+ * 	the sites of the query
+ */
 function getWorkers(study, dataset, lib, func, sites) {
 	if (study == null) {
 		alert('Please provide the study of the workers.');
@@ -1424,17 +1512,49 @@ function getDatasetSites(study, dataset) {
 	scanner.GET(url, true, postGetResourceAction, null, null, 0);
 }
 
+/**
+ * Function called after a GUI POST request was issued 
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject having as keys the display names)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ */
 function postResourceAction(data, textStatus, jqXHR, param) {
 	document.body.style.cursor = "default";
 	var res = $.parseJSON(data);
 	alert(res.status);
 }
 
+/**
+ * Function called after a GUI GET request was issued 
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject having as keys the display names)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ */
 function postGetResourceAction(data, textStatus, jqXHR, param) {
 	document.body.style.cursor = "default";
 	alert(valueToString(data));
 }
 
+/**
+ * Function to get the columns from an Oceans result 
+ * 
+ * @param res
+ * 	the data returned from the server for an Oceans request
+ * 
+ * @return the JSONObject with the grouped columns
+ */
 function getTableColumns(res) {
 	var outerColumns = new Array();
 	var columns = new Array();
@@ -1444,6 +1564,16 @@ function getTableColumns(res) {
 		};
 }
 
+/**
+ * Function to get the inner columns from an Oceans result 
+ * 
+ * @param res
+ * 	the data to get the columns from
+ * @param columns
+ * 	the inner columns
+ * @param outerColumns
+ * 	the outer columns
+ */
 function getTableColumnsFrom(res, columns, outerColumns) {
 	if ($.isPlainObject(res)) {
 		$.each(res, function(key, value) {
@@ -1459,6 +1589,14 @@ function getTableColumnsFrom(res, columns, outerColumns) {
 	}
 }
 
+/**
+ * Get the column values of a row 
+ * 
+ * @param res
+ * 	the data of a row
+  * 
+ * @return the array with the columns values
+*/
 function getTableColumnsValues(res) {
 	var columnsValues = new Array();
 	getTableColumnsValuesFrom(res, columnsValues);
@@ -1475,6 +1613,14 @@ function getTableColumnsValues(res) {
 	return columnsValues;
 }
 
+/**
+ * Get the column values of a row 
+ * 
+ * @param res
+ * 	the data of a row
+ * @param columnsValues
+ * 	the array with the collected values
+ */
 function getTableColumnsValuesFrom(res, columnsValues) {
 	if ($.isArray(res)) {
 		$.each(res, function(i, values) {
@@ -1493,21 +1639,26 @@ function getTableColumnsValuesFrom(res, columnsValues) {
 	}
 }
 
-function buildDataTable(res) {
-	if (oTable != null) {
-		//oTable.fnDestroy(true);
-		$('#example').remove();
-		oTable = null;
+function buildDataTable(res, resultDiv, tableId) {
+	if (tableId == 'queryExample') {
+		if (oQueryTable != null) {
+			$('#' + tableId).remove();
+			oQueryTable = null;
+		}
+	} else {
+		if (oHistoryTable != null) {
+			$('#' + tableId).remove();
+			oHistoryTable = null;
+		}
 	}
-	$('#resultDiv').css('display', '');
-	var resultDiv = $('#resultDivContent');
+	resultDiv.parent().css('display', '');
 	resultDiv.html('');
 	var table = $('<table>');
 	resultDiv.append(table);
 	table.attr({	'cellpadding': '0',
 			'cellspacing': '0',
 			'border': '0',
-			'id': 'example'}); 
+			'id': tableId}); 
 	table.addClass('display');
 	var thead = $('<thead>');
 	table.append(thead);
@@ -1555,7 +1706,7 @@ function buildDataTable(res) {
 			});
 		});
 	});
-	oTable = $('#example').dataTable({
+	var oTable = $('#' + tableId).dataTable({
 		'aLengthMenu': [
 		                [-1],
 		                ['All']
@@ -1567,7 +1718,7 @@ function buildDataTable(res) {
 		        return;
 		    }
 		     
-		    var nTrs = $('#example tbody tr');
+		    var nTrs = $('#' + tableId + ' tbody tr');
 		    var iColspan = nTrs[0].getElementsByTagName('td').length;
 		    var sLastGroup = "";
 		    for ( var i=0 ; i<nTrs.length ; i++ )
@@ -1593,6 +1744,11 @@ function buildDataTable(res) {
 		"aaSorting": [[ 1, 'asc' ]],
         	"sDom": 'lfr<"giveHeight"t>ip'
 	});
+	if (tableId == 'queryExample') {
+		oQueryTable = oTable;
+	} else {
+		oHistoryTable = oTable;
+	}
 }
 
 /**
@@ -1807,6 +1963,14 @@ function postSubmitLogin(data, textStatus, jqXHR, param) {
 	var loginDiv = $('#loginForm');
 	$('#errorDiv').remove();
 	if (res['status'] == 'success') {
+		$('#profileIdentity').html(res['user']);
+		$('#profileIdentityDescription').html(res['description'][0]);
+		$('#profileRole').html(res['role']);
+		$('#profileStudyCount').html('0');
+		$('#profileQueryCount').html('0');
+		$('#profileRoleDescription').html(res['description'][1]);
+		$('#profilePrivacyBudget').html('xxxxxx');
+		$('#profilePrivacyBudgetDescription').html(res['description'][2]);
 		loginRegistry();
 	} else {
 		var errorDiv = $('<div>');
@@ -1831,6 +1995,7 @@ function loginRegistry() {
 	obj['action'] = 'loginRegistry';
 	scanner.POST(url, obj, true, postLoginRegistry, null, null, 0);
 }
+
 function postLoginRegistry(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
@@ -1842,12 +2007,14 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 		alert(res['status']);
 	}
 }
+
 function downloadFile() {
 	var url = HOME + '/query';
 	var obj = new Object();
 	obj['action'] = 'file';
 	scanner.POST(url, obj, true, postDownloadFile, null, null, 0);
 }
+
 function postDownloadFile(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
@@ -1870,6 +2037,14 @@ function postRegistryUserLogout(data, textStatus, jqXHR, param) {
 }
 
 
+/**
+ * Return a string representation of a JavaScript value 
+ * 
+ * @param val
+ * 	the JavaScript value
+  * 
+ * @return string representation of a JavaScript value
+*/
 function valueToString(val) {
 	if ($.isArray(val)) {
 		return arrayToString(val);
@@ -1895,6 +2070,14 @@ function valueToString(val) {
 	}
 }
 
+/**
+ * Return a string representation of a JavaScript array 
+ * 
+ * @param obj
+ * 	the JavaScript array
+  * 
+ * @return string representation of a JavaScript array
+*/
 function arrayToString(obj) {
 	var s = '[';
 	var first = true;
@@ -1909,6 +2092,14 @@ function arrayToString(obj) {
 	return s;
 }
 
+/**
+ * Return a string representation of a JavaScript object 
+ * 
+ * @param obj
+ * 	the JavaScript object
+  * 
+ * @return string representation of a JavaScript object
+*/
 function objectToString(obj) {
 	var s = '{';
 	var first = true;
@@ -1923,10 +2114,26 @@ function objectToString(obj) {
 	return s;
 }
 
+/**
+ * Return an escaped string   
+ * 
+ * @param text
+ * 	the string to be escaped
+  * 
+ * @return the escaped string
+*/
 function escapeDoubleQuotes(text) {
 	return text.replace(/"/g, '\\"');
 }
 
+/**
+ * Return an URL encoded string 
+ * 
+ * @param value
+ * 	the JavaScript string
+ * 
+ * @return encoded URL string
+*/
 function encodeSafeURIComponent(value) {
 	var ret = encodeURIComponent(value);
 	$.each("~!()'", function(i, c) {
@@ -1934,8 +2141,18 @@ function encodeSafeURIComponent(value) {
 	});
 	return ret;
 }
+
 /**
  * Compares two strings lexicographically, ignoring case differences.
+ * 
+ * @param str1
+ * 	the left operand string
+ * @param str2
+ * 	the right operand string
+ * @return: 
+ * 	0 if str1 == str2
+ * 	-1 if the str1 < str2
+ * 	1 if str1 > str2
  */
 function compareIgnoreCase(str1, str2) {
 	var val1 = str1.toLowerCase();
@@ -1949,14 +2166,30 @@ function compareIgnoreCase(str1, str2) {
 	}
 }
 
-function expandAll() {
-	$('#navigation').find('div.hitarea.expandable-hitarea').click();
+/**
+ * Expand a tree
+ * 
+ * @param id
+ * 	the id of the root
+ */
+function expandAll(id) {
+	$('#' + id).find('div.hitarea.expandable-hitarea').click();
+	//$('#navigation').find('div.hitarea.expandable-hitarea').click();
 	//$('#navigation').find('div.hitarea.tree-hitarea.expandable-hitarea').click();
 }
 
-function buildTreeResult(res) {
-	$('#resultDiv').css('display', '');
-	var resultDiv = $('#resultDivContent');
+/**
+ * Build a tree for a JSONObject
+ * 
+ * @param res
+ * 	the JSONObject for the tree
+ * @param resultDiv
+ * 	the div to place the tree
+ * @param id
+ * 	the id of the tree
+ */
+function buildTreeResult(res, resultDiv, id) {
+	resultDiv.parent().css('display', '');
 	resultDiv.html('');
 	var h1 = $('<h1>');
 	resultDiv.append(h1);
@@ -1965,21 +2198,30 @@ function buildTreeResult(res) {
 	input.attr({'type': 'button',
 		'value': 'Expand All'});
 	input.val('Expand All');
-	input.click(function(event) {expandAll();});
+	input.click(function(event) {expandAll(id);});
 	resultDiv.append(input);
 	resultDiv.append($('<br>'));
 	resultDiv.append($('<br>'));
 	var ul = $('<ul>');
-	ul.attr({'id': 'navigation'});
+	ul.attr({'id': id});
 	resultDiv.append(ul);
 	appendTreeItem(ul, res);
-	$('#navigation').treeview({
+	$('#' + id).treeview({
 		persist: 'location',
 		collapsed: true,
 		unique: false
 	});
 }
 
+/**
+ * Append an item to a tree
+ * 
+ * @param res
+ * 	the JSONObject for the item
+ * @param resultDiv
+ * 	the div to place the item
+ * 	the id of the tree
+ */
 function appendTreeItem(div, res) {
 	if ($.isArray(res)) {
 		var ul = $('<ul>');
@@ -2008,6 +2250,13 @@ function appendTreeItem(div, res) {
 	}
 }
 
+/**
+ * Load the studies dropdown box with the specified values
+ * 
+ * @param values
+ * 	the array with the studies names
+ * 	the id of the tree
+ */
 function loadStudies(values) {
 	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
 		ready(function(){
@@ -2048,6 +2297,13 @@ function loadStudies(values) {
 	});
 }
 
+/**
+ * Load the datasets dropdown box with the specified values
+ * 
+ * @param values
+ * 	the array with the datasets names
+ * 	the id of the tree
+ */
 function loadDatasets(values) {
 	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
 		ready(function(){
@@ -2086,6 +2342,13 @@ function loadDatasets(values) {
 	});
 }
 
+/**
+ * Load the libraries dropdown box with the specified values
+ * 
+ * @param values
+ * 	the array with the libraries names
+ * 	the id of the tree
+ */
 function loadLibraries(values) {
 	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
 		ready(function(){
@@ -2122,6 +2385,13 @@ function loadLibraries(values) {
 	});
 }
 
+/**
+ * Load the methods dropdown box with the specified values
+ * 
+ * @param values
+ * 	the array with the methods names
+ * 	the id of the tree
+ */
 function loadMethods(values) {
 	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
 		ready(function(){
@@ -2157,6 +2427,13 @@ function loadMethods(values) {
 	});
 }
 
+/**
+ * Load the sites dropdown box with the specified values
+ * 
+ * @param values
+ * 	the array with the sites names
+ * 	the id of the tree
+ */
 function loadSites(values, selectAll) {
 	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
 		ready(function(){
@@ -2180,15 +2457,104 @@ function loadSites(values, selectAll) {
 	});
 }
 
+/**
+ * Actions to be performed when the "Query" tab is clicked
+ */
 function showQuery() {
-	$('#queryHelpWrapperDiv').show();
 	$('#paramsWrapperDiv').show();
 	$('#resultWrapperDiv').show();
+	$('#replayDivContent').html('');
+	$('#replayDivWrapper').hide();
 }
 
+/**
+ * Actions to be performed when the "Query" tab is deselected
+ */
 function hideQuery() {
-	$('#queryHelpWrapperDiv').hide();
 	$('#paramsWrapperDiv').hide();
 	$('#resultWrapperDiv').hide();
+	$('#replayDivWrapper').show();
+}
+
+/**
+ * Get the string representation of a date
+ * 
+ * @param date
+ * 	the date object
+ * @return the string representation of the date 
+ */
+function getDateString(date) {
+	var year = date.getFullYear();
+	var month = date.getMonth() + 1;
+	if (month < 10) {
+		month = '0' + month;
+	}
+	var day = date.getDate();
+	if (day < 10) {
+		day = '0' + day;
+	}
+	var hours = date.getHours();
+	var am_pm = ' AM';
+	if (hours > 12) {
+		hours -= 12;
+		am_pm = ' PM';
+	}
+	var minutes = date.getMinutes();
+	if (minutes < 10) {
+		minutes = '0' + minutes;
+	}
+	return (year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + am_pm);
+}
+
+/**
+ * Push an entry in the history table
+ * 
+ * @param obj
+ * 	the object with the columns values
+ */
+function pushHistory(obj) {
+	require(['dojox/grid/DataGrid', 'dojo/data/ItemFileWriteStore'], function(DataGrid, ItemFileWriteStore) {
+		var index = historyDataStore.items.length;
+		if (historyGrid != null) {
+			historyGrid.destroyRecursive();
+		}
+		var item = {};
+		item.parameters = obj.parameters;
+		item.action = obj.action;
+		item.study = obj.study;
+		item.dataset = obj.dataset;
+		item.library = obj.library;
+		item.method = obj.method;
+		item.sites = obj.sites;
+		item.date = getDateString(new Date());
+		item.options = '<a href="javascript:replayQuery(' + index + ')" >See results</a>';
+		item.budget = 'xxxxx';
+		item.id = index;
+		historyDataStore.items.unshift(item);
+		var store = new ItemFileWriteStore({data: historyDataStore});
+		historyGrid = new DataGrid({
+			id: 'historyGrid',
+			store: store,
+			structure: historyLayout,
+			escapeHTMLInData: false,
+			rowSelector: '20px'});
+
+		/*append the new grid to the div*/
+		historyGrid.placeAt("historyGridDiv");
+
+		/*Call startup() to render the grid*/
+		historyGrid.startup();
+	});
+}
+
+/**
+ * Function to be called when a query is replayed
+ * 
+ * @param index
+ * 	the row index in the history table
+ */
+function replayQuery(index) {
+	var item = historyDataStore.items[index];
+	submitQuery('replayDivContent', item);
 }
 

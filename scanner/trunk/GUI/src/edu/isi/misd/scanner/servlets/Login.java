@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -74,6 +75,13 @@ public class Login extends HttpServlet {
 				JakartaClient client = new JakartaClient(4, 8192, 120000);
 				session.setAttribute("httpClient", client);
 				obj.put("status", "success");
+				obj.put("user", username);
+				obj.put("role", Utils.getUserRole(username));
+				JSONArray description = new JSONArray();
+				description.put(Utils.profileDescription[0]);
+				description.put(Utils.profileDescription[1]);
+				description.put(Utils.profileDescription[2]);
+				obj.put("description", description);
 			} else {
 				obj.put("status", "Invalid userid and/or password.");
 			}

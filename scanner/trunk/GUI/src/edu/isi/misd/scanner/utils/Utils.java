@@ -87,6 +87,19 @@ public class Utils {
     public static String getEntity(String value) {
 		return (value != null) ? value : "";
     }
+    
+    public static String[] profileDescription = {
+    	"",
+    	"",
+    	"",
+    	"More stuff...",
+    	"Furthermore, access to each data set is limited to study investigators as specified in an Institutional Review Board (IRB) approvals database, and the user must belong to one of the study sites and be authenticated by that site's enterprise authentication services.",
+    	"SCANNER is supported by the Agency for Healthcare Research and Quality (AHRQ) through the American Recovery & Reinvestment Act of 2009, Grant R01 HS19913-01."
+    };
+    
+    public static String getUserRole(String user) {
+    	return "researcher";
+    }
 
     public static String oceansResult = "" +
     "{" +
