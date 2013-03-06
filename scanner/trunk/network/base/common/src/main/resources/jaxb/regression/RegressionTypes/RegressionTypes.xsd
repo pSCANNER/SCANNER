@@ -10,12 +10,77 @@
         schemaLocation="../../base/BaseTypes/BaseTypes.xsd" 
         namespace="http://scanner.misd.isi.edu/network/types/base"/>  
       
-                    <!-- input types -->    
+    <!-- Metadata Types -->
+            
+    <xsd:simpleType name="LogisticRegressionVariableType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Binary"/>
+            <xsd:enumeration value="Categorical"/>          
+            <xsd:enumeration value="Continuous"/>
+            <xsd:enumeration value="Integer"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+                           
+    <xsd:complexType name="LogisticRegressionVariable">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines a data element (column) of a logical data source
+            </xsd:documentation>
+        </xsd:annotation> 
+        <xsd:sequence>
+            <xsd:element name="Name" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>                       
+            <xsd:element name="Type" 
+                         type="tns:LogisticRegressionVariableType"
+                         minOccurs="1"
+                         maxOccurs="1"/>    
+            <xsd:element name="Description" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="1"/>                                                                                         
+        </xsd:sequence>   
+    </xsd:complexType>                     
+       
+    <xsd:complexType name="LogisticRegressionVariables">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines the data elements (columns) of a data set
+            </xsd:documentation>
+        </xsd:annotation> 
+        <xsd:sequence>
+            <xsd:element name="Variable" 
+                         type="tns:LogisticRegressionVariable"
+                         minOccurs="0"
+                         maxOccurs="unbounded"/>                                                                                                             
+        </xsd:sequence>   
+    </xsd:complexType>            
+         
+    <xsd:complexType name="LogisticRegressionDataSetMetadata">
+        <xsd:annotation>
+            <xsd:documentation>
+                Defines the metadata of a dataset
+            </xsd:documentation>
+        </xsd:annotation>        
+        <xsd:sequence>   
+            <xsd:element name="DataSet" 
+                         type="base:DataSetMetadata"
+                         minOccurs="1"
+                         maxOccurs="1"/>                          
+            <xsd:element name="Variables" 
+                         type="tns:LogisticRegressionVariables"
+                         minOccurs="1"
+                         maxOccurs="1"/>                                                                       
+        </xsd:sequence>      
+    </xsd:complexType>
+                                                                                                                
+    <!-- Input Types -->    
                     
     <xsd:complexType name="LogisticRegressionRequest">
         <xsd:annotation>
             <xsd:documentation>
-
+                Defines an input request for a logistic regression
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
@@ -33,7 +98,7 @@
     <xsd:complexType name="LogisticRegressionRequestDescription">
         <xsd:annotation>
             <xsd:documentation>
-
+                Defines a metadata description that can be used to uniquely identify a request
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
@@ -55,7 +120,7 @@
     <xsd:complexType name="LogisticRegressionRequestParameters">
         <xsd:annotation>
             <xsd:documentation>
-
+                Defines parameters used to process a logistic regression
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
@@ -77,7 +142,7 @@
     <xsd:complexType name="CategoricalVariableType">
         <xsd:annotation>
             <xsd:documentation>
-
+                Defines a categorical variable
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
@@ -92,7 +157,8 @@
         </xsd:sequence>
     </xsd:complexType>
         
-                    <!-- output types -->                          
+    <!-- Output Types -->  
+                            
 <!-- 
 Scalar values:
        
@@ -122,7 +188,8 @@ Matrix values:
 
     cov.scaled: a kXk matrix of scaled covariances. (each row and column corresponding to an independent variable)
     cov.unscaled: a kXk matrix of unscaled covariances. (each row and column corresponding to an independent variable)
--->               
+-->  
+             
     <xsd:element name="N">
         <xsd:complexType>    
             <xsd:annotation>
@@ -270,7 +337,7 @@ Matrix values:
         <xsd:complexType>
             <xsd:annotation>
                 <xsd:documentation>
-                    A structure corresponding to the results coefficients of an independent variable
+                    Defines a structure corresponding to the results coefficients of an independent variable
                 </xsd:documentation>
             </xsd:annotation>     
             <xsd:sequence>          
@@ -330,7 +397,7 @@ Matrix values:
     <xsd:complexType name="LogisticRegressionResponse">
         <xsd:annotation>
             <xsd:documentation>
-                Represents the reponse of a logistic regression calculation
+                Defines the reponse of a logistic regression calculation
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>
@@ -382,14 +449,18 @@ Matrix values:
     <xsd:complexType name="LogisticRegressionOutput">
         <xsd:annotation>
             <xsd:documentation>
-                A structure representing a complete regression response, including the input request and dataset ID
+                Defines a structure representing a complete regression response, including the input request and dataset ID
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence> 
-            <xsd:element name="DatasetID" 
+            <xsd:element name="DataSetID" 
                          type="xsd:string"
                          minOccurs="0"
-                         maxOccurs="1"/>                     
+                         maxOccurs="1"/>    
+            <xsd:element name="DataSetVariables" 
+                         type="tns:LogisticRegressionVariables"
+                         minOccurs="1"
+                         maxOccurs="1"/>                                           
             <xsd:element name="Request" 
                          type="tns:LogisticRegressionRequest"
                          minOccurs="1"

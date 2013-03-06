@@ -28,7 +28,9 @@
         
         <camel:route>
             <camel:from uri="jetty:https://{{master.address}}:{{master.ssl.port}}/{{master.appDomain}}/{{master.appContext}}/example/echo?handlers=masterSecurityHandler&amp;sslContextParametersRef=sslContextParametersMaster&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>          
+            <camel:log message="Input Message:\n\n${body}\n"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.base.master.routes.DefaultRoute"/>
+            <camel:log message="Output Message:\n\n${body}\n"/>
             <camel:to uri="mock:result"/>            
         </camel:route>
                     

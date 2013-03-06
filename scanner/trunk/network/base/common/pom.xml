@@ -119,6 +119,7 @@
           <forceRegenerate>true</forceRegenerate>
           <generateDirectory>${project.build.directory}/generated-sources/xjc</generateDirectory>
           <verbose>true</verbose>
+          <extension>true</extension> 
         </configuration>
       </plugin>
                     

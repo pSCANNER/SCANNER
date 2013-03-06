@@ -26,10 +26,11 @@
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
 
-        <camel:route>
-            <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/glore/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
+        <camel:route streamCache="true">
+            <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/glore/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>
+            <camel:log message="Input Message:\n\n${body}\n"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.glore.GloreRoute"/>
-            <camel:to uri="stream:out"/>            
+            <camel:log message="Output Message:\n\n${body}\n"/>             
             <camel:to uri="mock:result"/>
         </camel:route>
                                         
