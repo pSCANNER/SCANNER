@@ -20,7 +20,7 @@ public class OceansLogisticRegressionRoute extends DefaultRoute
 
     @Override
     public String getJSONUnmarshallType() {
-        return "edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionParameters";
+        return "edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionRequest";
     }
     
     

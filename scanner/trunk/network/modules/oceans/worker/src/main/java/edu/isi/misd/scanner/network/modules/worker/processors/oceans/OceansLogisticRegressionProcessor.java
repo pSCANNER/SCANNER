@@ -6,9 +6,18 @@ import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ConfigUtils;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
-import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionCoefficient;
-import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionParameters;
-import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionResults;
+import edu.isi.misd.scanner.network.types.base.DataSetMetadata;
+import edu.isi.misd.scanner.network.types.base.FileDataSource;
+import edu.isi.misd.scanner.network.types.regression.Coefficient;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionOutput;
+import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionRequest;
+import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionResponse;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionResponse;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionVariable;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionVariableType;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionVariables;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionDataSetMetadata;
 import edu.vanderbilt.oceans.core.InstanceBuilder;
 import edu.vanderbilt.oceans.statistics.analysis.LogisticRegressionAnalysis;
 import edu.vanderbilt.oceans.statistics.analysis.LogisticRegressionAnalysis.LogisticRegressionCoefficient;
@@ -46,13 +55,13 @@ public class OceansLogisticRegressionProcessor implements Processor
         }                
     }
     
-    private OceansLogisticRegressionResults executeAnalysis(Exchange exchange) 
+    private OceansLogisticRegressionResponse executeAnalysis(Exchange exchange) 
         throws Exception
     {
-        OceansLogisticRegressionParameters request = 
-            (OceansLogisticRegressionParameters)
+        OceansLogisticRegressionRequest request = 
+            (OceansLogisticRegressionRequest)
                 exchange.getIn().getBody(
-                    OceansLogisticRegressionParameters.class); 
+                    OceansLogisticRegressionRequest.class); 
         
         // locate the specified input file
         String fileName = 
@@ -68,10 +77,12 @@ public class OceansLogisticRegressionProcessor implements Processor
         File file = new File(baseInputDir,fileName);
         
         // setup and run the oceans lr analysis
-        String uniqueID = MessageUtils.getID(exchange);           
-        String dependentVariableName = request.getDependentVariableName();
+        String uniqueID = MessageUtils.getID(exchange);
+        LogisticRegressionInputParameters params = 
+            request.getLogisticRegressionInput().getInputParameters();
+        String dependentVariableName = params.getDependentVariableName();
         ArrayList<String> independentVariables = 
-            new ArrayList(request.getIndependentVariableNames());    
+            new ArrayList(params.getIndependentVariableName());    
 
         InstanceBuilder instBuilder = 
             new InstanceBuilder(file, dependentVariableName);
@@ -84,29 +95,88 @@ public class OceansLogisticRegressionProcessor implements Processor
         lrAnalysis.setIndependentVariableNames(independentVariables);
         lrAnalysis.Analyze();
         
-        // create, initialize and return the results object
-        OceansLogisticRegressionResults results = 
-            new OceansLogisticRegressionResults();
+        // create, initialize and return the response object
+        OceansLogisticRegressionResponse oceansResponse = 
+            new OceansLogisticRegressionResponse();
+        LogisticRegressionResponse response = new LogisticRegressionResponse();
+//        response.setDataSetID(getMetadata().getDataSet().getDataSetID());  // will come from registry
+//        response.setDataSetVariables(getMetadata().getVariables());   // will come from registry
+        response.setInput(request.getLogisticRegressionInput());
+        response.setOutput(new LogisticRegressionOutput());
         this.formatCoefficientResultsObjects(
-            lrAnalysis.getLRCoefficients(), results.getCoefficients());
-
-        return results;
+            lrAnalysis.getLRCoefficients(),
+            response.getOutput().getCoefficient());
+        oceansResponse.setLogisticRegressionResponse(response);
+        return oceansResponse;
     }
     
     private void formatCoefficientResultsObjects(
         List<LogisticRegressionCoefficient> source, 
-        List<OceansLogisticRegressionCoefficient> target)
+        List<Coefficient> target)
     {
         for (LogisticRegressionCoefficient c: source) 
         {
-            OceansLogisticRegressionCoefficient coefficient = 
-                new OceansLogisticRegressionCoefficient();
+            Coefficient coefficient = new Coefficient();
             coefficient.setName(c.getName());
-            coefficient.setEstimate(c.getEstimate());
+            coefficient.setB(c.getEstimate());
             coefficient.setPValue(c.getPValue());
             coefficient.setDegreeOfFreedom(c.getDegreeOfFreedom());
-            coefficient.setStandardError(c.getStandardError());
+            coefficient.setSE(c.getStandardError());
             target.add(coefficient);
         }        
-    }    
+    }   
+        
+    // The hardcoding of values returned is just here for testing.  
+    // It will be replaced by reading the local registry for metadata 
+
+    private LogisticRegressionDataSetMetadata getMetadata()
+    {
+        LogisticRegressionDataSetMetadata metadata = 
+            new LogisticRegressionDataSetMetadata();
+        DataSetMetadata dataSetMetadata = new DataSetMetadata();
+        metadata.setDataSet(dataSetMetadata);        
+        LogisticRegressionVariables variables = 
+            new LogisticRegressionVariables();
+        metadata.setVariables(variables);        
+        
+        FileDataSource fileDataSource = new FileDataSource();
+        fileDataSource.setFileType("csv");
+        fileDataSource.setFilePath("/path/to/file.csv");
+        fileDataSource.setDescription("Fake file");
+        fileDataSource.setType("edu.isi.misd.scanner.network.types.base.FileDataSource");
+        dataSetMetadata.setDataSource(fileDataSource);
+        dataSetMetadata.setDataSetName("Fake Dataset Name");
+        dataSetMetadata.setDataSetID("001Test");
+        
+        LogisticRegressionVariable age = new LogisticRegressionVariable();
+        age.setName("age");
+        age.setType(LogisticRegressionVariableType.CONTINUOUS);
+        variables.getVariable().add(age);
+        LogisticRegressionVariable race_cat = new LogisticRegressionVariable();
+        race_cat.setName("race_cat");
+        race_cat.setType(LogisticRegressionVariableType.CATEGORICAL);
+        variables.getVariable().add(race_cat);
+        LogisticRegressionVariable creatinine = new LogisticRegressionVariable();
+        creatinine.setName("creatinine");
+        creatinine.setType(LogisticRegressionVariableType.CONTINUOUS);
+        variables.getVariable().add(creatinine);
+        LogisticRegressionVariable diabetes = new LogisticRegressionVariable();
+        diabetes.setName("diabetes");
+        diabetes.setType(LogisticRegressionVariableType.CONTINUOUS);
+        variables.getVariable().add(diabetes);
+        LogisticRegressionVariable cad = new LogisticRegressionVariable();
+        cad.setName("cad");
+        cad.setType(LogisticRegressionVariableType.CONTINUOUS);
+        variables.getVariable().add(cad);        
+        LogisticRegressionVariable los = new LogisticRegressionVariable();
+        los.setName("los");
+        los.setType(LogisticRegressionVariableType.CONTINUOUS);
+        variables.getVariable().add(los); 
+        LogisticRegressionVariable outcome = new LogisticRegressionVariable();
+        outcome.setName("outcome");
+        outcome.setType(LogisticRegressionVariableType.CONTINUOUS);
+        variables.getVariable().add(outcome); 
+        
+        return metadata;
+    }
 }

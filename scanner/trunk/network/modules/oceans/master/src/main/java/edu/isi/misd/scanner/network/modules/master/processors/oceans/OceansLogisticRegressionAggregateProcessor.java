@@ -2,8 +2,8 @@ package edu.isi.misd.scanner.network.modules.master.processors.oceans;
 
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
-import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionResults;
-import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionResultsArray;
+import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionResponse;
+import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionResponseArray;
 import java.util.ArrayList;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -21,8 +21,8 @@ public class OceansLogisticRegressionAggregateProcessor implements Processor
     @Override
     public void process(Exchange exchange) throws Exception 
     {
-        OceansLogisticRegressionResultsArray oceansLRResultsArray = 
-            new OceansLogisticRegressionResultsArray();
+        OceansLogisticRegressionResponseArray oceansLRResponseArray = 
+            new OceansLogisticRegressionResponseArray();
                 
         ArrayList<String> results = exchange.getIn().getBody(ArrayList.class);
         if (results == null) {
@@ -33,15 +33,15 @@ public class OceansLogisticRegressionAggregateProcessor implements Processor
         
         for (Object result : results)
         {           
-            OceansLogisticRegressionResults lrResult = 
-                (OceansLogisticRegressionResults)
+            OceansLogisticRegressionResponse lrResult = 
+                (OceansLogisticRegressionResponse)
                     MessageUtils.convertTo(
-                        OceansLogisticRegressionResults.class, result, exchange);
+                        OceansLogisticRegressionResponse.class, result, exchange);
 
             if (lrResult != null) {
-                oceansLRResultsArray.getOceansLogisticRegressionResults().add(lrResult);
+                oceansLRResponseArray.getOceansLogisticRegressionResponse().add(lrResult);
             }
         }
-        exchange.getIn().setBody(oceansLRResultsArray);        
+        exchange.getIn().setBody(oceansLRResponseArray);        
     }
 }

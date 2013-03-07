@@ -77,28 +77,28 @@
                                                                                                                 
     <!-- Input Types -->    
                     
-    <xsd:complexType name="LogisticRegressionRequest">
+    <xsd:complexType name="LogisticRegressionInput">
         <xsd:annotation>
             <xsd:documentation>
                 Defines an input request for a logistic regression
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
-            <xsd:element name="RequestDescription" 
-                         type="tns:LogisticRegressionRequestDescription"
+            <xsd:element name="InputDescription" 
+                         type="tns:LogisticRegressionInputDescription"
                          minOccurs="0"
                          maxOccurs="1"/>                 
-            <xsd:element name="RequestParameters" 
-                         type="tns:LogisticRegressionRequestParameters"
+            <xsd:element name="InputParameters" 
+                         type="tns:LogisticRegressionInputParameters"
                          minOccurs="1"
                          maxOccurs="1"/>                                            
         </xsd:sequence>
     </xsd:complexType> 
 
-    <xsd:complexType name="LogisticRegressionRequestDescription">
+    <xsd:complexType name="LogisticRegressionInputDescription">
         <xsd:annotation>
             <xsd:documentation>
-                Defines a metadata description that can be used to uniquely identify a request
+                Defines a metadata description that can be used to uniquely identify an input request
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
@@ -117,10 +117,10 @@
         </xsd:sequence>
     </xsd:complexType> 
 
-    <xsd:complexType name="LogisticRegressionRequestParameters">
+    <xsd:complexType name="LogisticRegressionInputParameters">
         <xsd:annotation>
             <xsd:documentation>
-                Defines parameters used to process a logistic regression
+                Defines input parameters used to process a logistic regression
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
@@ -178,7 +178,6 @@ Vector values:
 
     Coefficients (vectors of length k, with each element corresponding to an independent variable)
         name: string
-        intercept: (double)
         B: parameter estimates for the independent variables. (double)
         SE: standard errors for each param. estimate (double)
         p-value: for each param est. (double)
@@ -340,11 +339,11 @@ Matrix values:
                     Defines a structure corresponding to the results coefficients of an independent variable
                 </xsd:documentation>
             </xsd:annotation>     
-            <xsd:sequence>          
-                <xsd:element name="intercept" 
-                             type="xsd:double"
+            <xsd:sequence>   
+                <xsd:element name="name" 
+                             type="xsd:string"
                              minOccurs="1"
-                             maxOccurs="1"/>
+                             maxOccurs="1"/>                       
                 <xsd:element name="B" 
                              type="xsd:double"
                              minOccurs="1"
@@ -360,11 +359,12 @@ Matrix values:
                 <xsd:element name="t-statistics" 
                              type="xsd:double"
                              minOccurs="1"
-                             maxOccurs="1"/>                                                
-            </xsd:sequence>
-            <xsd:attribute name="name"
-                           type="xsd:string"
-                           use="optional"/>            
+                             maxOccurs="1"/>
+                <xsd:element name="degreeOfFreedom" 
+                             type="xsd:int"
+                             minOccurs="0"
+                             maxOccurs="1"/>                                                                 
+            </xsd:sequence>           
         </xsd:complexType> 
     </xsd:element>       
             
@@ -394,10 +394,10 @@ Matrix values:
         </xsd:complexType>
     </xsd:element>
                                            
-    <xsd:complexType name="LogisticRegressionResponse">
+    <xsd:complexType name="LogisticRegressionOutput">
         <xsd:annotation>
             <xsd:documentation>
-                Defines the reponse of a logistic regression calculation
+                Defines the output of a logistic regression calculation
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>
@@ -446,7 +446,7 @@ Matrix values:
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:complexType name="LogisticRegressionOutput">
+    <xsd:complexType name="LogisticRegressionResponse">
         <xsd:annotation>
             <xsd:documentation>
                 Defines a structure representing a complete regression response, including the input request and dataset ID
@@ -461,12 +461,12 @@ Matrix values:
                          type="tns:LogisticRegressionVariables"
                          minOccurs="1"
                          maxOccurs="1"/>                                           
-            <xsd:element name="Request" 
-                         type="tns:LogisticRegressionRequest"
+            <xsd:element name="Input" 
+                         type="tns:LogisticRegressionInput"
                          minOccurs="1"
                          maxOccurs="1"/>                 
-            <xsd:element name="Response" 
-                         type="tns:LogisticRegressionResponse"
+            <xsd:element name="Output" 
+                         type="tns:LogisticRegressionOutput"
                          minOccurs="1"
                          maxOccurs="1"/>                                            
         </xsd:sequence>

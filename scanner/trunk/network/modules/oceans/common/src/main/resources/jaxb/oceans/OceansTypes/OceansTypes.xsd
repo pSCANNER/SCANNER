@@ -1,78 +1,61 @@
 <?xml version="1.0"?>
 <xsd:schema version="1.0"
             targetNamespace="http://scanner.misd.isi.edu/network/types/oceans"
-            xmlns:tns="http://scanner.misd.isi.edu/network/types/oceans"             
+            xmlns:tns="http://scanner.misd.isi.edu/network/types/oceans"              
+            xmlns:regr="http://scanner.misd.isi.edu/network/types/regression"                        
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             elementFormDefault="qualified"
-            attributeFormDefault="unqualified">                   
-        
-    <xsd:element name="OceansLogisticRegressionParameters">
+            attributeFormDefault="unqualified">                     
+          
+    <xsd:import 
+        schemaLocation="../../../../../../../../../base/common/src/main/resources/jaxb/regression/RegressionTypes/RegressionTypes.xsd" 
+        namespace="http://scanner.misd.isi.edu/network/types/regression"/>
+                
+    <xsd:element name="OceansLogisticRegressionRequest">
         <xsd:complexType>
             <xsd:annotation>
                <xsd:documentation>
                    Parameters needed to do a distributed logical regression analysis using OCEANS
                </xsd:documentation>
-            </xsd:annotation>             
+            </xsd:annotation>   
             <xsd:sequence>                                        
-              <xsd:element name="dependentVariableName" 
-                           type="xsd:string"/>
-              <xsd:element name="independentVariableNames" 
-                           type="xsd:string"
-                           minOccurs="0" 
-                           maxOccurs="unbounded"/>
-            </xsd:sequence>
+              <xsd:element name="LogisticRegressionInput"
+                           type="regr:LogisticRegressionInput"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+            </xsd:sequence>                      
         </xsd:complexType> 
     </xsd:element>  
          
-    <xsd:element name="OceansLogisticRegressionResults">
+    <xsd:element name="OceansLogisticRegressionResponse">
         <xsd:complexType>
             <xsd:annotation>
                <xsd:documentation>
-                   Results from a single logistical regression analysis using OCEANS
+                   Results from a single logistic regression analysis using OCEANS
                </xsd:documentation>
-            </xsd:annotation>             
+            </xsd:annotation> 
             <xsd:sequence>                                        
-              <xsd:element name="Coefficients" 
-                           type="tns:OceansLogisticRegressionCoefficient"
+              <xsd:element name="LogisticRegressionResponse"
+                           type="regr:LogisticRegressionResponse"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+            </xsd:sequence>                         
+        </xsd:complexType> 
+    </xsd:element>  
+
+    <xsd:element name="OceansLogisticRegressionResponseArray">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
+                   Results from a aggregated logistic regression analysis using OCEANS
+               </xsd:documentation>
+            </xsd:annotation>     
+            <xsd:sequence>                                        
+              <xsd:element ref="tns:OceansLogisticRegressionResponse"
                            minOccurs="0"
                            maxOccurs="unbounded"/>
             </xsd:sequence>
         </xsd:complexType> 
-    </xsd:element>  
-
-    <xsd:element name="OceansLogisticRegressionResultsArray">
-        <xsd:complexType>
-            <xsd:annotation>
-               <xsd:documentation>
-                   Results from a aggregated logistical regression analysis using OCEANS
-               </xsd:documentation>
-            </xsd:annotation>     
-                <xsd:sequence>                                        
-                  <xsd:element ref="tns:OceansLogisticRegressionResults"
-                               minOccurs="0"
-                               maxOccurs="unbounded"/>
-                </xsd:sequence>
-        </xsd:complexType> 
     </xsd:element> 
-                    
-    <xsd:complexType name="OceansLogisticRegressionCoefficient">
-        <xsd:annotation>
-           <xsd:documentation>
-               XML structure definition for an OCEANS LogisticRegressionCoefficient object
-           </xsd:documentation>
-        </xsd:annotation>            
-        <xsd:sequence>                                        
-          <xsd:element name="Name" 
-                       type="xsd:string"/>
-          <xsd:element name="Estimate" 
-                       type="xsd:double"/>
-          <xsd:element name="DegreeOfFreedom" 
-                       type="xsd:int"/>
-          <xsd:element name="StandardError" 
-                       type="xsd:double"/>
-          <xsd:element name="PValue" 
-                       type="xsd:double"/>                                                                                                            
-        </xsd:sequence>
-    </xsd:complexType>
              
 </xsd:schema>

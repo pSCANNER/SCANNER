@@ -59,14 +59,15 @@
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
+            <xsd:element name="name" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="1"/>                
             <xsd:element name="value" 
                          type="xsd:integer"
                          minOccurs="1"
-                         maxOccurs="1"/>
-        </xsd:sequence>
-        <xsd:attribute name="name"
-                       type="xsd:string"
-                       use="optional"/>            
+                         maxOccurs="1"/>        
+        </xsd:sequence>         
     </xsd:complexType>
                
     <xsd:complexType name="DoubleType">
@@ -76,14 +77,15 @@
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
+            <xsd:element name="name" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="1"/>             
             <xsd:element name="value" 
                          type="xsd:double"
                          minOccurs="1"
-                         maxOccurs="1"/>
-        </xsd:sequence>
-        <xsd:attribute name="name"
-                       type="xsd:string"
-                       use="optional"/>            
+                         maxOccurs="1"/>              
+        </xsd:sequence>         
     </xsd:complexType>
                  
     <xsd:complexType name="MatrixRowType">
@@ -93,14 +95,15 @@
             </xsd:documentation>
         </xsd:annotation>     
         <xsd:sequence>          
+            <xsd:element name="name" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="1"/>               
             <xsd:element name="MatrixColumn" 
                          type="tns:DoubleType"
                          minOccurs="1"
-                         maxOccurs="unbounded"/>
-        </xsd:sequence>
-        <xsd:attribute name="name"
-                       type="xsd:string"
-                       use="optional"/>         
+                         maxOccurs="unbounded"/>            
+        </xsd:sequence>       
     </xsd:complexType>
 
     <xsd:complexType name="MatrixType">
@@ -110,14 +113,15 @@
             </xsd:documentation>
         </xsd:annotation>        
         <xsd:sequence>
+            <xsd:element name="name" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="1"/>              
             <xsd:element name="MatrixRow" 
                          type="tns:MatrixRowType"
                          minOccurs="1"
-                         maxOccurs="unbounded"/>                             
-        </xsd:sequence>
-        <xsd:attribute name="name"
-                       type="xsd:string"
-                       use="optional"/>              
+                         maxOccurs="unbounded"/>                                          
+        </xsd:sequence>            
     </xsd:complexType>
                    
     <xsd:complexType name="MatrixTypeArray">
@@ -127,14 +131,15 @@
             </xsd:documentation>
         </xsd:annotation>        
         <xsd:sequence>
+            <xsd:element name="name" 
+                         type="xsd:string"
+                         minOccurs="0"
+                         maxOccurs="1"/>             
             <xsd:element name="Matrix" 
                          type="tns:MatrixType"
                          minOccurs="1"
-                         maxOccurs="unbounded"/>                             
-        </xsd:sequence>
-        <xsd:attribute name="name"
-                       type="xsd:string"
-                       use="optional"/>           
+                         maxOccurs="unbounded"/>                                           
+        </xsd:sequence>          
     </xsd:complexType>
                                           
     <xsd:complexType name="DataSetMetadata">

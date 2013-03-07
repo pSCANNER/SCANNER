@@ -27,7 +27,7 @@
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
         
-        <!--<camel:routeContextRef ref="ExampleRouteContext"/>-->          
+        <!--<camel:routeContextRef ref="ExampleRouteContext"/>-->
         <!--<camel:routeContextRef ref="OceansRouteContext"/>-->                
         <!--<camel:routeContextRef ref="GloreRouteContext"/>-->            
         <!--<camel:routeContextRef ref="TestRouteContext"/>-->

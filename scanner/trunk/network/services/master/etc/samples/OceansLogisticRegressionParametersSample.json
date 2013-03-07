@@ -1,4 +1,15 @@
 {
-    "dependentVariableName":"Outcome",
-    "independentVariableNames":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"]
+    "logisticRegressionInput":
+    {
+        "inputDescription":
+        {
+            "id":"001","name":"Test","description":"Test Parameters"
+        },
+        "inputParameters":
+        {
+            "dependentVariableName":"Outcome",
+            "independentVariableName":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"],
+            "categoricalVariable":null
+        }
+    }
 }

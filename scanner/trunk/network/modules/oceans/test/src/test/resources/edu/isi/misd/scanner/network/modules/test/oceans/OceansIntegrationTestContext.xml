@@ -27,10 +27,10 @@
         </camel:packageScan>
         
         <camel:route streamCache="true">
-            <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
+            <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>                      
             <camel:log message="Input Message:\n\n${body}\n"/>
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.oceans.OceansLogisticRegressionRoute"/>
-            <camel:log message="Output Message:\n\n${body}\n"/>         
+            <camel:log message="Output Message:\n\n${body}\n"/>  
             <camel:to uri="mock:result"/>
         </camel:route>
                                         

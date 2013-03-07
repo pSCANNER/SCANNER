@@ -3,11 +3,15 @@ package edu.isi.misd.scanner.network.base.utils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  */
 public class ErrorUtils 
 {
+    private static final transient Logger log = 
+        LoggerFactory.getLogger(ErrorUtils.class);    
     /**
      *
      * @param exchange
@@ -67,6 +71,8 @@ public class ErrorUtils
         exchange.getIn().setBody(ErrorUtils.formatErrorResponse(exchange,ex));
         if (setException) {
             exchange.setException(ex);
+        } else {
+            log.error(ex.toString());
         }
     }
     
