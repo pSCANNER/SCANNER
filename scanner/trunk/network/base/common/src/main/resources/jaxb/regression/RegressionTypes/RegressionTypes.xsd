@@ -56,25 +56,27 @@
                          maxOccurs="unbounded"/>                                                                                                             
         </xsd:sequence>   
     </xsd:complexType>            
-         
-    <xsd:complexType name="LogisticRegressionDataSetMetadata">
-        <xsd:annotation>
-            <xsd:documentation>
-                Defines the metadata of a dataset
-            </xsd:documentation>
-        </xsd:annotation>        
-        <xsd:sequence>   
-            <xsd:element name="DataSet" 
-                         type="base:DataSetMetadata"
-                         minOccurs="1"
-                         maxOccurs="1"/>                          
-            <xsd:element name="Variables" 
-                         type="tns:LogisticRegressionVariables"
-                         minOccurs="1"
-                         maxOccurs="1"/>                                                                       
-        </xsd:sequence>      
-    </xsd:complexType>
-                                                                                                                
+    
+    <xsd:element name="LogisticRegressionDataSetMetadata">     
+        <xsd:complexType>
+            <xsd:annotation>
+                <xsd:documentation>
+                    Defines the metadata of a dataset
+                </xsd:documentation>
+            </xsd:annotation>  
+            <xsd:complexContent>
+                <xsd:extension base="base:DataSetMetadata"> 
+                    <xsd:sequence>                            
+                        <xsd:element name="Variables" 
+                                     type="tns:LogisticRegressionVariables"
+                                     minOccurs="1"
+                                     maxOccurs="1"/>                                                                       
+                    </xsd:sequence>  
+                </xsd:extension>            
+            </xsd:complexContent>                    
+        </xsd:complexType>
+    </xsd:element>
+                                                                                                                    
     <!-- Input Types -->    
                     
     <xsd:complexType name="LogisticRegressionInput">
@@ -460,7 +462,7 @@ Matrix values:
             <xsd:element name="DataSetVariables" 
                          type="tns:LogisticRegressionVariables"
                          minOccurs="1"
-                         maxOccurs="1"/>                                           
+                         maxOccurs="1"/>                                            
             <xsd:element name="Input" 
                          type="tns:LogisticRegressionInput"
                          minOccurs="1"

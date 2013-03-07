@@ -132,9 +132,7 @@ public class OceansLogisticRegressionProcessor implements Processor
     private LogisticRegressionDataSetMetadata getMetadata()
     {
         LogisticRegressionDataSetMetadata metadata = 
-            new LogisticRegressionDataSetMetadata();
-        DataSetMetadata dataSetMetadata = new DataSetMetadata();
-        metadata.setDataSet(dataSetMetadata);        
+            new LogisticRegressionDataSetMetadata();        
         LogisticRegressionVariables variables = 
             new LogisticRegressionVariables();
         metadata.setVariables(variables);        
@@ -144,9 +142,9 @@ public class OceansLogisticRegressionProcessor implements Processor
         fileDataSource.setFilePath("/path/to/file.csv");
         fileDataSource.setDescription("Fake file");
         fileDataSource.setType("edu.isi.misd.scanner.network.types.base.FileDataSource");
-        dataSetMetadata.setDataSource(fileDataSource);
-        dataSetMetadata.setDataSetName("Fake Dataset Name");
-        dataSetMetadata.setDataSetID("001Test");
+        metadata.setDataSource(fileDataSource);
+        metadata.setDataSetName("Fake Dataset Name");
+        metadata.setDataSetID("001");
         
         LogisticRegressionVariable age = new LogisticRegressionVariable();
         age.setName("age");

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LogisticRegressionDataSetMetadata 
+    xmlns="http://scanner.misd.isi.edu/network/types/regression" 
+    xmlns:base="http://scanner.misd.isi.edu/network/types/base">
+    
+    <base:DataSetName>OCEANS Test Data 4</base:DataSetName>
+    <base:DataSetID>OutcomePredictionWeka4</base:DataSetID>
+    <base:FileDataSource>
+        <base:Type>edu.isi.misd.scanner.network.types.base.FileDataSource</base:Type>
+        <base:Description>OCEANS Test File</base:Description>
+        <base:FileType>csv</base:FileType>
+        <base:FilePath>data/input/oceans/lr/OutcomePredictionWeka4.csv</base:FilePath>
+    </base:FileDataSource>
+ 
+    <Variables>
+        <Variable>
+            <Name>age</Name>
+            <Type>Continuous</Type>
+            <Description>The patient age</Description>
+        </Variable>
+        <Variable>
+            <Name>race_cat</Name>
+            <Type>Categorical</Type>
+        </Variable>
+        <Variable>
+            <Name>creatinine</Name>
+            <Type>Continuous</Type>
+        </Variable>
+        <Variable>
+            <Name>diabetes</Name>
+            <Type>Continuous</Type>
+        </Variable>
+        <Variable>
+            <Name>cad</Name>
+            <Type>Continuous</Type>
+        </Variable>
+        <Variable>
+            <Name>los</Name>
+            <Type>Continuous</Type>
+        </Variable>
+        <Variable>
+            <Name>outcome</Name>
+            <Type>Continuous</Type>
+        </Variable>
+    </Variables>
+ 
+</LogisticRegressionDataSetMetadata>
