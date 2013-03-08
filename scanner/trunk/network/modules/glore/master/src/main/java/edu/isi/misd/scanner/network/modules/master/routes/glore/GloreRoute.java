@@ -26,7 +26,7 @@ public class GloreRoute extends DefaultRoute
 
     @Override
     public String getJSONUnmarshallType() {
-        return "edu.isi.misd.scanner.network.types.glore.GloreData";
+        return "edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest";
     }    
     
     @Override    

@@ -14,7 +14,27 @@
     <xsd:import 
         schemaLocation="../../../../../../../../../base/common/src/main/resources/jaxb/regression/RegressionTypes/RegressionTypes.xsd" 
         namespace="http://scanner.misd.isi.edu/network/types/regression"/>
-                 
+        
+    <xsd:element name="GloreLogisticRegressionRequest">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
+                   Parameters needed to do a distributed logical regression analysis using GLORE
+               </xsd:documentation>
+            </xsd:annotation>   
+            <xsd:sequence>                                        
+              <xsd:element name="LogisticRegressionInput"
+                           type="regr:LogisticRegressionInput"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+              <xsd:element ref="tns:GloreData"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+            </xsd:sequence>                      
+        </xsd:complexType> 
+    </xsd:element>  
+         
+    <!-- this is a structure that GLORE uses to share state among the calculating nodes -->        
     <xsd:element name="GloreData">
         <xsd:complexType>
             <xsd:annotation>
@@ -51,6 +71,7 @@
         </xsd:complexType> 
     </xsd:element>  
 
+    <!-- this needs to be phase out in favor of GloreLogisticRegressionResponse -->
     <xsd:element name="GloreResultData">
         <xsd:complexType>
             <xsd:annotation>
@@ -74,17 +95,19 @@
     </xsd:element>    
        
                    
-    <!-- temporary name until we phase out the old GloreResultData -->
-    <xsd:element name="NewGloreResultData">
+    <xsd:element name="GloreLogisticRegressionResponse">
         <xsd:complexType>
             <xsd:annotation>
                <xsd:documentation>
 
                </xsd:documentation>
             </xsd:annotation>
-            <xsd:complexContent>
-                <xsd:extension base="regr:LogisticRegressionOutput"/>  
-            </xsd:complexContent>                          
+            <xsd:sequence>                                        
+              <xsd:element name="LogisticRegressionResponse"
+                           type="regr:LogisticRegressionResponse"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+            </xsd:sequence>                     
         </xsd:complexType> 
     </xsd:element>   
               

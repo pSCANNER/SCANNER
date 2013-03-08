@@ -6,6 +6,8 @@ import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
 import edu.isi.misd.scanner.network.types.glore.GloreResultData;
+import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
+import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionResponse;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.camel.Exchange;
@@ -35,14 +37,21 @@ public class GloreAggregateProcessor implements Processor
     @Override
     public void process(Exchange exchange) throws Exception 
     {
-        List<GloreData> gloreDataList = getGloreDataList(exchange);
-        if (gloreDataList.isEmpty()) {
+        List<GloreLogisticRegressionRequest> gloreRequestList = 
+            getGloreRequestList(exchange);
+        if (gloreRequestList.isEmpty()) {
             ErrorUtils.setHttpError(
                 exchange, 
                 new NullPointerException("Null aggregate results"), 500);           
         }
         
-        GloreData gloreData = gloreDataList.get(0);
+        GloreLogisticRegressionRequest request = gloreRequestList.get(0);
+        GloreData gloreData = request.getGloreData();
+        if (gloreData == null) {
+            ErrorUtils.setHttpError(
+                exchange, 
+                new NullPointerException("Null Glore state data"), 500);           
+        }        
         int features = gloreData.getFeatures(); 
         int iter = gloreData.getIteration();
         Matrix beta0, beta1;
@@ -51,9 +60,11 @@ public class GloreAggregateProcessor implements Processor
         {
             log.info("Compute covariance matrix");
             ArrayList<double[][]> D_values = new ArrayList<double[][]>();
-            for (GloreData gloreDataListItem : gloreDataList) { 
+            for (GloreLogisticRegressionRequest gloreRequest : gloreRequestList)
+            { 
                 Matrix D = 
-                    GloreUtils.convertMatrixTypeToMatrix(gloreDataListItem.getD());
+                    GloreUtils.convertMatrixTypeToMatrix(
+                        gloreRequest.getGloreData().getD());
                 D_values.add(D.getArray());
             }              
             Matrix temp_b = new Matrix(row_sums_two_dim(D_values,features));
@@ -117,10 +128,11 @@ public class GloreAggregateProcessor implements Processor
             /* beta1<-beta0+solve(rowSums(d,dims=2)+
                diag(0.0000001,m))%*%(rowSums(e,dims=2)) */
             ArrayList<double[]> E_values = new ArrayList<double[]>();
-            for (GloreData gloreDataListItem : gloreDataList) { 
+            for (GloreLogisticRegressionRequest gloreRequest : gloreRequestList)
+            { 
                 Matrix E = 
                     GloreUtils.convertMatrixTypeToMatrix(
-                        gloreDataListItem.getE());
+                        gloreRequest.getGloreData().getE());
                 double[] e = new double[features];
                 for (int i = 0; i < features; i++) {
                     e[i] = E.get(i,0);           
@@ -130,10 +142,11 @@ public class GloreAggregateProcessor implements Processor
             Matrix temp_a = new Matrix(row_sums_one_dim(E_values, features)); 
             
             ArrayList<double[][]> D_values = new ArrayList<double[][]>();
-            for (GloreData gloreDataListItem : gloreDataList) { 
+            for (GloreLogisticRegressionRequest gloreRequest : gloreRequestList) 
+            { 
                 Matrix D = 
                     GloreUtils.convertMatrixTypeToMatrix(
-                        gloreDataListItem.getD());
+                        gloreRequest.getGloreData().getD());
                 D_values.add(D.getArray());
             }  
             Matrix temp_b = new Matrix(row_sums_two_dim(D_values, features));
@@ -164,22 +177,24 @@ public class GloreAggregateProcessor implements Processor
             gloreData.setIteration(iter + 1);                
         }
 
-        exchange.getIn().setBody(gloreData);        
+        exchange.getIn().setBody(request);        
     }
 
-    private List<GloreData> getGloreDataList(Exchange exchange)
+    private List<GloreLogisticRegressionRequest> 
+        getGloreRequestList(Exchange exchange)
         throws Exception
     {
         ArrayList<String> resultsInput = 
             exchange.getIn().getBody(ArrayList.class);
-        ArrayList<GloreData> resultsOutput = new ArrayList<GloreData>();
+        ArrayList<GloreLogisticRegressionRequest> resultsOutput = 
+            new ArrayList<GloreLogisticRegressionRequest>();
         
         for (Object result : resultsInput) 
         {            
-            GloreData data = 
-                (GloreData)MessageUtils.convertTo(
-                    GloreData.class, result, exchange);
-            resultsOutput.add(data);
+            GloreLogisticRegressionRequest request = 
+                (GloreLogisticRegressionRequest)MessageUtils.convertTo(
+                    GloreLogisticRegressionRequest.class, result, exchange);
+            resultsOutput.add(request);
         }
         
         return resultsOutput; 

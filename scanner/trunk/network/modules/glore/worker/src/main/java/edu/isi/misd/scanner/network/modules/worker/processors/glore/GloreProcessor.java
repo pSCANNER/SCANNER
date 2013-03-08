@@ -6,6 +6,7 @@ import edu.isi.misd.scanner.network.base.utils.ConfigUtils;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
+import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -50,11 +51,14 @@ public class GloreProcessor implements Processor
         }                
     }
     
-    private GloreData executeAnalysis(Exchange exchange) 
+    private GloreLogisticRegressionRequest executeAnalysis(Exchange exchange) 
         throws Exception
     {
-        GloreData data = 
-            (GloreData)exchange.getIn().getBody(GloreData.class); 
+        GloreLogisticRegressionRequest request = 
+            (GloreLogisticRegressionRequest)exchange.getIn().getBody(
+                GloreLogisticRegressionRequest.class);
+        
+        GloreData data = request.getGloreData();
         GloreStateData state = getState(exchange);
         
         if (!state.dataLoaded) 
@@ -147,7 +151,7 @@ public class GloreProcessor implements Processor
             // print beta for this iteration
             log.info("Beta: " + GloreUtils.matrixToString(state.beta, 8, 8));         
         }
-        return data;
+        return request;
     }
 
     /**
