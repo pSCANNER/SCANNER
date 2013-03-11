@@ -1,0 +1,30 @@
+<GloreLogisticRegressionRequest
+    xmlns="http://scanner.misd.isi.edu/network/types/glore"
+    xmlns:regr="http://scanner.misd.isi.edu/network/types/regression">   
+    
+    <LogisticRegressionInput>
+        
+        <regr:InputDescription>
+            <regr:ID>001</regr:ID>
+            <regr:Name>Test</regr:Name>
+            <regr:Description>Test Parameters</regr:Description>
+        </regr:InputDescription>
+
+        <regr:InputParameters>
+            <regr:DependentVariableName>Outcome</regr:DependentVariableName>
+            <regr:IndependentVariableName>Age</regr:IndependentVariableName>
+            <regr:IndependentVariableName>Race_Cat</regr:IndependentVariableName>
+            <regr:IndependentVariableName>Creatinine</regr:IndependentVariableName>
+            <regr:IndependentVariableName>CAD</regr:IndependentVariableName>
+            <regr:IndependentVariableName>LOS</regr:IndependentVariableName>
+            <regr:IndependentVariableName>Diabetes</regr:IndependentVariableName>          
+        </regr:InputParameters>    
+             
+    </LogisticRegressionInput>
+    
+    <!-- legacy value, should go away -->
+    <GloreData>
+        <features>3</features>
+    </GloreData>       
+    
+</GloreLogisticRegressionRequest>

@@ -1,0 +1,262 @@
+<!-- 
+ * Copyright 2012 University of Southern California
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+-->
+
+<!-- 
+ * SCANNER UI
+ * 
+ * @author Serban Voinea
+ * 
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta content="text/html;charset=UTF-8" http-equiv="Content-Type">
+<title>Scanner</title>
+<style type="text/css" title="currentStyle">
+@import
+	"resources/dojo-release-1.8.3/dojox/grid/resources/claroGrid.css";
+
+#historyGridDiv {
+	height: 20em;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="resources/jquery-ui.css">
+<link rel="stylesheet" type="text/css"
+	href="resources/css/demo_page.css">
+<link rel="stylesheet" type="text/css"
+	href="resources/css/demo_table.css">
+<link rel="stylesheet" type="text/css"
+	href="resources/jquery.treeview.css">
+<link rel="stylesheet" type="text/css" href="resources/css/scanner.css">
+<link rel="stylesheet" type="text/css"
+	href="resources/dojo-release-1.8.3/dojo/../dijit/themes/claro/claro.css">
+<script type="text/javascript" src="resources/jquery.js"></script>
+<script type="text/javascript" src="resources/jquery-ui.js"></script>
+<script type="text/javascript" src="resources/jquery.dataTables.js"></script>
+<script type="text/javascript" src="resources/jquery.treeview.js"></script>
+<script type="text/javascript">
+	dojoConfig = {
+		async : true,
+		parseOnLoad : true
+	}
+</script>
+<script type="text/javascript"
+	src='resources/dojo-release-1.8.3/dojo/dojo.js'></script>
+<script type="text/javascript">
+	require([ "dojo/parser", "dijit/layout/TabContainer",
+			"dijit/layout/ContentPane" ]);
+</script>
+<script type="text/javascript" src="resources/scanner.js"></script>
+</head>
+
+<body>
+	<div id="wrapper">
+		<div id="tophead">
+			<div id="login"></div>
+		</div>
+		<div id="content">
+			<div id="welcome" style="display: none;">
+				<h3>Welcome to SCANNER</h3>
+				<p>You have reached a restricted access portal. Please use the
+					login box below to access the resource of your interest.</p>
+				<p>Note that access control to data in SCANNER is delegated to
+					the site that is providing the data. Furthermore, access to each
+					data set is limited to study investigators as specified in an
+					Institutional Review Board (IRB) approvals database, and the user
+					must belong to one of the study sites and be authenticated by that
+					site's enterprise authentication services.</p>
+			</div>
+			<div id="loginForm" style="display: none;">
+				<h2>Log In</h2>
+				<fieldset>
+					<legend>Login</legend>
+					<table>
+						<tr>
+							<td>Username: <input type="text" id="username"
+								name="username" size="15">
+							</td>
+						</tr>
+						<tr>
+							<td>Password: <input type="password" id="password"
+								name="password" size="15">
+							</td>
+						</tr>
+						<tr>
+							<td><input type="button" value="Login"
+								onclick="submitLogin();">
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+			</div>
+
+			<div id="ui" style="visibility: hidden;">
+				<div style="width: 100%; height: 300px;" class="claro">
+					<div id="queryTabContainer"
+						data-dojo-type="dijit/layout/TabContainer"
+						style="width: 100%; height: 100%">
+						<div data-dojo-type="dijit/layout/ContentPane" title="Query"
+							data-dojo-props="selected:true" onShow="showQuery();">
+							<table>
+								<tbody>
+									<tr>
+										<td valign="top" style="width: 60%;">
+											<table>
+												<tbody>
+													<tr>
+														<td>Studies</td>
+														<td>Datasets</td>
+														<td>Libraries</td>
+														<td>Methods</td>
+														<td>Sites</td>
+													</tr>
+													<tr>
+														<td valign="top"><select id="selectStudies"></select>
+														</td>
+														<td valign="top"><select id="selectDatasets"></select>
+														</td>
+														<td valign="top"><select id="selectLibraries"></select>
+														</td>
+														<td valign="top"><select id="selectMethods"></select>
+														</td>
+														<td valign="top"><select id="selectSites"></select>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+										<td style="width: 35%;">
+											<div id="queryHelp">
+												<span class="double_bottom_border"> Quick Help </span> <br /> <br />
+												<span>Select study, dataset, library, method and sites on
+													the left</span> <br /> <br /> <span id="studyHelp"></span> <br /> <br />
+												<span id="datasetHelp"></span> <br /> <br /> <span
+													id="libraryHelp"></span> <br /> <br /> <span id="methodHelp"></span>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div data-dojo-type="dijit/layout/ContentPane"
+							title="Query History" onShow="hideQuery();">
+							<div id="historyGridDiv"></div>
+						</div>
+						<div data-dojo-type="dijit/layout/ContentPane" title="Profile" onShow="hideQuery();">
+							<div id="profileDiv" class="method_border method_margin">
+								<table id="profileTable">
+									<tr>
+										<td>Identity</td>
+										<td id="profileIdentity"></td>
+										<td id="profileIdentityDescription"></td>
+									</tr>
+									<tr>
+										<td>Role</td>
+										<td id="profileRole"></td>
+										<td rowspan="3" id="profileRoleDescription"></td>
+									</tr>
+									<tr>
+										<td class="nowrap">Study count</td>
+										<td id="profileStudyCount"></td>
+									</tr>
+									<tr>
+										<td class="nowrap">Query count</td>
+										<td id="profileQueryCount"></td>
+									</tr>
+									<tr>
+										<td class="nowrap">Privacy budget</td>
+										<td id="profilePrivacyBudget"></td>
+										<td rowspan="2" id="profilePrivacyBudgetDescription"></td>
+									</tr>
+									<tr>
+										<td class="nowrap">Last activity</td>
+										<td class="nowrap" id="profileLastActivity"></td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="paramsWrapperDiv" style="width: 100%;">
+					<p id="paramsTitle"></p>
+					<table id="paramsTable">
+						<tbody>
+							<tr>
+								<td valign="top"style="width: 60%;">
+									<div id="paramsDiv" class="method_border" style="width: 100%; display: none;">
+										<div id="paramsDivContent" class="method_margin"></div>
+										<div id="ajaxSpinnerContainer">
+											<img src="resources/images/ajax-loader.gif" id="ajaxSpinnerImage"
+												title="Processing..." alt="Spinner" />
+										</div>
+										<input type="button" value="Query" onclick="submitQuery('resultDivContent', null);"
+											class="method_margin"> <input type="button" value="Clear"
+											onclick="renderAvailableStudies();"> <br />
+										<br />
+									</div>
+								</td>
+								<td style="width: 35%;" valign="top">
+									<div id="paramsHelpDiv">
+										<span class="double_bottom_border"> Quick Help </span>
+										<br/><br/>
+										<div id="paramsHelp"></div>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<br/><br/>
+				</div>
+			</div>
+		</div>
+		<div id="resultWrapperDiv">
+			<div id="resultDiv" style="display: none;" >
+				<div id="resultDivContent">
+				</div>
+				<br/><br/><br/>
+			</div>
+		</div>
+		<div id="replayDivWrapper">
+			<br style="clear: left;" />
+			<div id="ajaxHistorySpinnerContainer">
+				<img src="resources/images/ajax-loader.gif" id="ajaxHistorySpinnerImage"
+					title="Processing..." alt="Spinner" />
+			</div>
+			<div id="replayDiv" style="display: none;" >
+				<div id="replayDivContent">
+				</div>
+				<br/><br/><br/>
+			</div>
+		</div>
+
+
+		<div id="footer" style="display: none; float: left;">SCANNER is
+			supported by the Agency for Healthcare Research and Quality (AHRQ)
+			through the American Recovery &amp; Reinvestment Act of 2009, Grant
+			R01 HS19913-01.
+		</div>
+		<script type="text/javascript">
+		$(document).ready(function () { 
+			initScanner();
+		});
+		</script>
+	</div>
+</body>
+</html>
+
