@@ -10,6 +10,8 @@ import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionResponse;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
@@ -51,8 +53,15 @@ public class GloreAggregateProcessor implements Processor
             ErrorUtils.setHttpError(
                 exchange, 
                 new NullPointerException("Null Glore state data"), 500);           
-        }        
-        int features = gloreData.getFeatures(); 
+        }
+
+        // replace the getFeatures with the standardized input parameters
+        LogisticRegressionInputParameters params = request.getLogisticRegressionInput().getInputParameters();
+        ArrayList<String> independentVariables = new ArrayList(params.getIndependentVariableName());
+
+//        int features = gloreData.getFeatures();
+
+        int features = independentVariables.size();
         int iter = gloreData.getIteration();
         Matrix beta0, beta1;
         
