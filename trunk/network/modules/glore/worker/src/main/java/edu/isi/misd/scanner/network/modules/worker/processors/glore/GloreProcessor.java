@@ -192,12 +192,8 @@ public class GloreProcessor implements Processor
 
         GloreStateData state = getState(exchange);
 
-//        // Obtain the independent and dependent variables
-//        List<GloreLogisticRegressionRequest> gloreRequestList =
-//                getGloreRequestList(exchange);
-//        GloreLogisticRegressionRequest request = gloreRequestList.get(0);
-//        LogisticRegressionInputParameters params = request.getLogisticRegressionInput().getInputParameters();
-//        ArrayList<String> independentVariables = new ArrayList(params.getIndependentVariableName());
+
+
         
         // locate the specified input file
         String fileName = 
@@ -217,14 +213,35 @@ public class GloreProcessor implements Processor
         file_in = new DataInputStream(file_stream);
         file_br = new BufferedReader(new InputStreamReader(file_in));
 
+
+        // Obtain the independent and dependent variables
+        GloreLogisticRegressionRequest request =
+                (GloreLogisticRegressionRequest)exchange.getIn().getBody(
+                        GloreLogisticRegressionRequest.class);
+
+        ArrayList<String> independentVariables =
+                new ArrayList(request.getLogisticRegressionInput().getInputParameters().getIndependentVariableName());
+
+        String dependentVariableName = request.getLogisticRegressionInput().getInputParameters().getDependentVariableName();
+
+
         // read file and populate X and Y matrices
         state.rows = 0;
-        // get rid of the first line
+        int targetVar = 2;
+        // parse the first line to match with the arrary list of dependent and independent variables
         if ((file_line = file_br.readLine()) != null){
-            // do nothing
+            line_tokens = file_line.split(",");
+            for (int i = 0; i < line_tokens.length; i++) {
+               // if dependent variable is matched
+                if (line_tokens[i].equals(dependentVariableName))
+                {
+                      targetVar = i;
+                      break;
+                }
+            }
         }
         else{
-            log.info("Warning: no line is read...");
+            log.info("Warning: no line is read, empty file...");
         }
 
         while ((file_line = file_br.readLine()) != null) 
@@ -247,11 +264,12 @@ public class GloreProcessor implements Processor
             // populate data structures with data
             state.xrow = new ArrayList<Double>();
             state.xrow.add(1.0);
-            for (int i = 0; i < line_tokens.length - 1; i++) {
-                state.xrow.add(new Double(line_tokens[i]));
+            for (int i = 0; i < line_tokens.length ; i++) {
+                if (i!=targetVar)
+                    state.xrow.add(new Double(line_tokens[i]));
             }
             state.Xv.add(state.xrow);
-            state.Yv.add(new Double(line_tokens[line_tokens.length-1]));
+            state.Yv.add(new Double(line_tokens[targetVar]));
         }
 
         state.dataLoaded = true;

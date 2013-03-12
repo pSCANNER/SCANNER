@@ -61,7 +61,6 @@ public class GloreAggregateProcessor implements Processor
         int features = independentVariables.size()+1;
 //        int features = gloreData.getFeatures();
 
-
         int iter = gloreData.getIteration();
         Matrix beta0, beta1;
         
