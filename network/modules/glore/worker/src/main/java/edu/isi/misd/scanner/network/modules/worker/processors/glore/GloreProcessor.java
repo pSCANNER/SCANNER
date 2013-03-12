@@ -22,6 +22,7 @@ import java.util.Map;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -223,16 +224,17 @@ public class GloreProcessor implements Processor
                 new ArrayList(request.getLogisticRegressionInput().getInputParameters().getIndependentVariableName());
 
         String dependentVariableName = request.getLogisticRegressionInput().getInputParameters().getDependentVariableName();
-
+//        Log.info("--##-- DependentVariableName="+dependentVariableName);
 
         // read file and populate X and Y matrices
         state.rows = 0;
-        int targetVar = 2;
+        int targetVar = -1;
         // parse the first line to match with the arrary list of dependent and independent variables
         if ((file_line = file_br.readLine()) != null){
             line_tokens = file_line.split(",");
             for (int i = 0; i < line_tokens.length; i++) {
                // if dependent variable is matched
+//                Log.info("--**-- headerVariable[" + i+"]="+line_tokens[i]);
                 if (line_tokens[i].equals(dependentVariableName))
                 {
                       targetVar = i;
