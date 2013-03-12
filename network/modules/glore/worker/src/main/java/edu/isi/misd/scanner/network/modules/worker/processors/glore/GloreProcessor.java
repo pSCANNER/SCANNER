@@ -4,6 +4,7 @@ import Jama.Matrix;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ConfigUtils;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
+import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
@@ -156,6 +157,26 @@ public class GloreProcessor implements Processor
         return request;
     }
 
+    // retrive the gloreRequest list to be processed
+    private List<GloreLogisticRegressionRequest>
+    getGloreRequestList(Exchange exchange)
+            throws Exception
+    {
+        ArrayList<String> resultsInput =
+                exchange.getIn().getBody(ArrayList.class);
+        ArrayList<GloreLogisticRegressionRequest> resultsOutput =
+                new ArrayList<GloreLogisticRegressionRequest>();
+
+        for (Object result : resultsInput)
+        {
+            GloreLogisticRegressionRequest request =
+                    (GloreLogisticRegressionRequest) MessageUtils.convertTo(
+                            GloreLogisticRegressionRequest.class, result, exchange);
+            resultsOutput.add(request);
+        }
+
+        return resultsOutput;
+    }
     /**
      *
      * @param exchange
@@ -171,7 +192,9 @@ public class GloreProcessor implements Processor
 
         GloreStateData state = getState(exchange);
 
-        // Obtain the independent and dependent variables
+//        // Obtain the independent and dependent variables
+//        List<GloreLogisticRegressionRequest> gloreRequestList =
+//                getGloreRequestList(exchange);
 //        GloreLogisticRegressionRequest request = gloreRequestList.get(0);
 //        LogisticRegressionInputParameters params = request.getLogisticRegressionInput().getInputParameters();
 //        ArrayList<String> independentVariables = new ArrayList(params.getIndependentVariableName());

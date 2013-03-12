@@ -58,10 +58,10 @@ public class GloreAggregateProcessor implements Processor
         // replace the getFeatures with the standardized input parameters
         LogisticRegressionInputParameters params = request.getLogisticRegressionInput().getInputParameters();
         ArrayList<String> independentVariables = new ArrayList(params.getIndependentVariableName());
-
+        int features = independentVariables.size()+1;
 //        int features = gloreData.getFeatures();
 
-        int features = independentVariables.size();
+
         int iter = gloreData.getIteration();
         Matrix beta0, beta1;
         

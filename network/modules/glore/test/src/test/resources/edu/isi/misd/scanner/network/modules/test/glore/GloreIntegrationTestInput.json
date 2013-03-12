@@ -8,7 +8,7 @@
         "inputParameters":
         {
             "dependentVariableName":"Outcome",
-            "independentVariableName":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"],
+            "independentVariableName":["g1","g2"],
             "categoricalVariable":null
         }
     },
