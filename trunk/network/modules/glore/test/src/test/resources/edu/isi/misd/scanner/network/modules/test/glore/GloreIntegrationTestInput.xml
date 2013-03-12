@@ -12,12 +12,8 @@
 
         <regr:InputParameters>
             <regr:DependentVariableName>Outcome</regr:DependentVariableName>
-            <regr:IndependentVariableName>Age</regr:IndependentVariableName>
-            <regr:IndependentVariableName>Race_Cat</regr:IndependentVariableName>
-            <regr:IndependentVariableName>Creatinine</regr:IndependentVariableName>
-            <regr:IndependentVariableName>CAD</regr:IndependentVariableName>
-            <regr:IndependentVariableName>LOS</regr:IndependentVariableName>
-            <regr:IndependentVariableName>Diabetes</regr:IndependentVariableName>          
+            <regr:IndependentVariableName>g1</regr:IndependentVariableName>
+            <regr:IndependentVariableName>g2</regr:IndependentVariableName>
         </regr:InputParameters>    
              
     </LogisticRegressionInput>

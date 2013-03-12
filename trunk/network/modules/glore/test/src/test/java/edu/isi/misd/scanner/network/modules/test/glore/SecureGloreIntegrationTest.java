@@ -58,24 +58,18 @@ public class SecureGloreIntegrationTest extends BaseIntegrationTest
     @Test
     public void testSecureGloreLogisticRegressionXML() throws Exception 
     {
-//        doPost("application/xml",
-//               "GloreIntegrationTestInput.xml",
-//               "GloreIntegrationTestOutput.xml");
-
         doPost("application/xml",
-                "GloreIntegrationTestInput.xml");
+               "GloreIntegrationTestInput.xml",
+               "GloreIntegrationTestOutput.xml");
         assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);         
     }
     
     @Test
     public void testSecureGloreLogisticRegressionJSON() throws Exception 
     {
-//        doPost("application/json",
-//               "GloreIntegrationTestInput.json",
-//               "GloreIntegrationTestOutput.json");
-
         doPost("application/json",
-                "GloreIntegrationTestInput.json");
+               "GloreIntegrationTestInput.json",
+               "GloreIntegrationTestOutput.json");
         assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);   
     }      
 }
