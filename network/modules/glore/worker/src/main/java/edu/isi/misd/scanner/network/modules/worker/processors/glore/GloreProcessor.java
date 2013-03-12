@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -168,6 +170,11 @@ public class GloreProcessor implements Processor
         String[] line_tokens;   
 
         GloreStateData state = getState(exchange);
+
+        // Obtain the independent and dependent variables
+//        GloreLogisticRegressionRequest request = gloreRequestList.get(0);
+//        LogisticRegressionInputParameters params = request.getLogisticRegressionInput().getInputParameters();
+//        ArrayList<String> independentVariables = new ArrayList(params.getIndependentVariableName());
         
         // locate the specified input file
         String fileName = 
