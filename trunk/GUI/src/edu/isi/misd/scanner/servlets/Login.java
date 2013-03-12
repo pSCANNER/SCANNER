@@ -19,6 +19,7 @@ package edu.isi.misd.scanner.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -42,6 +43,13 @@ import edu.isi.misd.scanner.utils.Utils;
 @WebServlet(description = "Servlet for Login", urlPatterns = { "/login" })
 public class Login extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final String shibIdAttr = "ShibuscNetID";
+	private static final String shibDisplayNameAttr = "ShibdisplayName";
+	private static final String shibFirstNameAttr = "ShibgivenName";
+	private static final String shibLastNameAttr = "Shibsurname";
+	private static final String shibMailAttr = "Shibmail";
+	private static final String shibRolesAttr = "ShibuscAffiliation";
+	private static final String shibPrimaryRoleAttr = "ShibuscPrimaryAffiliation";
 
     /**
      * Default constructor. 
@@ -59,32 +67,46 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String username = request.getParameter("username");
-		String password = request.getParameter("password");
-		System.out.println("User: \"" + username + "\" logged in.");
+		String username = (String) request.getAttribute(shibIdAttr);
+		String displayName = (String) request.getAttribute(shibDisplayNameAttr);
+		String firstName = (String) request.getAttribute(shibFirstNameAttr);
+		String lastName = (String) request.getAttribute(shibLastNameAttr);
+		String mail = (String) request.getAttribute(shibMailAttr);
+		String roles = (String) request.getAttribute(shibRolesAttr);
+		String role = (String) request.getAttribute(shibPrimaryRoleAttr);
+		System.out.println("User \"" + username + "\" agreed." + "\n\t" +
+				"id: " + username + "\n\t" +
+				"displayName: " + displayName + "\n\t" +
+				"firstName: " + firstName + "\n\t" +
+				"lastName: " + lastName + "\n\t" +
+				"mail: " + mail + "\n\t" +
+				"roles: " + roles + "\n\t" +
+				"primary role: " + role + "\n\t");
 		HttpSession session = request.getSession(true);
 		if (session.isNew() == false) {
 			session.invalidate();
 			session = request.getSession(true);
 		}  
-		boolean valid = Utils.login(request, response, username, password);
 		try {
 			JSONObject obj = new JSONObject();
-			if (valid) {
-				session.setAttribute("user", username);
-				JakartaClient client = new JakartaClient(4, 8192, 120000);
-				session.setAttribute("httpClient", client);
-				obj.put("status", "success");
-				obj.put("user", username);
-				obj.put("role", Utils.getUserRole(username));
-				JSONArray description = new JSONArray();
-				description.put(Utils.profileDescription[0]);
-				description.put(Utils.profileDescription[1]);
-				description.put(Utils.profileDescription[2]);
-				obj.put("description", description);
-			} else {
-				obj.put("status", "Invalid userid and/or password.");
-			}
+			session.setAttribute("user", username);
+			session.setAttribute("displayName", displayName);
+			session.setAttribute("firstName", firstName);
+			session.setAttribute("lastName", lastName);
+			session.setAttribute("mail", mail);
+			session.setAttribute("roles", roles);
+			session.setAttribute("role", role);
+			JakartaClient client = new JakartaClient(4, 8192, 120000);
+			session.setAttribute("httpClient", client);
+			obj.put("status", "success");
+			obj.put("mail", mail);
+			obj.put("user", username);
+			obj.put("role", role);
+			JSONArray description = new JSONArray();
+			description.put(Utils.profileDescription[0]);
+			description.put(Utils.profileDescription[1]);
+			description.put(Utils.profileDescription[2]);
+			obj.put("description", description);
 			PrintWriter out = response.getWriter();
 			out.print(obj.toString());
 		} catch (JSONException e) {
