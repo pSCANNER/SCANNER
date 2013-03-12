@@ -467,8 +467,9 @@ function submitQuery(div, replay) {
 			$('#profileStudyCount').html('' + studiesCounter.length);
 		}
 		$('#profileLastActivity').html(getDateString(new Date()));
-		pushHistory(obj);
+		param['history'] = obj;
 	} else {
+		obj['trxId'] = replay['trxId'][0];
 		obj['parameters'] = replay['parameters'][0];
 		obj['study'] = replay['study'][0];
 		obj['dataset'] = replay['dataset'][0];
@@ -499,6 +500,12 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	param.spinner.hide();
 	var resultDiv = param['resultDiv'];
 	data = $.parseJSON(data);
+	var obj = param['history'];
+	if (obj != null) {
+		obj['trxId'] = data['trxId'];
+		pushHistory(obj);
+	}
+	data = data['data'];
 	if (param['library'] == 'Oceans') {
 		buildDataTable(data, resultDiv, param.tableId);
 	} else {
@@ -1964,7 +1971,7 @@ function postSubmitLogin(data, textStatus, jqXHR, param) {
 	var loginDiv = $('#loginForm');
 	$('#errorDiv').remove();
 	if (res['status'] == 'success') {
-		$('#profileIdentity').html(res['user']);
+		$('#profileIdentity').html(res['mail']);
 		$('#profileIdentityDescription').html(res['description'][0]);
 		$('#profileRole').html(res['role']);
 		$('#profileStudyCount').html('0');
@@ -2520,6 +2527,7 @@ function pushHistory(obj) {
 			historyGrid.destroyRecursive();
 		}
 		var item = {};
+		item.trxId = obj.trxId;
 		item.parameters = obj.parameters;
 		item.action = obj.action;
 		item.study = obj.study;

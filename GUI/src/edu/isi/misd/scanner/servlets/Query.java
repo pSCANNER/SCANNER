@@ -257,13 +257,32 @@ public class Query extends HttpServlet {
 					String targetsURLs = buff.toString();
 					buff = new StringBuffer();
 					buff.append(masterURL).append("/query/").append(libPath).append("/").append(funcPath);
-					String url = buff.toString();
-					System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nParams: "+params);
-					ClientURLResponse rsp = scannerClient.postScannerQuery(url, targetsURLs, params);
+					String trxId = request.getParameter("trxId");
+					String url = null;
+					ClientURLResponse rsp = null;
+					String rspId = null;
+					obj = new JSONObject();
+					if (trxId != null) {
+						trxId = Utils.urlEncode(trxId);
+						buff.append("/id/" + trxId);
+						url = buff.toString();
+						System.out.println("URL: " + url);
+						rsp = scannerClient.get(url);
+					} else {
+						url = buff.toString();
+						System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nParams: "+params);
+						rsp = scannerClient.postScannerQuery(url, targetsURLs, params);
+						rspId = rsp.getIdHeader();
+						System.out.println("Response Id: \n"+rspId);
+						obj.put("trxId", rspId);
+					}
 					res = rsp.getEntityString();
 					System.out.println("Response Body: \n"+res);
+					JSONObject body = new JSONObject(res);
+					obj.put("data", body);
 					PrintWriter out = response.getWriter();
-					out.print(res);
+					out.print(obj.toString());
+					//out.print(res);
 					return;
 					// simulated response
 					//obj = new JSONObject(Utils.oceansResult);

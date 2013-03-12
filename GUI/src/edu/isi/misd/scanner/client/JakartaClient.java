@@ -283,7 +283,7 @@ public class JakartaClient {
 	}
     
     /**
-     * Get the list of the file names to be downloaded.
+     * Execute a GET request.
      * 
      * @param url
      *            the query url
@@ -295,6 +295,20 @@ public class JakartaClient {
 		HttpGet httpget = new HttpGet(url);
     	httpget.setHeader("Accept", "application/json");
 		return execute(httpget, cookie);
+	}
+    
+    /**
+     * Execute a GET request.
+     * 
+     * @param url
+     *            the query url
+     * @return the HTTP Response
+     */
+    public ClientURLResponse get(String url) {
+		HttpGet httpget = new HttpGet(url);
+    	httpget.setHeader("Accept", "application/json");
+    	httpget.setHeader("Content-Type", "application/json; charset=UTF-8");
+		return execute(httpget, null);
 	}
     
     /**
@@ -518,6 +532,11 @@ public class JakartaClient {
     			}
             }
     	}
+        
+        /**
+         * Get the cookie value.
+         * 
+         */
         public String getCookieValue() {
         	String res = null;
         	try {
@@ -529,6 +548,19 @@ public class JakartaClient {
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
+			return res;
+        }
+
+        /**
+         * Get the value for the "id" header
+         * 
+         */
+        public String getIdHeader() {
+        	String res = null;
+        	Header id = response.getFirstHeader("id");
+			if (id != null) {
+				res = id.getValue();
+    		}
 			return res;
         }
 
