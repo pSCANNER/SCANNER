@@ -72,7 +72,7 @@ public class ErrorUtils
         if (setException) {
             exchange.setException(ex);
         } else {
-            log.error(ex.toString());
+            log.error(ex.toString(),ex);
         }
     }
     
