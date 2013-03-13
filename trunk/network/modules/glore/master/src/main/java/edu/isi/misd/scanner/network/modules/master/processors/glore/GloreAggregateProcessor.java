@@ -11,7 +11,10 @@ import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.isi.misd.scanner.network.types.regression.Coefficient;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionOutput;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionResponse;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
@@ -37,7 +40,7 @@ public class GloreAggregateProcessor implements Processor
      * @throws Exception
      */
     @Override
-    public void process(Exchange exchange) throws Exception 
+    public void process(Exchange exchange) throws Exception
     {
         List<GloreLogisticRegressionRequest> gloreRequestList = 
             getGloreRequestList(exchange);
@@ -114,7 +117,45 @@ public class GloreAggregateProcessor implements Processor
             exchange.getIn().setBody(resultData);              
             
             // signal complete
-            exchange.setProperty("status", "complete"); 
+            exchange.setProperty("status", "complete");
+
+
+            // prepare GLORE outputs
+            GloreLogisticRegressionResponse gloreResponse = new GloreLogisticRegressionResponse();
+            LogisticRegressionResponse response = new LogisticRegressionResponse();
+            response.setDataSetID("GLORE server");
+            response.setInput(request.getLogisticRegressionInput());
+            response.setOutput(new LogisticRegressionOutput());
+
+            List<Coefficient> target= response.getOutput().getCoefficient();
+            Matrix fBeta =  GloreUtils.convertMatrixTypeToMatrix(gloreData.getBeta());
+
+            // set intercept
+            Coefficient coefficient = new Coefficient();
+            coefficient.setB(fBeta.get(0,0));
+            coefficient.setSE(SD.get(0,0));
+            coefficient.setTStatistics(fBeta.get(0,0)/SD.get(0,0));
+            coefficient.setDegreeOfFreedom(1);
+            coefficient.setPValue(0);
+            coefficient.setName("Intercept");
+            target.add(coefficient);
+
+            //set the rest of the attributes
+            for (int i=1; i<fBeta.getColumnPackedCopy().length;i++ )
+            {
+                coefficient = new Coefficient();
+                coefficient.setB(fBeta.get(i,0));
+                coefficient.setSE(SD.get(0,i));
+                coefficient.setTStatistics(fBeta.get(i,0)/SD.get(0,i));
+                coefficient.setDegreeOfFreedom(1);
+                coefficient.setPValue(0);
+                coefficient.setName(independentVariables.get(i-1));
+                target.add(coefficient);
+            }
+
+            gloreResponse.setLogisticRegressionResponse(response);
+
+//            return gloreResponse;
             return;
         }            
         else 
@@ -188,6 +229,9 @@ public class GloreAggregateProcessor implements Processor
         exchange.getIn().setBody(request);        
     }
 
+
+
+
     private List<GloreLogisticRegressionRequest> 
         getGloreRequestList(Exchange exchange)
         throws Exception
@@ -204,7 +248,6 @@ public class GloreAggregateProcessor implements Processor
                     GloreLogisticRegressionRequest.class, result, exchange);
             resultsOutput.add(request);
         }
-        
         return resultsOutput; 
     }
 
