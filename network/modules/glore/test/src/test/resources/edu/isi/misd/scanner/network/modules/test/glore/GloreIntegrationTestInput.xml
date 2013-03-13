@@ -17,10 +17,5 @@
         </regr:InputParameters>    
              
     </LogisticRegressionInput>
-    
-    <!-- legacy value, should go away -->
-    <GloreData>
-        <features>3</features>
-    </GloreData>       
-    
+        
 </GloreLogisticRegressionRequest>

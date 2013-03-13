@@ -28,7 +28,7 @@
                            minOccurs="1"
                            maxOccurs="1"/>
               <xsd:element ref="tns:GloreData"
-                           minOccurs="1"
+                           minOccurs="0"
                            maxOccurs="1"/>
             </xsd:sequence>                      
         </xsd:complexType> 
