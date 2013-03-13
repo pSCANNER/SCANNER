@@ -22,7 +22,6 @@ import java.util.Map;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,9 +191,6 @@ public class GloreProcessor implements Processor
         String[] line_tokens;   
 
         GloreStateData state = getState(exchange);
-
-
-
         
         // locate the specified input file
         String fileName = 
@@ -224,7 +220,9 @@ public class GloreProcessor implements Processor
                 new ArrayList(request.getLogisticRegressionInput().getInputParameters().getIndependentVariableName());
 
         String dependentVariableName = request.getLogisticRegressionInput().getInputParameters().getDependentVariableName();
-//        Log.info("--##-- DependentVariableName="+dependentVariableName);
+        if (log.isDebugEnabled()) {
+            log.debug("--##-- DependentVariableName="+dependentVariableName);
+        }
 
         // read file and populate X and Y matrices
         state.rows = 0;
@@ -234,7 +232,9 @@ public class GloreProcessor implements Processor
             line_tokens = file_line.split(",");
             for (int i = 0; i < line_tokens.length; i++) {
                // if dependent variable is matched
-//                Log.info("--**-- headerVariable[" + i+"]="+line_tokens[i]);
+                if (log.isDebugEnabled()) {
+                    log.debug("--**-- headerVariable[" + i+"]="+line_tokens[i]);
+                }
                 if (line_tokens[i].equals(dependentVariableName))
                 {
                       targetVar = i;

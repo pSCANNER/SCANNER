@@ -105,25 +105,12 @@ public class GloreAggregateProcessor implements Processor
                 SD.set(0,i, Math.sqrt(cov_matrix.get(i,i)));
             }          
             log.info("SD Matrix: " + GloreUtils.matrixToString(SD, 8, 6));
-
-            gloreData.setSDMatrix(GloreUtils.convertMatrixToMatrixType(SD));
             gloreData.setState("complete");
-                   
-            // prepare final results
-            GloreResultData resultData = new GloreResultData();
-            resultData.setBeta(gloreData.getBeta());
-            resultData.setCovarianceMatrix(gloreData.getCovarianceMatrix());
-            resultData.setSDMatrix(gloreData.getSDMatrix());
-            exchange.getIn().setBody(resultData);              
-            
-            // signal complete
-            exchange.setProperty("status", "complete");
-
 
             // prepare GLORE outputs
             GloreLogisticRegressionResponse gloreResponse = new GloreLogisticRegressionResponse();
             LogisticRegressionResponse response = new LogisticRegressionResponse();
-            response.setDataSetID("GLORE server");
+            //response.setDataSetID("GLORE server");  // need to decide how best to handle this
             response.setInput(request.getLogisticRegressionInput());
             response.setOutput(new LogisticRegressionOutput());
 
@@ -152,10 +139,11 @@ public class GloreAggregateProcessor implements Processor
                 coefficient.setName(independentVariables.get(i-1));
                 target.add(coefficient);
             }
-
             gloreResponse.setLogisticRegressionResponse(response);
-
-//            return gloreResponse;
+            exchange.getIn().setBody(gloreResponse);   
+            
+            // signal complete
+            exchange.setProperty("status", "complete");           
             return;
         }            
         else 
