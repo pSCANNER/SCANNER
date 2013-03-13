@@ -8,12 +8,7 @@
         "inputParameters":
         {
             "dependentVariableName":"Outcome",
-            "independentVariableName":["g1","g2"],
-            "categoricalVariable":null
+            "independentVariableName":["g1","g2"]
         }
-    },
-    "gloreData":
-    {
-        "features":"3"
     }
 }

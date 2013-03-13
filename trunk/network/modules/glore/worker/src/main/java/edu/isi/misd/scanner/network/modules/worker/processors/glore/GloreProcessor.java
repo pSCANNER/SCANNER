@@ -62,8 +62,12 @@ public class GloreProcessor implements Processor
                 GloreLogisticRegressionRequest.class);
         
         GloreData data = request.getGloreData();
-        GloreStateData state = getState(exchange);
+        if (data == null) {
+            data = new GloreData();
+            request.setGloreData(data);
+        }
         
+        GloreStateData state = getState(exchange);        
         if (!state.dataLoaded) 
         {
             readDataFile(exchange);
@@ -157,26 +161,6 @@ public class GloreProcessor implements Processor
         return request;
     }
 
-    // retrive the gloreRequest list to be processed
-    private List<GloreLogisticRegressionRequest>
-    getGloreRequestList(Exchange exchange)
-            throws Exception
-    {
-        ArrayList<String> resultsInput =
-                exchange.getIn().getBody(ArrayList.class);
-        ArrayList<GloreLogisticRegressionRequest> resultsOutput =
-                new ArrayList<GloreLogisticRegressionRequest>();
-
-        for (Object result : resultsInput)
-        {
-            GloreLogisticRegressionRequest request =
-                    (GloreLogisticRegressionRequest) MessageUtils.convertTo(
-                            GloreLogisticRegressionRequest.class, result, exchange);
-            resultsOutput.add(request);
-        }
-
-        return resultsOutput;
-    }
     /**
      *
      * @param exchange
