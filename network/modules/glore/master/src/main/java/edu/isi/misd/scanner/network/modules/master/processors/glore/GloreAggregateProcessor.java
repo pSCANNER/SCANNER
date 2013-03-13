@@ -123,7 +123,7 @@ public class GloreAggregateProcessor implements Processor
             coefficient.setSE(SD.get(0,0));
             coefficient.setTStatistics(fBeta.get(0,0)/SD.get(0,0));
             coefficient.setDegreeOfFreedom(1);
-            coefficient.setPValue(0);
+            coefficient.setPValue(ztest(fBeta.get(0,0)/SD.get(0,0)));
             coefficient.setName("Intercept");
             target.add(coefficient);
 
@@ -135,7 +135,7 @@ public class GloreAggregateProcessor implements Processor
                 coefficient.setSE(SD.get(0,i));
                 coefficient.setTStatistics(fBeta.get(i,0)/SD.get(0,i));
                 coefficient.setDegreeOfFreedom(1);
-                coefficient.setPValue(0);
+                coefficient.setPValue(ztest(fBeta.get(i,0)/SD.get(0,i)));
                 coefficient.setName(independentVariables.get(i-1));
                 target.add(coefficient);
             }
@@ -218,8 +218,6 @@ public class GloreAggregateProcessor implements Processor
     }
 
 
-
-
     private List<GloreLogisticRegressionRequest> 
         getGloreRequestList(Exchange exchange)
         throws Exception
@@ -292,5 +290,58 @@ public class GloreAggregateProcessor implements Processor
             A[i][i] = v;
 	    }
 	    return new Matrix(A);
-    }    
+    }
+
+    /* some additional statistical function to calculate normCDF*/
+
+    private static final double coefficient = 2 / Math.sqrt(Math.PI);
+
+    /**
+     * Calculates probability that normal random variable is less than x
+     * @param x - input value
+     * @return - Probability that normal random variable is less than x
+     */
+    public static double getCDF(double x) {
+        double tolerance = 1e-15;
+        int maxCycles = 100;
+        return 0.5 * (1.0 + getERF(x/Math.sqrt(2.0), tolerance, maxCycles));
+    }
+
+    /**
+     * Estimates error function value for x
+     * @param x - input value
+     * @return - error function value for x
+     */
+    private static double getERF(double x, double tolerance, int maxCycles) {
+        int n = 1;
+        double nextCorrection = tolerance + 1;
+        double erf = x;
+        while((n <= maxCycles) && (Math.abs(nextCorrection) > tolerance)) {
+            nextCorrection = Math.pow(x, 2*n + 1)/(factorial(n)*(2*n + 1));
+            if((n % 2) == 1) erf -= nextCorrection;
+            else erf += nextCorrection;
+            n++;
+        }
+        erf = erf * coefficient;
+        return erf;
+    }
+
+    /**
+     * Calculates n factorial.
+     * @param n - input value
+     * @return
+     */
+    private static double factorial(int n) {
+        double result = 1.0;
+        for(int i=2; i<=n; i++) {
+            result *= i;
+        }
+        return result;
+    }
+
+    private static double ztest(double v)
+    {
+        return 2*(1-getCDF(Math.abs(v)));
+    }
+
 }
