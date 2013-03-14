@@ -5,7 +5,6 @@ import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
-import edu.isi.misd.scanner.network.types.glore.GloreResultData;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionResponse;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public class GloreAggregateProcessor implements Processor
         if (gloreRequestList.isEmpty()) {
             ErrorUtils.setHttpError(
                 exchange, 
-                new NullPointerException("Null aggregate results"), 500);           
+                new NullPointerException("Null Glore aggregate results"), 500);           
         }
         
         GloreLogisticRegressionRequest request = gloreRequestList.get(0);
@@ -59,10 +58,11 @@ public class GloreAggregateProcessor implements Processor
         }
 
         // replace the getFeatures with the standardized input parameters
-        LogisticRegressionInputParameters params = request.getLogisticRegressionInput().getInputParameters();
-        ArrayList<String> independentVariables = new ArrayList(params.getIndependentVariableName());
+        LogisticRegressionInputParameters params = 
+            request.getLogisticRegressionInput().getInputParameters();
+        ArrayList<String> independentVariables = 
+            new ArrayList(params.getIndependentVariableName());
         int features = independentVariables.size()+1;
-//        int features = gloreData.getFeatures();
 
         int iter = gloreData.getIteration();
         Matrix beta0, beta1;
@@ -108,14 +108,19 @@ public class GloreAggregateProcessor implements Processor
             gloreData.setState("complete");
 
             // prepare GLORE outputs
-            GloreLogisticRegressionResponse gloreResponse = new GloreLogisticRegressionResponse();
-            LogisticRegressionResponse response = new LogisticRegressionResponse();
-            //response.setDataSetID("GLORE server");  // need to decide how best to handle this
+            GloreLogisticRegressionResponse gloreResponse =
+                new GloreLogisticRegressionResponse();
+            LogisticRegressionResponse response =
+                new LogisticRegressionResponse();
+            // need to decide how best to handle the DataSetID
+            //response.setDataSetID("GLORE server");  
             response.setInput(request.getLogisticRegressionInput());
-            response.setOutput(new LogisticRegressionOutput());
+            response.getOutput().add(new LogisticRegressionOutput());
 
-            List<Coefficient> target= response.getOutput().getCoefficient();
-            Matrix fBeta =  GloreUtils.convertMatrixTypeToMatrix(gloreData.getBeta());
+            List<Coefficient> target = 
+                response.getOutput().get(0).getCoefficient();
+            Matrix fBeta = 
+                GloreUtils.convertMatrixTypeToMatrix(gloreData.getBeta());
 
             // set intercept
             Coefficient coefficient = new Coefficient();
