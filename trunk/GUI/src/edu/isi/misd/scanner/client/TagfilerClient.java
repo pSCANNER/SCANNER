@@ -710,7 +710,7 @@ public class TagfilerClient implements RegistryClient {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;cname;minOccurs;maxOccurs;values;description)";
+			String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;cname;minOccurs;maxOccurs;values;description;path)";
 			ClientURLResponse rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
