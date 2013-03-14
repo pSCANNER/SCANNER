@@ -1,5 +1,7 @@
 package edu.isi.misd.scanner.client;
 
+import java.util.StringTokenizer;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -152,26 +154,32 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 		String result = null;
 		try {
 			String res = response.getEntityString();
+			System.out.println("Params:\n"+res);
 			JSONArray arr = new JSONArray(res);
-			JSONArray ret = new JSONArray();
+			JSONObject params = new JSONObject();
+			JSONObject paramsDescription = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				String name = obj.getString("id");
 				String cname = obj.getString("cname");
-				String description = obj.getString("description");
+				if (!obj.isNull("description")) {
+					paramsDescription.put(cname, obj.getString("description"));
+				}
+				String path = obj.getString("path");
+				StringTokenizer tokenizer = new StringTokenizer(path, "|");
+				JSONObject crtParam = params;
+				while (tokenizer.hasMoreTokens()) {
+					String token = tokenizer.nextToken();
+					if (!crtParam.has(token)) {
+						crtParam.put(token, new JSONObject());
+					}
+					crtParam = crtParam.getJSONObject(token);
+				}
 				JSONArray resourceValues = obj.getJSONArray("values");
-				int resourceMaxOccurs = obj.getInt("maxOccurs");
-				int resourceMinOccurs = obj.getInt("minOccurs");
-				JSONObject value = new JSONObject();
-				value.put("cname", cname);
-				value.put("description", description);
-				value.put("values", resourceValues);
-				value.put("maxOccurs", resourceMaxOccurs);
-				value.put("minOccurs", resourceMinOccurs);
-				JSONObject temp = new JSONObject();
-				temp.put(name, value);
-				ret.put(temp);
+				crtParam.put(cname, resourceValues);
 			}
+			JSONObject ret = new JSONObject();
+			ret.put("description", paramsDescription);
+			ret.put("params", params);
 			result = ret.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
