@@ -102,10 +102,10 @@ public class OceansLogisticRegressionProcessor implements Processor
 //        response.setDataSetID(getMetadata().getDataSet().getDataSetID());  // will come from registry
 //        response.setDataSetVariables(getMetadata().getVariables());   // will come from registry
         response.setInput(request.getLogisticRegressionInput());
-        response.setOutput(new LogisticRegressionOutput());
+        response.getOutput().add(new LogisticRegressionOutput());
         this.formatCoefficientResultsObjects(
             lrAnalysis.getLRCoefficients(),
-            response.getOutput().getCoefficient());
+            response.getOutput().get(0).getCoefficient());
         oceansResponse.setLogisticRegressionResponse(response);
         return oceansResponse;
     }

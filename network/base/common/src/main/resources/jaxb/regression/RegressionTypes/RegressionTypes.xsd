@@ -470,7 +470,7 @@ Matrix values:
             <xsd:element name="Output" 
                          type="tns:LogisticRegressionOutput"
                          minOccurs="1"
-                         maxOccurs="1"/>                                            
+                         maxOccurs="unbounded"/>                                            
         </xsd:sequence>
     </xsd:complexType> 
                 

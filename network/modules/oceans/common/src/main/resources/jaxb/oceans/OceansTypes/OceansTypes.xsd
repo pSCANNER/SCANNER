@@ -41,21 +41,6 @@
                            maxOccurs="1"/>
             </xsd:sequence>                         
         </xsd:complexType> 
-    </xsd:element>  
-
-    <xsd:element name="OceansLogisticRegressionResponseArray">
-        <xsd:complexType>
-            <xsd:annotation>
-               <xsd:documentation>
-                   Results from a aggregated logistic regression analysis using OCEANS
-               </xsd:documentation>
-            </xsd:annotation>     
-            <xsd:sequence>                                        
-              <xsd:element ref="tns:OceansLogisticRegressionResponse"
-                           minOccurs="0"
-                           maxOccurs="unbounded"/>
-            </xsd:sequence>
-        </xsd:complexType> 
-    </xsd:element> 
+    </xsd:element>   
              
 </xsd:schema>
