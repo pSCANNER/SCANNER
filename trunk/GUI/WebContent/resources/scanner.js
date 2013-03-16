@@ -70,9 +70,6 @@ var studiesCounter = [];
 var parametersDescription = null;
 var parametersBody = null;
 
-var testOceans = {"OceansLogisticRegressionResponse":[{"LogisticRegressionResponse":{"Input":{"InputDescription":{"ID":"001","Name":"Test","Description":"Test Parameters"},"InputParameters":{"DependentVariableName":"Outcome","IndependentVariableName":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"]}},"Output":{"Coefficient":[{"name":"intercept","B":"-45.42403638596345","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"age","B":"-1.643919570960919E-4","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"race_cat","B":"-0.0650683935299444","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"creatinine","B":"6.286832147409307","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"cad","B":"4.283257414660756","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"los","B":"3.3437816808396903","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"diabetes","B":"1.449691950678093","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"}]}}},{"LogisticRegressionResponse":{"Input":{"InputDescription":{"ID":"001","Name":"Test","Description":"Test Parameters"},"InputParameters":{"DependentVariableName":"Outcome","IndependentVariableName":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"]}},"Output":{"Coefficient":[{"name":"intercept","B":"-53.03819420896878","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"age","B":"-0.0027296358632070764","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"race_cat","B":"-0.018916938565496037","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"creatinine","B":"7.215921327611177","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"cad","B":"4.472718265389867","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"los","B":"4.22722259924643","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"diabetes","B":"1.7001241500703579","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"}]}}},{"LogisticRegressionResponse":{"Input":{"InputDescription":{"ID":"001","Name":"Test","Description":"Test Parameters"},"InputParameters":{"DependentVariableName":"Outcome","IndependentVariableName":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"]}},"Output":{"Coefficient":[{"name":"intercept","B":"-54.76920236531161","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"age","B":"0.005350790277416168","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"race_cat","B":"-0.2628890645323887","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"creatinine","B":"7.821184098912648","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"cad","B":"3.821069256821278","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"los","B":"3.516627757396053","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"diabetes","B":"1.7269688338952898","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"}]}}},{"LogisticRegressionResponse":{"Input":{"InputDescription":{"ID":"001","Name":"Test","Description":"Test Parameters"},"InputParameters":{"DependentVariableName":"Outcome","IndependentVariableName":["Age","Race_Cat","Creatinine","CAD","LOS","Diabetes"]}},"Output":{"Coefficient":[{"name":"intercept","B":"-46.165006789186364","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"age","B":"-3.90907095442028E-4","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"race_cat","B":"-0.16749899989421474","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"creatinine","B":"5.973116283740093","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"cad","B":"3.5159761443112867","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"los","B":"3.95076555032989","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"},{"name":"diabetes","B":"1.5230748645579761","SE":"0.0","p-value":"0.0","t-statistics":"0.0","degreeOfFreedom":"0"}]}}}]};
-var testGlore = {"LogisticRegressionResponse":{"Input":{"InputDescription":{"ID":"001","Name":"Test","Description":"Test Parameters"},"InputParameters":{"DependentVariableName":"Outcome","IndependentVariableName":["g1","g2"]}},"Output":{"Coefficient":[{"name":"Intercept","B":"-1.4644914404088611","SE":"0.38805987293280053","p-value":"0.0","t-statistics":"-3.7738801214895616","degreeOfFreedom":"1"},{"name":"g1","B":"0.027407228070019395","SE":"0.008547943774863256","p-value":"0.0","t-statistics":"3.2062948460909637","degreeOfFreedom":"1"},{"name":"g2","B":"0.016260005043414065","SE":"0.007739967319887634","p-value":"0.0","t-statistics":"2.100784715412742","degreeOfFreedom":"1"}]}}};
-
 /**
  * Method "contains" for the Array object
  * returns true if an element is in the array, and false otherwise
@@ -148,12 +145,19 @@ function getSelectedSitesNames() {
    }
  */
 function getSelectedParameters() {
-	var params = parametersBody;
+	var params = copyObject(parametersBody);
 	$.each(params, function(key2, res2) {
 		$.each(res2, function(key3, res3) {
 			$.each(res3, function(key, res) {
-				if (res.length == 1 && res[0] == 'string') {
-					params[key2][key3][key] = $('#param_'+key).val();
+				if ($.type(res) == 'string') {
+					params[key2][key3][key] = '' + $('#param_'+key).html();
+				}
+				else if (res.length == 1 && res[0] == 'string') {
+					if ($.isNumeric($('#param_'+key).val())) {
+						params[key2][key3][key] = '"' + $('#param_'+key).val() + '"';
+					} else {
+						params[key2][key3][key] = $('#param_'+key).val();
+					}
 				} else {
 					var values = [];
 					$.each($('input:checked', $('#param_'+key)), function(i, elem) {
@@ -387,7 +391,26 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 				if (parametersDescription[key] != null) {
 					paramsHelp.append(parametersDescription[key]).append($('<br/><br/>'));
 				}
-				if (res.length == 1 && res[0] == 'string') {
+				if ($.type(res) == 'string') {
+					var h4 = $('<h4>');
+					paramsDiv.append(h4);
+					h4.html(key);
+					var checkboxDiv = $('<div>');
+					//checkboxDiv.attr({'id': 'param_'+key});
+					paramsDiv.append(checkboxDiv);
+					var div = $('<div>');
+					checkboxDiv.append(div);
+					var input = $('<input>');
+					input.attr({'type': 'checkbox',
+						'checked': 'checked',
+						'parName': res,
+						'parValue': res});
+					div.append(input);
+					var label = $('<label>');
+					label.attr({'id': 'param_'+key});
+					div.append(label);
+					label.html(res);
+				} else if (res.length == 1 && res[0] == 'string') {
 					if (stringDiv == null) {
 						stringDiv = $('<div>');
 						paramsDiv.append(stringDiv);
@@ -537,8 +560,6 @@ function submitQuery(div, replay) {
 function postSubmitQuery(data, textStatus, jqXHR, param) {
 	param.spinner.hide();
 	var resultDiv = param['resultDiv'];
-	buildDataTable(data, resultDiv, param.tableId);
-	return;
 	data = $.parseJSON(data);
 	var obj = param['history'];
 	if (obj != null) {
@@ -1602,7 +1623,12 @@ function postGetResourceAction(data, textStatus, jqXHR, param) {
 function getColumnsNames(res, columns) {
 	if ($.isPlainObject(res)) {
 		if (res['Output'] != null) {
-			var coefficient = res['Output']['Coefficient'];
+			var coefficient = null;
+			if ($.isArray(res['Output'])) {
+				coefficient = res['Output'][0]['Coefficient'];
+			} else {
+				coefficient = res['Output']['Coefficient'];
+			}
 			$.each(coefficient[0], function(col, val) {
 				columns.push(col);
 			});
@@ -1634,16 +1660,32 @@ function getColumnsNames(res, columns) {
 function getRowsValues(res, columns, rows) {
 	if ($.isPlainObject(res)) {
 		if (res['Output'] != null) {
-			var group = [];
-			var coefficient = res['Output']['Coefficient'];
-			$.each(coefficient, function(i, obj) {
-				var row = [];
-				$.each(columns, function(j, col) {
-					row.push(obj[col]);
+			var coefficient = null;
+			if ($.isArray(res['Output'])) {
+				$.each(res['Output'], function(i, output) {
+					coefficient = output['Coefficient'];
+					var group = [];
+					$.each(coefficient, function(i, obj) {
+						var row = [];
+						$.each(columns, function(j, col) {
+							row.push(obj[col]);
+						});
+						group.push(row);
+					});
+					rows.push(group);
 				});
-				group.push(row);
-			});
-			rows.push(group);
+			} else {
+				coefficient = res['Output']['Coefficient'];
+				var group = [];
+				$.each(coefficient, function(i, obj) {
+					var row = [];
+					$.each(columns, function(j, col) {
+						row.push(obj[col]);
+					});
+					group.push(row);
+				});
+				rows.push(group);
+			}
 		} else {
 			$.each(res, function(key, value) {
 				getRowsValues(value, columns, rows);
@@ -1668,8 +1710,6 @@ function getRowsValues(res, columns, rows) {
  */
 
 function buildDataTable(res, resultDiv, tableId) {
-	res = testOceans;
-	//res = testGlore;
 	if (tableId == 'queryExample') {
 		if (oQueryTable != null) {
 			$('#' + tableId).remove();
@@ -2588,5 +2628,39 @@ function replayQuery(index) {
 	var tableIndex = historyDataStore.items.length - index - 1;
 	var item = historyDataStore.items[tableIndex];
 	submitQuery('replayDivContent', item);
+}
+
+function copyValue(val) {
+	if ($.isArray(val)) {
+		return copyArray(val);
+	} else if ($.isPlainObject(val)) {
+		return copyObject(val);
+	} else if ($.isNumeric(val)) {
+		return val;
+	} else {
+		var valType = $.type(val);
+		if (valType == 'string') {
+			return valType;
+		} else {
+			return '"' + valType + '"';
+		}
+	}
+}
+
+
+function copyArray(arr) {
+	var ret = [];
+	$.each(arr, function(i,elem) {
+		ret.push(copyValue(elem));
+	});
+	return ret;
+}
+
+function copyObject(obj) {
+	var ret = {};
+	$.each(obj, function(key, val) {
+		ret[key] = copyValue(val);
+	});
+	return ret;
 }
 

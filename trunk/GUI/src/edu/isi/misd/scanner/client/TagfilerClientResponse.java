@@ -175,7 +175,11 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 					crtParam = crtParam.getJSONObject(token);
 				}
 				JSONArray resourceValues = obj.getJSONArray("values");
-				crtParam.put(cname, resourceValues);
+				if (resourceValues.length() == 1 && !resourceValues.getString(0).equals("string")) {
+					crtParam.put(cname, resourceValues.getString(0));
+				} else {
+					crtParam.put(cname, resourceValues);
+				}
 			}
 			JSONObject ret = new JSONObject();
 			ret.put("description", paramsDescription);
