@@ -186,7 +186,7 @@ public class GloreProcessor implements Processor
         }        
         String baseInputDir = 
             ConfigUtils.getBaseInputDir(
-                exchange, BaseConstants.WORKER_INPUT_DIR) + "/glore/lr";  
+                exchange, BaseConstants.WORKER_INPUT_DIR);  
         
         // access the file
         File file = new File(baseInputDir,fileName);        
@@ -200,10 +200,13 @@ public class GloreProcessor implements Processor
                 (GloreLogisticRegressionRequest)exchange.getIn().getBody(
                         GloreLogisticRegressionRequest.class);
 
-        ArrayList<String> independentVariables =
-                new ArrayList(request.getLogisticRegressionInput().getInputParameters().getIndependentVariableName());
+        ArrayList<Integer> independentVariableColumnsSelected = 
+            new ArrayList<Integer>();
+        ArrayList<String> independentVariableNames = new ArrayList(
+            request.getLogisticRegressionInput().getInputParameters().getIndependentVariableName());
 
-        String dependentVariableName = request.getLogisticRegressionInput().getInputParameters().getDependentVariableName();
+        String dependentVariableName = 
+            request.getLogisticRegressionInput().getInputParameters().getDependentVariableName();
         if (log.isDebugEnabled()) {
             log.debug("--##-- DependentVariableName="+dependentVariableName);
         }
@@ -222,7 +225,13 @@ public class GloreProcessor implements Processor
                 if (line_tokens[i].equals(dependentVariableName))
                 {
                       targetVar = i;
-                      break;
+                      continue;
+                }
+                else
+                {
+                    if (independentVariableNames.contains(line_tokens[i])) {
+                        independentVariableColumnsSelected.add(i);
+                    }
                 }
             }
         }
@@ -246,18 +255,25 @@ public class GloreProcessor implements Processor
                     "ERROR: data file dimensions don't " +
                     "match on line " + state.rows + ".");
             }
-
+            
             // populate data structures with data
             state.xrow = new ArrayList<Double>();
             state.xrow.add(1.0);
             for (int i = 0; i < line_tokens.length ; i++) {
-                if (i!=targetVar)
+                if (independentVariableColumnsSelected.contains(i)) {
                     state.xrow.add(new Double(line_tokens[i]));
+                }
             }
             state.Xv.add(state.xrow);
             state.Yv.add(new Double(line_tokens[targetVar]));
         }
 
+        // update state.columns to match the total number of columns being
+        // analyzed, and not the total number of columns present in the file...
+        // the total number of columns is the number of independent variables 
+        // specified, plus one for the dependent variable
+        state.columns = independentVariableNames.size() + 1; 
+            
         state.dataLoaded = true;
         // close input stream
         file_in.close();
