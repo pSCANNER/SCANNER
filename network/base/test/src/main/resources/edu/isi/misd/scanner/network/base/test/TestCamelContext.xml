@@ -56,8 +56,8 @@
       <camel:trustManagers>
         <camel:keyStore  
             type="JKS"
-            resource="edu/isi/misd/scanner/network/base/test/scanner-test-ca-cert.jks"
-            password="scannertest"/>
+            resource="edu/isi/misd/scanner/network/base/test/scanner-ca-certs.jks"
+            password="scannerca"/>
       </camel:trustManagers>  
     </camel:sslContextParameters>
      
@@ -71,8 +71,8 @@
       <camel:trustManagers>
         <camel:keyStore  
             type="JKS"
-            resource="edu/isi/misd/scanner/network/base/test/scanner-test-ca-cert.jks"
-            password="scannertest"/>
+            resource="edu/isi/misd/scanner/network/base/test/scanner-ca-certs.jks"
+            password="scannerca"/>
       </camel:trustManagers>
       <camel:serverParameters clientAuthentication="REQUIRE"/>
     </camel:sslContextParameters>
@@ -87,8 +87,8 @@
       <camel:trustManagers>
         <camel:keyStore  
             type="JKS"
-            resource="edu/isi/misd/scanner/network/base/test/scanner-test-ca-cert.jks"
-            password="scannertest"/>
+            resource="edu/isi/misd/scanner/network/base/test/scanner-ca-certs.jks"
+            password="scannerca"/>
       </camel:trustManagers>
       <camel:serverParameters clientAuthentication="REQUIRE"/>
     </camel:sslContextParameters>
