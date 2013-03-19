@@ -1,5 +1,5 @@
-<OceansLogisticRegressionRequest
-    xmlns="http://scanner.misd.isi.edu/network/types/oceans"
+<GloreLogisticRegressionRequest
+    xmlns="http://scanner.misd.isi.edu/network/types/glore"
     xmlns:regr="http://scanner.misd.isi.edu/network/types/regression">   
     
     <LogisticRegressionInput>
@@ -27,9 +27,9 @@
             <regr:IndependentVariableName>hdl baseline</regr:IndependentVariableName>
             <regr:IndependentVariableName>bmi baseline</regr:IndependentVariableName>
             <regr:IndependentVariableName>days between index date and final measure date</regr:IndependentVariableName>
-            <regr:IndependentVariableName>number of visits</regr:IndependentVariableName>                                     
+            <regr:IndependentVariableName>number of visits</regr:IndependentVariableName>                                    
         </regr:InputParameters>    
              
     </LogisticRegressionInput>
         
-</OceansLogisticRegressionRequest>
+</GloreLogisticRegressionRequest>
