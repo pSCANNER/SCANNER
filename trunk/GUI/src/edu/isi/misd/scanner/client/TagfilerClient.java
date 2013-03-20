@@ -1100,4 +1100,14 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+	@Override
+	public RegistryClientResponse getContacts() {
+		RegistryClientResponse clientResponse = null;
+		client.setCookieValue(cookie);
+		String url = tagfilerURL + "/query/contact(cname;rtype;title;contact;email;phone;website;address;agreement;approvals)";
+		ClientURLResponse rsp = client.get(url, cookie);
+		clientResponse = new TagfilerClientResponse(rsp);
+		return clientResponse;
+	}
+
 }

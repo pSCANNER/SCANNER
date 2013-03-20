@@ -500,5 +500,15 @@ public interface RegistryClient {
      */
 	public RegistryClientResponse getDatasetSites(String study, String dataset);
 	
+    /**
+     * Get the contacts of the SCANNER, studies and sites
+     * 
+     * @param study
+     *            the study the worker belongs to
+     * @param dataset
+     *            the dataset the worker belongs to
+     * @return the Client Response
+     */
+	public RegistryClientResponse getContacts();
 
 }

@@ -135,6 +135,31 @@ public interface RegistryClientResponse {
     public String toWorkers();
 
     /**
+     * Returns a string representing a JSONArray for the contacts
+     * 		- each array element is a string representing a JSONObject of a contact 
+     *   
+     * Example: [	{"website":"http://www.study1.org","title":"PI","approvals":"http://www.study1.org/approvals",
+     * 					"rtype":"study","agreement":null,"phone":"555-123-4567","contact":"John Smith",
+     * 					"address":"Study1<br/>1-st Avenue<br/>New York, NY 10026","email":"john@study1.org"},
+     *				{"website":"http://www.scanner-net.org","title":"Project PI","approvals":null,"rtype":"master",
+     *					"agreement":null,"phone":"858-822-4931","contact":"Prof. Lucila Ohno-Machado",
+     *					"address":"UCSD<br/>Division of Biomedical Informatics<br/>9500 Gilman Dr. MC 0505<br/>La Jolla, CA 92093-0505",
+     *					"email":"scanner@ussd.edu"},
+     *				{"website":"http://www.usc.edu","title":"Administrator","approvals":null,"rtype":"site",
+     *					"agreement":"http://www.usc.edu/agreement","phone":"555-123-4570","contact":"Jane Doe",
+     *					"address":"USC<br/>900 West 34th Street<br/>Los Angeles, CA 90033","email":"jane@usc.edu"},
+     *				{"website":"http://www.ucsd.edu","title":"Administrator","approvals":null,"rtype":"site",
+     *					"agreement":"http://www.ucsd.edu/agreement","phone":"555-123-4581","contact":"Jim Martinez",
+     *					"address":"USC<br/>9500 GILMAN DR. # 0533<br/>LA JOLLA, CA  92093-0533","email":"jim@ucsd.edu"},
+     *				{"website":"http://www.usc.edu","title":"Administrator","approvals":null,"rtype":"site",
+     *					"agreement":"http://www.rand.org/agreement","phone":"555-123-4550","contact":"Dan Wu",
+     *					"address":"RAND<br/>1776 Main St<br/>Santa Monica, CA 90401","email":"dan@rand.edu"}
+     *			]
+     * 
+     */
+    public String toContacts();
+
+    /**
      * Returns a string representing a JSONObject for the study
      *   
      * Example: {"id":196,"cname":"Study1"}
