@@ -249,5 +249,9 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	public String toSite() {
 		return response.getEntityString();
 	}
+	@Override
+	public String toContacts() {
+		return response.getEntityString();
+	}
 
 }

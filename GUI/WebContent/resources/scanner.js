@@ -2059,6 +2059,159 @@ function postSubmitLogin(data, textStatus, jqXHR, param) {
 	}
 }
 
+function setContacts(contacts) {
+	var studies = {};
+	var sites = {};
+	var master = [];
+	$.each(contacts, function(i, contact) {
+		var rtype = contact['rtype'];
+		//alert(rtype);
+		if (rtype == 'study') {
+			studies[contact['cname']] = contact;
+		} else if (rtype == 'site') {
+			sites[contact['cname']] = contact;
+		} else if (rtype == 'master') {
+			master.push(contact);
+		}
+	});
+	var div = $('#contactsDiv');
+	var h4 = $('<h4>');
+	div.append(h4);
+	h4.html('Project contact information');
+	addContact(div, master[0]);
+	h4 = $('<h4>');
+	div.append(h4);
+	h4.html('Participating site contact information');
+	var names = [];
+	$.each(sites, function(name, value) {
+		names.push(name);
+	});
+	names.sort(compareIgnoreCase);
+	$.each(names, function(i, name) {
+		var h6 = $('<h6>');
+		div.append(h6);
+		h6.html('Site ' + name);
+		addContact(div, sites[name]);
+	});
+	h4 = $('<h4>');
+	div.append(h4);
+	h4.html('Studies related information');
+	names = [];
+	$.each(studies, function(name, value) {
+		names.push(name);
+	});
+	names.sort(compareIgnoreCase);
+	$.each(names, function(i, name) {
+		var h6 = $('<h6>');
+		div.append(h6);
+		h6.html('Study ' + name);
+		addContact(div, studies[name]);
+	});
+}
+
+function addContact(div, elem) {
+	var table = $('<table>');
+	table.addClass('contactsTable');
+	div.append(table);
+	var tbody = $('<tbody>');
+	table.append(tbody);
+	var tr = $('<tr>');
+	tbody.append(tr);
+	var td = $('<td>');
+	tr.append(td);
+	var table1 = $('<table>');
+	table1.addClass('contactsTable');
+	td.append(table1);
+	var tbody1 = $('<tbody>');
+	table1.append(tbody1);
+	var tr1 = $('<tr>');
+	tbody1.append(tr1);
+	var td1 = $('<td>');
+	tr1.append(td1);
+	td1.html(elem['title'] + ':');
+	td1 = $('<td>');
+	tr1.append(td1);
+	td1.html(elem['contact']);
+	tr1 = $('<tr>');
+	tbody1.append(tr1);
+	td1 = $('<td>');
+	tr1.append(td1);
+	td1.html('Email:');
+	td1 = $('<td>');
+	tr1.append(td1);
+	td1.html(elem['email']);
+	tr1 = $('<tr>');
+	tbody1.append(tr1);
+	td1 = $('<td>');
+	tr1.append(td1);
+	td1.html('Phone:');
+	td1 = $('<td>');
+	tr1.append(td1);
+	td1.html(elem['phone']);
+	tr1 = $('<tr>');
+	tbody1.append(tr1);
+	td1 = $('<td>');
+	tr1.append(td1);
+	td1.html('Website:');
+	td1 = $('<td>');
+	tr1.append(td1);
+	var a = $('<a>');
+	td1.append(a);
+	a.attr({'href': elem['website'],
+		'target': '_newtab2'
+	});
+	a.html(elem['website']);
+	td = $('<td>');
+	td.attr('valign', 'top');
+	tr.append(td);
+	var table2 = $('<table>');
+	//table2.attr({'cellspacing': '10'});
+	table2.addClass('contactsTable');
+	td.append(table2);
+	var tbody2 = $('<tbody>');
+	table2.append(tbody2);
+	var tr2 = $('<tr>');
+	tbody2.append(tr2);
+	var td2 = $('<td>');
+	tr2.append(td2);
+	td2.attr('valign', 'top');
+	td2.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Address:');
+	td2 = $('<td>');
+	tr2.append(td2);
+	td2.html(elem['address']);
+	if (elem['agreement'] != null) {
+		tr2 = $('<tr>');
+		tbody2.append(tr2);
+		td2 = $('<td>');
+		tr2.append(td2);
+		td2.attr('valign', 'top');
+		td2.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Agreement:');
+		td2 = $('<td>');
+		tr2.append(td2);
+		var a = $('<a>');
+		td2.append(a);
+		a.attr({'href': elem['agreement'],
+			'target': '_newtab2'
+		});
+		a.html(elem['agreement']);
+	} else if (elem['approvals'] != null) {
+		tr2 = $('<tr>');
+		tbody2.append(tr2);
+		td2 = $('<td>');
+		tr2.append(td2);
+		td2.attr('valign', 'top');
+		td2.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Approvals:');
+		td2 = $('<td>');
+		tr2.append(td2);
+		var a = $('<a>');
+		td2.append(a);
+		a.attr({'href': elem['approvals'],
+			'target': '_newtab2'
+		});
+		a.html(elem['approvals']);
+	}
+}
+
 function loginRegistry() {
 	var url = HOME + '/query';
 	var obj = new Object();
@@ -2072,6 +2225,7 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 		$('#loginForm').css('display', 'none');
 		$('#ui').css('visibility', 'visible');
 		$('#ui').css('display', '');
+		setContacts(res['contacts']);
 		renderAvailableStudies();
 	} else {
 		alert(res['status']);
@@ -2662,5 +2816,14 @@ function copyObject(obj) {
 		ret[key] = copyValue(val);
 	});
 	return ret;
+}
+
+function enableScanner() {
+	if ($('#acceptConditions').attr('checked') == 'checked') {
+		$('#continueButton').removeAttr('disabled');
+	} else {
+		$('#continueButton').attr('disabled', 'disabled');
+	}
+
 }
 

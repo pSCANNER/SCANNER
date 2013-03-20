@@ -171,6 +171,11 @@ public class Query extends HttpServlet {
 					//RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue(), request);
 					RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue());
 					session.setAttribute("registryClient", registryClient);
+					RegistryClientResponse clientResponse = registryClient.getContacts();
+					String ret = clientResponse.toContacts();
+					JSONArray arr = new JSONArray(ret);
+					obj.put("contacts", arr);
+					System.out.println("Get Contacts:\n"+ret);
 				} else {
 					// to handle this case
 					System.out.println("Response is null");
