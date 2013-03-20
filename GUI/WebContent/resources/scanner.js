@@ -263,7 +263,9 @@ function renderAvailableLibraries() {
 	var dataset = getSelectedDatasetName();
 	$('#datasetHelp').html(availableDatasets[dataset]);
 	if (dataset != null) {
-		var url = HOME + '/query?action=getLibraries';
+		var url = HOME + '/query?action=getLibraries' +
+		'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+		'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
 		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
 	}
 }
@@ -301,7 +303,9 @@ function renderAvailableMethods() {
 	var lib = getSelectedLibraryName();
 	$('#libraryHelp').html(availableLibraries[lib]);
 	if (lib != null) {
-		var url = HOME + '/query?action=getMethods&library=' + encodeSafeURIComponent(lib);
+		var url = HOME + '/query?action=getMethods&library=' + encodeSafeURIComponent(lib) +
+			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
 		scanner.GET(url, true, postRenderAvailableMethods, null, null, 0);
 	}
 }

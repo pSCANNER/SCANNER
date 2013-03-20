@@ -118,14 +118,18 @@ public class Query extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getLibraries")) {
-			RegistryClientResponse clientResponse = registryClient.getLibraries();
+			String study = request.getParameter("study");
+			String dataset = request.getParameter("dataset");
+			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset);
 			String ret = clientResponse.toLibraries();
 			System.out.println("Get Libraries: "+ret.toString());
 			PrintWriter out = response.getWriter();
 			out.print(ret.toString());
 		} else if (action.equals("getMethods")) {
+			String study = request.getParameter("study");
+			String dataset = request.getParameter("dataset");
 			String lib = request.getParameter("library");
-			RegistryClientResponse clientResponse = registryClient.getMethods(lib);
+			RegistryClientResponse clientResponse = registryClient.getMethods(study, dataset, lib);
 			String ret = clientResponse.toMethods();
 			System.out.println("Get Methods: "+ret);
 			PrintWriter out = response.getWriter();
