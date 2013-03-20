@@ -135,10 +135,10 @@ public class Registry extends HttpServlet {
 			clientResponse = registryClient.getDatasets(study);
 			res= clientResponse.toDatasets();
 		} else if (action.equals("getLibraries")) {
-			clientResponse = registryClient.getLibraries();
+			clientResponse = registryClient.getLibraries(study, dataset);
 			res= clientResponse.toLibraries();
 		} else if (action.equals("getMethods")) {
-			clientResponse = registryClient.getMethods(lib);
+			clientResponse = registryClient.getMethods(study, dataset, lib);
 			res= clientResponse.toMethods();
 		} else if (action.equals("getParameters")) {
 			clientResponse = registryClient.getParameters(func, lib);

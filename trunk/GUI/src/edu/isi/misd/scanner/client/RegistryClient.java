@@ -329,7 +329,7 @@ public interface RegistryClient {
      * 
      * @return the Client Response
      */
-	public RegistryClientResponse getLibraries();
+	public RegistryClientResponse getLibraries(String study, String dataset);
 	
     /**
      * Get the methods of a library 
@@ -338,7 +338,7 @@ public interface RegistryClient {
      *            the name of the library
      * @return the Client Response
      */
-	public RegistryClientResponse getMethods(String lib);
+	public RegistryClientResponse getMethods(String study, String dataset, String lib);
 	
     /**
      * Get the parameters of a method 
