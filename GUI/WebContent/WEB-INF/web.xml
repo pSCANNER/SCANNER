@@ -41,7 +41,7 @@
   </context-param>
   <context-param>
     <param-name>tagfilerPassword</param-name>
-    <param-value>just4demo</param-value>
+    <param-value>*******</param-value>
   </context-param>
   <context-param>
     <param-name>trustStoreType</param-name>
@@ -61,15 +61,15 @@
   </context-param>
   <context-param>
     <param-name>keyStorePassword</param-name>
-    <param-value>raeyu1oa</param-value>
+    <param-value>*********</param-value>
   </context-param>
   <context-param>
     <param-name>keyStoreResource</param-name>
-    <param-value>etc/security/portal.scanner-net.org.p12</param-value>
+    <param-value>etc/security/********</param-value>
   </context-param>
   <context-param>
     <param-name>keyManagerPassword</param-name>
-    <param-value>raeyu1oa</param-value>
+    <param-value>*********</param-value>
   </context-param>
   <servlet>
     <servlet-name>Login</servlet-name>
