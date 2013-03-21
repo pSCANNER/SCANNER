@@ -46,6 +46,8 @@ var availableMethods = {};
 var availableSites = {};
 var availableParameters = {};
 
+var descriptionId = 0;
+
 var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
 
 var historyLayout = [[
@@ -99,6 +101,8 @@ function initScanner() {
 			$('#footer').css('display', '');
 		});
 	});
+	$('#acceptConditions').removeAttr('checked');
+	$('#continueButton').attr('disabled', 'disabled');
 }
 
 /**
@@ -150,14 +154,18 @@ function getSelectedParameters() {
 		$.each(res2, function(key3, res3) {
 			$.each(res3, function(key, res) {
 				if ($.type(res) == 'string') {
-					params[key2][key3][key] = '' + $('#param_'+key).html();
+					//params[key2][key3][key] = '' + $('#param_'+key).html();
+					params[key2][key3][key] = '' + $('#param_'+key).val();
 				}
 				else if (res.length == 1 && res[0] == 'string') {
+					/*
 					if ($.isNumeric($('#param_'+key).val())) {
 						params[key2][key3][key] = '"' + $('#param_'+key).val() + '"';
 					} else {
 						params[key2][key3][key] = $('#param_'+key).val();
 					}
+					*/
+					params[key2][key3][key] = $('#param_'+key).val();
 				} else {
 					var values = [];
 					$.each($('input:checked', $('#param_'+key)), function(i, elem) {
@@ -384,11 +392,21 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 	$.each(parametersBody, function(key2, res2) {
 		var h2 = $('<h2>');
 		paramsDiv.append(h2);
-		h2.html(key2);
+		var title = key2;
+		if (key2 == 'logisticRegressionInput') {
+			title = 'Logistic Regression Input';
+		}
+		h2.html(title);
 		$.each(res2, function(key3, res3) {
 			var h3 = $('<h3>');
 			paramsDiv.append(h3);
-			h3.html(key3);
+			var title = key3;
+			if (key3 == 'inputParameters') {
+				title = 'Input Parameters';
+			} else if (key3 == 'inputDescription') {
+				title = 'Input Description';
+			}
+			h3.html(title);
 			var stringDiv = null;
 			var tbody = null;
 			$.each(res3, function(key, res) {
@@ -398,22 +416,38 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 				if ($.type(res) == 'string') {
 					var h4 = $('<h4>');
 					paramsDiv.append(h4);
-					h4.html(key);
-					var checkboxDiv = $('<div>');
-					//checkboxDiv.attr({'id': 'param_'+key});
-					paramsDiv.append(checkboxDiv);
-					var div = $('<div>');
-					checkboxDiv.append(div);
-					var input = $('<input>');
-					input.attr({'type': 'checkbox',
-						'checked': 'checked',
-						'parName': res,
-						'parValue': res});
-					div.append(input);
-					var label = $('<label>');
-					label.attr({'id': 'param_'+key});
-					div.append(label);
-					label.html(res);
+					var title = key;
+					if (key == 'dependentVariableName') {
+						title = 'Dependent Variable';
+					} else if (key == 'independentVariableName') {
+						title = 'Independent Variables';
+					}
+					h4.html(title);
+					if (key == 'dependentVariableName') {
+						var dependentVariableName = $('<select>');
+						dependentVariableName.attr('id', 'param_'+key);
+						paramsDiv.append(dependentVariableName);
+						var option = $('<option>');
+						option.text(res);
+						option.attr('value', res);
+						dependentVariableName.append(option);
+					} else {
+						var checkboxDiv = $('<div>');
+						//checkboxDiv.attr({'id': 'param_'+key});
+						paramsDiv.append(checkboxDiv);
+						var div = $('<div>');
+						checkboxDiv.append(div);
+						var input = $('<input>');
+						input.attr({'type': 'checkbox',
+							'checked': 'checked',
+							'parName': res,
+							'parValue': res});
+						div.append(input);
+						var label = $('<label>');
+						label.attr({'id': 'param_'+key});
+						div.append(label);
+						label.html(res);
+					}
 				} else if (res.length == 1 && res[0] == 'string') {
 					if (stringDiv == null) {
 						stringDiv = $('<div>');
@@ -434,11 +468,21 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 					input.attr({'type': 'text',
 						'parName': key,
 						'id': 'param_'+key});
+					if (key == 'id' && key3 == 'inputDescription') {
+						input.val(++descriptionId);
+						input.attr('disabled', 'disabled');
+					}
 					td.append(input);
 				} else {
 					var h4 = $('<h4>');
 					paramsDiv.append(h4);
-					h4.html(key);
+					var title = key;
+					if (key == 'dependentVariableName') {
+						title = 'Dependent Variable';
+					} else if (key == 'independentVariableName') {
+						title = 'Independent Variables';
+					}
+					h4.html(title);
 					var checkboxDiv = $('<div>');
 					checkboxDiv.attr({'id': 'param_'+key});
 					paramsDiv.append(checkboxDiv);
@@ -1738,8 +1782,9 @@ function buildDataTable(res, resultDiv, tableId) {
 	table.append(thead);
 	var tr = $('<tr>');
 	thead.append(tr);
-	var columns = [];
-	getColumnsNames(res, columns);
+	var columns = ['name', 'B', 'SE', 'p-value', 't-statistics', 'degreeOfFreedom'];
+	//var columns = [];
+	//getColumnsNames(res, columns);
 	var th = $('<th>');
 	tr.append(th);
 	th.html('Sample');

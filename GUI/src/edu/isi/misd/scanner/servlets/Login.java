@@ -44,13 +44,18 @@ import edu.isi.misd.scanner.utils.Utils;
 public class Login extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String shibIdAttr = "ShibuscNetID";
-	private static final String shibDisplayNameAttr = "ShibdisplayName";
-	private static final String shibFirstNameAttr = "ShibgivenName";
-	private static final String shibLastNameAttr = "Shibsurname";
+	//private static final String shibDisplayNameAttr = "ShibdisplayName";
+	//private static final String shibFirstNameAttr = "ShibgivenName";
+	//private static final String shibLastNameAttr = "Shibsurname";
 	private static final String shibMailAttr = "Shibmail";
 	private static final String shibRolesAttr = "ShibuscAffiliation";
 	private static final String shibPrimaryRoleAttr = "ShibuscPrimaryAffiliation";
 
+	private static final String shibFirstNameAttr = "givenName";
+	private static final String shibLastNameAttr = "sn";
+	private static final String shibDisplayNameAttr = "displayName";
+	private static final String eppn = "eppn";
+	private static final String persistent_id = "persistent-id";
     /**
      * Default constructor. 
      */
@@ -74,6 +79,9 @@ public class Login extends HttpServlet {
 		String mail = (String) request.getAttribute(shibMailAttr);
 		String roles = (String) request.getAttribute(shibRolesAttr);
 		String role = (String) request.getAttribute(shibPrimaryRoleAttr);
+		String remoteUser = request.getRemoteUser();
+		String eppn_val = (String) request.getAttribute(eppn);
+		String persistent_id_val = (String) request.getAttribute(persistent_id);
 		System.out.println("User \"" + username + "\" agreed." + "\n\t" +
 				"id: " + username + "\n\t" +
 				"displayName: " + displayName + "\n\t" +
@@ -81,6 +89,9 @@ public class Login extends HttpServlet {
 				"lastName: " + lastName + "\n\t" +
 				"mail: " + mail + "\n\t" +
 				"roles: " + roles + "\n\t" +
+				"remoteUser: " + remoteUser + "\n\t" +
+				"eppn_val: " + eppn_val + "\n\t" +
+				"persistent_id_val: " + persistent_id_val + "\n\t" +
 				"primary role: " + role + "\n\t");
 		HttpSession session = request.getSession(true);
 		if (session.isNew() == false) {
@@ -99,7 +110,8 @@ public class Login extends HttpServlet {
 			JakartaClient client = new JakartaClient(4, 8192, 120000);
 			session.setAttribute("httpClient", client);
 			obj.put("status", "success");
-			obj.put("mail", mail);
+			//obj.put("mail", mail);
+			obj.put("mail", displayName);
 			obj.put("user", username);
 			obj.put("role", role);
 			JSONArray description = new JSONArray();
