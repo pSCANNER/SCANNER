@@ -33,7 +33,7 @@
   </welcome-file-list>
   <context-param>
     <param-name>tagfilerURL</param-name>
-    <param-value>https://scanner.misd.isi.edu/tagfiler</param-value>
+    <param-value>https://portal.scanner-net.org/tagfiler</param-value>
   </context-param>
   <context-param>
     <param-name>tagfilerUser</param-name>
@@ -49,11 +49,11 @@
   </context-param>
   <context-param>
     <param-name>trustStorePassword</param-name>
-    <param-value>scannertest</param-value>
+    <param-value>scannerca</param-value>
   </context-param>
   <context-param>
     <param-name>trustStoreResource</param-name>
-    <param-value>etc/security/scanner-test-ca-cert.jks</param-value>
+    <param-value>etc/security/scanner-ca-certs.jks</param-value>
   </context-param>
   <context-param>
     <param-name>keyStoreType</param-name>
@@ -61,15 +61,15 @@
   </context-param>
   <context-param>
     <param-name>keyStorePassword</param-name>
-    <param-value>scannertest</param-value>
+    <param-value>raeyu1oa</param-value>
   </context-param>
   <context-param>
     <param-name>keyStoreResource</param-name>
-    <param-value>etc/security/scanner.misd.isi.edu.p12</param-value>
+    <param-value>etc/security/portal.scanner-net.org.p12</param-value>
   </context-param>
   <context-param>
     <param-name>keyManagerPassword</param-name>
-    <param-value>scannertest</param-value>
+    <param-value>raeyu1oa</param-value>
   </context-param>
   <servlet>
     <servlet-name>Login</servlet-name>
