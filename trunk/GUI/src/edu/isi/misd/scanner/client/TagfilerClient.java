@@ -790,6 +790,23 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.isi.misd.scanner.client.RegistryClient#getParameters(java.lang.String)
+	 */
+	@Override
+	public RegistryClientResponse getVariables(String dataset) {
+		RegistryClientResponse clientResponse = null;
+		try {
+			client.setCookieValue(cookie);
+			String url = tagfilerURL + "/query/rtype=dataset;cname=" + Utils.urlEncode(dataset) + "(variables)";
+			ClientURLResponse rsp = client.get(url, cookie);
+			clientResponse = new TagfilerClientResponse(rsp);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return clientResponse;
+	}
+
 	@Override
 	public RegistryClientResponse getSites(String study, String dataset,
 			String lib, String func) {

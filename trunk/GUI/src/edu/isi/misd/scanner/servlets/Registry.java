@@ -142,7 +142,7 @@ public class Registry extends HttpServlet {
 			res= clientResponse.toMethods();
 		} else if (action.equals("getParameters")) {
 			clientResponse = registryClient.getParameters(func, lib);
-			res= clientResponse.toParameters();
+			res= clientResponse.toParameters("[]");
 		} else if (action.equals("getSites")) {
 			clientResponse = registryClient.getSites(study, dataset, lib, func);
 			res= clientResponse.toSites();

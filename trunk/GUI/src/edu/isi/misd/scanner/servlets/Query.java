@@ -137,8 +137,12 @@ public class Query extends HttpServlet {
 		} else if (action.equals("getParameters")) {
 			String func = request.getParameter("method");
 			String lib = request.getParameter("library");
-			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib);
-			String ret = clientResponse.toParameters();
+			String dataset = request.getParameter("dataset");
+			RegistryClientResponse clientResponse = registryClient.getVariables(dataset);
+			String variables = clientResponse.getEntityString();
+			System.out.println("Get Variables:\n"+variables);
+			clientResponse = registryClient.getParameters(func, lib);
+			String ret = clientResponse.toParameters(variables);
 			System.out.println("Get Parameters:\n"+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);

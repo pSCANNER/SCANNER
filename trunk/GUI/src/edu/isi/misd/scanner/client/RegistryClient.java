@@ -352,6 +352,17 @@ public interface RegistryClient {
 	public RegistryClientResponse getParameters(String func, String lib);
 	
     /**
+     * Get the parameters of a method 
+     * 
+     * @param func
+     *            the name of the method
+     * @param lib
+     *            the name of the library
+     * @return the Client Response
+     */
+	public RegistryClientResponse getVariables(String dataset);
+	
+    /**
      * Get the sites for a given study, dataset, library and method 
      * 
      * @param study
