@@ -108,14 +108,6 @@ public class ScannerClient extends JakartaClient {
 	private void init(int maxConnections, int socketBufferSize, int socketTimeout,
 			String trustStoreType, String trustStorePassword, String trustStoreResource,
 			String keyStoreType, String keyStorePassword, String keyStoreResource, String keyManagerPassword) throws Throwable {
-		//keyManagerPassword: scannertest
-		//keyStoreType: PKCS12
-		//keyStoreResource: etc/security/scanner.misd.isi.edu.p12
-		//keyStorePassword: scannertest
-		//trustStoreType: JKS
-		//trustStoreResource: etc/security/scanner-test-ca-cert.jks
-		//trustStorePassword: scannertest
-		
 		/*
 		System.out.println("keyManagerPassword: "+keyManagerPassword +
 				"\nkeyStoreType: "+keyStoreType +
@@ -125,6 +117,8 @@ public class ScannerClient extends JakartaClient {
 				"\ntrustStoreResource: "+trustStoreResource +
 				"\ntrustStorePassword: "+trustStorePassword);
 		*/
+		System.out.println("keyStoreResource: "+keyStoreResource +
+				"\ntrustStoreResource: "+trustStoreResource);
 
 		
 		KeyStore trustKeyStore = KeyStore.getInstance(trustStoreType);
