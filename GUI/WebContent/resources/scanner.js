@@ -47,6 +47,7 @@ var availableSites = {};
 var availableParameters = {};
 
 var descriptionId = 0;
+var tipBox;
 
 var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
 
@@ -103,6 +104,7 @@ function initScanner() {
 	});
 	$('#acceptConditions').removeAttr('checked');
 	$('#continueButton').attr('disabled', 'disabled');
+	tipBox = $('#TipBox');
 }
 
 /**
@@ -155,7 +157,7 @@ function getSelectedParameters() {
 			$.each(res3, function(key, res) {
 				if ($.type(res) == 'string') {
 					//params[key2][key3][key] = '' + $('#param_'+key).html();
-					params[key2][key3][key] = '' + $('#param_'+key).val();
+					params[key2][key3][key] = '' + $('#param_'+makeId(key)).val();
 				}
 				else if (res.length == 1 && res[0] == 'string') {
 					/*
@@ -165,12 +167,17 @@ function getSelectedParameters() {
 						params[key2][key3][key] = $('#param_'+key).val();
 					}
 					*/
-					params[key2][key3][key] = $('#param_'+key).val();
+					params[key2][key3][key] = $('#param_'+makeId(key)).val();
 				} else {
 					var values = [];
-					$.each($('input:checked', $('#param_'+key)), function(i, elem) {
-						values.push($(elem).attr('parValue'));
-					});
+					var checkboxes = $('input:checkbox', $('#param_'+makeId(key))).length;
+					if (checkboxes > 0) {
+						$.each($('input:checked', $('#param_'+makeId(key))), function(i, elem) {
+							values.push($(elem).attr('parValue'));
+						});
+					} else {
+						values = $('#param_'+makeId(key)).val();
+					}
 					params[key2][key3][key] = values;
 				}
 			});
@@ -349,8 +356,11 @@ function renderAvailableParameters() {
 	// send the request
 	var func = getSelectedMethodName();
 	var lib = getSelectedLibraryName();
+	var dataset = getSelectedDatasetName();
 	if (func != '') {
-		var url = HOME + '/query?action=getParameters&method=' + encodeSafeURIComponent(func) + '&library=' + encodeSafeURIComponent(lib);
+		var url = HOME + '/query?action=getParameters&method=' + encodeSafeURIComponent(func) + 
+			'&library=' + encodeSafeURIComponent(lib) +
+			'&dataset=' + encodeSafeURIComponent(dataset);
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -425,7 +435,7 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 					h4.html(title);
 					if (key == 'dependentVariableName') {
 						var dependentVariableName = $('<select>');
-						dependentVariableName.attr('id', 'param_'+key);
+						dependentVariableName.attr('id', 'param_'+makeId(key));
 						paramsDiv.append(dependentVariableName);
 						var option = $('<option>');
 						option.text(res);
@@ -444,7 +454,7 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 							'parValue': res});
 						div.append(input);
 						var label = $('<label>');
-						label.attr({'id': 'param_'+key});
+						label.attr({'id': 'param_'+makeId(key)});
 						div.append(label);
 						label.html(res);
 					}
@@ -467,7 +477,7 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 					var input = $('<input>');
 					input.attr({'type': 'text',
 						'parName': key,
-						'id': 'param_'+key});
+						'id': 'param_'+makeId(key)});
 					if (key == 'id' && key3 == 'inputDescription') {
 						input.val(++descriptionId);
 						input.attr('disabled', 'disabled');
@@ -483,26 +493,55 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 						title = 'Independent Variables';
 					}
 					h4.html(title);
-					var checkboxDiv = $('<div>');
-					checkboxDiv.attr({'id': 'param_'+key});
-					paramsDiv.append(checkboxDiv);
-					$.each(res, function(j, val) {
-						var div = $('<div>');
-						checkboxDiv.append(div);
-						var input = $('<input>');
-						input.attr({'type': 'checkbox',
-							'checked': 'checked',
-							'parName': val,
-							'parValue': val});
-						div.append(input);
-						var label = $('<label>');
-						div.append(label);
-						label.html(val);
-					});
+					if (key == 'dependentVariableName') {
+						var dependentVariableName = $('<select>');
+						dependentVariableName.change(function(event) {disableIndependentVariableName();});
+						dependentVariableName.attr('id', 'param_'+makeId(key));
+						paramsDiv.append(dependentVariableName);
+						$.each(res, function(j, val) {
+							var option = $('<option>');
+							var arr = val.split('<br/>');
+							option.text(arr[0]);
+							option.attr('value', arr[0]);
+							var description = '';
+							if (arr.length > 1) {
+								description = arr[1];
+							}
+							option.attr('description', description);
+							dependentVariableName.append(option);
+						});
+					} else if (key == 'independentVariableName') {
+						var checkboxDiv = $('<div>');
+						checkboxDiv.attr({'id': 'param_'+makeId(key)});
+						paramsDiv.append(checkboxDiv);
+						$.each(res, function(j, val) {
+							var div = $('<div>');
+							checkboxDiv.append(div);
+							var arr = val.split('<br/>');
+							var input = $('<input>');
+							input.attr({'type': 'checkbox',
+								'checked': 'checked',
+								'parName': arr[0],
+								'parValue': arr[0],
+								'id': 'param_' + makeId(arr[0])});
+							div.append(input);
+							var label = $('<label>');
+							div.append(label);
+							label.html(arr[0]);
+							var description = '';
+							if (arr.length > 1) {
+								description = arr[1];
+							}
+							label.hover(
+									function(event) {DisplayTipBox(event, description);}, 
+									function(){HideTipBox();});
+						});
+					}
 				}
 			});
 		});
 	});
+	disableIndependentVariableName();
 }
 
 /**
@@ -2876,3 +2915,41 @@ function enableScanner() {
 
 }
 
+function makeId(id) {
+	var parts = id.split(' ');
+	return parts.join('_');
+}
+
+/**
+ * Display a flyover message
+ * 
+ * @param e
+ * 	the event that triggered the flyover
+ * @param content
+ * 	the content to be displayed
+ */
+function DisplayTipBox(e, content) {
+	tipBox.html(content);
+	var dx = tipBox.width() + 30;
+	var delta = dx + 10;
+	dx = (e.clientX + delta > $(window).width()) ? $(window).width() - e.clientX - delta : 0;
+	tipBox.css('left', String(parseInt(e.pageX + dx) + 'px'));
+	tipBox.css('top', String(parseInt(e.pageY - tipBox.height() - 50) + 'px'));
+	tipBox.css('display', 'block');
+}
+
+/**
+ * Hide a flyover message
+ */
+function HideTipBox() {
+	tipBox.css('display', 'none');
+}
+
+function disableIndependentVariableName() {
+	var val = $('#param_dependentVariableName').val();
+	if (val != null) {
+		$('input:checkbox', $('#param_independentVariableName')).removeAttr('disabled');
+		$('#param_' + makeId(val)).removeAttr('checked');
+		$('#param_' + makeId(val)).attr('disabled', 'disabled');
+	}
+}

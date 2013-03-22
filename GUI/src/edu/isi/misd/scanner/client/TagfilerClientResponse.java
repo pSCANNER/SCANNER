@@ -150,7 +150,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toParameters()
 	 */
 	@Override
-	public String toParameters() {
+	public String toParameters(String variables) {
 		String result = null;
 		try {
 			String res = response.getEntityString();
@@ -174,11 +174,20 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 					}
 					crtParam = crtParam.getJSONObject(token);
 				}
-				JSONArray resourceValues = obj.getJSONArray("values");
-				if (resourceValues.length() == 1 && !resourceValues.getString(0).equals("string")) {
-					crtParam.put(cname, resourceValues.getString(0));
-				} else {
+				if (obj.isNull("values")) {
+					JSONArray resourceValues = new JSONArray(variables);
+					if (resourceValues.length() > 0) {
+						JSONObject resourceObj = resourceValues.getJSONObject(0);
+						resourceValues = resourceObj.getJSONArray("variables");
+					}
 					crtParam.put(cname, resourceValues);
+				} else {
+					JSONArray resourceValues = obj.getJSONArray("values");
+					if (resourceValues.length() == 1 && !resourceValues.getString(0).equals("string")) {
+						crtParam.put(cname, resourceValues.getString(0));
+					} else {
+						crtParam.put(cname, resourceValues);
+					}
 				}
 			}
 			JSONObject ret = new JSONObject();
