@@ -42,6 +42,7 @@ public class TagfilerClient implements RegistryClient {
 	String cookie;
 	List<String> roles;
 
+	@SuppressWarnings("unchecked")
 	public TagfilerClient(JakartaClient client, String tagfilerURL, String cookie, HttpServletRequest request) {
 		this(client, tagfilerURL, cookie);
 		String url = tagfilerURL + "/query/rtype=worker(users)";
@@ -64,9 +65,10 @@ public class TagfilerClient implements RegistryClient {
 				System.out.println(res.get(i));
 			}
 			roles = new ArrayList<String>();
+			ArrayList<String> userRoles = (ArrayList<String>) request.getSession(false).getAttribute("roles");
 			for (int i=0; i < res.size(); i++) {
 				String role = res.get(i);
-				if (request.isUserInRole(role)) {
+				if (userRoles.contains(role)) {
 					roles.add(role);
 				}
 			}
@@ -628,6 +630,7 @@ public class TagfilerClient implements RegistryClient {
 		try {
 			client.setCookieValue(cookie);
 			String url = tagfilerURL + "/query/rtype=worker" + getUserPredicate() + "(study)";
+			System.out.println("url: " + url);
 			ClientURLResponse rsp = client.get(url, cookie);
 			JSONArray arr = new JSONArray(rsp.getEntityString());
 			ArrayList<String> studies = new ArrayList<String>();
@@ -664,6 +667,7 @@ public class TagfilerClient implements RegistryClient {
 		try {
 			client.setCookieValue(cookie);
 			String url = tagfilerURL + "/query/rtype=worker;study=" + Utils.urlEncode(study) + getUserPredicate() + "(dataset)";
+			System.out.println("url: " + url);
 			ClientURLResponse rsp = client.get(url, cookie);
 			JSONArray arr = new JSONArray(rsp.getEntityString());
 			ArrayList<String> datasets = new ArrayList<String>();
@@ -702,6 +706,7 @@ public class TagfilerClient implements RegistryClient {
 		try {
 			String url = tagfilerURL + "/query/rtype=worker;study=" + Utils.urlEncode(study) + 
 			";dataset=" + Utils.urlEncode(dataset) + getUserPredicate() + "(library)";
+			System.out.println("url: " + url);
 			ClientURLResponse rsp = client.get(url, cookie);
 			JSONArray arr = new JSONArray(rsp.getEntityString());
 			ArrayList<String> libraries = new ArrayList<String>();
@@ -745,6 +750,7 @@ public class TagfilerClient implements RegistryClient {
 			String url = tagfilerURL + "/query/rtype=worker;study=" + Utils.urlEncode(study) + 
 			";dataset=" + Utils.urlEncode(dataset) + ";library=" + Utils.urlEncode(lib) + getUserPredicate() + 
 			"(method)";
+			System.out.println("url: " + url);
 			ClientURLResponse rsp = client.get(url, cookie);
 			JSONArray arr = new JSONArray(rsp.getEntityString());
 			ArrayList<String> methods = new ArrayList<String>();
@@ -820,6 +826,7 @@ public class TagfilerClient implements RegistryClient {
 				";method=" + Utils.urlEncode(func)  +
 				getUserPredicate() +
 				"(id;site)";
+			System.out.println("url: " + url);
 			ClientURLResponse rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 			List<String> sites = new ArrayList<String>();
@@ -861,6 +868,7 @@ public class TagfilerClient implements RegistryClient {
 				}
 			}
 			url += "(id;study;dataset;library;method;site;datasource)";
+			System.out.println("url: " + url);
 			ClientURLResponse rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {

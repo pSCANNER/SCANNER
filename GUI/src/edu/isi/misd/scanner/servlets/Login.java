@@ -18,6 +18,8 @@ package edu.isi.misd.scanner.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -47,8 +49,8 @@ public class Login extends HttpServlet {
 	//private static final String shibDisplayNameAttr = "ShibdisplayName";
 	//private static final String shibFirstNameAttr = "ShibgivenName";
 	//private static final String shibLastNameAttr = "Shibsurname";
-	private static final String shibMailAttr = "Shibmail";
-	private static final String shibRolesAttr = "ShibuscAffiliation";
+	//private static final String shibMailAttr = "Shibmail";
+	//private static final String shibRolesAttr = "ShibuscAffiliation";
 	private static final String shibPrimaryRoleAttr = "ShibuscPrimaryAffiliation";
 
 	private static final String shibFirstNameAttr = "givenName";
@@ -56,6 +58,8 @@ public class Login extends HttpServlet {
 	private static final String shibDisplayNameAttr = "displayName";
 	private static final String eppn = "eppn";
 	private static final String persistent_id = "persistent-id";
+	private static final String shibMailAttr = "mail";
+	private static final String shibRolesAttr = "protectNetworkEntitlement";
     /**
      * Default constructor. 
      */
@@ -82,6 +86,11 @@ public class Login extends HttpServlet {
 		String remoteUser = request.getRemoteUser();
 		String eppn_val = (String) request.getAttribute(eppn);
 		String persistent_id_val = (String) request.getAttribute(persistent_id);
+		//if (roles != null) {
+		//	StringTokenizer tokenizer = new StringTokenizer(roles, "@");
+		//	role = tokenizer.nextToken();
+		//}
+		role = roles;
 		System.out.println("User \"" + username + "\" agreed." + "\n\t" +
 				"id: " + username + "\n\t" +
 				"displayName: " + displayName + "\n\t" +
@@ -105,7 +114,9 @@ public class Login extends HttpServlet {
 			session.setAttribute("firstName", firstName);
 			session.setAttribute("lastName", lastName);
 			session.setAttribute("mail", mail);
-			session.setAttribute("roles", roles);
+			ArrayList<String> userRoles = new ArrayList<String>();
+			userRoles.add(roles);
+			session.setAttribute("roles", userRoles);
 			session.setAttribute("role", role);
 			JakartaClient client = new JakartaClient(4, 8192, 120000);
 			session.setAttribute("httpClient", client);
