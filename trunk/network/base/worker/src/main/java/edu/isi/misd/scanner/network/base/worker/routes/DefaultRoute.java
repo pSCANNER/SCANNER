@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.base.worker.routes;
 
+import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils.ErrorProcessor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
@@ -76,7 +77,8 @@ public class DefaultRoute extends RouteBuilder
                 doTry().
                     unmarshal(jaxb).              
                     processRef(getComputeProcessorRef()).
-                    marshal(jaxb).                  
+                    marshal(jaxb).    
+                    removeHeader(BaseConstants.DATASOURCE).            
                 doCatch(Exception.class).
                     process(new ErrorProcessor()).
                     stop().
