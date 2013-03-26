@@ -289,14 +289,23 @@ public class Query extends HttpServlet {
 						System.out.println("Response Id: \n"+rspId);
 						obj.put("trxId", rspId);
 					}
+					if (rsp.isError()) {
+						response.sendError(rsp.getStatus(), rsp.getEntityString());
+						return;
+					}
 					res = rsp.getEntityString();
 					System.out.println("Response Body: \n"+res);
-					JSONObject body = new JSONObject(res);
-					obj.put("data", body);
-					PrintWriter out = response.getWriter();
-					out.print(obj.toString());
-					//out.print(res);
-					return;
+					try {
+						JSONObject body = new JSONObject(res);
+						obj.put("data", body);
+						PrintWriter out = response.getWriter();
+						out.print(obj.toString());
+						return;
+					} catch (JSONException e) {
+						e.printStackTrace();
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+						return;
+					}
 					// simulated response
 					//obj = new JSONObject(Utils.oceansResult);
 					//PrintWriter out = response.getWriter();

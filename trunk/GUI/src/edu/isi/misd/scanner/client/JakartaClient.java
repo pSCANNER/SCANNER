@@ -441,6 +441,16 @@ public class JakartaClient {
     		return response.getStatusLine().getStatusCode();
     	}
 
+    	
+        /**
+         * Return the true if it is a HTTP error code; false otherwise
+         * 
+         */
+    	public boolean isError() {
+    		// TODO Auto-generated method stub
+    		return getStatus() > 400;
+    	}
+
         /**
          * Return the body as a string
          * 

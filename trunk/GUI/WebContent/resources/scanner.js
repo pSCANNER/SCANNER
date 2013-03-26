@@ -1990,6 +1990,7 @@ function handleError(jqXHR, textStatus, errorThrown, retryCallback, url, obj, as
 		msg += 'URL: ' + url + '\n';
 		alert(msg);
 		document.body.style.cursor = "default";
+		$('#ajaxSpinnerImage').hide();
 	} else {
 		var delay = Math.round(Math.ceil((0.75 + Math.random() * 0.5) * Math.pow(10, count) * 0.00001));
 		setTimeout(function(){retryCallback(url, obj, async, successCallback, param, errorCallback, count+1);}, delay);
