@@ -86,11 +86,13 @@ public class Login extends HttpServlet {
 		String remoteUser = request.getRemoteUser();
 		String eppn_val = (String) request.getAttribute(eppn);
 		String persistent_id_val = (String) request.getAttribute(persistent_id);
-		//if (roles != null) {
-		//	StringTokenizer tokenizer = new StringTokenizer(roles, "@");
-		//	role = tokenizer.nextToken();
-		//}
-		role = roles;
+		ArrayList<String> userRoles = new ArrayList<String>();
+		if (roles != null) {
+			StringTokenizer tokenizer = new StringTokenizer(roles, ";");
+			while (tokenizer.hasMoreTokens()) {
+				userRoles.add(tokenizer.nextToken());
+			}
+		}
 		System.out.println("User \"" + username + "\" agreed." + "\n\t" +
 				"id: " + username + "\n\t" +
 				"displayName: " + displayName + "\n\t" +
@@ -114,8 +116,6 @@ public class Login extends HttpServlet {
 			session.setAttribute("firstName", firstName);
 			session.setAttribute("lastName", lastName);
 			session.setAttribute("mail", mail);
-			ArrayList<String> userRoles = new ArrayList<String>();
-			userRoles.add(roles);
 			session.setAttribute("roles", userRoles);
 			session.setAttribute("role", role);
 			JakartaClient client = new JakartaClient(4, 8192, 120000);
@@ -124,7 +124,7 @@ public class Login extends HttpServlet {
 			//obj.put("mail", mail);
 			obj.put("mail", displayName);
 			obj.put("user", username);
-			obj.put("role", role);
+			obj.put("role", roles);
 			JSONArray description = new JSONArray();
 			description.put(Utils.profileDescription[0]);
 			description.put(Utils.profileDescription[1]);
