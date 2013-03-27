@@ -64,6 +64,7 @@ public class GloreAggregateProcessor implements Processor
             new ArrayList(params.getIndependentVariableName());
         int features = independentVariables.size()+1;
 
+        int maxiter =   20;
         int iter = gloreData.getIteration();
         Matrix beta0, beta1;
         
@@ -207,7 +208,7 @@ public class GloreAggregateProcessor implements Processor
             log.info("Iteration " + iter + " value: " + 
                 GloreUtils.max_abs((beta1.minus(beta0)).getArray()));
            
-            if (iter > 0) {
+            if (iter > 0 && iter<maxiter) {
                 if (GloreUtils.max_abs(
                     (beta1.minus(beta0)).getArray()) < epsilon) 
                 {  
