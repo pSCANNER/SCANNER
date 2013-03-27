@@ -104,6 +104,11 @@ public class Query extends HttpServlet {
 		String cookie = (String) session.getAttribute("tagfilerCookie");
 		httpClient.setCookieValue(cookie);
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
+		if (!registryClient.hasRoles()) {
+			PrintWriter out = response.getWriter();
+			out.print("{}");
+			return;
+		}
 		if (action.equals("getStudies")) {
 			RegistryClientResponse clientResponse = registryClient.getStudies();
 			String ret = clientResponse.toStudies();
@@ -219,6 +224,10 @@ public class Query extends HttpServlet {
 			} else if (action.equals("getResults")) {
 				try {
 					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
+					if (!registryClient.hasRoles()) {
+						response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+						return;
+					}
 					String params = request.getParameter("parameters");
 					String sites = request.getParameter("sites");
 					String lib = request.getParameter("library");
