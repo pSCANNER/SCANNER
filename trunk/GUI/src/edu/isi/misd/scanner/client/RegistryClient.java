@@ -521,5 +521,10 @@ public interface RegistryClient {
      * @return the Client Response
      */
 	public RegistryClientResponse getContacts();
+	
+    /**
+     * Return true if the user has at least one role
+     */
+	public boolean hasRoles();
 
 }
