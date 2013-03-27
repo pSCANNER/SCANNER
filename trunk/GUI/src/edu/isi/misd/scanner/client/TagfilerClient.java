@@ -1232,8 +1232,12 @@ public class TagfilerClient implements RegistryClient {
 
 	@Override
 	public boolean hasRoles() {
-		// TODO Auto-generated method stub
 		return roles != null && roles.size() > 0;
+	}
+
+	@Override
+	public List<String> getRoles() {
+		return roles;
 	}
 
 }

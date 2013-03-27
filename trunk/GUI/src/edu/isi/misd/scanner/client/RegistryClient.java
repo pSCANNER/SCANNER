@@ -526,5 +526,10 @@ public interface RegistryClient {
      * Return true if the user has at least one role
      */
 	public boolean hasRoles();
+	
+    /**
+     * Return the roles of the user
+     */
+	public List<String> getRoles();
 
 }
