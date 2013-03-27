@@ -42,22 +42,18 @@ public class GloreVariableTest extends GloreIntegrationTest
     @Test
     public void testGloreVariablesXML() throws Exception 
     {
-//        doPost("application/xml",
-//               "GloreVariableTestInput1.xml",
-//               "GloreVariableTestOutput1.xml");
         doPost("application/xml",
-               "GloreVariableTestInput2.xml");        
-        assertMockEndpointsSatisfied(60, TimeUnit.MINUTES);         
+               "GloreVariableTestInput2.xml",
+               "GloreVariableTestOutput2.xml");     
+        assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);      
     }
     
-//    @Test
-//    public void testGloreVariablesJSON() throws Exception 
-//    {
-////        doPost("application/json",
-////               "GloreVariableTestInput1.json",
-////               "GloreVariableTestOutput1.json");
-//        doPost("application/json",
-//               "GloreVariableTestInput2.json");        
-//        assertMockEndpointsSatisfied(60, TimeUnit.MINUTES);   
-//    }         
+    @Test
+    public void testGloreVariablesJSON() throws Exception 
+    {
+        doPost("application/json",
+               "GloreVariableTestInput2.json",
+               "GloreVariableTestOutput2.json");    
+        assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);    
+    }         
 }
