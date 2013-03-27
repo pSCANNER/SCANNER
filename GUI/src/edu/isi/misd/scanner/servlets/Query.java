@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -168,6 +170,7 @@ public class Query extends HttpServlet {
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
+	@SuppressWarnings("unchecked")
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		JSONObject obj = new JSONObject();
 		try {
@@ -289,6 +292,27 @@ public class Query extends HttpServlet {
 					String rspId = null;
 					obj = new JSONObject();
 					if (trxId != null) {
+						// check that the user authorization for this trxId
+						boolean isAuthorized = false;
+						Hashtable<String, List<String>> trxTable = (Hashtable<String, List<String>>) session.getAttribute("trxIdTable");
+						if (trxTable != null) {
+							List<String> trxRoles = trxTable.get(trxId);
+							if (trxRoles != null) {
+								isAuthorized = true;
+								List<String> userRoles = registryClient.getRoles();
+								// check that the user has all the transaction roles
+								for (int i=0; i < trxRoles.size(); i++) {
+									if (!userRoles.contains(trxRoles.get(i))) {
+										isAuthorized = false;
+										break;
+									}
+								}
+							}
+						}
+						if (!isAuthorized) {
+							response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+							return;
+						}
 						trxId = Utils.urlEncode(trxId);
 						buff.append("/id/" + trxId);
 						url = buff.toString();
@@ -301,6 +325,12 @@ public class Query extends HttpServlet {
 						rspId = rsp.getIdHeader();
 						System.out.println("Response Id: \n"+rspId);
 						obj.put("trxId", rspId);
+						Hashtable<String, List<String>> trxTable = (Hashtable<String, List<String>>) session.getAttribute("trxIdTable");
+						if (trxTable == null) {
+							trxTable = new Hashtable<String, List<String>>();
+							session.setAttribute("trxIdTable", trxTable);
+						}
+						trxTable.put(rspId, registryClient.getRoles());
 					}
 					if (rsp.isError()) {
 						response.sendError(rsp.getStatus(), rsp.getEntityString());
