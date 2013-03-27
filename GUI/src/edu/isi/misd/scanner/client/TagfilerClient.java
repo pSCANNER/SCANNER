@@ -52,11 +52,13 @@ public class TagfilerClient implements RegistryClient {
 		try {
 			JSONArray arr = new JSONArray(clientResponse.getEntityString());
 			for (int i=0; i < arr.length(); i++) {
-				JSONArray values = arr.getJSONObject(i).getJSONArray("users");
-				for (int j=0; j < values.length(); j++) {
-					String role = values.getString(j);
-					if (!res.contains(role)) {
-						res.add(role);
+				if (!arr.getJSONObject(i).isNull("users")) {
+					JSONArray values = arr.getJSONObject(i).getJSONArray("users");
+					for (int j=0; j < values.length(); j++) {
+						String role = values.getString(j);
+						if (!res.contains(role)) {
+							res.add(role);
+						}
 					}
 				}
 			}

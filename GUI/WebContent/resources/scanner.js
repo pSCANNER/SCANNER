@@ -498,6 +498,7 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 						dependentVariableName.change(function(event) {disableIndependentVariableName();});
 						dependentVariableName.attr('id', 'param_'+makeId(key));
 						paramsDiv.append(dependentVariableName);
+						res.sort(compareIgnoreCase);
 						$.each(res, function(j, val) {
 							var option = $('<option>');
 							var arr = val.split('<br/>');
@@ -514,6 +515,7 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 						var checkboxDiv = $('<div>');
 						checkboxDiv.attr({'id': 'param_'+makeId(key)});
 						paramsDiv.append(checkboxDiv);
+						res.sort(compareIgnoreCase);
 						$.each(res, function(j, val) {
 							var div = $('<div>');
 							checkboxDiv.append(div);
