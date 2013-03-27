@@ -32,7 +32,8 @@ public class GloreAggregateProcessor implements Processor
      *
      */
     public static final double epsilon = Math.pow(10.0, -6.0);
-            
+    public static final int max_iter = 20;
+    
     /**
      *
      * @param exchange
@@ -64,7 +65,6 @@ public class GloreAggregateProcessor implements Processor
             new ArrayList(params.getIndependentVariableName());
         int features = independentVariables.size()+1;
 
-        int maxiter =   20;
         int iter = gloreData.getIteration();
         Matrix beta0, beta1;
         
@@ -208,10 +208,16 @@ public class GloreAggregateProcessor implements Processor
             log.info("Iteration " + iter + " value: " + 
                 GloreUtils.max_abs((beta1.minus(beta0)).getArray()));
            
-            if (iter > 0 && iter<maxiter) {
-                if (GloreUtils.max_abs(
-                    (beta1.minus(beta0)).getArray()) < epsilon) 
+            if (iter > 0) {
+                if ((GloreUtils.max_abs(
+                    (beta1.minus(beta0)).getArray()) < epsilon) || 
+                    (iter >= max_iter))
                 {  
+                    if (iter >= max_iter) {
+                        log.info(
+                            "Hit maximum number of iterations (" + max_iter  + 
+                            ") without converging, iterations stopped.");
+                    }
                     log.info("Iteration final value: " + 
                         GloreUtils.max_abs((beta1.minus(beta0)).getArray()));                    
                     gloreData.setState("computeCovarianceMatrix");        
@@ -324,8 +330,12 @@ public class GloreAggregateProcessor implements Processor
         double erf = x;
         while((n <= maxCycles) && (Math.abs(nextCorrection) > tolerance)) {
             nextCorrection = Math.pow(x, 2*n + 1)/(factorial(n)*(2*n + 1));
-            if((n % 2) == 1) erf -= nextCorrection;
-            else erf += nextCorrection;
+            if((n % 2) == 1) {
+                erf -= nextCorrection;
+            }
+            else {
+                erf += nextCorrection;
+            }
             n++;
         }
         erf = erf * coefficient;
