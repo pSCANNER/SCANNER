@@ -225,7 +225,7 @@ public class Query extends HttpServlet {
 				try {
 					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 					if (!registryClient.hasRoles()) {
-						response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+						response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
 						return;
 					}
 					String params = request.getParameter("parameters");
@@ -268,6 +268,10 @@ public class Query extends HttpServlet {
 					res = clientResponse.toWorkers();
 					StringBuffer buff = new StringBuffer();
 					JSONArray targets= new JSONArray(res);
+					if (targets.length() == 0) {
+						response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+						return;
+					}
 					for (int i=0; i < targets.length(); i++) {
 						if (i > 0) {
 							buff.append(",");
