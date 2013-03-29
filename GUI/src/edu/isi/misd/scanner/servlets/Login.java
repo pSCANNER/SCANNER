@@ -93,8 +93,8 @@ public class Login extends HttpServlet {
 				userRoles.add(tokenizer.nextToken());
 			}
 		}
-		System.out.println("User \"" + username + "\" agreed." + "\n\t" +
-				"id: " + username + "\n\t" +
+		System.out.println("User \"" + remoteUser + "\" agreed." + "\n\t" +
+				"id: " + remoteUser + "\n\t" +
 				"displayName: " + displayName + "\n\t" +
 				"firstName: " + firstName + "\n\t" +
 				"lastName: " + lastName + "\n\t" +
