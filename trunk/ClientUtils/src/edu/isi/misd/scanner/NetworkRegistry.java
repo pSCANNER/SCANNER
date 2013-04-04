@@ -19,7 +19,7 @@ import org.json.JSONObject;
  * @author serban
  *
  */
-public class ScannerStandalone {
+public class NetworkRegistry {
 
 	static String textSimple[] = {"path", "study", "dataset", "method", "rtype", "rURL", "datasource", "rpath", "cname", 
 		"site", "description", "title", "email", "phone", "website", "address", "agreement", "contact", "approvals"};
