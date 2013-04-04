@@ -30,21 +30,70 @@ public class NetworkRegistry {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		/*
+		 * Usage: 
+		 * 	Redirect to a file the output of the following command:
+		 * 		java -classpath "NetworkRegistry.jar:json-org.jar" edu.isi.misd.scanner.NetworkRegistry -h <hostname> -f <input-file-name> -u <tagfiler-user> -p <tagfiler-password> [-all]
+		 * 
+		 *	Execute the output file
+		 */
 		try {
-			// TODO Auto-generated method stub
-			System.out.println("#!/bin/sh\n");
-			System.out.println("./login_VM.sh\n");
-			String host = args[0];
-			String file = args[1];
+			String host = null;
+			String file = null;
+			String tagfilerUser = null;
+			String tagfilerPassword = null;
+			boolean defineTags = false;
+			
+			for (int i=0; i < args.length; i++) {
+				if (args[i].equals("-all")) {
+					defineTags = true;
+				} else if (args[i].equals("-h")) {
+					host = args[++i];
+				} else if (args[i].equals("-f")) {
+					file = args[++i];
+				} else if (args[i].equals("-u")) {
+					tagfilerUser = args[++i];
+				} else if (args[i].equals("-p")) {
+					tagfilerPassword = args[++i];
+				} else if (args[i].equals("--help")) {
+					usage();
+				} else {
+					System.err.println("Ignored argument: " + args[i]);
+				}
+			}
+			
+			if (host == null) {
+				System.err.println("Missing tagfiler hostname");
+				usage();
+			} else if (file == null) {
+				System.err.println("Missing input file name");
+				usage();
+			} else if (tagfilerUser == null) {
+				System.err.println("Missing tagfiler user");
+				usage();
+			} else if (tagfilerPassword == null) {
+				System.err.println("Missing tagfiler password");
+				usage();
+			}
+
 			String url = "https://" + host + "/tagfiler";
-			for (int i=0; i < textSimple.length; i++) {
-				genTagdef(url, textSimple[i], "text", "false");
-			}
-			for (int i=0; i < textMultiple.length; i++) {
-				genTagdef(url, textMultiple[i], "text", "true");
-			}
-			for (int i=0; i < intSimple.length; i++) {
-				genTagdef(url, intSimple[i], "int8", "false");
+			System.out.println("#!/bin/sh\n");
+			// authenticate to tagfiler
+			System.out.println("rm -f cookiefile");
+			System.out.println("curl -b cookiefile -c cookiefile -s -S -k -d username=" + tagfilerUser + 
+					" -d password=" + tagfilerPassword +
+					" \"" + url + "/session\"");
+			System.out.println("");
+			if (defineTags) {
+				for (int i=0; i < textSimple.length; i++) {
+					genTagdef(url, textSimple[i], "text", "false");
+				}
+				for (int i=0; i < textMultiple.length; i++) {
+					genTagdef(url, textMultiple[i], "text", "true");
+				}
+				for (int i=0; i < intSimple.length; i++) {
+					genTagdef(url, intSimple[i], "int8", "false");
+				}
 			}
 			System.out.println("");
 			StringBuffer buff = new StringBuffer();
@@ -60,6 +109,16 @@ public class NetworkRegistry {
 			e.printStackTrace();
 		}
 
+	}
+	
+	static void usage() {
+		System.err.println("Usage:");
+		System.err.println("\t-h <tagfiler-hostname>");
+		System.err.println("\t-f <input-file-name>");
+		System.err.println("\t-u <tagfiler-userid>");
+		System.err.println("\t-p <tagfiler-password>");
+		System.err.println("\t[-all] : generate also the tags definitions statements");
+		System.exit(0);
 	}
 
 	static void genTagdef(String url, String name, String type, String multivalue) {
