@@ -1,9 +1,10 @@
 package edu.isi.misd.scanner.network.base.master.aggregators;
 
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
+import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import java.util.ArrayList;
 import org.apache.camel.Exchange;
-import org.apache.camel.component.http.HttpOperationFailedException;
+import org.apache.camel.component.http4.HttpOperationFailedException;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
 
 import org.slf4j.Logger;
@@ -26,27 +27,22 @@ public class BaseResultsAggregator implements AggregationStrategy
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) 
     {  
-        String newBody = newExchange.getIn().getBody(String.class); 
+        Object newBody;
         
         Throwable cause =
             newExchange.getProperty(
                 Exchange.EXCEPTION_CAUGHT,
                 Throwable.class);
         if (cause != null) {
-            if (cause instanceof HttpOperationFailedException) {
-                newBody =  
-                    ((HttpOperationFailedException)cause).getResponseBody();
-                ErrorUtils.setHttpError(newExchange, cause, 500, false);                
-            } else {
-                ErrorUtils.setHttpError(newExchange, cause, 500, false);                
-                newBody = ErrorUtils.formatErrorResponse(newExchange, cause);
-            }
+            newBody = ErrorUtils.formatErrorResponse(newExchange, cause);
+        } else {
+            newBody = newExchange.getIn().getBody(String.class); 
         }
               
-        ArrayList<String> list;
+        ArrayList list;
         if (oldExchange == null) 
         {
-            list = new ArrayList<String>();
+            list = new ArrayList();
             list.add(newBody);
             newExchange.getIn().setBody(list);
             return newExchange;
@@ -54,7 +50,9 @@ public class BaseResultsAggregator implements AggregationStrategy
         else 
         {
             list = oldExchange.getIn().getBody(ArrayList.class);
-            list.add(newBody);
+            if (list != null) {
+                list.add(newBody);
+            } 
             return oldExchange;
         }
     }    

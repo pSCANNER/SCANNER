@@ -18,10 +18,10 @@
         
     <camel:errorHandler id="deadLetterErrorHandler" 
                         type="DeadLetterChannel" 
-                        deadLetterUri="stream:err">
+                        deadLetterUri="mock:err">
         
-        <camel:redeliveryPolicy asyncDelayedRedelivery="true" 
-                                maximumRedeliveries="2" 
+        <camel:redeliveryPolicy asyncDelayedRedelivery="false" 
+                                maximumRedeliveries="0" 
                                 redeliveryDelay="1000" 
                                 logHandled="true"
                                 logStackTrace="true"                                 
@@ -32,11 +32,11 @@
     <camel:errorHandler id="defaultErrorHandler"
                         type="DefaultErrorHandler">
         
-        <camel:redeliveryPolicy asyncDelayedRedelivery="true" 
-                                maximumRedeliveries="2" 
+        <camel:redeliveryPolicy asyncDelayedRedelivery="false" 
+                                maximumRedeliveries="0" 
                                 redeliveryDelay="1000" 
                                 logHandled="true"
-                                logStackTrace="false"                                 
+                                logStackTrace="true"                                 
                                 logRetryStackTrace="false" 
                                 logRetryAttempted="false"/> 
     </camel:errorHandler>  

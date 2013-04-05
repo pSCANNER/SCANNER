@@ -3,10 +3,13 @@ package edu.isi.misd.scanner.network.base.master.processors;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.UUID;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.camel.util.ObjectHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +50,7 @@ public class BaseRequestProcessor implements Processor
                 return;
             }
             
-            if (!checkTargets(exchange)) {
+            if (!checkTargets(exchange, true)) {
                 return;
             }
             
@@ -68,6 +71,9 @@ public class BaseRequestProcessor implements Processor
                     ErrorUtils.setHttpError(exchange, iae, 500);
                     return;
                 }
+            } 
+            if (!checkTargets(exchange, false)) {
+                return;
             }            
         }
         
@@ -80,17 +86,35 @@ public class BaseRequestProcessor implements Processor
         
     }
     
-    private static boolean checkTargets(Exchange exchange) 
+    private static boolean checkTargets(Exchange exchange, boolean mustExist) 
     {
         String targets = MessageUtils.getTargets(exchange);
         if ((targets == null) || ((targets != null) && targets.isEmpty())) {
-            IllegalArgumentException iae = 
-                new IllegalArgumentException(
-                    "Must specify at least one remote target URL using " + 
-                    "\"targets=x,y,z\" as query parameter or message header");                
-            ErrorUtils.setHttpError(exchange, iae, 500);     
-            return false;
+            if (mustExist) 
+            {
+                IllegalArgumentException iae = 
+                    new IllegalArgumentException(
+                        "Must specify at least one remote target URL using " + 
+                        "\"targets=x,y,z\" as query parameter or message header");                
+                ErrorUtils.setHttpError(exchange, iae, 500);     
+                return false;
+            }
         }
+        
+        Iterator iter = ObjectHelper.createIterator(targets);
+        while (iter.hasNext()) 
+        {
+            String target = (String)iter.next();
+            try {
+                target = target.trim();
+                URI uri = new URI(target);                          
+            } catch (URISyntaxException use) {
+                ErrorUtils.setHttpError(
+                    exchange, use, 500, 
+                    "Error: invalid target URI specified");  
+                return false;
+            }
+        }        
         return true;
     }
 }

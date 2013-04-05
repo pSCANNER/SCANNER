@@ -50,7 +50,11 @@ public class GloreProcessor implements Processor
             exchange.getIn().setBody(this.executeAnalysis(exchange)); 
         }
         catch (Exception e) {
-            ErrorUtils.setHttpError(exchange, e, 500);
+            RuntimeException rtex = 
+                new RuntimeException(
+                    "Unhandled exception during GLORE processing. Caused by [" + 
+                    e.toString() + "]");
+            ErrorUtils.setHttpError(exchange, rtex, 500);
         }                
     }
     

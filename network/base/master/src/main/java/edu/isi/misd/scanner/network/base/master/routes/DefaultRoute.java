@@ -3,11 +3,13 @@ package edu.isi.misd.scanner.network.base.master.routes;
 
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils.ErrorProcessor;
+import java.net.SocketException;
 import java.util.Map;
 import org.apache.camel.Body;
 import org.apache.camel.Properties;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.builder.ValueBuilder;
+import org.apache.camel.component.http4.HttpOperationFailedException;
 import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.dataformat.xmljson.XmlJsonDataFormat;
@@ -185,10 +187,21 @@ public class DefaultRoute extends RouteBuilder
     protected void configureAggregation() throws Exception
     {
         from("direct:" + getAggregatorRouteName()).
+            // dont retry remote exceptions
+            onException(HttpOperationFailedException.class).
+            maximumRedeliveries(0).
+            continued(true).
+            end().
+            // do retry socket/io/connect errors (at least once)
+            onException(SocketException.class).
+            maximumRedeliveries(1).
+            redeliveryDelay(1000).
+            continued(true).
+            end().   
+            // recipientList does the actual multicast
             recipientList(getRecipientList()).          
                 parallelProcessing().
-                aggregationStrategyRef(getAggregationStrategyRef()).
-                //stopOnException().  // handled downstream in aggregator 
+                aggregationStrategyRef(getAggregationStrategyRef()). 
             processRef(getPostAggregationProcessorRef()).
             marshal(jaxb).
             processRef(getCacheWriteProcessorRef()).            

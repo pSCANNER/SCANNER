@@ -4,6 +4,7 @@ import Jama.Matrix;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
+import edu.isi.misd.scanner.network.types.base.ErrorDetails;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionResponse;
@@ -42,6 +43,25 @@ public class GloreAggregateProcessor implements Processor
     @Override
     public void process(Exchange exchange) throws Exception
     {
+        // fail fast - treating GLORE as transactional for now,
+        // so if any part of the request fails, the entire request fails.
+        List<ErrorDetails> errors = getGloreErrorList(exchange);
+        if (!errors.isEmpty()) 
+        {
+            GloreLogisticRegressionResponse gloreResponse =
+                new GloreLogisticRegressionResponse();
+            LogisticRegressionResponse response =
+                new LogisticRegressionResponse();
+            response.getError().addAll(errors);
+            gloreResponse.setLogisticRegressionResponse(response);
+            exchange.getIn().setBody(gloreResponse);  
+            
+            // signal complete
+            exchange.setProperty("status", "complete");           
+            return;            
+            
+        }
+        
         List<GloreLogisticRegressionRequest> gloreRequestList = 
             getGloreRequestList(exchange);
         if (gloreRequestList.isEmpty()) {
@@ -234,13 +254,16 @@ public class GloreAggregateProcessor implements Processor
         getGloreRequestList(Exchange exchange)
         throws Exception
     {
-        ArrayList<String> resultsInput = 
+        ArrayList resultsInput = 
             exchange.getIn().getBody(ArrayList.class);
         ArrayList<GloreLogisticRegressionRequest> resultsOutput = 
             new ArrayList<GloreLogisticRegressionRequest>();
         
         for (Object result : resultsInput) 
-        {            
+        {
+            if (result instanceof ErrorDetails) {
+                continue;
+            }
             GloreLogisticRegressionRequest request = 
                 (GloreLogisticRegressionRequest)MessageUtils.convertTo(
                     GloreLogisticRegressionRequest.class, result, exchange);
@@ -249,6 +272,21 @@ public class GloreAggregateProcessor implements Processor
         return resultsOutput; 
     }
 
+    private List<ErrorDetails> getGloreErrorList(Exchange exchange)
+    {
+        ArrayList resultsInput = 
+            exchange.getIn().getBody(ArrayList.class);        
+        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>(); 
+        
+        for (Object result : resultsInput) 
+        {
+            if (result instanceof ErrorDetails) {
+                errors.add((ErrorDetails)result);                
+            }
+        }
+        return errors;         
+    }
+    
 	/* Return a one dimensional array that is the sum of the E.length
 	   one dimensional vectors. */
 	private double[][] row_sums_one_dim(List<double[]> E, int features) 
