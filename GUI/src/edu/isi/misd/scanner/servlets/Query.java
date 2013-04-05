@@ -324,13 +324,15 @@ public class Query extends HttpServlet {
 						rsp = scannerClient.postScannerQuery(url, targetsURLs, params);
 						rspId = rsp.getIdHeader();
 						System.out.println("Response Id: \n"+rspId);
-						obj.put("trxId", rspId);
-						Hashtable<String, List<String>> trxTable = (Hashtable<String, List<String>>) session.getAttribute("trxIdTable");
-						if (trxTable == null) {
-							trxTable = new Hashtable<String, List<String>>();
-							session.setAttribute("trxIdTable", trxTable);
+						if (rspId != null) {
+							obj.put("trxId", rspId);
+							Hashtable<String, List<String>> trxTable = (Hashtable<String, List<String>>) session.getAttribute("trxIdTable");
+							if (trxTable == null) {
+								trxTable = new Hashtable<String, List<String>>();
+								session.setAttribute("trxIdTable", trxTable);
+							}
+							trxTable.put(rspId, registryClient.getRoles());
 						}
-						trxTable.put(rspId, registryClient.getRoles());
 					}
 					if (rsp.isError()) {
 						response.sendError(rsp.getStatus(), rsp.getEntityString());
