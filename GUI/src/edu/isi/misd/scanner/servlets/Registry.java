@@ -19,6 +19,7 @@ package edu.isi.misd.scanner.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -236,6 +237,18 @@ public class Registry extends HttpServlet {
 		String func = request.getParameter("method");
 		String site = request.getParameter("site");
 		String resourceValues = request.getParameter("values"); 
+		String description = request.getParameter("description"); 
+		String title = request.getParameter("title"); 
+		String email = request.getParameter("email"); 
+		String phone = request.getParameter("phone"); 
+		String website = request.getParameter("website"); 
+		String address = request.getParameter("address"); 
+		String contact = request.getParameter("contact"); 
+		String approvals = request.getParameter("approvals"); 
+		String variables = request.getParameter("variables"); 
+		String path = request.getParameter("path"); 
+		String users = request.getParameter("users"); 
+		String agreement = request.getParameter("agreement"); 
 		Integer minOccurs = null; 
 		Integer maxOccurs = null; 
 		if (request.getParameter("minOccurs") != null) {
@@ -247,26 +260,101 @@ public class Registry extends HttpServlet {
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
 		if (action.equals("createStudy")) {
-			clientResponse = registryClient.createStudy(name);
-			responseBody = Utils.extractId(clientResponse.getEntityString());
+			clientResponse = registryClient.createStudy(name, description, title,
+					email, phone, website, address, contact, approvals);
+			if (clientResponse != null) {
+				responseBody = Utils.extractId(clientResponse.getEntityString());
+			} else {
+				responseBody = "ERROR: Can not create study.";
+			}
 		} else if (action.equals("createDataset")) {
-			clientResponse = registryClient.createDataset(name, study);
-			responseBody = Utils.extractId(clientResponse.getEntityString());
+			try {
+				ArrayList<String> values = null;
+				if (variables != null) {
+					JSONArray arr = new JSONArray(variables);
+					if (arr.length() > 0) {
+						values = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							values.add(arr.getString(i));
+						}
+					}
+				}
+				clientResponse = registryClient.createDataset(name, study, description, values);
+				if (clientResponse != null) {
+					responseBody = Utils.extractId(clientResponse.getEntityString());
+				} else {
+					responseBody = "ERROR: Can not create dataset.";
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("createLibrary")) {
-			clientResponse = registryClient.createLibrary(name, rpath);
-			responseBody = Utils.extractId(clientResponse.getEntityString());
+			clientResponse = registryClient.createLibrary(name, rpath, description);
+			if (clientResponse != null) {
+				responseBody = Utils.extractId(clientResponse.getEntityString());
+			} else {
+				responseBody = "ERROR: Can not create library.";
+			}
 		} else if (action.equals("createMethod")) {
-			clientResponse = registryClient.createMethod(name, lib, rpath);
-			responseBody = Utils.extractId(clientResponse.getEntityString());
+			try {
+				ArrayList<String> values = null;
+				if (lib != null) {
+					JSONArray arr = new JSONArray(lib);
+					if (arr.length() > 0) {
+						values = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							values.add(arr.getString(i));
+						}
+					}
+				}
+				clientResponse = registryClient.createMethod(name, values, rpath, description);
+				if (clientResponse != null) {
+					responseBody = Utils.extractId(clientResponse.getEntityString());
+				} else {
+					responseBody = "ERROR: Can not create method.";
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("createMaster")) {
-			clientResponse = registryClient.createMaster(rURL);
-			responseBody = Utils.extractId(clientResponse.getEntityString());
+			clientResponse = registryClient.createMaster(rURL, title,
+					email, phone, website, address, contact);
+			if (clientResponse != null) {
+				responseBody = Utils.extractId(clientResponse.getEntityString());
+			} else {
+				responseBody = "ERROR: Can not create master.";
+			}
 		} else if (action.equals("createWorker")) {
-			clientResponse = registryClient.createWorker(study, dataset, lib, func, site, datasource);
-			responseBody = Utils.extractId(clientResponse.getEntityString());
+				try {
+					ArrayList<String> values = null;
+					if (users != null) {
+						JSONArray arr;
+						arr = new JSONArray(users);
+						if (arr.length() > 0) {
+							values = new ArrayList<String>();
+							for (int i=0; i < arr.length(); i++) {
+								values.add(arr.getString(i));
+							}
+						}
+					}
+					clientResponse = registryClient.createWorker(study, dataset, lib, func, site, datasource, values);
+					if (clientResponse != null) {
+						responseBody = Utils.extractId(clientResponse.getEntityString());
+					} else {
+						responseBody = "ERROR: Can not create worker.";
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		} else if (action.equals("createSite")) {
-			clientResponse = registryClient.createSite(name, rURL);
-			responseBody = Utils.extractId(clientResponse.getEntityString());
+			clientResponse = registryClient.createSite(name, rURL, title,
+					email, phone, website, address, agreement, contact);
+			if (clientResponse != null) {
+				responseBody = Utils.extractId(clientResponse.getEntityString());
+			} else {
+				responseBody = "ERROR: Can not create site.";
+			}
 		} else if (action.equals("createParameter")) {
 			try {
 				ArrayList<String> values = null;
@@ -279,8 +367,23 @@ public class Registry extends HttpServlet {
 						}
 					}
 				}
-				clientResponse = registryClient.createParameter(name, func, lib, minOccurs, maxOccurs, values);
-				responseBody = Utils.extractId(clientResponse.getEntityString());
+				ArrayList<String> libs = null;
+				if (resourceValues != null) {
+					JSONArray arr = new JSONArray(lib);
+					if (arr.length() > 0) {
+						libs = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							libs.add(arr.getString(i));
+						}
+					}
+				}
+				clientResponse = registryClient.createParameter(name, func, libs, 
+						minOccurs, maxOccurs, values, path, description);
+				if (clientResponse != null) {
+					responseBody = Utils.extractId(clientResponse.getEntityString());
+				} else {
+					responseBody = "ERROR: Can not create master.";
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

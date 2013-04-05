@@ -31,9 +31,26 @@ public interface RegistryClient {
      * 
      * @param name
      *            the name of the study
+     * @param description
+     *            the description of the study
+     * @param title
+     *            the title of the person for contact
+     * @param email
+     *            the email for contact
+     * @param phone
+     *            the phone for contact
+     * @param website
+     *            the website of the study
+     * @param address
+     *            the address for contact
+     * @param contact
+     *            the name of the person for contact
+     * @param approvals
+     *            the website for the study approvals
      * @return the Client Response
      */
-	public RegistryClientResponse createStudy(String name);
+	public RegistryClientResponse createStudy(String name, String description, String title,
+			String email, String phone, String website, String address, String contact, String approvals);
 	
     /**
      * Creates an entry of "dataset" type in the registry
@@ -42,9 +59,13 @@ public interface RegistryClient {
      *            the name of the dataset
      * @param study
      *            the study the dataset belongs to
+     * @param description
+     *            the description of the study
+     * @param variables
+     *            the list of dependent/independent variables names
      * @return the Client Response
      */
-	public RegistryClientResponse createDataset(String name, String study);
+	public RegistryClientResponse createDataset(String name, String study, String description, List<String>  variables);
 	
     /**
      * Creates an entry of "library" type in the registry
@@ -53,31 +74,48 @@ public interface RegistryClient {
      *            the name of the library
      * @param urlPath
      *            the path to be used in the URL
+     * @param description
+     *            the description of the study
      * @return the Client Response
      */
-	public RegistryClientResponse createLibrary(String name, String urlPath);
+	public RegistryClientResponse createLibrary(String name, String urlPath, String description);
 	
     /**
      * Creates an entry of "method" type in the registry
      * 
      * @param name
      *            the name of the method
-     * @param lib
-     *            the library the method belongs to
+     * @param libs
+     *            the libraries the method belongs to
      * @param urlPath
      *            the path to be used in the URL
+     * @param description
+     *            the description of the study
      * @return the Client Response
      */
-	public RegistryClientResponse createMethod(String name, String lib, String urlPath);
+	public RegistryClientResponse createMethod(String name, List<String> libs, String urlPath, String description);
 	
     /**
      * Creates an entry of "master" type in the registry
      * 
      * @param url
      *            the url of the master
+     * @param title
+     *            the title of the person for contact
+     * @param email
+     *            the email for contact
+     * @param phone
+     *            the phone for contact
+     * @param website
+     *            the website of the project
+     * @param address
+     *            the address for contact
+     * @param contact
+     *            the name of the person for contact
      * @return the Client Response
      */
-	public RegistryClientResponse createMaster(String url);
+	public RegistryClientResponse createMaster(String url, String title,
+			String email, String phone, String website, String address, String contact);
 	
     /**
      * Creates an entry of "site" type in the registry
@@ -86,9 +124,24 @@ public interface RegistryClient {
      *            the name of the site
      * @param url
      *            the url of the site
-     * @return the Client Response
+     * @param title
+     *            the title of the person for contact
+     * @param email
+     *            the email for contact
+     * @param phone
+     *            the phone for contact
+     * @param website
+     *            the website of the project
+     * @param address
+     *            the address for contact
+     * @param agreement
+     *            the URL for agreement
+     * @param contact
+     *            the name of the person for contact
+      * @return the Client Response
      */
-	public RegistryClientResponse createSite(String name, String url);
+	public RegistryClientResponse createSite(String name, String rURL, String title,
+			String email, String phone, String website, String address, String agreement, String contact);
 	
     /**
      * Creates an entry of "parameter" type in the registry
@@ -97,17 +150,20 @@ public interface RegistryClient {
      *            the name of the parameter
      * @param func
      *            the method the parameter belongs to
-     * @param lib
-     *            the library the parameter belongs to
+     * @param libs
+     *            the libraries the parameter belongs to
      * @param minOccurs
      *            the minimum occurrences of the parameter
      * @param maxOccurs
      *            the maximum occurrences of the parameter (-1 if unbounded)
      * @param values
      *            the list of the parameter values
+     * @param description
+     *            the description of the study
      * @return the Client Response
      */
-	public RegistryClientResponse createParameter(String name, String func, String lib, int minOccurs, int maxOccurs, List<String> values);
+	public RegistryClientResponse createParameter(String name, String func, List<String> libs, 
+			Integer minOccurs, Integer maxOccurs, List<String> values, String path, String description);
 	
     /**
      * Creates an entry of "worker" type in the registry
@@ -124,9 +180,12 @@ public interface RegistryClient {
      *            the site the worker belongs to
      * @param sourceData
      *            the data source
+     * @param users
+     *            the users who can access the data source
      * @return the Client Response
      */
-	public RegistryClientResponse createWorker(String study, String dataset, String lib, String func, String site, String sourceData);
+	public RegistryClientResponse createWorker(String study, String dataset, String lib, String func, String site, 
+			String sourceData, List<String> users);
 	
     /**
      * Deletes a study from the registry
