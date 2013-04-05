@@ -471,6 +471,10 @@ Matrix values:
                          type="tns:LogisticRegressionOutput"
                          minOccurs="1"
                          maxOccurs="unbounded"/>                                            
+            <xsd:element name="Error" 
+                         type="base:ErrorDetails"
+                         minOccurs="0"
+                         maxOccurs="unbounded"/>                 
         </xsd:sequence>
     </xsd:complexType> 
                 

@@ -51,7 +51,11 @@ public class OceansLogisticRegressionProcessor implements Processor
             exchange.getIn().setBody(this.executeAnalysis(exchange)); 
         }
         catch (Exception e) {
-            ErrorUtils.setHttpError(exchange, e, 500);
+            RuntimeException rtex = 
+                new RuntimeException(
+                    "Unhandled exception during OCEANS processing. Caused by [" + 
+                    e.toString() + "]");
+            ErrorUtils.setHttpError(exchange, rtex, 500);
         }                
     }
     
@@ -122,6 +126,7 @@ public class OceansLogisticRegressionProcessor implements Processor
             coefficient.setPValue(c.getPValue());
             coefficient.setDegreeOfFreedom(c.getDegreeOfFreedom());
             coefficient.setSE(c.getStandardError());
+            //coefficient.setTStatistics(c.getTestStatistics());
             target.add(coefficient);
         }        
     }   

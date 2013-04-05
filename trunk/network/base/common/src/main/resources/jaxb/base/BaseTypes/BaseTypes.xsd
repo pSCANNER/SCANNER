@@ -8,6 +8,32 @@
             jaxb:version="2.0" jaxb:extensionBindingPrefixes="xjc"            
             elementFormDefault="qualified">                   
 
+    <xsd:complexType name="ErrorDetails">
+        <xsd:annotation>
+            <xsd:documentation>
+                A structure describing error details
+            </xsd:documentation>
+        </xsd:annotation>          
+        <xsd:sequence>
+            <xsd:element name="ErrorSource" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>            
+            <xsd:element name="ErrorType" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>
+            <xsd:element name="ErrorCode" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>            
+            <xsd:element name="ErrorDescription" 
+                         type="xsd:string"
+                         minOccurs="1"
+                         maxOccurs="1"/>                
+        </xsd:sequence>
+    </xsd:complexType>        
+            
     <xsd:element name="SimpleMap">
         <xsd:annotation>
             <xsd:documentation>
