@@ -28,6 +28,9 @@ var HOME;
 var oQueryTable = null;
 var oHistoryTable = null;
 
+var oErrorQueryTable = null;
+var oErrorHistoryTable = null;
+
 var selStudies = null;
 var selDatasets = null;
 var selLibraries = null;
@@ -199,6 +202,7 @@ function renderAvailableStudies() {
 	$('#paramsTitle').css('display', 'none');
 	$('#paramsDiv').css('display', 'none');
 	$('#resultDiv').css('display', 'none');
+	$('#errorDiv').css('display', 'none');
 	
 	// send the request
 	var url = HOME + '/query?action=getStudies';
@@ -592,10 +596,12 @@ function submitQuery(div, replay) {
 		param.spinner = $('#ajaxSpinnerImage');
 		param.treeId = 'navigation';
 		param.tableId = 'queryExample';
+		param.errorTableId = 'errorQueryExample';
 	} else {
 		param.spinner = $('#ajaxHistorySpinnerImage');
 		param.treeId = 'historyNavigation';
 		param.tableId = 'historyExample';
+		param.errorTableId = 'errorHistoryExample';
 	}
 	obj['action'] = 'getResults';
 	if (replay == null) {
@@ -628,6 +634,9 @@ function submitQuery(div, replay) {
 		obj['sites'] = replay['sites'][0];
 	}
 	param['resultDiv'] = $('#' + div);
+	param['errorDiv'] = $('#' + (div == 'resultDivContent' ? 'errorDivContent' : 'errorReplayDivContent'));
+	param['resultDiv'].parent().hide();
+	param['errorDiv'].parent().hide();
 	param['library'] = obj['library'];
 	param.spinner.show();
 	var url = HOME + '/query';
@@ -649,6 +658,7 @@ function submitQuery(div, replay) {
 function postSubmitQuery(data, textStatus, jqXHR, param) {
 	param.spinner.hide();
 	var resultDiv = param['resultDiv'];
+	var errorDiv = param['errorDiv'];
 	data = $.parseJSON(data);
 	var obj = param['history'];
 	if (obj != null) {
@@ -657,6 +667,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	}
 	data = data['data'];
 	buildDataTable(data, resultDiv, param.tableId);
+	buildErrorDataTable(data, errorDiv, param.errorTableId);
 }
 
 /**
@@ -1788,6 +1799,51 @@ function getRowsValues(res, columns, rows) {
 }
 
 /**
+ * Get the column values of a JSONObject 
+ * 
+ * @param res
+ * 	the data of a row
+ * @param columns
+ * 	the name of the columns
+ * @param rows
+ * 	the output parameter to collect the values
+ * 
+ * @return the array with the columns values
+*/
+function getRowsErrors(res, columns, rows) {
+	if ($.isPlainObject(res)) {
+		if (res['Error'] != null) {
+			if ($.isArray(res['Error'])) {
+				var arr = res['Error'];
+				$.each(arr, function(i, obj) {
+					var row = [];
+					$.each(columns, function(j, col) {
+						row.push(obj[col] == null ? '' : obj[col]);
+					});
+					rows.push(row);
+				});
+				
+			} else if ($.isPlainObject(res['Error'])) {
+				var obj = res['Error'];
+				var row = [];
+				$.each(columns, function(j, col) {
+					row.push(obj[col] == null ? '' : obj[col]);
+				});
+				rows.push(row);
+			}
+		} else {
+			$.each(res, function(key, value) {
+				getRowsErrors(value, columns, rows);
+			});
+		}
+	} else if ($.isArray(res)) {
+		$.each(res, function(i, val) {
+			getRowsErrors(val, columns, rows);
+		});
+	}	
+}
+
+/**
  * Build a data table for a JSONObject
  * 
  * @param res
@@ -1799,6 +1855,14 @@ function getRowsValues(res, columns, rows) {
  */
 
 function buildDataTable(res, resultDiv, tableId) {
+	var columns = ['name', 'B', 'SE', 'p-value', 't-statistics', 'degreeOfFreedom'];
+	//var columns = [];
+	//getColumnsNames(res, columns);
+	var datasets = [];
+	getRowsValues(res, columns, datasets);
+	if (datasets.length == 0) {
+		return;
+	}
 	if (tableId == 'queryExample') {
 		if (oQueryTable != null) {
 			$('#' + tableId).remove();
@@ -1823,9 +1887,6 @@ function buildDataTable(res, resultDiv, tableId) {
 	table.append(thead);
 	var tr = $('<tr>');
 	thead.append(tr);
-	var columns = ['name', 'B', 'SE', 'p-value', 't-statistics', 'degreeOfFreedom'];
-	//var columns = [];
-	//getColumnsNames(res, columns);
 	var th = $('<th>');
 	tr.append(th);
 	th.html('Sample');
@@ -1836,8 +1897,6 @@ function buildDataTable(res, resultDiv, tableId) {
 	}
 	var tbody = $('<tbody>');
 	table.append(tbody);
-	var datasets = [];
-	getRowsValues(res, columns, datasets);
 	var groupNo = 0;
 	var display = true;
 	$.each(datasets, function(i, dataset) {
@@ -1908,6 +1967,79 @@ function buildDataTable(res, resultDiv, tableId) {
 		oQueryTable = oTable;
 	} else {
 		oHistoryTable = oTable;
+	}
+}
+
+/**
+ * Build a data table for a JSONObject
+ * 
+ * @param res
+ * 	the JSONObject for the tree
+ * @param resultDiv
+ * 	the div to place the tree
+ * @param tableId
+ * 	the id of the table
+ */
+
+function buildErrorDataTable(res, resultDiv, tableId) {
+	var columns = ['ErrorSource', 'ErrorType', 'ErrorCode', 'ErrorDescription'];
+	var rows = [];
+	getRowsErrors(res, columns, rows);
+	if (rows.length == 0) {
+		return;
+	}
+	if (tableId == 'errorQueryExample') {
+		if (oErrorQueryTable != null) {
+			$('#' + tableId).remove();
+			oErrorQueryTable = null;
+		}
+	} else {
+		if (oErrorHistoryTable != null) {
+			$('#' + tableId).remove();
+			oErrorHistoryTable = null;
+		}
+	}
+	resultDiv.parent().css('display', '');
+	resultDiv.html('');
+	var table = $('<table>');
+	resultDiv.append(table);
+	table.attr({	'cellpadding': '0',
+			'cellspacing': '0',
+			'border': '0',
+			'id': tableId}); 
+	table.addClass('display');
+	var thead = $('<thead>');
+	table.append(thead);
+	var tr = $('<tr>');
+	thead.append(tr);
+	for (var i=0; i < columns.length; i++) {
+		var th = $('<th>');
+		tr.append(th);
+		th.html(columns[i]);
+	}
+	var tbody = $('<tbody>');
+	table.append(tbody);
+	$.each(rows, function(i, row) {
+		var tr = $('<tr>');
+		tbody.append(tr);
+		$.each(row, function(j, col) {
+			var td = $('<td>');
+			td.html(col);
+			tr.append(td);
+		});
+	});
+	var oTable = $('#' + tableId).dataTable({
+		'aLengthMenu': [
+		                [-1],
+		                ['All']
+		                ],
+		'iDisplayLength': -1,
+        'sDom': 'lfr<"giveHeight"t>ip'
+	});
+	if (tableId == 'errorQueryExample') {
+		oErrorQueryTable = oTable;
+	} else {
+		oErrorHistoryTable = oTable;
 	}
 }
 
@@ -2598,6 +2730,7 @@ function loadStudies(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
+				$('#errorDiv').css('display', 'none');
 				var selValues = studiesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2643,6 +2776,7 @@ function loadDatasets(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
+				$('#errorDiv').css('display', 'none');
 				var selValues = datasetsMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2686,6 +2820,7 @@ function loadLibraries(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
+				$('#errorDiv').css('display', 'none');
 				var selValues = librariesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2728,6 +2863,7 @@ function loadMethods(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
+				$('#errorDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
 						renderAvailableSites();
@@ -2778,8 +2914,10 @@ function loadSites(values, selectAll) {
 function showQuery() {
 	$('#paramsWrapperDiv').show();
 	$('#resultWrapperDiv').show();
+	$('#errorWrapperDiv').show();
 	$('#replayDivContent').html('');
 	$('#replayDivWrapper').hide();
+	$('#errorReplayWrapperDiv').hide();
 }
 
 /**
@@ -2788,7 +2926,9 @@ function showQuery() {
 function hideQuery() {
 	$('#paramsWrapperDiv').hide();
 	$('#resultWrapperDiv').hide();
+	$('#errorWrapperDiv').hide();
 	$('#replayDivWrapper').show();
+	$('#errorReplayWrapperDiv').show();
 }
 
 /**
