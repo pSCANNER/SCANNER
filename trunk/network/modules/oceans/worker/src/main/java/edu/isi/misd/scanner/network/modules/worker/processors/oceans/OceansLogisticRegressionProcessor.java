@@ -103,8 +103,6 @@ public class OceansLogisticRegressionProcessor implements Processor
         OceansLogisticRegressionResponse oceansResponse = 
             new OceansLogisticRegressionResponse();
         LogisticRegressionResponse response = new LogisticRegressionResponse();
-//        response.setDataSetID(getMetadata().getDataSet().getDataSetID());  // will come from registry
-//        response.setDataSetVariables(getMetadata().getVariables());   // will come from registry
         response.setInput(request.getLogisticRegressionInput());
         response.getOutput().add(new LogisticRegressionOutput());
         this.formatCoefficientResultsObjects(
@@ -126,7 +124,7 @@ public class OceansLogisticRegressionProcessor implements Processor
             coefficient.setPValue(c.getPValue());
             coefficient.setDegreeOfFreedom(c.getDegreeOfFreedom());
             coefficient.setSE(c.getStandardError());
-            //coefficient.setTStatistics(c.getTestStatistics());
+            coefficient.setTStatistics(c.getTestStatistics());
             target.add(coefficient);
         }        
     }   
