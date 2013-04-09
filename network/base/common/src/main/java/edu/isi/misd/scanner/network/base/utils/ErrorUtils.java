@@ -38,6 +38,11 @@ public class ErrorUtils
         } else {         
             error.setErrorDescription(e.getLocalizedMessage());
         }
+        try {
+            error.setSiteInfo(MessageUtils.getSiteInfo(exchange));
+        } catch (Exception ex) {
+            log.warn("Exception while getting local SiteInfo: " + ex.toString());
+        }        
         return error;    
     }  
     
