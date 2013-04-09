@@ -1,11 +1,13 @@
 package edu.isi.misd.scanner.network.base.utils;
 
 import edu.isi.misd.scanner.network.base.BaseConstants;
+import edu.isi.misd.scanner.network.types.base.SiteInfo;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.TypeConverter;
@@ -211,4 +213,19 @@ public class MessageUtils
         return req.getPathInfo();         
     }
     
+    public static SiteInfo getSiteInfo(Exchange exchange) 
+        throws Exception
+    {
+        CamelContext context = exchange.getContext();
+        String siteID = context.resolvePropertyPlaceholders("{{worker.siteID}}");
+        String siteName = context.resolvePropertyPlaceholders("{{worker.siteName}}"); 
+        String siteDesc = context.resolvePropertyPlaceholders("{{worker.siteDescription}}");
+        
+        SiteInfo siteInfo = new SiteInfo();
+        siteInfo.setSiteID(siteID);
+        siteInfo.setSiteName(siteName);
+        siteInfo.setSiteDescription(siteDesc);
+        
+        return siteInfo;
+    }
 }
