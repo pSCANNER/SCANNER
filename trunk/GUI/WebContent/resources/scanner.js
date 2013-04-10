@@ -1773,13 +1773,15 @@ function getColumnsNames(res, columns) {
  * 
  * @return the array with the columns values
 */
-function getRowsValues(res, columns, rows) {
+function getRowsValues(res, columns, rows, sites) {
 	if ($.isPlainObject(res)) {
 		if (res['Output'] != null) {
 			var coefficient = null;
+			var siteInfo = null;
 			if ($.isArray(res['Output'])) {
 				$.each(res['Output'], function(i, output) {
 					coefficient = output['Coefficient'];
+					siteInfo = output['SiteInfo'];
 					var group = [];
 					$.each(coefficient, function(i, obj) {
 						var row = [];
@@ -1789,10 +1791,16 @@ function getRowsValues(res, columns, rows) {
 						group.push(row);
 					});
 					rows.push(group);
+					var site = [];
+					if (siteInfo != null) {
+						site.push(siteInfo);
+					}
+					sites.push(site);
 				});
 			} else {
 				coefficient = res['Output']['Coefficient'];
 				var group = [];
+				siteInfo = res['Output']['SiteInfo'];
 				$.each(coefficient, function(i, obj) {
 					var row = [];
 					$.each(columns, function(j, col) {
@@ -1801,15 +1809,20 @@ function getRowsValues(res, columns, rows) {
 					group.push(row);
 				});
 				rows.push(group);
+				var site = [];
+				if (siteInfo != null) {
+					site.push(siteInfo);
+				}
+				sites.push(site);
 			}
 		} else {
 			$.each(res, function(key, value) {
-				getRowsValues(value, columns, rows);
+				getRowsValues(value, columns, rows, sites);
 			});
 		}
 	} else if ($.isArray(res)) {
 		$.each(res, function(i, val) {
-			getRowsValues(val, columns, rows);
+			getRowsValues(val, columns, rows, sites);
 		});
 	}	
 }
@@ -1826,35 +1839,48 @@ function getRowsValues(res, columns, rows) {
  * 
  * @return the array with the columns values
 */
-function getRowsErrors(res, columns, rows) {
+function getRowsErrors(res, columns, rows, sites) {
 	if ($.isPlainObject(res)) {
 		if (res['Error'] != null) {
+			var siteInfo = null;
 			if ($.isArray(res['Error'])) {
 				var arr = res['Error'];
 				$.each(arr, function(i, obj) {
+					siteInfo = obj['SiteInfo'];
 					var row = [];
 					$.each(columns, function(j, col) {
 						row.push(obj[col] == null ? '' : obj[col]);
 					});
 					rows.push(row);
+					var site = [];
+					if (siteInfo != null) {
+						site.push(siteInfo);
+					}
+					sites.push(site);
 				});
 				
 			} else if ($.isPlainObject(res['Error'])) {
 				var obj = res['Error'];
+				siteInfo = obj['SiteInfo'];
 				var row = [];
 				$.each(columns, function(j, col) {
 					row.push(obj[col] == null ? '' : obj[col]);
 				});
 				rows.push(row);
+				var site = [];
+				if (siteInfo != null) {
+					site.push(siteInfo);
+				}
+				sites.push(site);
 			}
 		} else {
 			$.each(res, function(key, value) {
-				getRowsErrors(value, columns, rows);
+				getRowsErrors(value, columns, rows, sites);
 			});
 		}
 	} else if ($.isArray(res)) {
 		$.each(res, function(i, val) {
-			getRowsErrors(val, columns, rows);
+			getRowsErrors(val, columns, rows, sites);
 		});
 	}	
 }
@@ -1875,7 +1901,8 @@ function buildDataTable(res, resultDiv, tableId) {
 	//var columns = [];
 	//getColumnsNames(res, columns);
 	var datasets = [];
-	getRowsValues(res, columns, datasets);
+	var sites = [];
+	getRowsValues(res, columns, datasets, sites);
 	if (datasets.length == 0) {
 		return;
 	}
@@ -1956,6 +1983,7 @@ function buildDataTable(res, resultDiv, tableId) {
 		    var nTrs = $('#' + tableId + ' tbody tr');
 		    var iColspan = nTrs[0].getElementsByTagName('td').length;
 		    var sLastGroup = "";
+		    var siteNo = 0;
 		    for ( var i=0 ; i<nTrs.length ; i++ )
 		    {
 		        var iDisplayIndex = oSettings._iDisplayStart + i;
@@ -1967,7 +1995,23 @@ function buildDataTable(res, resultDiv, tableId) {
 				var td = $('<td>');
 				td.attr({'colSpan': columns.length+1});
 				td.addClass('group');
-				td.html('&nbsp;');
+				var site = sites[siteNo++];
+				if (site.length > 0) {
+					var value = '';
+					var siteInfo = site[0];
+					if (siteInfo['SiteName'] != null) {
+						value = 'Site Name: ' + siteInfo['SiteName'];
+					}
+					if (siteInfo['SiteDescription'] != null) {
+						if (value.length > 0) {
+							value += '<br/>';
+						}
+						value += 'Site Description: ' + siteInfo['SiteDescription'];
+					}
+					td.html(value);
+				} else {
+					td.html('&nbsp;');
+				}
 				tr.append(td);
 		        }
 		    }
@@ -1977,7 +2021,9 @@ function buildDataTable(res, resultDiv, tableId) {
 		],
 		"aaSortingFixed": [[ 0, 'asc' ]],
 		"aaSorting": [[ 1, 'asc' ]],
-        	"sDom": 'lfr<"giveHeight"t>ip'
+		"bInfo": false,
+		"bPaginate": false,
+        "sDom": 'lfr<"giveHeight"t>ip'
 	});
 	if (tableId == 'queryExample') {
 		oQueryTable = oTable;
@@ -2000,7 +2046,8 @@ function buildDataTable(res, resultDiv, tableId) {
 function buildErrorDataTable(res, resultDiv, tableId) {
 	var columns = ['ErrorSource', 'ErrorType', 'ErrorCode', 'ErrorDescription'];
 	var rows = [];
-	getRowsErrors(res, columns, rows);
+	var sites = [];
+	getRowsErrors(res, columns, rows, sites);
 	if (rows.length == 0) {
 		return;
 	}
@@ -2028,6 +2075,9 @@ function buildErrorDataTable(res, resultDiv, tableId) {
 	table.append(thead);
 	var tr = $('<tr>');
 	thead.append(tr);
+	var th = $('<th>');
+	tr.append(th);
+	th.html('Sample');
 	for (var i=0; i < columns.length; i++) {
 		var th = $('<th>');
 		tr.append(th);
@@ -2035,9 +2085,25 @@ function buildErrorDataTable(res, resultDiv, tableId) {
 	}
 	var tbody = $('<tbody>');
 	table.append(tbody);
+	var groupNo = 0;
 	$.each(rows, function(i, row) {
+		groupNo++;
 		var tr = $('<tr>');
+		tr.addClass('group');
 		tbody.append(tr);
+		var td = $('<td>');
+		td.html(''+groupNo);
+		tr.append(td);
+		for (var k=0; k < columns.length; k++) {
+			var td = $('<td>');
+			td.html('');
+			tr.append(td);
+		}
+		tr = $('<tr>');
+		tbody.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		td.html(''+groupNo);
 		$.each(row, function(j, col) {
 			var td = $('<td>');
 			td.html(col);
@@ -2050,6 +2116,55 @@ function buildErrorDataTable(res, resultDiv, tableId) {
 		                ['All']
 		                ],
 		'iDisplayLength': -1,
+		"fnDrawCallback": function ( oSettings ) {
+		    if ( oSettings.aiDisplay.length == 0 )
+		    {
+		        return;
+		    }
+		     
+		    var nTrs = $('#' + tableId + ' tbody tr');
+		    var iColspan = nTrs[0].getElementsByTagName('td').length;
+		    var sLastGroup = "";
+		    var siteNo = 0;
+		    for ( var i=0 ; i<nTrs.length ; i++ )
+		    {
+		        var iDisplayIndex = oSettings._iDisplayStart + i;
+		        var sGroup = oSettings.aoData[ oSettings.aiDisplay[iDisplayIndex] ]._aData[0];
+		        if ($(nTrs[i]).hasClass('group')) {
+				var tr = $(nTrs[i]);
+				tr.removeClass('group');
+				tr.html('');
+				var td = $('<td>');
+				td.attr({'colSpan': columns.length+1});
+				td.addClass('group');
+				var site = sites[siteNo++];
+				if (site.length > 0) {
+					var value = '';
+					var siteInfo = site[0];
+					if (siteInfo['SiteName'] != null) {
+						value = 'Site Name: ' + siteInfo['SiteName'];
+					}
+					if (siteInfo['SiteDescription'] != null) {
+						if (value.length > 0) {
+							value += '<br/>';
+						}
+						value += 'Site Description: ' + siteInfo['SiteDescription'];
+					}
+					td.html(value);
+				} else {
+					td.html('&nbsp;');
+				}
+				tr.append(td);
+		        }
+		    }
+		},
+		"aoColumnDefs": [
+		    { "bVisible": false, "aTargets": [ 0 ] }
+		],
+		"aaSortingFixed": [[ 0, 'asc' ]],
+		"aaSorting": [[ 1, 'asc' ]],
+		"bInfo": false,
+		"bPaginate": false,
         'sDom': 'lfr<"giveHeight"t>ip'
 	});
 	if (tableId == 'errorQueryExample') {
@@ -2140,7 +2255,15 @@ function handleError(jqXHR, textStatus, errorThrown, retryCallback, url, obj, as
 		msg += 'URL: ' + url + '\n';
 		document.body.style.cursor = "default";
 		$('#ajaxSpinnerImage').hide();
-		$('#errorMessage').html(jqXHR.responseText);
+		var alertMessage = jqXHR.responseText;
+		var index1 = jqXHR.responseText.indexOf('<body>');
+		if (index1 >= 0) {
+			var index2 = jqXHR.responseText.indexOf('</body>');
+			if (index2 >= 0) {
+				alertMessage = alertMessage.substring(index1+'<body>'.length, index2);
+			}
+		}
+		$('#errorMessage').html(alertMessage);
 		alertErrorDialog.dialog('open');
 		$('.ui-widget-overlay').css('opacity', 1.0);
 		//alert(msg);
@@ -2307,7 +2430,6 @@ function setContacts(contacts) {
 	var master = [];
 	$.each(contacts, function(i, contact) {
 		var rtype = contact['rtype'];
-		//alert(rtype);
 		if (rtype == 'study') {
 			studies[contact['cname']] = contact;
 		} else if (rtype == 'site') {
