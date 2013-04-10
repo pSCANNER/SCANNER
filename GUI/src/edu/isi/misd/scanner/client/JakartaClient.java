@@ -265,7 +265,10 @@ public class JakartaClient {
 				e.printStackTrace();
 			}
         }
-		return execute(httppost, null);
+        retries = 0;
+        ClientURLResponse rsp = execute(httppost, null);
+        retries = 10;
+		return rsp;
     }
     
     /**
@@ -325,6 +328,8 @@ public class JakartaClient {
     	request.setHeader("X-Machine-Generated", "true");
     	ClientURLResponse response = null;
     	int count = 0;
+    	connectException = clientProtocolException = ioException = null;
+    	Exception lastException = null;
     	while (true) {
     		try {
     			response = new ClientURLResponse(httpclient.execute(request));
@@ -341,6 +346,7 @@ public class JakartaClient {
             			System.err.println("ConnectException");
         				e.printStackTrace();
             			connectException = e.getMessage();
+            			lastException = e;
         			}
     			}
     		} catch (ClientProtocolException e) {
@@ -349,6 +355,7 @@ public class JakartaClient {
             			System.err.println("ClientProtocolException");
             			e.printStackTrace();
             			clientProtocolException = e.getMessage();
+            			lastException = e;
         			}
     			}
     		} catch (IOException e) {
@@ -358,10 +365,12 @@ public class JakartaClient {
             			System.err.println("IOException");
             			e.printStackTrace();
             			ioException = e.getMessage();
+            			lastException = e;
         			}
     			}
     		}
 			if (++count > retries) {
+    			response = new ClientURLResponse(lastException);
 				break;
 			} else {
 				// just in case
@@ -428,9 +437,14 @@ public class JakartaClient {
 
 	public class ClientURLResponse {
     	private HttpResponse response;
+    	private Exception exception;
     	
     	ClientURLResponse(HttpResponse response) {
     		this.response = response;
+    	}
+    	
+    	ClientURLResponse(Exception exception) {
+    		this.exception = exception;
     	}
     	
         /**
@@ -447,8 +461,23 @@ public class JakartaClient {
          * 
          */
     	public boolean isError() {
-    		// TODO Auto-generated method stub
     		return getStatus() > 400;
+    	}
+
+        /**
+         * Return the true if an exception was thrown during the execution of the HTTP request; false otherwise
+         * 
+         */
+    	public boolean isException() {
+    		return exception != null;
+    	}
+
+        /**
+         * Return the exception
+         * 
+         */
+    	public Exception getException() {
+    		return exception;
     	}
 
         /**
