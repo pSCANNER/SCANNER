@@ -217,9 +217,16 @@ public class MessageUtils
         throws Exception
     {
         CamelContext context = exchange.getContext();
-        String siteID = context.resolvePropertyPlaceholders("{{worker.siteID}}");
-        String siteName = context.resolvePropertyPlaceholders("{{worker.siteName}}"); 
-        String siteDesc = context.resolvePropertyPlaceholders("{{worker.siteDescription}}");
+        
+        String siteID =
+            context.resolvePropertyPlaceholders(
+                BaseConstants.SITE_ID_PROPERTY);
+        String siteName = 
+            context.resolvePropertyPlaceholders(
+                BaseConstants.SITE_NAME_PROPERTY); 
+        String siteDesc = 
+            context.resolvePropertyPlaceholders(
+                BaseConstants.SITE_DESC_PROPERTY);
         
         SiteInfo siteInfo = new SiteInfo();
         siteInfo.setSiteID(siteID);

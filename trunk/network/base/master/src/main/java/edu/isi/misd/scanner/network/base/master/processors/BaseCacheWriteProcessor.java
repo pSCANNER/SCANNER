@@ -18,6 +18,6 @@ public  class BaseCacheWriteProcessor implements Processor
     @Override
     public void process(Exchange exchange) throws Exception 
     {        
-        FileUtils.writeFile(exchange, BaseConstants.MASTER_OUTPUT_DIR);                
+        FileUtils.writeFile(exchange, BaseConstants.MASTER_OUTPUT_DIR_PROPERTY);                
     }  
 }

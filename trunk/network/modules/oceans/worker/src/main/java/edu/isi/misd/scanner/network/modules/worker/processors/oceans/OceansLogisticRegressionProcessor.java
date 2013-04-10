@@ -77,7 +77,7 @@ public class OceansLogisticRegressionProcessor implements Processor
         }        
         String baseInputDir = 
             ConfigUtils.getBaseInputDir(
-                exchange, BaseConstants.WORKER_INPUT_DIR);   
+                exchange, BaseConstants.WORKER_INPUT_DIR_PROPERTY);   
         File file = new File(baseInputDir,fileName);
         
         // setup and run the oceans lr analysis

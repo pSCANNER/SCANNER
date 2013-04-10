@@ -190,7 +190,7 @@ public class GloreProcessor implements Processor
         }        
         String baseInputDir = 
             ConfigUtils.getBaseInputDir(
-                exchange, BaseConstants.WORKER_INPUT_DIR);  
+                exchange, BaseConstants.WORKER_INPUT_DIR_PROPERTY);  
         
         // access the file
         File file = new File(baseInputDir,fileName);        
