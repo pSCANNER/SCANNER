@@ -358,11 +358,13 @@ public class Query extends HttpServlet {
 					//return;
 				} catch (JSONException e) {
 					e.printStackTrace();
+					throw(new ServletException(e));
 				}
 			}
 
 		} catch (JSONException e) {
 			e.printStackTrace();
+			throw(new ServletException(e));
 		}
 		PrintWriter out = response.getWriter();
 		String text = obj.toString();

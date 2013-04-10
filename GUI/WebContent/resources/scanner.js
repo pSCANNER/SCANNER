@@ -51,6 +51,7 @@ var availableParameters = {};
 
 var descriptionId = 0;
 var tipBox;
+var alertErrorDialog;
 
 var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
 
@@ -108,6 +109,21 @@ function initScanner() {
 	$('#acceptConditions').removeAttr('checked');
 	$('#continueButton').attr('disabled', 'disabled');
 	tipBox = $('#TipBox');
+	$('#Alert_Error_Dialog').css('display', '');
+	alertErrorDialog = $('#Alert_Error_Dialog');
+	alertErrorDialog.dialog({
+		autoOpen: false,
+		title: 'Error',
+		buttons: {
+			'OK': function() {
+					$(this).dialog('close');
+				}
+		},
+		draggable: true,
+		modal: false,
+		resizable: true,
+		width: 500
+	});
 }
 
 /**
@@ -2122,9 +2138,12 @@ function handleError(jqXHR, textStatus, errorThrown, retryCallback, url, obj, as
 			msg += 'ErrorThrown: ' + errorThrown + '\n';
 		}
 		msg += 'URL: ' + url + '\n';
-		alert(msg);
 		document.body.style.cursor = "default";
 		$('#ajaxSpinnerImage').hide();
+		$('#errorMessage').html(jqXHR.responseText);
+		alertErrorDialog.dialog('open');
+		$('.ui-widget-overlay').css('opacity', 1.0);
+		//alert(msg);
 	} else {
 		var delay = Math.round(Math.ceil((0.75 + Math.random() * 0.5) * Math.pow(10, count) * 0.00001));
 		setTimeout(function(){retryCallback(url, obj, async, successCallback, param, errorCallback, count+1);}, delay);
