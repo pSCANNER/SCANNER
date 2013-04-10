@@ -218,7 +218,7 @@ function renderAvailableStudies() {
 	$('#paramsTitle').css('display', 'none');
 	$('#paramsDiv').css('display', 'none');
 	$('#resultDiv').css('display', 'none');
-	$('#errorDiv').css('display', 'none');
+	$('#errorQueryDiv').css('display', 'none');
 	
 	// send the request
 	var url = HOME + '/query?action=getStudies';
@@ -2871,7 +2871,7 @@ function loadStudies(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
-				$('#errorDiv').css('display', 'none');
+				$('#errorQueryDiv').css('display', 'none');
 				var selValues = studiesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2917,7 +2917,7 @@ function loadDatasets(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
-				$('#errorDiv').css('display', 'none');
+				$('#errorQueryDiv').css('display', 'none');
 				var selValues = datasetsMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2961,7 +2961,7 @@ function loadLibraries(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
-				$('#errorDiv').css('display', 'none');
+				$('#errorQueryDiv').css('display', 'none');
 				var selValues = librariesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -3004,7 +3004,7 @@ function loadMethods(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
-				$('#errorDiv').css('display', 'none');
+				$('#errorQueryDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
 						renderAvailableSites();

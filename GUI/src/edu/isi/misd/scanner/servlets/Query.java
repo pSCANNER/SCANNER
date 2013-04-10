@@ -196,7 +196,7 @@ public class Query extends HttpServlet {
 					// to handle this case
 					System.out.println("Response is null");
 				}
-				scannerClient = new ScannerClient(4, 8192, 120000,
+				scannerClient = new ScannerClient(4, 8192, 300000,
 						trustStoreType, trustStorePassword, trustStoreResource,
 						keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
 				session.setAttribute("scannerClient", scannerClient);
