@@ -17,8 +17,7 @@
     <camel:camelContext id="IterationIntegrationTestContext" errorHandlerRef="testErrorHandler">
                 
         <camel:propertyPlaceholder id="properties" 
-                                   location="classpath:edu/isi/misd/scanner/network/base/test/test.properties"/>    
-                
+                                   location="classpath:edu/isi/misd/scanner/network/base/test/test-master.properties,classpath:edu/isi/misd/scanner/network/base/test/test-worker.properties"/>                
         <camel:packageScan>
             <camel:package>edu.isi.misd.scanner.network.modules.master</camel:package>            
             <camel:package>edu.isi.misd.scanner.network.modules.worker</camel:package>

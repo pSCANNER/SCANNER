@@ -27,6 +27,6 @@ public class BaseCacheReadProcessor implements Processor
     public void process(Exchange exchange) throws Exception 
     {
         MessageUtils.setTimestamp(exchange);          
-        FileUtils.readFile(exchange, BaseConstants.WORKER_OUTPUT_DIR);
+        FileUtils.readFile(exchange, BaseConstants.WORKER_OUTPUT_DIR_PROPERTY);
     }              
 }
