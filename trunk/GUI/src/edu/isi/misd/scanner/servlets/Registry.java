@@ -195,7 +195,7 @@ public class Registry extends HttpServlet {
 			}  
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
-			boolean valid = Utils.login(request, response, username, password);
+			boolean valid = username != null && password != null && username.equals(tagfilerUser) && password.equals(tagfilerPassword);
 			if (valid) {
 				session.setAttribute("user", username);
 				JakartaClient client = new JakartaClient(4, 8192, 120000);
@@ -382,7 +382,7 @@ public class Registry extends HttpServlet {
 				if (clientResponse != null) {
 					responseBody = Utils.extractId(clientResponse.getEntityString());
 				} else {
-					responseBody = "ERROR: Can not create master.";
+					responseBody = "ERROR: Can not create parameter.";
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();

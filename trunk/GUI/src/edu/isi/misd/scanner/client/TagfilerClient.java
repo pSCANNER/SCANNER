@@ -282,6 +282,9 @@ public class TagfilerClient implements RegistryClient {
 				if (description != null) {
 					url += "&description=" + Utils.urlEncode(description);
 				}
+				if (path != null) {
+					url += "&path=" + Utils.urlEncode(path);
+				}
 				if (values != null) {
 					url += "&values=";
 					for (int i=0; i < values.size(); i++) {
