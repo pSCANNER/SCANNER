@@ -381,15 +381,17 @@ public class TagfilerClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse deleteStudy(String name) {
 		RegistryClientResponse clientResponse = null;
-		try {
-			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/subject/rtype;study=" + Utils.urlEncode(name);
-			ClientURLResponse rsp = client.delete(url, cookie);
-			url = tagfilerURL + "/subject/rtype=study;cname=" + Utils.urlEncode(name);
-			rsp = client.delete(url, cookie);
-			clientResponse = new TagfilerClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		if (name != null) {
+			try {
+				client.setCookieValue(cookie);
+				String url = tagfilerURL + "/subject/rtype;study=" + Utils.urlEncode(name);
+				ClientURLResponse rsp = client.delete(url, cookie);
+				url = tagfilerURL + "/subject/rtype=study;cname=" + Utils.urlEncode(name);
+				rsp = client.delete(url, cookie);
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		return clientResponse;
 	}
@@ -400,15 +402,19 @@ public class TagfilerClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse deleteLibrary(String name) {
 		RegistryClientResponse clientResponse = null;
-		try {
-			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/subject/rtype;library=" + Utils.urlEncode(name);
-			ClientURLResponse rsp = client.delete(url, cookie);
-			url = tagfilerURL + "/subject/rtype=library;cname=" + Utils.urlEncode(name);
-			rsp = client.delete(url, cookie);
-			clientResponse = new TagfilerClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		if (name != null) {
+			try {
+				client.setCookieValue(cookie);
+				String url = tagfilerURL + "/subject/rtype=worker;library=" + Utils.urlEncode(name);
+				ClientURLResponse rsp = client.delete(url, cookie);
+				url = tagfilerURL + "/tags/rtype=method,parameter;library=" + Utils.urlEncode(name) + "(library=" + Utils.urlEncode(name) + ")";
+				rsp = client.delete(url, cookie);
+				url = tagfilerURL + "/subject/rtype=library;cname=" + Utils.urlEncode(name);
+				rsp = client.delete(url, cookie);
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		return clientResponse;
 	}
@@ -431,17 +437,30 @@ public class TagfilerClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse deleteParameter(String name, String func, String lib) {
 		RegistryClientResponse clientResponse = null;
-		try {
-			client.setCookieValue(cookie);
-			String url;
-			url = tagfilerURL + "/subject/rtype=parameter" + 
-			";cname=" + Utils.urlEncode(name) +
-			";method=" + Utils.urlEncode(func) +
-			";library=" + Utils.urlEncode(lib);
-			ClientURLResponse rsp = client.delete(url, cookie);
-			clientResponse = new TagfilerClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		if (name != null) {
+			try {
+				client.setCookieValue(cookie);
+				ClientURLResponse rsp = null;
+				String url;
+				if (lib != null) {
+					url = tagfilerURL + "/tags/rtype=parameter;cname=" + Utils.urlEncode(name) + ";library=" + Utils.urlEncode(lib);
+					if (func != null) {
+						url += ";method=" + Utils.urlEncode(func);
+					}
+					url += "(library=" + Utils.urlEncode(lib) + ")";
+					rsp = client.delete(url, cookie);
+				} else {
+					url = tagfilerURL + "/subject/rtype=parameter" + 
+					";cname=" + Utils.urlEncode(name);
+					if (func != null) {
+						url += ";method=" + Utils.urlEncode(func);
+					}
+					rsp = client.delete(url, cookie);
+				}
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		return clientResponse;
 	}
@@ -452,19 +471,21 @@ public class TagfilerClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse deleteWorker(String study, String dataset, String lib, String func, String site) {
 		RegistryClientResponse clientResponse = null;
-		try {
-			client.setCookieValue(cookie);
-			String url;
-			url = tagfilerURL + "/subject/rtype=worker" + 
-			";study=" + Utils.urlEncode(study) +
-			";dataset=" + Utils.urlEncode(dataset) +
-			";library=" + Utils.urlEncode(lib) +
-			";method=" + Utils.urlEncode(func) +
-			";site=" + Utils.urlEncode(site);
-			ClientURLResponse rsp = client.delete(url, cookie);
-			clientResponse = new TagfilerClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		if (study != null && dataset != null && lib != null && func != null && site != null) {
+			try {
+				client.setCookieValue(cookie);
+				String url;
+				url = tagfilerURL + "/subject/rtype=worker" + 
+				";study=" + Utils.urlEncode(study) +
+				";dataset=" + Utils.urlEncode(dataset) +
+				";library=" + Utils.urlEncode(lib) +
+				";method=" + Utils.urlEncode(func) +
+				";site=" + Utils.urlEncode(site);
+				ClientURLResponse rsp = client.delete(url, cookie);
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		return clientResponse;
 	}
@@ -472,30 +493,66 @@ public class TagfilerClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse deleteMethod(String name, String lib) {
 		RegistryClientResponse clientResponse = null;
-		try {
-			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/subject/rtype;method=" + Utils.urlEncode(name) + ";library=" + Utils.urlEncode(lib);
-			ClientURLResponse rsp = client.delete(url, cookie);
-			url = tagfilerURL + "/subject/rtype=method" + 
-			";cname=" + Utils.urlEncode(name) +
-			";library=" + Utils.urlEncode(lib);
-			rsp = client.delete(url, cookie);
-			clientResponse = new TagfilerClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		if (name != null) {
+			try {
+				client.setCookieValue(cookie);
+				String url = tagfilerURL + "/subject/rtype;method=" + Utils.urlEncode(name);
+				if (lib != null) {
+					url += ";library=" + Utils.urlEncode(lib);
+				}
+				ClientURLResponse rsp = client.delete(url, cookie);
+				url = tagfilerURL;
+				if (lib != null) {
+					url += "/tags/";
+				} else {
+					url += "/subject/";
+				}
+				url += "rtype=method" + 
+				";cname=" + Utils.urlEncode(name);
+				if (lib != null) {
+					url += ";library=" + Utils.urlEncode(lib) + "(library=" + Utils.urlEncode(lib) + ")";
+				}
+				rsp = client.delete(url, cookie);
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		return clientResponse;
 	}
 	@Override
 	public RegistryClientResponse deleteDataset(String name, String study) {
 		RegistryClientResponse clientResponse = null;
+		if (name != null) {
+			try {
+				client.setCookieValue(cookie);
+				String url = tagfilerURL + "/subject/rtype;dataset=" + Utils.urlEncode(name);
+				if (study != null) {
+					url += ";study=" + Utils.urlEncode(study);
+				}
+				ClientURLResponse rsp = client.delete(url, cookie);
+				url = tagfilerURL + "/subject/rtype=dataset" + 
+				";cname=" + Utils.urlEncode(name);
+				if (study != null) {
+					url += ";study=" + Utils.urlEncode(study);
+				}
+				rsp = client.delete(url, cookie);
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+		return clientResponse;
+	}
+	
+	@Override
+	public RegistryClientResponse deleteSite(String name) {
+		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/subject/rtype;dataset=" + Utils.urlEncode(name) + ";study=" + Utils.urlEncode(study);
+			String url = tagfilerURL + "/subject/rtype;site=" + Utils.urlEncode(name);
 			ClientURLResponse rsp = client.delete(url, cookie);
-			url = tagfilerURL + "/subject/rtype=dataset" + 
-			";cname=" + Utils.urlEncode(name) +
-			";study=" + Utils.urlEncode(study);
+			url = tagfilerURL + "/subject/rtype=site;cname=" + Utils.urlEncode(name);
 			rsp = client.delete(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -503,6 +560,7 @@ public class TagfilerClient implements RegistryClient {
 		}
 		return clientResponse;
 	}
+
 	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClient#modifyLibrary(java.lang.String, java.lang.String, java.lang.String)
 	 */
@@ -1269,22 +1327,6 @@ public class TagfilerClient implements RegistryClient {
 			}
 			url += "(id;cname;rURL)";
 			ClientURLResponse rsp = client.get(url, cookie);
-			clientResponse = new TagfilerClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return clientResponse;
-	}
-
-	@Override
-	public RegistryClientResponse deleteSite(String name) {
-		RegistryClientResponse clientResponse = null;
-		try {
-			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/subject/rtype;site=" + Utils.urlEncode(name);
-			ClientURLResponse rsp = client.delete(url, cookie);
-			url = tagfilerURL + "/subject/rtype=site;cname=" + Utils.urlEncode(name);
-			rsp = client.delete(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();

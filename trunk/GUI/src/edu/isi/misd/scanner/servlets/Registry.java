@@ -187,6 +187,10 @@ public class Registry extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
+		if (action == null) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No action specified.");
+			return;
+		}
 		if (action.equals("login")) {
 			HttpSession session = request.getSession(true);
 			if (session.isNew() == false) {
@@ -214,8 +218,7 @@ public class Registry extends HttpServlet {
 					out.print("Can not access registry service.\n");
 				}
 			} else {
-				PrintWriter out = response.getWriter();
-				out.print("Invalid username or password.\n");
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password.");
 			}
 			return;
 		}
@@ -265,7 +268,8 @@ public class Registry extends HttpServlet {
 			if (clientResponse != null) {
 				responseBody = Utils.extractId(clientResponse.getEntityString());
 			} else {
-				responseBody = "ERROR: Can not create study.";
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create study.");
+				return;
 			}
 		} else if (action.equals("createDataset")) {
 			try {
@@ -283,7 +287,8 @@ public class Registry extends HttpServlet {
 				if (clientResponse != null) {
 					responseBody = Utils.extractId(clientResponse.getEntityString());
 				} else {
-					responseBody = "ERROR: Can not create dataset.";
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create dataset.");
+					return;
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -293,7 +298,8 @@ public class Registry extends HttpServlet {
 			if (clientResponse != null) {
 				responseBody = Utils.extractId(clientResponse.getEntityString());
 			} else {
-				responseBody = "ERROR: Can not create library.";
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create library.");
+				return;
 			}
 		} else if (action.equals("createMethod")) {
 			try {
@@ -311,7 +317,8 @@ public class Registry extends HttpServlet {
 				if (clientResponse != null) {
 					responseBody = Utils.extractId(clientResponse.getEntityString());
 				} else {
-					responseBody = "ERROR: Can not create method.";
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create method.");
+					return;
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -322,7 +329,8 @@ public class Registry extends HttpServlet {
 			if (clientResponse != null) {
 				responseBody = Utils.extractId(clientResponse.getEntityString());
 			} else {
-				responseBody = "ERROR: Can not create master.";
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create master.");
+				return;
 			}
 		} else if (action.equals("createWorker")) {
 				try {
@@ -341,7 +349,8 @@ public class Registry extends HttpServlet {
 					if (clientResponse != null) {
 						responseBody = Utils.extractId(clientResponse.getEntityString());
 					} else {
-						responseBody = "ERROR: Can not create worker.";
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create worker.");
+						return;
 					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -353,7 +362,8 @@ public class Registry extends HttpServlet {
 			if (clientResponse != null) {
 				responseBody = Utils.extractId(clientResponse.getEntityString());
 			} else {
-				responseBody = "ERROR: Can not create site.";
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create site.");
+				return;
 			}
 		} else if (action.equals("createParameter")) {
 			try {
@@ -382,35 +392,76 @@ public class Registry extends HttpServlet {
 				if (clientResponse != null) {
 					responseBody = Utils.extractId(clientResponse.getEntityString());
 				} else {
-					responseBody = "ERROR: Can not create parameter.";
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create parameter.");
+					return;
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		} else if (action.equals("deleteMethod")) {
 			clientResponse = registryClient.deleteMethod(name, lib);
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete method.");
+				return;
+			}
 		} else if (action.equals("deleteLibrary")) {
 			clientResponse = registryClient.deleteLibrary(name);
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete library.");
+				return;
+			}
 		} else if (action.equals("deleteDataset")) {
 			clientResponse = registryClient.deleteDataset(name, study);
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete dataset.");
+				return;
+			}
 		} else if (action.equals("deleteStudy")) {
 			clientResponse = registryClient.deleteStudy(name);
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete study.");
+				return;
+			}
 		} else if (action.equals("deleteMaster")) {
 			clientResponse = registryClient.deleteMaster();
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete master.");
+				return;
+			}
 		}  else if (action.equals("deleteSite")) {
 			clientResponse = registryClient.deleteSite(name);
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete site.");
+				return;
+			}
 		} else if (action.equals("deleteParameter")) {
 			clientResponse = registryClient.deleteParameter(name, func, lib);
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete parameter.");
+				return;
+			}
 		} else if (action.equals("deleteWorker")) {
 			clientResponse = registryClient.deleteWorker(study, dataset, lib, func, site);
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete worker.");
+				return;
+			}
 		} else if (action.equals("updateLibrary")) {
 			clientResponse = registryClient.updateLibrary(id, name, rpath);
 			if (clientResponse != null) {
@@ -463,6 +514,9 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unknown action: \"" + action + "\"");
+			return;
 		}
 		if (clientResponse != null) {
 			clientResponse.release();
