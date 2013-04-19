@@ -13,6 +13,7 @@ import org.apache.camel.component.http4.HttpOperationFailedException;
 import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.dataformat.xmljson.XmlJsonDataFormat;
+import org.apache.http.conn.HttpHostConnectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,7 +193,12 @@ public class DefaultRoute extends RouteBuilder
             maximumRedeliveries(0).
             continued(true).
             end().
-            // do retry socket/io/connect errors (at least once)
+            // dont retry connects for now
+            onException(HttpHostConnectException.class).
+            maximumRedeliveries(0).
+            continued(true).
+            end().            
+            // do retry socket/io errors (at least once)
             onException(SocketException.class).
             maximumRedeliveries(1).
             redeliveryDelay(1000).
