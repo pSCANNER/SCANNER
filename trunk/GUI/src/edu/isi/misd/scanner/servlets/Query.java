@@ -129,9 +129,9 @@ public class Query extends HttpServlet {
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset);
 			String ret = clientResponse.toLibraries();
-			System.out.println("Get Libraries: "+ret.toString());
+			System.out.println("Get Libraries: "+ret);
 			PrintWriter out = response.getWriter();
-			out.print(ret.toString());
+			out.print(ret);
 		} else if (action.equals("getMethods")) {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
@@ -237,16 +237,19 @@ public class Query extends HttpServlet {
 					String func = request.getParameter("method");
 					String study = request.getParameter("study");
 					String dataset = request.getParameter("dataset");
-					RegistryClientResponse clientResponse = registryClient.getMaster();
-					String res = clientResponse.toMaster();
+					RegistryClientResponse clientResponse = registryClient.getMasterObject();
+					String res = clientResponse.toMasterString();
+					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("rURL");
-					clientResponse = registryClient.getMethod(func, lib);
-					res = clientResponse.toMethod();
+					clientResponse = registryClient.getMethodObject(func, lib);
+					res = clientResponse.toMethodString();
+					System.out.println("method string: " + res);
 					temp = new JSONObject(res);
 					String funcPath = temp.getString("rpath");
-					clientResponse = registryClient.getLibrary(lib);
-					res = clientResponse.toLibrary();
+					clientResponse = registryClient.getLibraryObject(lib);
+					res = clientResponse.toLibraryString();
+					System.out.println("library string: " + res);
 					temp = new JSONObject(res);
 					String libPath = temp.getString("rpath");
 					ArrayList<String> values = null;
@@ -259,8 +262,9 @@ public class Query extends HttpServlet {
 							}
 						}
 					}
-					clientResponse = registryClient.getSite(values);
-					res = clientResponse.toSite();
+					clientResponse = registryClient.getSiteObject(values);
+					res = clientResponse.toSiteString();
+					System.out.println("site string: " + res);
 					HashMap<String, String> sitesMap = new HashMap<String, String>();
 					JSONArray tempArray = new JSONArray(res);
 					for (int i=0; i < tempArray.length(); i++) {
@@ -269,6 +273,7 @@ public class Query extends HttpServlet {
 					}
 					clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
 					res = clientResponse.toWorkers();
+					System.out.println("workers string: " + res);
 					StringBuffer buff = new StringBuffer();
 					JSONArray targets= new JSONArray(res);
 					if (targets.length() == 0) {
@@ -324,7 +329,7 @@ public class Query extends HttpServlet {
 						rsp = scannerClient.postScannerQuery(url, targetsURLs, params);
 						if (!rsp.isException()) {
 							rspId = rsp.getIdHeader();
-							System.out.println("Response Id: \n"+rspId);
+							System.out.println("Response Id: "+rspId);
 							if (rspId != null) {
 								obj.put("trxId", rspId);
 								Hashtable<String, List<String>> trxTable = (Hashtable<String, List<String>>) session.getAttribute("trxIdTable");

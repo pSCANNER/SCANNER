@@ -483,6 +483,15 @@ public interface RegistryClient {
 	public RegistryClientResponse getLibrary(String name);
 	
     /**
+     * Get a library from the registry
+     * 
+     * @param name
+     *            the name of the library
+     * @return the Client Response
+     */
+	public RegistryClientResponse getLibraryObject(String name);
+	
+    /**
      * Get a method from the registry
      * 
      * @param name
@@ -494,6 +503,17 @@ public interface RegistryClient {
 	public RegistryClientResponse getMethod(String name, String lib);
 	
     /**
+     * Get a method from the registry
+     * 
+     * @param name
+     *            the name of the method
+     * @param lib
+     *            the library the method belongs to
+     * @return the Client Response
+     */
+	public RegistryClientResponse getMethodObject(String name, String lib);
+	
+    /**
      * Get the master from the registry
      * 
      * @param name
@@ -501,6 +521,15 @@ public interface RegistryClient {
      * @return the Client Response
      */
 	public RegistryClientResponse getMaster();
+	
+    /**
+     * Get the master from the registry
+     * 
+     * @param name
+     *            the name of the master
+     * @return the Client Response
+     */
+	public RegistryClientResponse getMasterObject();
 	
     /**
      * Get a parameter from the registry
@@ -539,36 +568,16 @@ public interface RegistryClient {
      *            the name of the sites; if null or empty; get all the sites
      * @return the Client Response
      */
-	public RegistryClientResponse getSite(List<String> sites);
-	
+	public RegistryClientResponse getSite(String site);
+		
     /**
-     * Get the libraries of a site
+     * Get the site(s)
      * 
-     * @param site
-     *            the site name
+     * @param sites
+     *            the name of the sites; if null or empty; get all the sites
      * @return the Client Response
      */
-	public RegistryClientResponse getNodeLibraries(String site);
-	
-    /**
-     * Get the extracts of a node
-     * 
-     * @param site
-     *            the site the worker belongs to
-     * @return the Client Response
-     */
-	public RegistryClientResponse getNodeExtracts(String site);
-	
-    /**
-     * Get the sites of a dataset
-     * 
-     * @param study
-     *            the study the worker belongs to
-     * @param dataset
-     *            the dataset the worker belongs to
-     * @return the Client Response
-     */
-	public RegistryClientResponse getDatasetSites(String study, String dataset);
+	public RegistryClientResponse getSiteObject(List<String> sites);
 	
     /**
      * Get the contacts of the SCANNER, studies and sites
