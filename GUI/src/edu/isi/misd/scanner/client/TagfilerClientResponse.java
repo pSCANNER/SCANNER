@@ -79,7 +79,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 		String result = null;
 		try {
 			String res = response.getEntityString();
-			System.out.println("Entity: " + res);
 			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
@@ -125,7 +124,6 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 		String result = null;
 		try {
 			String res = response.getEntityString();
-			System.out.println("Entity: " + res);
 			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
@@ -213,36 +211,52 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 
 	@Override
 	public String toStudy() {
-		return toResource();
+		return getEntityString();
 	}
 	@Override
 	public String toDataset() {
-		return toResource();
+		return getEntityString();
 	}
 	@Override
 	public String toLibrary() {
-		return toResource();
+		return getEntityString();
 	}
 	@Override
 	public String toMethod() {
+		return getEntityString();
+	}
+	@Override
+	public String toMaster() {
+		return getEntityString();
+	}
+	@Override
+	public String toParameter() {
+		return getEntityString();
+	}
+	@Override
+	public String toWorker() {
+		return getEntityString();
+	}
+	@Override
+	public String toSite() {
+		return response.getEntityString();
+	}
+	@Override
+	public String toLibraryString() {
+		return toResource();
+	}
+	@Override
+	public String toMethodString() {
 		return toResource();
 	}
 	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toMaster()
 	 */
 	@Override
-	public String toMaster() {
+	public String toMasterString() {
 		return toResource();
 	}
 
-	@Override
-	public String toWorker() {
-		return toResource();
-	}
-	@Override
-	public String toParameter() {
-		return toResource();
-	}
 	@Override
 	public String getResourceId() {
 		String ret = null;
@@ -255,7 +269,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 		return ret;
 	}
 	@Override
-	public String toSite() {
+	public String toSiteString() {
 		return response.getEntityString();
 	}
 	@Override

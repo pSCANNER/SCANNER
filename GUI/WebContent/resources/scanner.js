@@ -2255,14 +2255,7 @@ function handleError(jqXHR, textStatus, errorThrown, retryCallback, url, obj, as
 		msg += 'URL: ' + url + '\n';
 		document.body.style.cursor = "default";
 		$('#ajaxSpinnerImage').hide();
-		var alertMessage = jqXHR.responseText;
-		var index1 = jqXHR.responseText.indexOf('<body>');
-		if (index1 >= 0) {
-			var index2 = jqXHR.responseText.indexOf('</body>');
-			if (index2 >= 0) {
-				alertMessage = alertMessage.substring(index1+'<body>'.length, index2);
-			}
-		}
+		var alertMessage = getHTMLErrorMessage(jqXHR.responseText);
 		$('#errorMessage').html(alertMessage);
 		alertErrorDialog.dialog('open');
 		$('.ui-widget-overlay').css('opacity', 1.0);
@@ -2271,6 +2264,29 @@ function handleError(jqXHR, textStatus, errorThrown, retryCallback, url, obj, as
 		var delay = Math.round(Math.ceil((0.75 + Math.random() * 0.5) * Math.pow(10, count) * 0.00001));
 		setTimeout(function(){retryCallback(url, obj, async, successCallback, param, errorCallback, count+1);}, delay);
 	}
+}
+
+function getHTMLErrorMessage(msg) {
+	msg = msg.replace(/&lt;/g, '<');
+	msg = msg.replace(/&gt;/g, '>');
+	var index1 = msg.indexOf('<body>');
+	if (index1 >= 0) {
+		var index2 = msg.lastIndexOf('</body>');
+		msg = msg.substring(index1+'<body>'.length, index2);
+		// remove any head
+		index1 = msg.indexOf('<head>');
+		while (index1 >= 0) {
+			index2 = msg.indexOf('</head>');
+			msg = msg.substring(0, index1) + msg.substring(index2+'</head>'.length);
+			index1 = msg.indexOf('<head>');
+		}
+		// remove any body
+		msg = msg.replace(/<body>/g, '');
+		msg = msg.replace(/<\/body>/g, '');
+		msg = msg.replace(/<html>/g, '');
+		msg = msg.replace(/<\/html>/g, '');
+	}
+	return msg;
 }
 
 /**

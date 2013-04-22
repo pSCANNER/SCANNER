@@ -75,6 +75,10 @@ public class Registry extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
+		if (action == null) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No action specified.");
+			return;
+		}
 		HttpSession session = request.getSession(false);
 		if (session == null) {
 			PrintWriter out = response.getWriter();
@@ -93,86 +97,71 @@ public class Registry extends HttpServlet {
 		RegistryClientResponse clientResponse = null;
 		if  (action.equals("getStudy")) {
 			clientResponse = registryClient.getStudy(name);
-			res= clientResponse.toStudy();
+			if (clientResponse != null) {
+				res = clientResponse.toStudy();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study.");
+				return;
+			}
 		} else if (action.equals("getDataset")) {
 			clientResponse = registryClient.getDataset(name, study);
-			res= clientResponse.toDataset();
+			if (clientResponse != null) {
+				res = clientResponse.toDataset();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset.");
+				return;
+			}
 		} else if (action.equals("getLibrary")) {
 			clientResponse = registryClient.getLibrary(name);
-			res= clientResponse.toLibrary();
+			if (clientResponse != null) {
+				res = clientResponse.toLibrary();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get library.");
+				return;
+			}
 		} else if (action.equals("getMethod")) {
 			clientResponse = registryClient.getMethod(name, lib);
-			res= clientResponse.toMethod();
+			if (clientResponse != null) {
+				res = clientResponse.toMethod();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get method.");
+				return;
+			}
 		} else if (action.equals("getMaster")) {
 			clientResponse = registryClient.getMaster();
-			res= clientResponse.toMaster();
+			if (clientResponse != null) {
+				res = clientResponse.toMaster();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get master.");
+				return;
+			}
 		} else if (action.equals("getParameter")) {
 			clientResponse = registryClient.getParameter(name, func, lib);
-			res= clientResponse.toParameter();
+			if (clientResponse != null) {
+				res = clientResponse.toParameter();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get parameter.");
+				return;
+			}
 		} else if (action.equals("getWorker")) {
 			clientResponse = registryClient.getWorker(study, dataset, lib, func, site);
-			res= clientResponse.toWorker();
+			if (clientResponse != null) {
+				res = clientResponse.toWorker();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get worker.");
+				return;
+			}
 		}  else if (action.equals("getSite")) {
-			ArrayList<String> values = null;
-			if (sites != null) {
-				try {
-					JSONArray arr = new JSONArray(sites);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+			clientResponse = registryClient.getSite(name);
+			if (clientResponse != null) {
+				res = clientResponse.toSite();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site.");
+				return;
 			}
-			clientResponse = registryClient.getSite(values);
-			res= clientResponse.toSite();
-		} else if (action.equals("getStudies")) {
-			clientResponse = registryClient.getStudies();
-			res= clientResponse.toStudies();
-		} else if (action.equals("getDatasets")) {
-			clientResponse = registryClient.getDatasets(study);
-			res= clientResponse.toDatasets();
-		} else if (action.equals("getLibraries")) {
-			clientResponse = registryClient.getLibraries(study, dataset);
-			res= clientResponse.toLibraries();
-		} else if (action.equals("getMethods")) {
-			clientResponse = registryClient.getMethods(study, dataset, lib);
-			res= clientResponse.toMethods();
-		} else if (action.equals("getParameters")) {
-			clientResponse = registryClient.getParameters(func, lib);
-			res= clientResponse.toParameters("[]");
-		} else if (action.equals("getSites")) {
-			clientResponse = registryClient.getSites(study, dataset, lib, func);
-			res= clientResponse.toSites();
-		} else if (action.equals("getWorkers")) {
-			ArrayList<String> values = null;
-			if (sites != null) {
-				try {
-					JSONArray arr = new JSONArray(sites);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-			clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
-			res= clientResponse.toWorkers();
-		} else if (action.equals("getNodeLibraries")) {
-			clientResponse = registryClient.getNodeLibraries(site);
-			res= clientResponse.toLibraries();
-		} else if (action.equals("getNodeExtracts")) {
-			clientResponse = registryClient.getNodeExtracts(site);
-			res= clientResponse.toDatasets();
-		} else if (action.equals("getDatasetSites")) {
-			clientResponse = registryClient.getDatasetSites(study, dataset);
-			res= clientResponse.toSites();
+		} else {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unknown action: \"" + action + "\"");
+			return;
 		}
 		
 		if (clientResponse != null) {
