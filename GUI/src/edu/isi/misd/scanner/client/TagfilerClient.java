@@ -1648,7 +1648,6 @@ public class TagfilerClient implements RegistryClient {
 				}
 				ret = buff.toString();
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

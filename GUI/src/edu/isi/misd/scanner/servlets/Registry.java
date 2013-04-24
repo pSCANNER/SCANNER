@@ -19,7 +19,6 @@ package edu.isi.misd.scanner.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -341,7 +340,6 @@ public class Registry extends HttpServlet {
 						return;
 					}
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		} else if (action.equals("createSite")) {
@@ -552,7 +550,6 @@ public class Registry extends HttpServlet {
 					return;
 				}
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("updateParameter")) {
