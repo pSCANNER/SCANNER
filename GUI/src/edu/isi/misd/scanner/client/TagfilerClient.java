@@ -561,38 +561,194 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#modifyLibrary(java.lang.String, java.lang.String, java.lang.String)
-	 */
 	@Override
-	public RegistryClientResponse updateLibrary(String id, String name, String urlPath) {
+	public RegistryClientResponse updateStudy(String id, String name,
+			String description, String title, String email, String phone,
+			String website, String address, String contact, String approvals) {
 		RegistryClientResponse clientResponse = null;
-		if (name != null || urlPath != null) {
+		if (id != null && name != null || description != null || title != null || email != null || phone != null || website != null ||
+				address != null || approvals != null || contact != null) {
+			ClientURLResponse rsp = null;
 			try {
 				client.setCookieValue(cookie);
 				String url = null;
 				if (name != null) {
+					// update the study references
 					url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(cname)";
-					ClientURLResponse rsp = client.get(url, cookie);
+					rsp = client.get(url, cookie);
 					JSONObject obj = (new JSONArray(rsp.getEntityString())).getJSONObject(0);
-					String libName = obj.getString("cname");
-					if (!libName.equals(name)) {
-						url = tagfilerURL + "/tags/rtype=method,worker,parameter;library=" + Utils.urlEncode(libName) + "(library=" + Utils.urlEncode(name) + ")";
+					String studyName = obj.getString("cname");
+					if (!studyName.equals(name)) {
+						url = tagfilerURL + "/tags/study=" + Utils.urlEncode(studyName) + "(study=" + Utils.urlEncode(name) + ")";
 						client.putResource(url, cookie);
 					}
 				}
 				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
+				String sep = "";
 				if (name != null) {
-					url += "cname=" + Utils.urlEncode(name);
+					url += sep + "cname=" + Utils.urlEncode(name);
+					sep = ";";
 				}
-				if (urlPath != null) {
-					if (name != null) {
-						url += ";";
-					}
-					url += "rpath=" + Utils.urlEncode(urlPath);
+				if (description != null) {
+					url += sep + "description=" + Utils.urlEncode(description);
+					sep = ";";
+				}
+				if (title != null) {
+					url += sep + "title=" + Utils.urlEncode(title);
+					sep = ";";
+				}
+				if (email != null) {
+					url += sep + "email=" + Utils.urlEncode(email);
+					sep = ";";
+				}
+				if (phone != null) {
+					url += sep + "phone=" + Utils.urlEncode(phone);
+					sep = ";";
+				}
+				if (website != null) {
+					url += sep + "website=" + Utils.urlEncode(website);
+					sep = ";";
+				}
+				if (address != null) {
+					url += sep + "address=" + Utils.urlEncode(address);
+					sep = ";";
+				}
+				if (approvals != null) {
+					url += sep + "approvals=" + Utils.urlEncode(approvals);
+					sep = ";";
+				}
+				if (contact != null) {
+					url += sep + "contact=" + Utils.urlEncode(contact);
+					sep = ";";
 				}
 				url += ")";
-				ClientURLResponse rsp = client.putResource(url, cookie);
+				rsp = client.putResource(url, cookie);
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		return clientResponse;
+	}
+
+	@Override
+	public RegistryClientResponse updateDataset(String id, String name,
+			String study, String description, List<String> variables) {
+		RegistryClientResponse clientResponse = null;
+		if (id != null && (name != null || study != null || description != null || variables != null)) {
+				try {
+					String url = null;
+					ClientURLResponse rsp = null;
+					client.setCookieValue(cookie);
+					String sep = "";
+					if (name != null || study != null) {
+						// update dataset references
+						// get the old name
+						url = tagfilerURL + "/query/id=" + id + "(cname;study)";
+						rsp = client.get(url, cookie);
+						JSONObject obj = (new JSONArray(rsp.getEntityString())).getJSONObject(0);
+						String datasetName = obj.getString("cname");
+						String studyName = obj.getString("study");
+						if (name != null && !name.equals(datasetName) || study != null && !study.equals(studyName)) {
+							url = tagfilerURL + "/tags/dataset=" + Utils.urlEncode(datasetName) + ";study=" + Utils.urlEncode(studyName) + "(";
+							sep = "";
+							if (name != null && !name.equals(datasetName)) {
+								url += sep + "dataset=" + Utils.urlEncode(name);
+								sep = ";";
+							}
+							if (study != null && !study.equals(studyName)) {
+								url += sep + "study=" + Utils.urlEncode(study);
+								sep = ";";
+							}
+							url += ")";
+							rsp = client.putResource(url, cookie);
+						}
+					}
+					if (variables != null) {
+						// delete the old values
+						url = tagfilerURL + "/tags/id=" + id + "(variables)";
+						rsp = client.delete(url, cookie);
+					}
+					// update now the dataset
+					url = tagfilerURL + "/tags/id=" + id + "(";
+					sep = "";
+					if (name != null) {
+						url += sep + "cname=" + Utils.urlEncode(name);
+						sep = ";";
+					}
+					if (study != null) {
+						url += sep + "study=" + Utils.urlEncode(study);
+						sep = ";";
+					}
+					if (description != null) {
+						url += sep + "description=" + Utils.urlEncode(description);
+						sep = ";";
+					}
+					if (variables != null && variables.size() > 0) {
+						url += sep + "variables=";
+						for (int i=0; i < variables.size(); i++) {
+							if (i != 0) {
+								url += ",";
+							}
+							url += Utils.urlEncode(variables.get(i));
+						}
+					}
+					url += ")";
+					rsp = client.putResource(url, cookie);
+					clientResponse = new TagfilerClientResponse(rsp);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+		}
+		return clientResponse;
+	}
+
+	/* (non-Javadoc)
+	 * @see edu.isi.misd.scanner.client.RegistryClient#modifyLibrary(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	@Override
+	public RegistryClientResponse updateLibrary(String id, String name, String urlPath, String description) {
+		RegistryClientResponse clientResponse = null;
+		if (id != null && name != null || urlPath != null || description != null) {
+			try {
+				client.setCookieValue(cookie);
+				String url = null;
+				ClientURLResponse rsp = null;
+				client.setCookieValue(cookie);
+				String sep = "";
+				if (name != null) {
+					url = tagfilerURL + "/query/id=" + id + "(cname)";
+					rsp = client.get(url, cookie);
+					JSONObject obj = (new JSONArray(rsp.getEntityString())).getJSONObject(0);
+					String libName = obj.getString("cname");
+					if (!libName.equals(name)) {
+						// put the new name
+						url = tagfilerURL + "/tags/library=" + Utils.urlEncode(libName) + "(library=" + Utils.urlEncode(name) + ")";
+						client.putResource(url, cookie);
+						// delete the old references
+						url = tagfilerURL + "/tags/library=" + Utils.urlEncode(libName) + "(library=" + Utils.urlEncode(libName) + ")";
+						client.delete(url, cookie);
+					}
+				}
+				// set the new values
+				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
+				sep = "";
+				if (name != null) {
+					url += sep + "cname=" + Utils.urlEncode(name);
+					sep = ";";
+				}
+				if (urlPath != null) {
+					url += sep + "rpath=" + Utils.urlEncode(urlPath);
+				}
+				if (description != null) {
+					url += sep + "description=" + Utils.urlEncode(description);
+				}
+				url += ")";
+				rsp = client.putResource(url, cookie);
 				clientResponse = new TagfilerClientResponse(rsp);
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
@@ -607,57 +763,80 @@ public class TagfilerClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#updateMethod(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse updateMethod(String id, String name, String lib, String urlPath) {
+	public RegistryClientResponse updateMethod(String id, String name, List<String> libs, String urlPath, String description) {
 		RegistryClientResponse clientResponse = null;
-		if (name != null || urlPath != null || lib != null) {
+		if (id != null && name != null || urlPath != null || libs != null || description != null) {
 			try {
 				client.setCookieValue(cookie);
 				String url = null;
-				boolean sep = false;
-				if (name != null || lib != null) {
-					url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(cname;library)";
-					ClientURLResponse rsp = client.get(url, cookie);
+				String sep = "";
+				ClientURLResponse rsp = null;
+				if (name != null || libs != null) {
+					// update method references
+					// get the old name
+					url = tagfilerURL + "/query/id=" + id + "(cname;library)";
+					rsp = client.get(url, cookie);
 					JSONObject obj = (new JSONArray(rsp.getEntityString())).getJSONObject(0);
-					String funcName = obj.getString("cname");
-					String libName = obj.getString("library");
-					url = tagfilerURL + "/tags/rtype=worker,parameter;library=" + Utils.urlEncode(libName) + ";method=" + Utils.urlEncode(funcName) + "(";
-					if (lib != null && !libName.equals(lib)) {
-						url += "library=" + Utils.urlEncode(lib);
-						sep = true;
-					}
-					if (name != null && !funcName.equals(name)) {
-						if (sep) {
-							url += ";";
+					String methodName = obj.getString("cname");
+					JSONArray oldLibs = obj.getJSONArray("library");
+					if (libs != null) {
+						// delete old libraries references
+						ArrayList<String> values = new ArrayList<String>();
+						for (int i=0; i < oldLibs.length(); i++) {
+							values.add(oldLibs.getString(i));
 						}
-						url += "method=" + Utils.urlEncode(name);
+						ArrayList<String> removeValues = new ArrayList<String>();
+						for (int i=0; i < values.size(); i++) {
+							if (!libs.contains(values.get(i))) {
+								removeValues.add(values.get(i));
+							}
+						}
+						if (removeValues.size() > 0) {
+							url = tagfilerURL + "/tags/method=" + Utils.urlEncode(methodName) + "(library=";
+							sep = "";
+							for (int i=0; i < removeValues.size(); i++) {
+								url += sep + removeValues.get(i);
+								sep = ",";
+							}
+							url += ")";
+							rsp = client.delete(url, cookie);
+						}
+						// delete old libraries
+						url = tagfilerURL + "/tags/id=" + id + "(library)";
+						rsp = client.delete(url, cookie);
 					}
-					url += ")";
-					client.putResource(url, cookie);
+					// update method references
+					if (name != null && !name.equals(methodName)) {
+						url = tagfilerURL + "/tags/method=" + Utils.urlEncode(methodName) + "(method=" + Utils.urlEncode(name) + ")";
+						rsp = client.putResource(url, cookie);
+					}
 				}
 				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
-				sep = false;
+				sep = "";
 				if (name != null) {
-					url += "cname=" + Utils.urlEncode(name);
-					sep = true;
+					url += sep + "cname=" + Utils.urlEncode(name);
+					sep = ";";
 				}
 				if (urlPath != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "rpath=" + Utils.urlEncode(urlPath);
+					url += sep + "rpath=" + Utils.urlEncode(urlPath);
+					sep = ";";
 				}
-				if (lib != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
+				if (description != null) {
+					url += sep + "description=" + Utils.urlEncode(description);
+					sep = ";";
+				}
+				if (libs != null) {
+					url += sep + "library=";
+					sep = ";";
+					for (int i=0; i < libs.size(); i++) {
+						if (i != 0) {
+							url += ",";
+						}
+						url += Utils.urlEncode(libs.get(i));
 					}
-					url += "library=" + Utils.urlEncode(lib);
 				}
 				url += ")";
-				ClientURLResponse rsp = client.putResource(url, cookie);
+				rsp = client.putResource(url, cookie);
 				clientResponse = new TagfilerClientResponse(rsp);
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
@@ -672,70 +851,76 @@ public class TagfilerClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#modifyParameter(java.lang.String, java.lang.String, int, int, java.util.List)
 	 */
 	@Override
-	public RegistryClientResponse updateParameter(String id, String name, String func, String lib, Integer minOccurs, Integer maxOccurs, List<String> values) {
+	public RegistryClientResponse updateParameter(String id, String name, String func, List<String> libs, 
+			Integer minOccurs, Integer maxOccurs, List<String> values, String path, String description) {
 		RegistryClientResponse clientResponse = null;
-		if (name != null || func != null || lib != null || minOccurs != null || maxOccurs != null || values != null) {
+		if (id != null && name != null || func != null || libs != null || minOccurs != null || maxOccurs != null || values != null || path != null || description != null) {
 			try {
 				client.setCookieValue(cookie);
-				StringBuffer buff = new StringBuffer();
+				StringBuffer buff = null;
 				String url = null;
 				ClientURLResponse rsp = null;
-				if (values != null) {
-					url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(values)";
+				String sep = "";
+				if (libs != null || values != null) {
+					url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
+					if (libs != null) {
+						url += sep + "library";
+						sep = ";";
+					}
+					if (values != null) {
+						url += sep + "values";
+						sep = ";";
+					}
+					url += ")";
 					rsp = client.delete(url, cookie);
+				}
+				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
+				sep = "";
+				if (name != null) {
+					url += sep + "cname=" + Utils.urlEncode(name);
+					sep = ";";
+				}
+				if (func != null) {
+					url += sep + "method=" + Utils.urlEncode(func);
+					sep = ";";
+				}
+				if (libs != null && libs.size() > 0) {
+					buff = new StringBuffer();
+					for (int i=0; i < libs.size(); i++) {
+						if (i != 0) {
+							buff.append(",");
+						}
+						buff.append(Utils.urlEncode(libs.get(i)));
+					}
+					url += sep + "library=" + buff.toString();
+					sep = ";";
+				}
+				if (minOccurs != null) {
+					url += sep + "minOccurs=" + minOccurs;
+					sep = ";";
+				}
+				if (maxOccurs != null) {
+					url += sep + "maxOccurs=" + maxOccurs;
+					sep = ";";
+				}
+				if (values != null && values.size() > 0) {
+					buff = new StringBuffer();
 					for (int i=0; i < values.size(); i++) {
 						if (i != 0) {
 							buff.append(",");
 						}
 						buff.append(Utils.urlEncode(values.get(i)));
 					}
+					url += sep + "values=" + buff.toString();
+					sep = ";";
 				}
-				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
-				boolean sep = false;
-				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
-				if (name != null) {
-					url += "cname=" + Utils.urlEncode(name);
-					sep = true;
+				if (path != null) {
+					url += sep + "path=" + Utils.urlEncode(path);
+					sep = ";";
 				}
-				if (lib != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "library=" + Utils.urlEncode(lib);
-				}
-				if (func != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "method=" + Utils.urlEncode(func);
-				}
-				if (values != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "values=" + buff.toString();
-				}
-				if (minOccurs != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "minOccurs=" + minOccurs;
-				}
-				if (maxOccurs != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "maxOccurs=" + maxOccurs;
+				if (description != null) {
+					url += sep + "description=" + Utils.urlEncode(description);
+					sep = ";";
 				}
 				url += ")";
 				rsp = client.putResource(url, cookie);
@@ -748,77 +933,185 @@ public class TagfilerClient implements RegistryClient {
 	}
 
 	@Override
-	public RegistryClientResponse updateMaster(String url) {
+	public RegistryClientResponse updateMaster(String rURL, String title,
+			String email, String phone, String website, String address, String contact) {
 		RegistryClientResponse clientResponse = null;
-		try {
-			client.setCookieValue(cookie);
-			String req_url = tagfilerURL + "/tags/rtype=master(" +
-				"rURL=" + Utils.urlEncode(url) +
-				")";
-			ClientURLResponse rsp = client.putResource(req_url, cookie);
-			clientResponse = new TagfilerClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		if (rURL != null || title != null || email != null || phone != null || website != null || address != null || contact != null) {
+			try {
+				client.setCookieValue(cookie);
+				String sep = "";
+				String url = tagfilerURL + "/tags/rtype=master(";
+				if (rURL != null) {
+					url += sep + "rURL=" + Utils.urlEncode(rURL);
+					sep = ";";
+				}
+				if (title != null) {
+					url += sep + "title=" + Utils.urlEncode(title);
+					sep = ";";
+				}
+				if (email != null) {
+					url += sep + "email=" + Utils.urlEncode(email);
+					sep = ";";
+				}
+				if (phone != null) {
+					url += sep + "phone=" + Utils.urlEncode(phone);
+					sep = ";";
+				}
+				if (website != null) {
+					url += sep + "website=" + Utils.urlEncode(website);
+					sep = ";";
+				}
+				if (address != null) {
+					url += sep + "address=" + Utils.urlEncode(address);
+					sep = ";";
+				}
+				if (contact != null) {
+					url += sep + "contact=" + Utils.urlEncode(contact);
+					sep = ";";
+				}
+				url += ")";
+				ClientURLResponse rsp = client.putResource(url, cookie);
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 		}
 		return clientResponse;
 	}
+	
+	@Override
+	public RegistryClientResponse updateSite(String id, String name, String rURL, String title,
+			String email, String phone, String website, String address, String agreement, String contact) {
+		RegistryClientResponse clientResponse = null;
+		if (id != null && name != null || rURL != null || title != null || email != null || phone != null || website != null ||
+				address != null || agreement != null || contact != null) {
+			ClientURLResponse rsp = null;
+			try {
+				client.setCookieValue(cookie);
+				String url = null;
+				if (name != null) {
+					// update the site references
+					url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(cname)";
+					rsp = client.get(url, cookie);
+					JSONObject obj = (new JSONArray(rsp.getEntityString())).getJSONObject(0);
+					String siteName = obj.getString("cname");
+					if (!siteName.equals(name)) {
+						url = tagfilerURL + "/tags/site=" + Utils.urlEncode(siteName) + "(site=" + Utils.urlEncode(name) + ")";
+						client.putResource(url, cookie);
+					}
+				}
+				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
+				String sep = "";
+				if (name != null) {
+					url += sep + "cname=" + Utils.urlEncode(name);
+					sep = ";";
+				}
+				if (rURL != null) {
+					url += sep + "rURL=" + Utils.urlEncode(rURL);
+					sep = ";";
+				}
+				if (title != null) {
+					url += sep + "title=" + Utils.urlEncode(title);
+					sep = ";";
+				}
+				if (email != null) {
+					url += sep + "email=" + Utils.urlEncode(email);
+					sep = ";";
+				}
+				if (phone != null) {
+					url += sep + "phone=" + Utils.urlEncode(phone);
+					sep = ";";
+				}
+				if (website != null) {
+					url += sep + "website=" + Utils.urlEncode(website);
+					sep = ";";
+				}
+				if (address != null) {
+					url += sep + "address=" + Utils.urlEncode(address);
+					sep = ";";
+				}
+				if (agreement != null) {
+					url += sep + "agreement=" + Utils.urlEncode(agreement);
+					sep = ";";
+				}
+				if (contact != null) {
+					url += sep + "contact=" + Utils.urlEncode(contact);
+					sep = ";";
+				}
+				url += ")";
+				rsp = client.putResource(url, cookie);
+				clientResponse = new TagfilerClientResponse(rsp);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		return clientResponse;
+	}
+
 	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClient#modifyWorker(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, String datasource) {
+	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, 
+			String datasource, List<String> users) {
 		RegistryClientResponse clientResponse = null;
-		if (study != null || dataset != null || lib != null || func != null || site != null || datasource != null) {
+		ClientURLResponse rsp = null;
+		if (id != null && study != null || dataset != null || lib != null || func != null || site != null || datasource != null || users != null) {
 			try {
 				client.setCookieValue(cookie);
-				String url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
-				boolean sep = false;
+				String url = null;
+				String sep = "";
+				if (lib != null || users != null) {
+					url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
+					if (lib != null) {
+						url += sep + "library";
+						sep = ";";
+					}
+					if (users != null) {
+						url += sep + "users";
+						sep = ";";
+					}
+					url += ")";
+					rsp = client.delete(url, cookie);
+				}
+				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
+				sep = "";
 				if (study != null) {
-					url += "study=" + Utils.urlEncode(study);
-					sep = true;
-				}
-				if (lib != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "library=" + Utils.urlEncode(lib);
-				}
-				if (func != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "method=" + Utils.urlEncode(func);
+					url += sep + "study=" + Utils.urlEncode(study);
+					sep = ";";
 				}
 				if (dataset != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "dataset=" + Utils.urlEncode(dataset);
+					url += sep + "dataset=" + Utils.urlEncode(dataset);
+					sep = ";";
 				}
-				if (datasource != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
-					}
-					url += "datasource=" + Utils.urlEncode(datasource);
+				if (lib != null) {
+					url += sep + "library=" + Utils.urlEncode(lib);
+				}
+				if (func != null) {
+					url += sep + "method=" + Utils.urlEncode(func);
+					sep = ";";
 				}
 				if (site != null) {
-					if (sep) {
-						url += ";";
-					} else {
-						sep = true;
+					url += sep + "site=" + Utils.urlEncode(site);
+					sep = ";";
+				}
+				if (datasource != null) {
+					url += sep + "datasource=" + Utils.urlEncode(datasource);
+					sep = ";";
+				}
+				if (users != null) {
+					url += sep + "users=";
+					for (int i=0; i < users.size(); i++) {
+						if (i != 0) {
+							url += ",";
+						}
+						url += Utils.urlEncode(users.get(i));
 					}
-					url += "site=" + Utils.urlEncode(site);
 				}
 				url += ")";
-				ClientURLResponse rsp = client.putResource(url, cookie);
+				rsp = client.putResource(url, cookie);
 				clientResponse = new TagfilerClientResponse(rsp);
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
@@ -896,7 +1189,6 @@ public class TagfilerClient implements RegistryClient {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -939,7 +1231,6 @@ public class TagfilerClient implements RegistryClient {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -979,7 +1270,6 @@ public class TagfilerClient implements RegistryClient {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return clientResponse;
@@ -1331,46 +1621,6 @@ public class TagfilerClient implements RegistryClient {
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
-		}
-		return clientResponse;
-	}
-
-	@Override
-	public RegistryClientResponse updateSite(String id, String name, String rURL) {
-		RegistryClientResponse clientResponse = null;
-		if (name != null || rURL != null) {
-			ClientURLResponse rsp = null;
-			try {
-				client.setCookieValue(cookie);
-				String url = null;
-				if (name != null) {
-					url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(cname)";
-					rsp = client.get(url, cookie);
-					JSONObject obj = (new JSONArray(rsp.getEntityString())).getJSONObject(0);
-					String siteName = obj.getString("cname");
-					if (!siteName.equals(name)) {
-						url = tagfilerURL + "/tags/rtype=worker;site=" + Utils.urlEncode(siteName) + "(site=" + Utils.urlEncode(name) + ")";
-						client.putResource(url, cookie);
-					}
-				}
-				url = tagfilerURL + "/tags/id=" + Utils.urlEncode(id) +  "(";
-				if (name != null) {
-					url += "cname=" + Utils.urlEncode(name);
-				}
-				if (rURL != null) {
-					if (name != null) {
-						url += ";";
-					}
-					url += "rURL=" + Utils.urlEncode(rURL);
-				}
-				url += ")";
-				rsp = client.putResource(url, cookie);
-				clientResponse = new TagfilerClientResponse(rsp);
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
 		}
 		return clientResponse;
 	}

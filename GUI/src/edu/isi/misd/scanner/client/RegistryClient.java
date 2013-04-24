@@ -60,7 +60,7 @@ public interface RegistryClient {
      * @param study
      *            the study the dataset belongs to
      * @param description
-     *            the description of the study
+     *            the description of the dataset
      * @param variables
      *            the list of dependent/independent variables names
      * @return the Client Response
@@ -75,7 +75,7 @@ public interface RegistryClient {
      * @param urlPath
      *            the path to be used in the URL
      * @param description
-     *            the description of the study
+     *            the description of the library
      * @return the Client Response
      */
 	public RegistryClientResponse createLibrary(String name, String urlPath, String description);
@@ -90,7 +90,7 @@ public interface RegistryClient {
      * @param urlPath
      *            the path to be used in the URL
      * @param description
-     *            the description of the study
+     *            the description of the method
      * @return the Client Response
      */
 	public RegistryClientResponse createMethod(String name, List<String> libs, String urlPath, String description);
@@ -122,7 +122,7 @@ public interface RegistryClient {
      * 
      * @param name
      *            the name of the site
-     * @param url
+     * @param rURL
      *            the url of the site
      * @param title
      *            the title of the person for contact
@@ -159,7 +159,7 @@ public interface RegistryClient {
      * @param values
      *            the list of the parameter values
      * @param description
-     *            the description of the study
+     *            the description of the parameter
      * @return the Client Response
      */
 	public RegistryClientResponse createParameter(String name, String func, List<String> libs, 
@@ -274,6 +274,51 @@ public interface RegistryClient {
 	public RegistryClientResponse deleteWorker(String study, String dataset, String lib, String func, String site);
 	
     /**
+     * Creates an entry of "study" type in the registry
+     * 
+     * @param id
+     *            the study id in the registry
+     * @param name
+     *            the new name of the study
+     * @param description
+     *            the new description of the study
+     * @param title
+     *            the new title of the person for contact
+     * @param email
+     *            the new email for contact
+     * @param phone
+     *            the new phone for contact
+     * @param website
+     *            the new website of the study
+     * @param address
+     *            the new address for contact
+     * @param contact
+     *            the new name of the person for contact
+     * @param approvals
+     *            the new website for the study approvals
+     * @return the Client Response
+     */
+	public RegistryClientResponse updateStudy(String id, String name, String description, String title,
+			String email, String phone, String website, String address, String contact, String approvals);
+	
+    /**
+     * Update a dataset 
+     * 
+     * @param id
+     *            the dataset id in the registry
+     * @param name
+     *            the new name of the dataset
+     * @param study
+     *            the new study the dataset belongs to
+     * @param description
+     *            the new description of the dataset
+     * @param variables
+     *            the new list of dependent/independent variables names
+     * @return the Client Response
+     */
+	public RegistryClientResponse updateDataset(String id, String name, String study, String description, List<String>  variables);
+	
+    /**
      * Update a library 
      * 
      * @param id
@@ -282,9 +327,11 @@ public interface RegistryClient {
      *            the new name of the library
      * @param urlPath
      *            the new path to be used in the URL
+     * @param description
+     *            the new description of the library
      * @return the Client Response
      */
-	public RegistryClientResponse updateLibrary(String id, String name, String urlPath);
+	public RegistryClientResponse updateLibrary(String id, String name, String urlPath, String description);
 	
     /**
      * Update a method
@@ -293,13 +340,15 @@ public interface RegistryClient {
      *            the id of the method in the registry
      * @param name
      *            the new name of the method
-     * @param lib
-     *            the new library the method belongs to
+     * @param libs
+     *            the new libraries the method belongs to
      * @param urlPath
      *            the new path to be used in the URL
+     * @param description
+     *            the new description of the method
      * @return the Client Response
      */
-	public RegistryClientResponse updateMethod(String id, String name, String lib, String urlPath);
+	public RegistryClientResponse updateMethod(String id, String name, List<String> libs, String urlPath, String description);
 	
     /**
      * Update a parameter 
@@ -310,39 +359,70 @@ public interface RegistryClient {
      *            the new name of the parameter
      * @param func
      *            the new method the parameter belongs to
-     * @param lib
-     *            the new library the parameter belongs to
+     * @param libs
+     *            the new libraries the parameter belongs to
      * @param minOccurs
      *            the new minimum occurrences of the parameter
      * @param maxOccurs
      *            the new maximum occurrences of the parameter (-1 if unbounded)
      * @param values
      *            the new list of the parameter values
+     * @param description
+     *            the new description of the parameter
      * @return the Client Response
      */
-	public RegistryClientResponse updateParameter(String id, String name, String func, String lib, Integer minOccurs, Integer maxOccurs, List<String> values);
+	public RegistryClientResponse updateParameter(String id, String name, String func, List<String> libs, 
+			Integer minOccurs, Integer maxOccurs, List<String> values, String path, String description);
 	
     /**
      * Update the master 
      * 
      * @param url
      *            the new url of the master
+     * @param title
+     *            the new title of the person for contact
+     * @param email
+     *            the new email for contact
+     * @param phone
+     *            the new phone for contact
+     * @param website
+     *            the new website of the project
+     * @param address
+     *            the new address for contact
+     * @param contact
+     *            the new name of the person for contact
      * @return the Client Response
      */
-	public RegistryClientResponse updateMaster(String url);
+	public RegistryClientResponse updateMaster(String url, String title,
+			String email, String phone, String website, String address, String contact);
 	
     /**
      * Update the site 
      * 
      * @param id
      *            the id of the site
-     * @param url
-     *            the new url of the site
      * @param name
      *            the new name of the site
+     * @param rURL
+     *            the new url of the site
+     * @param title
+     *            the new title of the person for contact
+     * @param email
+     *            the new email for contact
+     * @param phone
+     *            the new phone for contact
+     * @param website
+     *            the new website of the project
+     * @param address
+     *            the new address for contact
+     * @param agreement
+     *            the new URL for agreement
+     * @param contact
+     *            the new name of the person for contact
      * @return the Client Response
      */
-	public RegistryClientResponse updateSite(String id, String name, String url);
+	public RegistryClientResponse updateSite(String id, String name, String rURL, String title,
+			String email, String phone, String website, String address, String agreement, String contact);
 	
     /**
      * Modify a worker 
@@ -361,11 +441,12 @@ public interface RegistryClient {
      *            the new site the worker belongs to
      * @param sourceData
      *            the new data source
-     * @param url
-     *            the new url of the worker
+     * @param users
+     *            the new users who can access the data source
      * @return the Client Response
      */
-	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, String sourceData);
+	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, 
+			String sourceData, List<String> users);
 	
     /**
      * Get the studies 

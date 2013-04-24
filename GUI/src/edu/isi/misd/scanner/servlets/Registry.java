@@ -93,7 +93,6 @@ public class Registry extends HttpServlet {
 		String dataset = request.getParameter("dataset");
 		String func = request.getParameter("method");
 		String site = request.getParameter("site");
-		String sites = request.getParameter("sites");
 		RegistryClientResponse clientResponse = null;
 		if  (action.equals("getStudy")) {
 			clientResponse = registryClient.getStudy(name);
@@ -451,40 +450,115 @@ public class Registry extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete worker.");
 				return;
 			}
-		} else if (action.equals("updateLibrary")) {
-			clientResponse = registryClient.updateLibrary(id, name, rpath);
+		} else if (action.equals("updateStudy")) {
+			clientResponse = registryClient.updateStudy(id, name,
+					description, title, email, phone,
+					website, address, contact, approvals);
 			if (clientResponse != null) {
 				responseBody = Utils.getEntity(clientResponse.getEntityString());
 			} else {
-				responseBody = "No library update\n";
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update study.");
+				return;
+			}
+		} else if (action.equals("updateDataset")) {
+			try {
+				ArrayList<String> values = null;
+				if (variables != null) {
+					JSONArray arr = new JSONArray(variables);
+					if (arr.length() > 0) {
+						values = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							values.add(arr.getString(i));
+						}
+					}
+				}
+				clientResponse = registryClient.updateDataset(id, name, study, description, values);
+				if (clientResponse != null) {
+					responseBody = Utils.getEntity(clientResponse.getEntityString());
+				} else {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update dataset.");
+					return;
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("updateLibrary")) {
+			clientResponse = registryClient.updateLibrary(id, name, rpath, description);
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update library.");
+				return;
 			}
 		} else if (action.equals("updateMethod")) {
-			clientResponse = registryClient.updateMethod(id, name, lib, rpath);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				responseBody = "No method update\n";
+			try {
+				ArrayList<String> values = null;
+				if (lib != null) {
+					JSONArray arr = new JSONArray(lib);
+					if (arr.length() > 0) {
+						values = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							values.add(arr.getString(i));
+						}
+					}
+				}
+				clientResponse = registryClient.updateMethod(id, name, values, rpath, description);
+				if (clientResponse != null) {
+					responseBody = Utils.getEntity(clientResponse.getEntityString());
+				} else {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update method.");
+					return;
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
 		} else if (action.equals("updateMaster")) {
-			clientResponse = registryClient.updateMaster(rURL);
-			responseBody = Utils.getEntity(clientResponse.getEntityString());
-		}  else if (action.equals("updateSite")) {
-			clientResponse = registryClient.updateSite(id, name, rURL);
+			clientResponse = registryClient.updateMaster(rURL, title,
+					email, phone, website, address, contact);
 			if (clientResponse != null) {
 				responseBody = Utils.getEntity(clientResponse.getEntityString());
 			} else {
-				responseBody = "No site update\n";
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update master.");
+				return;
+			}
+		}  else if (action.equals("updateSite")) {
+			clientResponse = registryClient.updateSite(id, name, rURL, title,
+					email, phone, website, address, agreement, contact);
+			if (clientResponse != null) {
+				responseBody = Utils.getEntity(clientResponse.getEntityString());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update site.");
+				return;
 			}
 		} else if (action.equals("updateWorker")) {
-			clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, datasource);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				responseBody = "No worker update\n";
+			try {
+				ArrayList<String> values = null;
+				if (users != null) {
+					JSONArray arr;
+					arr = new JSONArray(users);
+					if (arr.length() > 0) {
+						values = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							values.add(arr.getString(i));
+						}
+					}
+				}
+				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, 
+						datasource, values);
+				if (clientResponse != null) {
+					responseBody = Utils.getEntity(clientResponse.getEntityString());
+				} else {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update worker.");
+					return;
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		} else if (action.equals("updateParameter")) {
 			try {
 				ArrayList<String> values = null;
+				ArrayList<String> libs = null;
 				if (resourceValues != null) {
 					JSONArray arr = new JSONArray(resourceValues);
 					if (arr.length() > 0) {
@@ -494,11 +568,22 @@ public class Registry extends HttpServlet {
 						}
 					}
 				}
-				clientResponse = registryClient.updateParameter(id, name, func, lib, minOccurs, maxOccurs, values);
+				if (lib != null) {
+					JSONArray arr = new JSONArray(lib);
+					if (arr.length() > 0) {
+						libs = new ArrayList<String>();
+						for (int i=0; i < arr.length(); i++) {
+							libs.add(arr.getString(i));
+						}
+					}
+				}
+				clientResponse = registryClient.updateParameter(id, name, func, libs, 
+					 minOccurs, maxOccurs, values, path, description);
 				if (clientResponse != null) {
 					responseBody = Utils.getEntity(clientResponse.getEntityString());
 				} else {
-					responseBody = "No parameter update\n";
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update parameter.");
+					return;
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
