@@ -20,8 +20,7 @@
         <camel:packageScan>
             <camel:package>edu.isi.misd.scanner.network.base.worker</camel:package>
             <camel:package>edu.isi.misd.scanner.network.modules.worker</camel:package>
-            <camel:excludes>**.*example*</camel:excludes>
-            <camel:excludes>**.*Default*</camel:excludes>            
+            <camel:excludes>**.*example*</camel:excludes>           
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
                 
@@ -29,7 +28,7 @@
         <!--<camel:routeContextRef ref="GloreRouteContext"/>-->        
         <!--<camel:routeContextRef ref="ExampleRouteContext"/>-->        
 
-        <!--<camel:routeContextRef ref="ExampleSecureRouteContext"/>-->        
+        <camel:routeContextRef ref="ExampleSecureRouteContext"/>        
         <camel:routeContextRef ref="OceansSecureRouteContext"/>
         <camel:routeContextRef ref="GloreSecureRouteContext"/> 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
