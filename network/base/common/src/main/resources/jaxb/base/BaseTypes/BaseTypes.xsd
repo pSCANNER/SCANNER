@@ -88,11 +88,11 @@
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element> 
-   
-    <xsd:element name="SimpleMapArray">
+
+    <xsd:element name="BaseResponse">
         <xsd:annotation>
             <xsd:documentation>
-                An array of BaseMap objects
+                An object which encapuslates an aggregate response of either SimpleMaps or ErrorDetails
             </xsd:documentation>
         </xsd:annotation>          
         <xsd:complexType>
@@ -100,10 +100,14 @@
                 <xsd:element ref="tns:SimpleMap" 
                              minOccurs="0" 
                              maxOccurs="unbounded"/>
+                <xsd:element name="Error" 
+                             type="tns:ErrorDetails"
+                             minOccurs="0"
+                             maxOccurs="unbounded"/>                    
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
-           
+                          
     <xsd:complexType name="IntegerType">
         <xsd:annotation>
             <xsd:documentation>

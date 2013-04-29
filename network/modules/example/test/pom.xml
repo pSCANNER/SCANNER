@@ -148,7 +148,7 @@
                   <childDelegation>false</childDelegation>
                   <useFile>true</useFile>
                   <excludes>
-                      <exclude>**/*EchoIntegrationTest*</exclude>                      
+                      <!-- <exclude>**/*EchoIntegrationTest*</exclude> -->                     
                   </excludes>                    
                 </configuration>
               </plugin>          
@@ -193,8 +193,8 @@
      lines below. 
 -->              
                   <excludes>
-                      <exclude>**/*SecureIterationIntegrationTest*</exclude>
-                      <exclude>**/*EchoIntegrationTest*</exclude>                      
+                      <exclude>**/*SecureIterationIntegrationTest*</exclude>                  
+                      <!-- <exclude>**/*EchoIntegrationTest*</exclude> -->                     
                   </excludes>                  
                 </configuration>
             </plugin>          

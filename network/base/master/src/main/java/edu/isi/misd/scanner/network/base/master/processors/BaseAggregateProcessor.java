@@ -2,8 +2,9 @@ package edu.isi.misd.scanner.network.base.master.processors;
 
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
+import edu.isi.misd.scanner.network.types.base.BaseResponse;
+import edu.isi.misd.scanner.network.types.base.ErrorDetails;
 import edu.isi.misd.scanner.network.types.base.SimpleMap;
-import edu.isi.misd.scanner.network.types.base.SimpleMapArray;
 import java.util.ArrayList;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -34,17 +35,28 @@ public class BaseAggregateProcessor implements Processor
                 new NullPointerException("No result data (null aggregate results array)"), 500);
         }
         
-        SimpleMapArray baseMapArray = new SimpleMapArray();        
+        BaseResponse response = new BaseResponse(); 
+        ArrayList<SimpleMap> mapResults = new ArrayList<SimpleMap>();
+        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>();        
         for (Object result : results)
-        {           
-            SimpleMapArray mapResult = 
-                (SimpleMapArray)MessageUtils.convertTo(
-                    SimpleMapArray.class, result, exchange);
+        {   
+            if (result instanceof ErrorDetails)
+            {
+                errors.add((ErrorDetails)result);
+            } 
+            else 
+            {            
+                SimpleMap mapResult = 
+                    (SimpleMap)MessageUtils.convertTo(
+                        SimpleMap.class, result, exchange);
 
-            if (mapResult != null) {
-                baseMapArray.getSimpleMap().addAll(mapResult.getSimpleMap());
+                if (mapResult != null) {
+                    mapResults.add(mapResult);
+                }
             }
         }
-        exchange.getIn().setBody(baseMapArray);                
+        response.getSimpleMap().addAll(mapResults);
+        response.getError().addAll(errors);        
+        exchange.getIn().setBody(response);                
     }
 }
