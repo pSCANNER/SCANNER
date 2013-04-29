@@ -113,7 +113,7 @@ public class DefaultRoute extends RouteBuilder
      * @return
      */
     public String getJSONUnmarshallType() {
-        return "edu.isi.misd.scanner.network.types.base.SimpleMapArray";
+        return "edu.isi.misd.scanner.network.types.base.SimpleMap";
     }
     
     /**
