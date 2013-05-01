@@ -680,5 +680,12 @@ public interface RegistryClient {
      * Return the roles of the user
      */
 	public List<String> getRoles();
+	
+    /**
+     * Get the all the sites
+     * 
+     * @return the Client Response
+     */
+	public RegistryClientResponse getSitesMap();
 
 }

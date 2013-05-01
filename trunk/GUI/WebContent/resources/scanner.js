@@ -206,6 +206,112 @@ function getSelectedParameters() {
 }
 
 /**
+ * Send the request to get the sitest status
+ */
+function renderSitesStatus() {
+	// send the request
+	var obj = {};
+	var url = HOME + '/query';
+	obj['action'] = 'displaySitesStatus';
+	scanner.POST(url, obj, true, postRenderSitesStatus, null, null, 0);
+}
+
+/**
+ * Render the sites status
+ * 
+ * @param data
+ * 	the data returned from the server (a JSONObject)
+ * @param textStatus
+ * 	the string describing the status
+ * @param jqXHR
+ * 	the jQuery XMLHttpRequest
+ * @param param
+ * 	the parameters to be used by the callback success function
+ */
+function postRenderSitesStatus(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	var tbody = $('#sitesStatusBody');
+	tbody.html('');
+	var sitesStatus = data['echo'];
+	var sitesMap = data['sitesMap'];
+	if (sitesStatus['SimpleMap'] != null) {
+		var successSites = sitesStatus['SimpleMap'];
+		var successConnections = [];
+		if (successSites['SiteInfo'] != null) {
+			successConnections.push(successSites);
+		} else {
+			successConnections = successSites;
+		}
+		$.each(successConnections, function(i, site) {
+			var siteInfo = site['SiteInfo'];
+			var tr = $('<tr>');
+			tbody.append(tr);
+			var td = $('<td>');
+			tr.append(td);
+			var img = $('<img>');
+			img.attr({'alt': 'Up',
+				'title': 'Status Up',
+				'src': 'resources/images/green_circle.png',
+				'height': '10'
+				});
+			td.append(img);
+			var label = $('<label>');
+			td.append(label);
+			label.html(siteInfo['SiteName']);
+			td = $('<td>');
+			tr.append(td);
+			td.html('Up');
+			td = $('<td>');
+			tr.append(td);
+			td.html(siteInfo['SiteDescription']);
+
+		});
+	}
+	if (sitesStatus['Error'] != null) {
+		var errorSites = sitesStatus['Error'];
+		var errorConnections = [];
+		if (errorSites['SiteInfo'] != null) {
+			errorConnections.push(errorSites);
+		} else {
+			errorConnections = errorSites;
+		}
+		$.each(errorConnections, function(i, site) {
+			var siteInfo = site['SiteInfo'];
+			var tr = $('<tr>');
+			tbody.append(tr);
+			var td = $('<td>');
+			tr.append(td);
+			var img = $('<img>');
+			img.attr({'alt': 'Down',
+				'title': 'Status Down',
+				'src': 'resources/images/red_circle.png',
+				'height': '10'
+				});
+			td.append(img);
+			var label = $('<label>');
+			td.append(label);
+			var siteName = siteInfo['SiteName'];
+			var index = site['ErrorSource'].indexOf('/scanner/');
+			if (index > -1) {
+				var value = sitesMap[site['ErrorSource'].substring(0, index) + '/scanner'];
+				if (value != null) {
+					siteName = value;
+				}
+			}
+			label.html(siteName);
+			td = $('<td>');
+			tr.append(td);
+			td.html('Down');
+			td = $('<td>');
+			tr.append(td);
+			td.html('ErrorSource: ' + site['ErrorSource'] + '<br/>' + 'ErrorType: ' + site['ErrorType'] + '<br/>' + 'ErrorDescription: ' + site['ErrorDescription']);
+		});
+	}
+	// refresh after 5 minutes
+	setTimeout("renderSitesStatus()", 5*60*1000);
+}
+
+/**
  * Send the request to get the available studies
  */
 function renderAvailableStudies() {
@@ -1565,6 +1671,7 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 		$('#ui').css('display', '');
 		setContacts(res['contacts']);
 		renderAvailableStudies();
+		renderSitesStatus();
 	} else {
 		alert(res['status']);
 	}

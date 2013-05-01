@@ -86,3 +86,13 @@ div#wrapper {
 	border-spacing: 5px 0px;
 }
 
+table.sitesStatus {
+	border-collapse:collapse;
+	width:85%;
+}
+
+table.sitesStatus td, table.sitesStatus th {
+	border:1px solid black;
+	padding:5px;
+}
+

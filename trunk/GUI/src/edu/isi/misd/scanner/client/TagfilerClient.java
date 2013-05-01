@@ -1664,4 +1664,16 @@ public class TagfilerClient implements RegistryClient {
 		return roles;
 	}
 
+	@Override
+	public RegistryClientResponse getSitesMap() {
+		RegistryClientResponse clientResponse = null;
+		client.setCookieValue(cookie);
+		String url = tagfilerURL + "/query/rtype=site" +
+			"(rURL;cname)";
+		System.out.println("url: " + url);
+		ClientURLResponse rsp = client.get(url, cookie);
+		clientResponse = new TagfilerClientResponse(rsp);
+		return clientResponse;
+	}
+
 }

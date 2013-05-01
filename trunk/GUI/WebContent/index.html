@@ -97,7 +97,7 @@
 			</div>
 
 			<div id="ui" style="visibility: hidden;">
-				<div style="width: 100%; height: 300px;" class="claro">
+				<div style="width: 100%; height: 350px;" class="claro">
 					<div id="queryTabContainer"
 						data-dojo-type="dijit/layout/TabContainer"
 						style="width: 100%; height: 100%">
@@ -130,8 +130,20 @@
 													</tr>
 												</tbody>
 											</table>
+											<br/><br/>
+											<table class="sitesStatus">
+												<thead>
+													<tr>
+														<th>Site</th>
+														<th>Status</th>
+														<th style="width: 50%;">Description</th>
+													</tr>
+												</thead>
+												<tbody id="sitesStatusBody">
+												</tbody>
+											</table>
 										</td>
-										<td style="width: 35%;">
+										<td valign="top" style="width: 35%;">
 											<div id="queryHelp">
 												<span class="double_bottom_border"> Quick Help </span> <br /> <br />
 												<span>Select study, dataset, library, method and sites on

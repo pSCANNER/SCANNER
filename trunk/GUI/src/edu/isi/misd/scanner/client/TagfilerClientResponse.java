@@ -276,5 +276,20 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	public String toContacts() {
 		return response.getEntityString();
 	}
+	@Override
+	public JSONObject toSitesMap() {
+		JSONObject ret = new JSONObject();
+		try {
+			String res = response.getEntityString();
+			JSONArray arr = new JSONArray(res);
+			for (int i=0; i < arr.length(); i++) {
+				JSONObject obj = arr.getJSONObject(i);
+				ret.put(obj.getString("rURL"), obj.getString("cname"));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
 
 }
