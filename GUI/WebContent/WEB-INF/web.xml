@@ -95,4 +95,9 @@
     <servlet-name>Registry</servlet-name>
     <url-pattern>/registry</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>Echo</servlet-name>
+    <servlet-class>edu.isi.misd.scanner.servlets.Echo</servlet-class>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
 </web-app>

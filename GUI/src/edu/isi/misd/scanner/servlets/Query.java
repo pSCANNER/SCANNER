@@ -19,7 +19,6 @@ package edu.isi.misd.scanner.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -361,17 +360,15 @@ public class Query extends HttpServlet {
 						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 						return;
 					}
-					// simulated response
-					//obj = new JSONObject(Utils.oceansResult);
-					//PrintWriter out = response.getWriter();
-					//out.print(obj.toString());
-					//return;
 				} catch (JSONException e) {
 					e.printStackTrace();
 					throw(new ServletException(e));
 				}
 			} else if (action.equals("displaySitesStatus")) {
-				obj = echo(session);
+				obj = (JSONObject) servletConfig.getServletContext().getAttribute("echo");
+				if (obj == null) {
+					obj = new JSONObject();
+				}
 				System.out.println("Return: "+obj.toString());
 			}
 
@@ -384,48 +381,4 @@ public class Query extends HttpServlet {
 		out.print(text);
 	}
 	
-	private JSONObject echo(HttpSession session) {
-		JSONObject ret = new JSONObject();
-		try {
-			RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
-			ScannerClient scannerClient = (ScannerClient) session.getAttribute("scannerClient");
-			RegistryClientResponse clientResponse = registryClient.getSitesMap();
-			JSONObject sitesMap = clientResponse.toSitesMap();
-			ret.put("sitesMap", sitesMap);
-			clientResponse = registryClient.getMasterObject();
-			String res = clientResponse.toMasterString();
-			System.out.println("master string: " + res);
-			JSONObject temp = new JSONObject(res);
-			String masterURL = temp.getString("rURL");
-			String url = masterURL + "/query/example/echo";
-			StringBuffer buff = new StringBuffer();
-			JSONArray names = sitesMap.names();
-			for (int i=0; i < names.length(); i++) {
-				String key = names.getString(i);
-				if (i != 0) {
-					buff.append(",");
-				}
-				buff.append(key + "/dataset/example/echo");
-			}
-			String targetsURLs = buff.toString();
-			JSONObject body = new JSONObject();
-			JSONArray simpleMapData = new JSONArray();
-			body.put("simpleMapData", simpleMapData);
-			JSONObject params = new JSONObject();
-			simpleMapData.put(params);
-			params.put("key", "echoParameter");
-			params.put("value", "Test");
-			System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nBody: "+body);
-			ClientURLResponse rsp = scannerClient.postScannerQuery(url, targetsURLs, body.toString());
-			res = rsp.getEntityString();
-			System.out.println("Response Body: \n"+res);
-			JSONObject echoResult = new JSONObject(res);
-			ret.put("echo", echoResult);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return ret;
-	}
-
 }

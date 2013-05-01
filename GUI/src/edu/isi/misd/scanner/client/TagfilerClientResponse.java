@@ -1,5 +1,7 @@
 package edu.isi.misd.scanner.client;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.StringTokenizer;
 
 import org.json.JSONArray;
@@ -279,14 +281,25 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	@Override
 	public JSONObject toSitesMap() {
 		JSONObject ret = new JSONObject();
+		JSONObject map = new JSONObject();
+		JSONObject targets = new JSONObject();
 		try {
+			ret.put("map", map);
+			ret.put("targets", targets);
 			String res = response.getEntityString();
 			JSONArray arr = new JSONArray(res);
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				ret.put(obj.getString("rURL"), obj.getString("cname"));
+				URL url = new URL(obj.getString("rURL"));
+				String host = url.getHost();
+				int port = url.getPort();
+				String key = host + (port == -1 ? "" : ":" + port);
+				map.put(key, obj.getString("cname"));
+				targets.put(obj.getString("rURL"), obj.getString("cname"));
 			}
 		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
 		return ret;
