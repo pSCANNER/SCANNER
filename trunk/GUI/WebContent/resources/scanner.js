@@ -234,6 +234,8 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 	tbody.html('');
 	var sitesStatus = data['echo'];
 	var sitesMap = data['sitesMap'];
+	var refreshTimestamp = $('#refreshTimestamp');
+	refreshTimestamp.html(data['timestamp']);
 	if (sitesStatus['SimpleMap'] != null) {
 		var successSites = sitesStatus['SimpleMap'];
 		var successConnections = [];
@@ -258,16 +260,15 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 			var label = $('<label>');
 			td.append(label);
 			label.html(siteInfo['SiteName']);
-			td = $('<td>');
-			tr.append(td);
-			td.html('Up');
-			td = $('<td>');
-			tr.append(td);
-			td.html(siteInfo['SiteDescription']);
-
+			var description = 'Status: Up<br/>Description: ' + siteInfo['SiteDescription']; 
+			label.hover(
+					function(event) {DisplayTipBox(event, description);}, 
+					function(){HideTipBox();});
 		});
 	}
 	if (sitesStatus['Error'] != null) {
+		var errorsStatistics = data['errorsStatistics'];
+		var total = errorsStatistics['total'];
 		var errorSites = sitesStatus['Error'];
 		var errorConnections = [];
 		if (errorSites['SiteInfo'] != null) {
@@ -291,24 +292,26 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 			var label = $('<label>');
 			td.append(label);
 			var siteName = siteInfo['SiteName'];
-			var index = site['ErrorSource'].indexOf('/scanner/');
-			if (index > -1) {
-				var value = sitesMap[site['ErrorSource'].substring(0, index) + '/scanner'];
-				if (value != null) {
-					siteName = value;
-				}
+			var url = site['ErrorSource'].split('//');
+			url = url[1].split('/');
+			var value = sitesMap[url[0]];
+			if (value != null) {
+				siteName = value;
 			}
 			label.html(siteName);
-			td = $('<td>');
-			tr.append(td);
-			td.html('Down');
-			td = $('<td>');
-			tr.append(td);
-			td.html('ErrorSource: ' + site['ErrorSource'] + '<br/>' + 'ErrorType: ' + site['ErrorType'] + '<br/>' + 'ErrorDescription: ' + site['ErrorDescription']);
+			var rate = Math.floor(errorsStatistics[url[0]] * 100 / total);
+			var description = 'Status: Down<br/>' + 
+				'Failure Rate: ' + errorsStatistics[url[0]] + ' of ' + total + ' (' + rate + '%)<br/>' +
+				'ErrorSource: ' + site['ErrorSource'] + '<br/>' + 
+				'ErrorType: ' + site['ErrorType'] + '<br/>' + 
+				'ErrorDescription: ' + site['ErrorDescription'];
+			label.hover(
+					function(event) {DisplayTipBox(event, description);}, 
+					function(){HideTipBox();});
 		});
 	}
-	// refresh after 5 minutes
-	setTimeout("renderSitesStatus()", 5*60*1000);
+	// refresh every minute
+	setTimeout("renderSitesStatus()", 1*60*1000);
 }
 
 /**
