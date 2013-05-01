@@ -1,5 +1,7 @@
 package edu.isi.misd.scanner.client;
 
+import org.json.JSONObject;
+
 /* 
  * Copyright 2012 University of Southern California
  * 
@@ -547,5 +549,16 @@ public interface RegistryClientResponse {
      * 		- getWorker(String study, String dataset, String lib, String func, String site)
      */
     public String getResourceId();
+    
+    /**
+     * Returns a JSONObject representing the sites map having as keys the URL and as values the name
+     *   
+     * Example: {	"https://scanner-am.misd.isi.edu:8888/scanner":"USC",
+     * 				"https://idash-scanner1-dev.ucsd.edu/scanner":"UCSD",
+     * 				"https://scanner-rand.misd.isi.edu:8888/scanner":"RAND"
+				}
+     * 
+     */
+    public JSONObject toSitesMap();
 
 }
