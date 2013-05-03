@@ -20,7 +20,7 @@
         <camel:packageScan>
             <camel:package>edu.isi.misd.scanner.network.base.worker</camel:package>
             <camel:package>edu.isi.misd.scanner.network.modules.worker</camel:package>
-            <camel:excludes>**.*example*</camel:excludes>           
+            <camel:excludes>**.*Iteration*</camel:excludes>           
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
                 

@@ -32,7 +32,10 @@
     
     <bean id="BaseWorkerCacheWriteProcessor" 
           class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheWriteProcessor"/> 
-            
+    
+    <bean id="BaseNoOpProcessor" 
+          class="edu.isi.misd.scanner.network.base.processors.BaseNoOpProcessor"/>      
+                
     <!-- error handler -->      
     <camel:errorHandler id="testErrorHandler"
                         type="DefaultErrorHandler">

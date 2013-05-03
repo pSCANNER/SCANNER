@@ -13,38 +13,38 @@
         <camel:propertyPlaceholder id="properties" 
                                    location="classpath:edu/isi/misd/scanner/network/base/test/test-master.properties,classpath:edu/isi/misd/scanner/network/base/test/test-worker.properties"/>                  
         <camel:packageScan>
-            <camel:package>edu.isi.misd.scanner.network.base.master</camel:package>            
-            <camel:package>edu.isi.misd.scanner.network.base.worker</camel:package>
-            <camel:excludes>**.*Excluded*</camel:excludes>
+            <camel:package>edu.isi.misd.scanner.network.modules.master</camel:package>            
+            <camel:package>edu.isi.misd.scanner.network.modules.worker</camel:package>
+            <camel:excludes>**.*Iteration*</camel:excludes>
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
                 
         <camel:route streamCache="true">
             <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
             <camel:log message="Input Message:\n\n${body}\n"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.master.routes.DefaultRoute"/>
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.example.EchoRoute"/>
             <camel:log message="Output Message:\n\n${body}\n"/>
             <camel:to uri="mock:result"/>            
         </camel:route>
                     
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.EchoRoute"/>                    
         </camel:route>
 
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.EchoRoute"/>                    
         </camel:route>
         
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.EchoRoute"/>                     
         </camel:route>
         
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.EchoRoute"/>                      
         </camel:route>
                                                                     
     </camel:camelContext>
