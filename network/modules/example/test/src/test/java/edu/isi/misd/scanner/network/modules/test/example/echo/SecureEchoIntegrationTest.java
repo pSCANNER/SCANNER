@@ -25,12 +25,12 @@ public class SecureEchoIntegrationTest extends BaseIntegrationTest
         
         // test to ensure correct endpoints in registry
         String masterRoute = 
-            "direct:edu.isi.misd.scanner.network.base.master.routes.DefaultRoute";
+            "direct:edu.isi.misd.scanner.network.modules.master.routes.example.EchoRoute";
         assertNotNull(
             "Endpoint not present: " + masterRoute,
             context.hasEndpoint(masterRoute));
         String workerRoute = 
-            "direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute";            
+            "direct:edu.isi.misd.scanner.network.modules.worker.routes.example.EchoRoute";            
         assertNotNull(
             "Endpoint not present: " + workerRoute,
             context.hasEndpoint(workerRoute));

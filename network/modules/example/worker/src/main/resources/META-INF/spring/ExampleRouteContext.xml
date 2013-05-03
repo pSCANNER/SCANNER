@@ -13,7 +13,7 @@
     
         <camel:route>
             <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.EchoRoute"/>                  
         </camel:route>
 <!--                                                                                                                                                                                                                                                              
         <camel:route>
@@ -27,7 +27,7 @@
     
         <camel:route>
             <camel:from uri="jetty:https://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?handlers=securityHandler&amp;sslContextParametersRef=sslContextParameters&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>
-            <camel:to uri="direct:edu.isi.misd.scanner.network.base.worker.routes.DefaultRoute"/>                     
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.example.EchoRoute"/>            
         </camel:route>
 <!--                                                                                                                                                                                                                                                              
         <camel:route>

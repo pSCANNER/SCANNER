@@ -25,6 +25,9 @@
     <bean id="BaseAggregateProcessor" 
           class="edu.isi.misd.scanner.network.base.master.processors.BaseAggregateProcessor"/>                     
 
+    <bean id="BaseNoOpProcessor" 
+          class="edu.isi.misd.scanner.network.base.processors.BaseNoOpProcessor"/>      
+        
     <camel:errorHandler id="deadLetterErrorHandler"
                         type="DeadLetterChannel" 
                         deadLetterUri="mock:err">

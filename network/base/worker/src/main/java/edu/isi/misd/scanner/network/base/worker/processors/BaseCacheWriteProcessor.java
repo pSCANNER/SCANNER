@@ -2,7 +2,6 @@ package edu.isi.misd.scanner.network.base.worker.processors;
 
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.FileUtils;
-import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
