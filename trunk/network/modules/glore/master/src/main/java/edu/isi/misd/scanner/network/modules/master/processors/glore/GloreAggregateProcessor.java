@@ -90,7 +90,9 @@ public class GloreAggregateProcessor implements Processor
         
         if ("computeCovarianceMatrix".equalsIgnoreCase(gloreData.getState()))
         {
-            log.info("Compute covariance matrix");
+            if (log.isDebugEnabled()) {
+                log.debug("Compute covariance matrix");
+            }
             ArrayList<double[][]> D_values = new ArrayList<double[][]>();
             for (GloreLogisticRegressionRequest gloreRequest : gloreRequestList)
             { 
@@ -105,8 +107,10 @@ public class GloreAggregateProcessor implements Processor
             temp_b = temp_b.plus(temp_c);
             Matrix cov_matrix = temp_b.inverse();
   
-            log.info("Covariance matrix:" + 
-                GloreUtils.matrixToString(cov_matrix, 8, 6));
+            if (log.isDebugEnabled()) {
+                log.debug("Covariance matrix:" + 
+                    GloreUtils.matrixToString(cov_matrix, 8, 6));
+            }
             
             gloreData.setCovarianceMatrix(
                 GloreUtils.convertMatrixToMatrixType(cov_matrix));
@@ -115,7 +119,9 @@ public class GloreAggregateProcessor implements Processor
         } 
         else if ("computeSDMatrix".equalsIgnoreCase(gloreData.getState()))
         {
-            log.info("Compute SD matrix");
+            if (log.isDebugEnabled()) {            
+                log.debug("Compute SD matrix");
+            }
             
             Matrix cov_matrix = 
                 GloreUtils.convertMatrixTypeToMatrix(
@@ -124,8 +130,10 @@ public class GloreAggregateProcessor implements Processor
             Matrix SD = new Matrix(1, features);
             for (int i = 0; i < features; i++) {
                 SD.set(0,i, Math.sqrt(cov_matrix.get(i,i)));
-            }          
-            log.info("SD Matrix: " + GloreUtils.matrixToString(SD, 8, 6));
+            }   
+            if (log.isDebugEnabled()) {            
+                log.debug("SD Matrix: " + GloreUtils.matrixToString(SD, 8, 6));
+            }
             gloreData.setState("complete");
 
             // prepare GLORE outputs
@@ -175,12 +183,16 @@ public class GloreAggregateProcessor implements Processor
         else 
         {
             if (iter == 0) {
-                log.info("Primary iteration phase");  
+                if (log.isDebugEnabled()) {                
+                    log.debug("Primary iteration phase");  
+                }
                 // init beta vectors
                 beta0 = new Matrix(features, 1, -1.0);
-                beta1 = new Matrix(features, 1, 0.0);                  
-                log.info("Initial iteration value: " + 
-                    GloreUtils.max_abs((beta1.minus(beta0)).getArray()));                
+                beta1 = new Matrix(features, 1, 0.0);   
+                if (log.isDebugEnabled()) {                
+                    log.debug("Initial iteration value: " + 
+                        GloreUtils.max_abs((beta1.minus(beta0)).getArray()));                
+                }
                 gloreData.setState("iteration");
             } else {                              
                 beta1 = 
@@ -219,14 +231,16 @@ public class GloreAggregateProcessor implements Processor
             temp_b = temp_b.inverse();
             temp_b = temp_b.times(temp_a);
             beta1 = beta0.plus(temp_b);
-
-            log.info("beta1:" + GloreUtils.matrixToString(beta1, 10, 12));
+            if (log.isDebugEnabled()) {
+                log.debug("beta1:" + GloreUtils.matrixToString(beta1, 10, 12));
+            }
 
             gloreData.setBeta(
                 GloreUtils.convertMatrixToMatrixType(beta1));             
-
-            log.info("Iteration " + iter + " value: " + 
-                GloreUtils.max_abs((beta1.minus(beta0)).getArray()));
+            if (log.isDebugEnabled()) {
+                log.debug("Iteration " + iter + " value: " + 
+                    GloreUtils.max_abs((beta1.minus(beta0)).getArray()));
+            }
            
             if (iter > 0) {
                 if ((GloreUtils.max_abs(
@@ -238,8 +252,10 @@ public class GloreAggregateProcessor implements Processor
                             "Hit maximum number of iterations (" + max_iter  + 
                             ") without converging, iterations stopped.");
                     }
-                    log.info("Iteration final value: " + 
-                        GloreUtils.max_abs((beta1.minus(beta0)).getArray()));                    
+                    if (log.isDebugEnabled()) {
+                        log.debug("Iteration final value: " + 
+                            GloreUtils.max_abs((beta1.minus(beta0)).getArray()));    
+                    }
                     gloreData.setState("computeCovarianceMatrix");        
                 }                                 
             }
