@@ -36,7 +36,7 @@ import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.utils.Utils;
 
 /**
- * Servlet implementation class Login
+ * Servlet for initializing the servlet session at login.
  * 
  * @author Serban Voinea
  */
@@ -59,19 +59,32 @@ public class Login extends HttpServlet {
 	private static final String persistent_id = "persistent-id";
 	private static final String shibMailAttr = "mail";
 	private static final String shibRolesAttr = "protectNetworkEntitlement";
+	
     /**
      * Default constructor. 
+     * @see HttpServlet#HttpServlet()
      */
     public Login() {
     }
 
 	/**
+	 * Default method called by the server (via the service method) to allow a servlet to handle a GET request.
+	 * @param request
+	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
+	 * @param response
+	 * 		an HttpServletResponse object that contains the response the servlet sends to the client.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	}
 
 	/**
+	 * Sets the Shibboleth attributes in the session.
+	 * <br/>Called by the server (via the service method) to allow a servlet to handle a POST request.
+	 * @param request
+	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
+	 * @param response
+	 * 		an HttpServletResponse object that contains the response the servlet sends to the client.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

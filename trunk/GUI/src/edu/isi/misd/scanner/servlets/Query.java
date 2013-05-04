@@ -46,11 +46,10 @@ import edu.isi.misd.scanner.utils.Utils;
 
 
 /**
- * Servlet implementation class Query
+ * Servlet for submitting queries to the registry and the network.
  * 
  * @author Serban Voinea
  */
-
 @WebServlet(description = "Query Tagfiler and SCANNER", urlPatterns = { "/query" })
 public class Query extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -68,12 +67,18 @@ public class Query extends HttpServlet {
 	private String keyManagerPassword;
        
     /**
+     * Default constructor. 
      * @see HttpServlet#HttpServlet()
      */
     public Query() {
         super();
     }
 
+	/**
+	 * Initialize the servlet with the configuration values.
+	 * @param config
+     *            the servlet configuration.
+	 */
 	public void init(ServletConfig config)  throws ServletException {
 		super.init(config);
 		servletConfig = config;
@@ -97,6 +102,12 @@ public class Query extends HttpServlet {
 	}
 
 	/**
+	 * Retrieves registry entries.
+	 * <br/>Default method called by the server (via the service method) to allow a servlet to handle a GET request.
+	 * @param request
+	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
+	 * @param response
+	 * 		an HttpServletResponse object that contains the response the servlet sends to the client.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -164,10 +175,15 @@ public class Query extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		}
-
 	}
 
 	/**
+	 * Submits queries to the master node.
+	 * <br/>Called by the server (via the service method) to allow a servlet to handle a POST request.
+	 * @param request
+	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
+	 * @param response
+	 * 		an HttpServletResponse object that contains the response the servlet sends to the client.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	@SuppressWarnings("unchecked")
