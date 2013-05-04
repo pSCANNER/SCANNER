@@ -25,10 +25,11 @@ import edu.isi.misd.scanner.client.RegistryClientResponse;
 import edu.isi.misd.scanner.client.ScannerClient;
 import edu.isi.misd.scanner.client.TagfilerClient;
 import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
-import edu.isi.misd.scanner.utils.Utils;
 
 /**
- * Servlet implementation class Echo
+ * Servlet for pinging the sites nodes.
+ * 
+ * @author Serban Voinea
  */
 @WebServlet(description = "Servlet for pinging the sites nodes")
 public class Echo extends HttpServlet {
@@ -51,6 +52,7 @@ public class Echo extends HttpServlet {
 	ScannerClient scannerClient;
        
     /**
+     * Default constructor. 
      * @see HttpServlet#HttpServlet()
      */
     public Echo() {
@@ -58,7 +60,12 @@ public class Echo extends HttpServlet {
     }
 
 	/**
-	 * @see Servlet#init(ServletConfig)
+	 * Initialize the servlet.
+	 * The servlet is loaded on startup.
+	 * It creates a demon that every 5 minutes polls the sites nodes.
+	 * The result is stored in the servlet context and logged into a file.
+	 * @param config
+     *            the servlet configuration.
 	 */
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
@@ -110,10 +117,12 @@ public class Echo extends HttpServlet {
 			String fileName = path + "scanner_echo.log";
 			System.out.println("Echo log file: " + fileName);
 			while (!ready) {
-				count++;
 				JSONObject ret = new JSONObject();
-				System.out.println("Context test: " + servletConfig.getServletContext().getAttribute("test"));
 				try {
+					if (count != 0) {
+						Thread.sleep(5*60*1000);
+					}
+					count++;
 					RegistryClientResponse clientResponse = registryClient.getSitesMap();
 					JSONObject sites = clientResponse.toSitesMap();
 					JSONObject sitesMap = sites.getJSONObject("map");
@@ -144,54 +153,56 @@ public class Echo extends HttpServlet {
 					params.put("value", "Test");
 					System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nBody: "+body);
 					ClientURLResponse rsp = scannerClient.postScannerQuery(url, targetsURLs, body.toString());
+					String contentType = rsp.getHeader("Content-Type");
+					System.out.println("contentType received: " + contentType);
 					res = rsp.getEntityString();
 					System.out.println("Response Body: \n"+res);
-					JSONObject echoResult = new JSONObject(res);
-					ret.put("echo", echoResult);
 					ret.put("timestamp", (new Date()).toString());
-					if (echoResult.has("Error")) {
-						JSONObject errorsStatistics = new JSONObject();
-						ret.put("errorsStatistics", errorsStatistics);
-						errorsStatistics.put("total", count);
-						JSONArray errors = echoResult.optJSONArray("Error");
-						if (errors == null) {
-							errors = new JSONArray();
-							errors.put(echoResult.getJSONObject("Error"));
-						}
-						for (int i=0; i < errors.length(); i++) {
-							JSONObject obj = errors.getJSONObject(i);
-							URI error_url = new URI(obj.getString("ErrorSource"));
-							String host = error_url.getHost();
-							int port = error_url.getPort();
-							String key = host + (port == -1 ? "" : ":" + port);
-							Integer value = errorsMap.get(key);
-							if (value == null) {
-								value = 0;
+					if (contentType != null && contentType.indexOf("application/json") != -1) {
+						JSONObject echoResult = new JSONObject(res);
+						ret.put("echo", echoResult);
+						if (echoResult.has("Error")) {
+							JSONObject errorsStatistics = new JSONObject();
+							ret.put("errorsStatistics", errorsStatistics);
+							errorsStatistics.put("total", count);
+							JSONArray errors = echoResult.optJSONArray("Error");
+							if (errors == null) {
+								errors = new JSONArray();
+								errors.put(echoResult.getJSONObject("Error"));
 							}
-							errorsMap.put(key, ++value);
-							errorsStatistics.put(key, value);
+							for (int i=0; i < errors.length(); i++) {
+								JSONObject obj = errors.getJSONObject(i);
+								URI error_url = new URI(obj.getString("ErrorSource"));
+								String host = error_url.getHost();
+								int port = error_url.getPort();
+								String key = host + (port == -1 ? "" : ":" + port);
+								Integer value = errorsMap.get(key);
+								if (value == null) {
+									value = 0;
+								}
+								errorsMap.put(key, ++value);
+								errorsStatistics.put(key, value);
+							}
+							FileWriter fileWriter = new FileWriter(fileName, true);
+							fileWriter.write(ret.toString() + "\n\n");
+							fileWriter.close();
 						}
+						servletContext.setAttribute("echo", ret);
+					} else {
+						ret.put("echo", res);
+						FileWriter fileWriter = new FileWriter(fileName, true);
+						fileWriter.write(ret.toString() + "\n\n");
+						fileWriter.close();
 					}
-					servletContext.setAttribute("echo", ret);
-					FileWriter fileWriter = new FileWriter(fileName, true);
-					fileWriter.write(ret.toString() + "\n\n");
-					fileWriter.close();
-					Thread.sleep(5*60*1000);
 				} catch (JSONException e) {
 					e.printStackTrace();
-					ready = true;
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-					ready = true;
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
-					ready = true;
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
-					ready = true;
 				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
