@@ -291,17 +291,23 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 			td.append(img);
 			var label = $('<label>');
 			td.append(label);
-			var siteName = siteInfo['SiteName'];
-			var url = site['ErrorSource'].split('//');
-			url = url[1].split('/');
-			var value = sitesMap[url[0]];
-			if (value != null) {
-				siteName = value;
+			var siteName = siteInfo != null ? siteInfo['SiteName'] : null;
+			var url = null;
+			if (site['ErrorSource'] != null) {
+				url = site['ErrorSource'].split('//');
+				url = url[1].split('/');
+				var value = sitesMap[url[0]];
+				if (value != null) {
+					siteName = value;
+				}
 			}
 			label.html(siteName);
-			var rate = Math.floor(errorsStatistics[url[0]] * 100 / total);
+			var rate = null;
+			if (url != null) {
+				rate = Math.floor(errorsStatistics[url[0]] * 100 / total);
+			}
 			var description = 'Status: Down<br/>' + 
-				'Failure Rate: ' + errorsStatistics[url[0]] + ' of ' + total + ' (' + rate + '%)<br/>' +
+				(url != null ? 'Failure Rate: ' + errorsStatistics[url[0]] + ' of ' + total + ' (' + rate + '%)<br/>' : '') +
 				'ErrorSource: ' + site['ErrorSource'] + '<br/>' + 
 				'ErrorType: ' + site['ErrorType'] + '<br/>' + 
 				'ErrorDescription: ' + site['ErrorDescription'];
@@ -311,7 +317,7 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 		});
 	}
 	// refresh every minute
-	setTimeout("renderSitesStatus()", 1*60*1000);
+	setTimeout("renderSitesStatus()", 2*60*1000);
 }
 
 /**
