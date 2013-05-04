@@ -39,7 +39,7 @@ import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 import edu.isi.misd.scanner.utils.Utils;
 
 /**
- * Servlet implementation class Registry
+ * Servlet for implementing the web service registry API.
  * 
  * @author Serban Voinea
  */
@@ -52,6 +52,7 @@ public class Registry extends HttpServlet {
 	private String tagfilerPassword;
        
     /**
+     * Default constructor. 
      * @see HttpServlet#HttpServlet()
      */
     public Registry() {
@@ -59,7 +60,9 @@ public class Registry extends HttpServlet {
     }
 
 	/**
-	 * @see Servlet#init(ServletConfig)
+	 * Initialize the servlet with the configuration values.
+	 * @param config
+     *            the servlet configuration.
 	 */
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
@@ -70,6 +73,12 @@ public class Registry extends HttpServlet {
 	}
 
 	/**
+	 * Retrieves registry entries.
+	 * <br/>Default method called by the server (via the service method) to allow a servlet to handle a GET request.
+	 * @param request
+	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
+	 * @param response
+	 * 		an HttpServletResponse object that contains the response the servlet sends to the client.
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -170,6 +179,12 @@ public class Registry extends HttpServlet {
 	}
 
 	/**
+	 * Creates, updates or deletes entries in the registry.
+	 * <br/>Called by the server (via the service method) to allow a servlet to handle a POST request.
+	 * @param request
+	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
+	 * @param response
+	 * 		an HttpServletResponse object that contains the response the servlet sends to the client.
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

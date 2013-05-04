@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 /**
- * Public Interface for Accessing the Registry
+ * Public interface for accessing the registry.
  * 
  * @author Serban Voinea
  *
@@ -27,664 +27,668 @@ import java.util.List;
 public interface RegistryClient {
 	
     /**
-     * Creates an entry of "study" type in the registry
+     * Creates an entry of "study" type in the registry.
      * 
      * @param name
-     *            the name of the study
+     *            the name of the study.
      * @param description
-     *            the description of the study
+     *            the description of the study.
      * @param title
-     *            the title of the person for contact
+     *            the title of the person for contact.
      * @param email
-     *            the email for contact
+     *            the email for contact.
      * @param phone
-     *            the phone for contact
+     *            the phone for contact.
      * @param website
-     *            the website of the study
+     *            the website of the study.
      * @param address
-     *            the address for contact
+     *            the address for contact.
      * @param contact
-     *            the name of the person for contact
+     *            the name of the person for contact.
      * @param approvals
-     *            the website for the study approvals
-     * @return the Client Response
+     *            the website for the study approvals.
+     * @return The client response.
      */
 	public RegistryClientResponse createStudy(String name, String description, String title,
 			String email, String phone, String website, String address, String contact, String approvals);
 	
     /**
-     * Creates an entry of "dataset" type in the registry
+     * Creates an entry of "dataset" type in the registry.
      * 
      * @param name
-     *            the name of the dataset
+     *            the name of the dataset.
      * @param study
-     *            the study the dataset belongs to
+     *            the study the dataset belongs to.
      * @param description
-     *            the description of the dataset
+     *            the description of the dataset.
      * @param variables
-     *            the list of dependent/independent variables names
-     * @return the Client Response
+     *            the list of dependent/independent variables names.
+     * @return The client response.
      */
 	public RegistryClientResponse createDataset(String name, String study, String description, List<String>  variables);
 	
     /**
-     * Creates an entry of "library" type in the registry
+     * Creates an entry of "library" type in the registry.
      * 
      * @param name
-     *            the name of the library
+     *            the name of the library.
      * @param urlPath
-     *            the path to be used in the URL
+     *            the path to be used in the URL.
      * @param description
-     *            the description of the library
-     * @return the Client Response
+     *            the description of the library.
+     * @return The client response.
      */
 	public RegistryClientResponse createLibrary(String name, String urlPath, String description);
 	
     /**
-     * Creates an entry of "method" type in the registry
+     * Creates an entry of "method" type in the registry.
      * 
      * @param name
-     *            the name of the method
+     *            the name of the method.
      * @param libs
-     *            the libraries the method belongs to
+     *            the libraries the method belongs to.
      * @param urlPath
-     *            the path to be used in the URL
+     *            the path to be used in the URL.
      * @param description
-     *            the description of the method
-     * @return the Client Response
+     *            the description of the method.
+     * @return The client response.
      */
 	public RegistryClientResponse createMethod(String name, List<String> libs, String urlPath, String description);
 	
     /**
-     * Creates an entry of "master" type in the registry
+     * Creates an entry of "master" type in the registry.
      * 
      * @param url
-     *            the url of the master
+     *            the url of the master.
      * @param title
-     *            the title of the person for contact
+     *            the title of the person for contact.
      * @param email
-     *            the email for contact
+     *            the email for contact.
      * @param phone
-     *            the phone for contact
+     *            the phone for contact.
      * @param website
-     *            the website of the project
+     *            the website of the project.
      * @param address
-     *            the address for contact
+     *            the address for contact.
      * @param contact
-     *            the name of the person for contact
-     * @return the Client Response
+     *            the name of the person for contact.
+     * @return The client response.
      */
 	public RegistryClientResponse createMaster(String url, String title,
 			String email, String phone, String website, String address, String contact);
 	
     /**
-     * Creates an entry of "site" type in the registry
+     * Creates an entry of "site" type in the registry.
      * 
      * @param name
-     *            the name of the site
+     *            the name of the site.
      * @param rURL
-     *            the url of the site
+     *            the url of the site.
      * @param title
-     *            the title of the person for contact
+     *            the title of the person for contact.
      * @param email
-     *            the email for contact
+     *            the email for contact.
      * @param phone
-     *            the phone for contact
+     *            the phone for contact.
      * @param website
-     *            the website of the project
+     *            the website of the site.
      * @param address
-     *            the address for contact
+     *            the address for contact.
      * @param agreement
-     *            the URL for agreement
+     *            the URL for agreement.
      * @param contact
-     *            the name of the person for contact
-      * @return the Client Response
+     *            the name of the person for contact.
+      * @return The client response.
      */
 	public RegistryClientResponse createSite(String name, String rURL, String title,
 			String email, String phone, String website, String address, String agreement, String contact);
 	
     /**
-     * Creates an entry of "parameter" type in the registry
+     * Creates an entry of "parameter" type in the registry.
      * 
      * @param name
-     *            the name of the parameter
+     *            the name of the parameter.
      * @param func
-     *            the method the parameter belongs to
+     *            the method the parameter belongs to.
      * @param libs
-     *            the libraries the parameter belongs to
+     *            the libraries the parameter belongs to.
      * @param minOccurs
-     *            the minimum occurrences of the parameter
+     *            the minimum occurrences of the parameter.
      * @param maxOccurs
-     *            the maximum occurrences of the parameter (-1 if unbounded)
+     *            the maximum occurrences of the parameter (-1 if unbounded).
      * @param values
-     *            the list of the parameter values
+     *            the list of the parameter values.
+     * @param path
+     *            the path of the parameter in the input structure.
      * @param description
-     *            the description of the parameter
-     * @return the Client Response
+     *            the description of the parameter.
+     * @return The client response.
      */
 	public RegistryClientResponse createParameter(String name, String func, List<String> libs, 
 			Integer minOccurs, Integer maxOccurs, List<String> values, String path, String description);
 	
     /**
-     * Creates an entry of "worker" type in the registry
+     * Creates an entry of "worker" type in the registry.
      * 
      * @param study
-     *            the study the worker belongs to
+     *            the study the worker belongs to.
      * @param dataset
-     *            the dataset the worker belongs to
+     *            the dataset the worker belongs to.
      * @param lib
-     *            the library the worker belongs to
+     *            the library the worker belongs to.
      * @param func
-     *            the method the worker belongs to
+     *            the method the worker belongs to.
      * @param site
-     *            the site the worker belongs to
+     *            the site the worker belongs to.
      * @param sourceData
-     *            the data source
+     *            the data source.
      * @param users
-     *            the users who can access the data source
-     * @return the Client Response
+     *            the users who can access the data source.
+     * @return The client response.
      */
 	public RegistryClientResponse createWorker(String study, String dataset, String lib, String func, String site, 
 			String sourceData, List<String> users);
 	
     /**
-     * Deletes a study from the registry
+     * Deletes a study from the registry.
      * 
      * @param name
-     *            the name of the study
-     * @return the Client Response
+     *            the name of the study.
+     * @return The client response.
      */
 	public RegistryClientResponse deleteStudy(String name);
 	
     /**
-     * Delete a dataset from the registry
+     * Deletes a dataset from the registry.
      * 
      * @param name
-     *            the name of the dataset
+     *            the name of the dataset.
      * @param study
-     *            the study the dataset belongs to
-     * @return the Client Response
+     *            the study the dataset belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse deleteDataset(String name, String study);
 	
     /**
-     * Delete a library from the registry
+     * Deletes a library from the registry.
      * 
      * @param name
-     *            the name of the library
-     * @return the Client Response
+     *            the name of the library.
+     * @return The client response.
      */
 	public RegistryClientResponse deleteLibrary(String name);
 	
     /**
-     * Delete a method from the registry
+     * Deletes a method from the registry.
      * 
      * @param name
-     *            the name of the method
+     *            the name of the method.
      * @param lib
-     *            the library the method belongs to
-     * @return the Client Response
+     *            the library the method belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse deleteMethod(String name, String lib);
 	
     /**
-     * Delete the master from the registry
+     * Deletes the master from the registry.
      * 
-     * @return the Client Response
+     * @return The client response.
      */
 	public RegistryClientResponse deleteMaster();
 	
     /**
-     * Delete a site from the registry
+     * Deletes a site from the registry.
      * 
      * @param name
-     *            the name of the site
-     * @return the Client Response
+     *            the name of the site.
+     * @return The client response.
      */
 	public RegistryClientResponse deleteSite(String name);
 	
     /**
-     * Delete a parameter from the registry
+     * Deletes a parameter from the registry.
      * 
      * @param name
-     *            the name of the parameter
+     *            the name of the parameter.
      * @param func
-     *            the method the parameter belongs to
+     *            the method the parameter belongs to.
      * @param lib
-     *            the library the parameter belongs to
-     * @return the Client Response
+     *            the library the parameter belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse deleteParameter(String name, String func, String lib);
 	
     /**
-     * Delete a worker from the registry
+     * Deletes a worker from the registry.
      * 
      * @param study
-     *            the study the worker belongs to
+     *            the study the worker belongs to.
      * @param dataset
-     *            the dataset the worker belongs to
+     *            the dataset the worker belongs to.
      * @param lib
-     *            the library the worker belongs to
+     *            the library the worker belongs to.
      * @param func
-     *            the method the worker belongs to
+     *            the method the worker belongs to.
      * @param site
-     *            the site the worker belongs to
-     * @return the Client Response
+     *            the site the worker belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse deleteWorker(String study, String dataset, String lib, String func, String site);
 	
     /**
-     * Creates an entry of "study" type in the registry
+     * Updates an entry of "study" type in the registry.
      * 
      * @param id
-     *            the study id in the registry
+     *            the study id in the registry.
      * @param name
-     *            the new name of the study
+     *            the new name of the study.
      * @param description
-     *            the new description of the study
+     *            the new description of the study.
      * @param title
-     *            the new title of the person for contact
+     *            the new title of the person for contact.
      * @param email
-     *            the new email for contact
+     *            the new email for contact.
      * @param phone
-     *            the new phone for contact
+     *            the new phone for contact.
      * @param website
-     *            the new website of the study
+     *            the new website of the study.
      * @param address
-     *            the new address for contact
+     *            the new address for contact.
      * @param contact
-     *            the new name of the person for contact
+     *            the new name of the person for contact.
      * @param approvals
-     *            the new website for the study approvals
-     * @return the Client Response
+     *            the new website for the study approvals.
+     * @return The client response.
      */
 	public RegistryClientResponse updateStudy(String id, String name, String description, String title,
 			String email, String phone, String website, String address, String contact, String approvals);
 	
     /**
-     * Update a dataset 
+     * Updates a dataset. 
      * 
      * @param id
-     *            the dataset id in the registry
+     *            the dataset id in the registry.
      * @param name
-     *            the new name of the dataset
+     *            the new name of the dataset.
      * @param study
-     *            the new study the dataset belongs to
+     *            the new study the dataset belongs to.
      * @param description
-     *            the new description of the dataset
+     *            the new description of the dataset.
      * @param variables
-     *            the new list of dependent/independent variables names
-     * @return the Client Response
+     *            the new list of dependent/independent variables names.
+     * @return The client response.
      */
 	public RegistryClientResponse updateDataset(String id, String name, String study, String description, List<String>  variables);
 	
     /**
-     * Update a library 
+     * Updates a library. 
      * 
      * @param id
-     *            the library id in the registry
+     *            the library id in the registry.
      * @param name
-     *            the new name of the library
+     *            the new name of the library.
      * @param urlPath
-     *            the new path to be used in the URL
+     *            the new path to be used in the URL.
      * @param description
-     *            the new description of the library
-     * @return the Client Response
+     *            the new description of the library.
+     * @return The client response.
      */
 	public RegistryClientResponse updateLibrary(String id, String name, String urlPath, String description);
 	
     /**
-     * Update a method
+     * Updates a method.
      * 
      * @param id
-     *            the id of the method in the registry
+     *            the id of the method in the registry.
      * @param name
-     *            the new name of the method
+     *            the new name of the method.
      * @param libs
-     *            the new libraries the method belongs to
+     *            the new libraries the method belongs to.
      * @param urlPath
-     *            the new path to be used in the URL
+     *            the new path to be used in the URL.
      * @param description
-     *            the new description of the method
-     * @return the Client Response
+     *            the new description of the method.
+     * @return The client response.
      */
 	public RegistryClientResponse updateMethod(String id, String name, List<String> libs, String urlPath, String description);
 	
     /**
-     * Update a parameter 
+     * Updates a parameter. 
      * 
      * @param id
-     *            the id of the parameter in the registry
+     *            the id of the parameter in the registry.
      * @param name
-     *            the new name of the parameter
+     *            the new name of the parameter.
      * @param func
-     *            the new method the parameter belongs to
+     *            the new method the parameter belongs to.
      * @param libs
-     *            the new libraries the parameter belongs to
+     *            the new libraries the parameter belongs to.
      * @param minOccurs
-     *            the new minimum occurrences of the parameter
+     *            the new minimum occurrences of the parameter.
      * @param maxOccurs
-     *            the new maximum occurrences of the parameter (-1 if unbounded)
+     *            the new maximum occurrences of the parameter (-1 if unbounded).
      * @param values
-     *            the new list of the parameter values
+     *            the new list of the parameter values.
+     * @param path
+     *            the new path of the parameter in the input structure.
      * @param description
-     *            the new description of the parameter
-     * @return the Client Response
+     *            the new description of the parameter.
+     * @return The client response.
      */
 	public RegistryClientResponse updateParameter(String id, String name, String func, List<String> libs, 
 			Integer minOccurs, Integer maxOccurs, List<String> values, String path, String description);
 	
     /**
-     * Update the master 
+     * Updates the master. 
      * 
      * @param url
-     *            the new url of the master
+     *            the new url of the master.
      * @param title
-     *            the new title of the person for contact
+     *            the new title of the person for contact.
      * @param email
-     *            the new email for contact
+     *            the new email for contact.
      * @param phone
-     *            the new phone for contact
+     *            the new phone for contact.
      * @param website
-     *            the new website of the project
+     *            the new website of the project.
      * @param address
-     *            the new address for contact
+     *            the new address for contact.
      * @param contact
-     *            the new name of the person for contact
-     * @return the Client Response
+     *            the new name of the person for contact.
+     * @return The client response.
      */
 	public RegistryClientResponse updateMaster(String url, String title,
 			String email, String phone, String website, String address, String contact);
 	
     /**
-     * Update the site 
+     * Updates the site. 
      * 
      * @param id
-     *            the id of the site
+     *            the id of the site.
      * @param name
-     *            the new name of the site
+     *            the new name of the site.
      * @param rURL
-     *            the new url of the site
+     *            the new url of the site.
      * @param title
-     *            the new title of the person for contact
+     *            the new title of the person for contact.
      * @param email
-     *            the new email for contact
+     *            the new email for contact.
      * @param phone
-     *            the new phone for contact
+     *            the new phone for contact.
      * @param website
-     *            the new website of the project
+     *            the new website of the site.
      * @param address
-     *            the new address for contact
+     *            the new address for contact.
      * @param agreement
-     *            the new URL for agreement
+     *            the new URL for agreement.
      * @param contact
-     *            the new name of the person for contact
-     * @return the Client Response
+     *            the new name of the person for contact.
+     * @return The client response.
      */
 	public RegistryClientResponse updateSite(String id, String name, String rURL, String title,
 			String email, String phone, String website, String address, String agreement, String contact);
 	
     /**
-     * Modify a worker 
+     * Updates a worker. 
      * 
      * @param id
-     *            the id of the worker in the registry
+     *            the id of the worker in the registry.
      * @param study
-     *            the new study the worker belongs to
+     *            the new study the worker belongs to.
      * @param dataset
-     *            the new dataset the worker belongs to
+     *            the new dataset the worker belongs to.
      * @param lib
-     *            the new library the worker belongs to
+     *            the new library the worker belongs to.
      * @param func
-     *            the new method the worker belongs to
+     *            the new method the worker belongs to.
      * @param site
-     *            the new site the worker belongs to
+     *            the new site the worker belongs to.
      * @param sourceData
-     *            the new data source
+     *            the new data source.
      * @param users
-     *            the new users who can access the data source
-     * @return the Client Response
+     *            the new users who can access the data source.
+     * @return The client response.
      */
 	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, 
 			String sourceData, List<String> users);
 	
     /**
-     * Get the studies 
+     * Gets the studies. 
      * 
-     * @return the Client Response
+     * @return The client response.
      */
 	public RegistryClientResponse getStudies();
 	
     /**
-     * Get the datasets of a study 
+     * Gets the datasets of a study. 
      * 
      * @param study
-     *            the name of the study
-     * @return the Client Response
+     *            the name of the study.
+     * @return The client response.
      */
 	public RegistryClientResponse getDatasets(String study);
 	
     /**
-     * Get the libraries of a dataset 
+     * Gets the libraries of a dataset. 
      * 
-     * @return the Client Response
+     * @param study
+     *            the name of the study the library belongs to.
+     * @param dataset
+     *            the name of the dataset the library belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse getLibraries(String study, String dataset);
 	
     /**
-     * Get the methods of a library 
+     * Gets the methods of a library. 
      * 
+     * @param study
+     *            the name of the study the method belongs to.
+     * @param dataset
+     *            the name of the dataset the method belongs to.
      * @param lib
-     *            the name of the library
-     * @return the Client Response
+     *            the name of the library the method belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse getMethods(String study, String dataset, String lib);
 	
     /**
-     * Get the parameters of a method 
+     * Gets the parameters of a method. 
      * 
      * @param func
-     *            the name of the method
+     *            the name of the method.
      * @param lib
-     *            the name of the library
-     * @return the Client Response
+     *            the name of the library.
+     * @return The client response.
      */
 	public RegistryClientResponse getParameters(String func, String lib);
 	
     /**
-     * Get the parameters of a method 
+     * Gets the variables of a dataset. 
      * 
-     * @param func
-     *            the name of the method
-     * @param lib
-     *            the name of the library
-     * @return the Client Response
+     * @param dataset
+     *            the name of the dataset.
+     * @return The client response.
      */
 	public RegistryClientResponse getVariables(String dataset);
 	
     /**
-     * Get the sites for a given study, dataset, library and method 
+     * Gets the sites for a given study, dataset, library and method. 
      * 
      * @param study
-     *            the study name
+     *            the study name.
      * @param dataset
-     *            the dataset name
+     *            the dataset name.
      * @param lib
-     *            the library name
+     *            the library name.
      * @param func
-     *            the method name
-     * @return the Client Response
+     *            the method name.
+     * @return The client response.
      */
 	public RegistryClientResponse getSites(String study, String dataset, String lib, String func);
 	
     /**
-     * Get the workers  for a given study, dataset, library, method and sites
+     * Gets the workers  for a given study, dataset, library, method and sites.
      * 
      * @param study
-     *            the study name
+     *            the study name.
      * @param dataset
-     *            the dataset name
+     *            the dataset name.
      * @param lib
-     *            the library name
+     *            the library name.
      * @param func
-     *            the method name
+     *            the method name.
      * @param sites
-     *            the sites names
-     * @return the Client Response
+     *            the sites names.
+     * @return The client response.
      */
 	public RegistryClientResponse getWorkers(String study, String dataset, String lib, String func, List<String> sites);
 	
     /**
-     * Get a study from the registry
+     * Gets a study from the registry.
      * 
      * @param name
-     *            the name of the study
-     * @return the Client Response
+     *            the name of the study.
+     * @return The client response.
      */
 	public RegistryClientResponse getStudy(String name);
 	
     /**
-     * Get a dataset from the registry
+     * Gets a dataset from the registry.
      * 
      * @param name
-     *            the name of the dataset
+     *            the name of the dataset.
      * @param study
-     *            the study the dataset belongs to
-     * @return the Client Response
+     *            the study the dataset belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse getDataset(String name, String study);
 	
     /**
-     * Get a library from the registry
+     * Gets a library from the registry.
      * 
      * @param name
-     *            the name of the library
-     * @return the Client Response
+     *            the name of the library.
+     * @return The client response.
      */
 	public RegistryClientResponse getLibrary(String name);
 	
     /**
-     * Get a library from the registry
+     * Gets a library from the registry.
      * 
      * @param name
-     *            the name of the library
-     * @return the Client Response
+     *            the name of the library.
+     * @return The client response.
      */
 	public RegistryClientResponse getLibraryObject(String name);
 	
     /**
-     * Get a method from the registry
+     * Gets a method from the registry.
      * 
      * @param name
-     *            the name of the method
+     *            the name of the method.
      * @param lib
-     *            the library the method belongs to
-     * @return the Client Response
+     *            the library the method belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse getMethod(String name, String lib);
 	
     /**
-     * Get a method from the registry
+     * Gets a method from the registry.
      * 
      * @param name
-     *            the name of the method
+     *            the name of the method.
      * @param lib
-     *            the library the method belongs to
-     * @return the Client Response
+     *            the library the method belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse getMethodObject(String name, String lib);
 	
     /**
-     * Get the master from the registry
+     * Gets the master from the registry.
      * 
-     * @param name
-     *            the name of the master
-     * @return the Client Response
+     * @return The client response.
      */
 	public RegistryClientResponse getMaster();
 	
     /**
-     * Get the master from the registry
+     * Gets the master from the registry.
      * 
-     * @param name
-     *            the name of the master
-     * @return the Client Response
+     * @return The client response.
      */
 	public RegistryClientResponse getMasterObject();
 	
     /**
-     * Get a parameter from the registry
+     * Gets a parameter from the registry.
      * 
      * @param name
-     *            the name of the parameter
+     *            the name of the parameter.
      * @param func
-     *            the method the parameter belongs to
+     *            the method the parameter belongs to.
      * @param lib
-     *            the library the parameter belongs to
-     * @return the Client Response
+     *            the library the parameter belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse getParameter(String name, String func, String lib);
 	
     /**
-     * Get a worker from the registry
+     * Gets a worker from the registry.
      * 
      * @param study
-     *            the study the worker belongs to
+     *            the study the worker belongs to.
      * @param dataset
-     *            the dataset the worker belongs to
+     *            the dataset the worker belongs to.
      * @param lib
-     *            the library the worker belongs to
+     *            the library the worker belongs to.
      * @param func
-     *            the method the worker belongs to
+     *            the method the worker belongs to.
      * @param site
-     *            the site the worker belongs to
-     * @return the Client Response
+     *            the site the worker belongs to.
+     * @return The client response.
      */
 	public RegistryClientResponse getWorker(String study, String dataset, String lib, String func, String site);
 	
     /**
-     * Get the site(s)
+     * Gets the site.
      * 
-     * @param sites
-     *            the name of the sites; if null or empty; get all the sites
-     * @return the Client Response
+     * @param site
+     *            the name of the site.
+     * @return The client response.
      */
 	public RegistryClientResponse getSite(String site);
 		
     /**
-     * Get the site(s)
+     * Gets the site(s).
      * 
      * @param sites
-     *            the name of the sites; if null or empty; get all the sites
-     * @return the Client Response
+     *            the name of the sites; if null or empty then get all the sites.
+     * @return The client response.
      */
 	public RegistryClientResponse getSiteObject(List<String> sites);
 	
     /**
-     * Get the contacts of the SCANNER, studies and sites
+     * Gets the contacts of the SCANNER, studies and sites.
      * 
-     * @param study
-     *            the study the worker belongs to
-     * @param dataset
-     *            the dataset the worker belongs to
-     * @return the Client Response
+     * @return The client response.
      */
 	public RegistryClientResponse getContacts();
 	
     /**
-     * Return true if the user has at least one role
+     * Checks if the user has any role.
+     * @return True if the user has at least one role.
      */
 	public boolean hasRoles();
 	
     /**
-     * Return the roles of the user
+     * Gets the user roles.
+     * @return The user roles.
      */
 	public List<String> getRoles();
 	
     /**
-     * Get the all the sites
+     * Gets all the sites.
      * 
-     * @return the Client Response
+     * @return The client response.
      */
 	public RegistryClientResponse getSitesMap();
 

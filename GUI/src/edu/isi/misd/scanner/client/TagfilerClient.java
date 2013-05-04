@@ -30,18 +30,50 @@ import edu.isi.misd.scanner.utils.Utils;
  */
 
 /**
- * Implementation for Accessing the Tagfiler Registry
+ * Tagfiler implementation for accessing the registry.
  * 
  * @author Serban Voinea
  *
  */
 public class TagfilerClient implements RegistryClient {
-	JakartaClient client;
-	String tagfilerURL;
-	String tagfilerCreateURL;
-	String cookie;
-	List<String> roles;
+	/**
+	 * The HTTP client.
+	 * 
+	 */
+	protected JakartaClient client;
+	/**
+	 * The Tagfiler URL.
+	 * 
+	 */
+	protected String tagfilerURL;
+	/**
+	 * The Tagfiler URL for creating entries.
+	 * 
+	 */
+	protected String tagfilerCreateURL;
+	/**
+	 * The Tagfiler cookie.
+	 * 
+	 */
+	protected String cookie;
+	/**
+	 * The user's roles.
+	 * 
+	 */
+	protected List<String> roles;
 
+    /**
+     * Constructs a client to handle the registry requests. 
+     * 
+	 * @param client
+	 * 		the HTTP client to be used in accessing the registry.
+	 * @param tagfilerURL
+	 * 		the URL to be used in accessing the registry.
+	 * @param cookie
+	 * 		the cookie to be used in accessing the registry.
+	 * @param request
+	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
+     */
 	@SuppressWarnings("unchecked")
 	public TagfilerClient(JakartaClient client, String tagfilerURL, String cookie, HttpServletRequest request) {
 		this(client, tagfilerURL, cookie);
@@ -83,6 +115,16 @@ public class TagfilerClient implements RegistryClient {
 		}
 	}
 	
+    /**
+     * Constructs a client to handle the registry requests. 
+     * 
+	 * @param client
+	 * 		the HTTP client to be used in accessing the registry.
+	 * @param tagfilerURL
+	 * 		the URL to be used in accessing the registry.
+	 * @param cookie
+	 * 		the cookie to be used in accessing the registry.
+     */
 	public TagfilerClient(JakartaClient client, String tagfilerURL, String cookie) {
 		this.client = client;
 		this.tagfilerURL = tagfilerURL;
@@ -90,9 +132,29 @@ public class TagfilerClient implements RegistryClient {
 		tagfilerCreateURL = tagfilerURL + "/subject/?read+users=*&write+users=*&rtype=";
 	}
 	
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createStudy(java.lang.String, java.lang.String)
-	 */
+    /**
+     * Creates an entry of "study" type in the registry.
+     * 
+     * @param name
+     *            the name of the study.
+     * @param description
+     *            the description of the study.
+     * @param title
+     *            the title of the person for contact.
+     * @param email
+     *            the email for contact.
+     * @param phone
+     *            the phone for contact.
+     * @param website
+     *            the website of the study.
+     * @param address
+     *            the address for contact.
+     * @param contact
+     *            the name of the person for contact.
+     * @param approvals
+     *            the website for the study approvals.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse createStudy(String name, String description, String title,
 			String email, String phone, String website, String address, String contact, String approvals) {
@@ -134,9 +196,19 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createDataset(java.lang.String, java.lang.String)
-	 */
+    /**
+     * Creates an entry of "dataset" type in the registry.
+     * 
+     * @param dataset
+     *            the name of the dataset.
+     * @param study
+     *            the study the dataset belongs to.
+     * @param description
+     *            the description of the dataset.
+     * @param variables
+     *            the list of dependent/independent variables names.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse createDataset(String dataset, String study, String description, List<String> variables) {
 		RegistryClientResponse clientResponse = null;
@@ -165,9 +237,17 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createLibrary(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
+    /**
+     * Creates an entry of "library" type in the registry.
+     * 
+     * @param name
+     *            the name of the library.
+     * @param urlPath
+     *            the path to be used in the URL.
+     * @param description
+     *            the description of the library.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse createLibrary(String name,
 			String urlPath, String description) {
@@ -189,9 +269,19 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createMethod(java.lang.String, java.lang.String, java.lang.String)
-	 */
+    /**
+     * Creates an entry of "method" type in the registry.
+     * 
+     * @param name
+     *            the name of the method.
+     * @param libs
+     *            the libraries the method belongs to.
+     * @param urlPath
+     *            the path to be used in the URL.
+     * @param description
+     *            the description of the method.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse createMethod(String name,
 			List<String> libs, String urlPath, String description) {
@@ -220,6 +310,25 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Creates an entry of "master" type in the registry.
+     * 
+     * @param rURL
+     *            the url of the master.
+     * @param title
+     *            the title of the person for contact.
+     * @param email
+     *            the email for contact.
+     * @param phone
+     *            the phone for contact.
+     * @param website
+     *            the website of the project.
+     * @param address
+     *            the address for contact.
+     * @param contact
+     *            the name of the person for contact.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse createMaster(String rURL, String title,
 			String email, String phone, String website, String address, String contact) {
@@ -255,9 +364,28 @@ public class TagfilerClient implements RegistryClient {
 		}
 		return clientResponse;
 	}
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createParameter(java.lang.String, java.lang.String, int, int, java.util.List)
-	 */
+	
+    /**
+     * Creates an entry of "parameter" type in the registry.
+     * 
+     * @param name
+     *            the name of the parameter.
+     * @param func
+     *            the method the parameter belongs to.
+     * @param libs
+     *            the libraries the parameter belongs to.
+     * @param minOccurs
+     *            the minimum occurrences of the parameter.
+     * @param maxOccurs
+     *            the maximum occurrences of the parameter (-1 if unbounded).
+     * @param values
+     *            the list of the parameter values.
+     * @param path
+     *            the path of the parameter in the input structure.
+     * @param description
+     *            the description of the parameter.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse createParameter(String name, String func, List<String> libs, 
 			Integer minOccurs, Integer maxOccurs, List<String> values, String path, String description) {
@@ -303,9 +431,25 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createWorker(java.lang.String, java.lang.String, java.lang.String)
-	 */
+    /**
+     * Creates an entry of "worker" type in the registry.
+     * 
+     * @param study
+     *            the study the worker belongs to.
+     * @param dataset
+     *            the dataset the worker belongs to.
+     * @param lib
+     *            the library the worker belongs to.
+     * @param func
+     *            the method the worker belongs to.
+     * @param site
+     *            the site the worker belongs to.
+     * @param sourceData
+     *            the data source.
+     * @param users
+     *            the users who can access the data source.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse createWorker(String study, String dataset, String lib, String func, String site, 
 			String sourceData, List<String> users) {
@@ -337,6 +481,29 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Creates an entry of "site" type in the registry.
+     * 
+     * @param name
+     *            the name of the site.
+     * @param rURL
+     *            the url of the site.
+     * @param title
+     *            the title of the person for contact.
+     * @param email
+     *            the email for contact.
+     * @param phone
+     *            the phone for contact.
+     * @param website
+     *            the website of the site.
+     * @param address
+     *            the address for contact.
+     * @param agreement
+     *            the URL for agreement.
+     * @param contact
+     *            the name of the person for contact.
+      * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse createSite(String name, String rURL, String title,
 			String email, String phone, String website, String address, String agreement, String contact) {
@@ -375,9 +542,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteStudy(java.lang.String)
-	 */
+    /**
+     * Deletes a study from the registry.
+     * 
+     * @param name
+     *            the name of the study.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse deleteStudy(String name) {
 		RegistryClientResponse clientResponse = null;
@@ -396,9 +567,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteLibrary(java.lang.String)
-	 */
+    /**
+     * Deletes a library from the registry.
+     * 
+     * @param name
+     *            the name of the library.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse deleteLibrary(String name) {
 		RegistryClientResponse clientResponse = null;
@@ -419,9 +594,11 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteMaster(java.lang.String)
-	 */
+    /**
+     * Deletes the master from the registry.
+     * 
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse deleteMaster() {
 		client.setCookieValue(cookie);
@@ -431,9 +608,17 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteParameter(java.lang.String)
-	 */
+    /**
+     * Deletes a parameter from the registry.
+     * 
+     * @param name
+     *            the name of the parameter.
+     * @param func
+     *            the method the parameter belongs to.
+     * @param lib
+     *            the library the parameter belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse deleteParameter(String name, String func, String lib) {
 		RegistryClientResponse clientResponse = null;
@@ -465,9 +650,21 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteWorker(java.lang.String, java.lang.String)
-	 */
+    /**
+     * Deletes a worker from the registry.
+     * 
+     * @param study
+     *            the study the worker belongs to.
+     * @param dataset
+     *            the dataset the worker belongs to.
+     * @param lib
+     *            the library the worker belongs to.
+     * @param func
+     *            the method the worker belongs to.
+     * @param site
+     *            the site the worker belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse deleteWorker(String study, String dataset, String lib, String func, String site) {
 		RegistryClientResponse clientResponse = null;
@@ -490,6 +687,15 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Deletes a method from the registry.
+     * 
+     * @param name
+     *            the name of the method.
+     * @param lib
+     *            the library the method belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse deleteMethod(String name, String lib) {
 		RegistryClientResponse clientResponse = null;
@@ -520,6 +726,16 @@ public class TagfilerClient implements RegistryClient {
 		}
 		return clientResponse;
 	}
+	
+    /**
+     * Deletes a dataset from the registry.
+     * 
+     * @param name
+     *            the name of the dataset.
+     * @param study
+     *            the study the dataset belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse deleteDataset(String name, String study) {
 		RegistryClientResponse clientResponse = null;
@@ -545,6 +761,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 	
+    /**
+     * Deletes a site from the registry.
+     * 
+     * @param name
+     *            the name of the site.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse deleteSite(String name) {
 		RegistryClientResponse clientResponse = null;
@@ -561,6 +784,31 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Updates an entry of "study" type in the registry.
+     * 
+     * @param id
+     *            the study id in the registry.
+     * @param name
+     *            the new name of the study.
+     * @param description
+     *            the new description of the study.
+     * @param title
+     *            the new title of the person for contact.
+     * @param email
+     *            the new email for contact.
+     * @param phone
+     *            the new phone for contact.
+     * @param website
+     *            the new website of the study.
+     * @param address
+     *            the new address for contact.
+     * @param contact
+     *            the new name of the person for contact.
+     * @param approvals
+     *            the new website for the study approvals.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse updateStudy(String id, String name,
 			String description, String title, String email, String phone,
@@ -633,6 +881,21 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Updates a dataset. 
+     * 
+     * @param id
+     *            the dataset id in the registry.
+     * @param name
+     *            the new name of the dataset.
+     * @param study
+     *            the new study the dataset belongs to.
+     * @param description
+     *            the new description of the dataset.
+     * @param variables
+     *            the new list of dependent/independent variables names.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse updateDataset(String id, String name,
 			String study, String description, List<String> variables) {
@@ -707,9 +970,19 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#modifyLibrary(java.lang.String, java.lang.String, java.lang.String)
-	 */
+    /**
+     * Updates a library. 
+     * 
+     * @param id
+     *            the library id in the registry.
+     * @param name
+     *            the new name of the library.
+     * @param urlPath
+     *            the new path to be used in the URL.
+     * @param description
+     *            the new description of the library.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse updateLibrary(String id, String name, String urlPath, String description) {
 		RegistryClientResponse clientResponse = null;
@@ -759,9 +1032,21 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#updateMethod(java.lang.String, java.lang.String, java.lang.String)
-	 */
+    /**
+     * Updates a method.
+     * 
+     * @param id
+     *            the id of the method in the registry.
+     * @param name
+     *            the new name of the method.
+     * @param libs
+     *            the new libraries the method belongs to.
+     * @param urlPath
+     *            the new path to be used in the URL.
+     * @param description
+     *            the new description of the method.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse updateMethod(String id, String name, List<String> libs, String urlPath, String description) {
 		RegistryClientResponse clientResponse = null;
@@ -847,9 +1132,29 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#modifyParameter(java.lang.String, java.lang.String, int, int, java.util.List)
-	 */
+    /**
+     * Updates a parameter. 
+     * 
+     * @param id
+     *            the id of the parameter in the registry.
+     * @param name
+     *            the new name of the parameter.
+     * @param func
+     *            the new method the parameter belongs to.
+     * @param libs
+     *            the new libraries the parameter belongs to.
+     * @param minOccurs
+     *            the new minimum occurrences of the parameter.
+     * @param maxOccurs
+     *            the new maximum occurrences of the parameter (-1 if unbounded).
+     * @param values
+     *            the new list of the parameter values.
+     * @param path
+     *            the new path of the parameter in the input structure.
+     * @param description
+     *            the new description of the parameter.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse updateParameter(String id, String name, String func, List<String> libs, 
 			Integer minOccurs, Integer maxOccurs, List<String> values, String path, String description) {
@@ -932,6 +1237,25 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Updates the master. 
+     * 
+     * @param rURL
+     *            the new url of the master.
+     * @param title
+     *            the new title of the person for contact.
+     * @param email
+     *            the new email for contact.
+     * @param phone
+     *            the new phone for contact.
+     * @param website
+     *            the new website of the project.
+     * @param address
+     *            the new address for contact.
+     * @param contact
+     *            the new name of the person for contact.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse updateMaster(String rURL, String title,
 			String email, String phone, String website, String address, String contact) {
@@ -979,6 +1303,31 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 	
+    /**
+     * Updates the site. 
+     * 
+     * @param id
+     *            the id of the site.
+     * @param name
+     *            the new name of the site.
+     * @param rURL
+     *            the new url of the site.
+     * @param title
+     *            the new title of the person for contact.
+     * @param email
+     *            the new email for contact.
+     * @param phone
+     *            the new phone for contact.
+     * @param website
+     *            the new website of the site.
+     * @param address
+     *            the new address for contact.
+     * @param agreement
+     *            the new URL for agreement.
+     * @param contact
+     *            the new name of the person for contact.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse updateSite(String id, String name, String rURL, String title,
 			String email, String phone, String website, String address, String agreement, String contact) {
@@ -1050,9 +1399,27 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#modifyWorker(java.lang.String, java.lang.String, java.lang.String)
-	 */
+    /**
+     * Updates a worker. 
+     * 
+     * @param id
+     *            the id of the worker in the registry.
+     * @param study
+     *            the new study the worker belongs to.
+     * @param dataset
+     *            the new dataset the worker belongs to.
+     * @param lib
+     *            the new library the worker belongs to.
+     * @param func
+     *            the new method the worker belongs to.
+     * @param site
+     *            the new site the worker belongs to.
+     * @param datasource
+     *            the new data source.
+     * @param users
+     *            the new users who can access the data source.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse updateWorker(String id, String study, String dataset, String lib, String func, String site, 
 			String datasource, List<String> users) {
@@ -1120,9 +1487,11 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getStudies(java.lang.String)
-	 */
+    /**
+     * Gets the studies. 
+     * 
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getStudies() {
 		RegistryClientResponse ret = null;
@@ -1157,9 +1526,13 @@ public class TagfilerClient implements RegistryClient {
 		return ret;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getDatasets(java.lang.String)
-	 */
+    /**
+     * Gets the datasets of a study. 
+     * 
+     * @param study
+     *            the name of the study.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getDatasets(String study) {
 		RegistryClientResponse clientResponse = null;
@@ -1194,9 +1567,15 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getLibraries(java.lang.String)
-	 */
+    /**
+     * Gets the libraries of a dataset. 
+     * 
+     * @param study
+     *            the name of the study the library belongs to.
+     * @param dataset
+     *            the name of the dataset the library belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getLibraries(String study, String dataset) {
 		RegistryClientResponse clientResponse = null;
@@ -1236,9 +1615,17 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getMethods(java.lang.String)
-	 */
+    /**
+     * Gets the methods of a library. 
+     * 
+     * @param study
+     *            the name of the study the method belongs to.
+     * @param dataset
+     *            the name of the dataset the method belongs to.
+     * @param lib
+     *            the name of the library the method belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getMethods(String study, String dataset, String lib) {
 		RegistryClientResponse clientResponse = null;
@@ -1275,9 +1662,15 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getParameters(java.lang.String)
-	 */
+    /**
+     * Gets the parameters of a method. 
+     * 
+     * @param func
+     *            the name of the method.
+     * @param lib
+     *            the name of the library.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getParameters(String func, String lib) {
 		RegistryClientResponse clientResponse = null;
@@ -1292,9 +1685,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getParameters(java.lang.String)
-	 */
+    /**
+     * Gets the variables of a dataset. 
+     * 
+     * @param dataset
+     *            the name of the dataset.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getVariables(String dataset) {
 		RegistryClientResponse clientResponse = null;
@@ -1309,6 +1706,19 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Gets the sites for a given study, dataset, library and method. 
+     * 
+     * @param study
+     *            the study name.
+     * @param dataset
+     *            the dataset name.
+     * @param lib
+     *            the library name.
+     * @param func
+     *            the method name.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getSites(String study, String dataset,
 			String lib, String func) {
@@ -1340,9 +1750,22 @@ public class TagfilerClient implements RegistryClient {
 		}
 		return clientResponse;
 	}
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getWorkers(java.lang.String)
-	 */
+	
+    /**
+     * Gets the workers  for a given study, dataset, library, method and sites.
+     * 
+     * @param study
+     *            the study name.
+     * @param dataset
+     *            the dataset name.
+     * @param lib
+     *            the library name.
+     * @param func
+     *            the method name.
+     * @param sites
+     *            the sites names.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getWorkers(String study, String dataset, String lib, String func, List<String> sites) {
 		RegistryClientResponse clientResponse = null;
@@ -1373,9 +1796,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getStudy(java.lang.String)
-	 */
+    /**
+     * Gets a study from the registry.
+     * 
+     * @param study
+     *            the name of the study.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getStudy(String study) {
 		RegistryClientResponse clientResponse = null;
@@ -1394,9 +1821,15 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getDataset(java.lang.String)
-	 */
+    /**
+     * Gets a dataset from the registry.
+     * 
+     * @param dataset
+     *            the name of the dataset.
+     * @param study
+     *            the study the dataset belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getDataset(String dataset, String study) {
 		RegistryClientResponse clientResponse = null;
@@ -1418,9 +1851,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getLibrary(java.lang.String)
-	 */
+    /**
+     * Gets a library from the registry.
+     * 
+     * @param name
+     *            the name of the library.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getLibrary(String name) {
 		RegistryClientResponse clientResponse = null;
@@ -1439,9 +1876,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getLibrary(java.lang.String)
-	 */
+    /**
+     * Gets a library from the registry.
+     * 
+     * @param name
+     *            the name of the library.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getLibraryObject(String name) {
 		RegistryClientResponse clientResponse = null;
@@ -1456,9 +1897,15 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getMethod(java.lang.String)
-	 */
+    /**
+     * Gets a method from the registry.
+     * 
+     * @param name
+     *            the name of the method.
+     * @param lib
+     *            the library the method belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getMethod(String name, String lib) {
 		RegistryClientResponse clientResponse = null;
@@ -1480,9 +1927,15 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getMethod(java.lang.String)
-	 */
+    /**
+     * Gets a method from the registry.
+     * 
+     * @param name
+     *            the name of the method.
+     * @param lib
+     *            the library the method belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getMethodObject(String name, String lib) {
 		RegistryClientResponse clientResponse = null;
@@ -1497,9 +1950,11 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getMaster(java.lang.String)
-	 */
+    /**
+     * Gets the master from the registry.
+     * 
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getMaster() {
 		RegistryClientResponse clientResponse = null;
@@ -1510,9 +1965,11 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getMaster(java.lang.String)
-	 */
+    /**
+     * Gets the master from the registry.
+     * 
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getMasterObject() {
 		RegistryClientResponse clientResponse = null;
@@ -1523,9 +1980,17 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getParameter(java.lang.String)
-	 */
+    /**
+     * Gets a parameter from the registry.
+     * 
+     * @param name
+     *            the name of the parameter.
+     * @param func
+     *            the method the parameter belongs to.
+     * @param lib
+     *            the library the parameter belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getParameter(String name, String func, String lib) {
 		RegistryClientResponse clientResponse = null;
@@ -1550,9 +2015,21 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getWorker(java.lang.String)
-	 */
+    /**
+     * Gets a worker from the registry.
+     * 
+     * @param study
+     *            the study the worker belongs to.
+     * @param dataset
+     *            the dataset the worker belongs to.
+     * @param lib
+     *            the library the worker belongs to.
+     * @param func
+     *            the method the worker belongs to.
+     * @param site
+     *            the site the worker belongs to.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getWorker(String study, String dataset, String lib, String func, String site) {
 		RegistryClientResponse clientResponse = null;
@@ -1583,6 +2060,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Gets the site.
+     * 
+     * @param site
+     *            the name of the site.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getSite(String site) {
 		RegistryClientResponse clientResponse = null;
@@ -1601,6 +2085,13 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Gets the site(s).
+     * 
+     * @param sites
+     *            the name of the sites; if null or empty then get all the sites.
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getSiteObject(List<String> sites) {
 		RegistryClientResponse clientResponse = null;
@@ -1625,6 +2116,11 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+    /**
+     * Gets the contacts of the SCANNER, studies and sites.
+     * 
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getContacts() {
 		RegistryClientResponse clientResponse = null;
@@ -1635,6 +2131,11 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 	
+    /**
+     * Gets the predicate with the users roles.
+     * 
+     * @return The string representing the predicate of the user roles.
+     */
 	protected String getUserPredicate() {
 		String ret = "";
 		if (roles != null && roles.size() > 0) {
@@ -1654,16 +2155,29 @@ public class TagfilerClient implements RegistryClient {
 		return ret;
 	}
 
+    /**
+     * Checks if the user has any role.
+     * @return True if the user has at least one role.
+     */
 	@Override
 	public boolean hasRoles() {
 		return roles != null && roles.size() > 0;
 	}
 
+    /**
+     * Gets the user roles.
+     * @return The user roles.
+     */
 	@Override
 	public List<String> getRoles() {
 		return roles;
 	}
 
+    /**
+     * Gets all the sites.
+     * 
+     * @return The client response.
+     */
 	@Override
 	public RegistryClientResponse getSitesMap() {
 		RegistryClientResponse clientResponse = null;

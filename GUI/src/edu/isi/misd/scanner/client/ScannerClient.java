@@ -40,34 +40,35 @@ import org.apache.http.params.CoreConnectionPNames;
 
 
 /**
- * Class to implement an HTTPS Client
+ * Class to implement an HTTPS client.
+ * 
  * @author Serban Voinea
  *
  */
 public class ScannerClient extends JakartaClient {
 	/**
-     * Constructor
+     * Constructor.
      * 
-     * @param connections
-     *            the maximum number of HTTP connections
+     * @param maxConnections
+     *            the maximum number of HTTP connections.
      * @param socketBufferSize
-     *            the socket buffer size
+     *            the socket buffer size.
      * @param socketTimeout
-     *            the socket buffer timeout
+     *            the socket buffer timeout.
      * @param trustStoreType
-     *            the TrustStore type
+     *            the TrustStore type.
      * @param trustStorePassword
-     *            the Trust Store password
+     *            the Trust Store password.
      * @param trustStoreResource
-     *            the Trust Store file
+     *            the Trust Store file.
      * @param keyStoreType
-     *            the KeyStore type
+     *            the KeyStore type.
      * @param keyStorePassword
-     *            the KeyStore password
+     *            the KeyStore password.
      * @param keyStoreResource
-     *            the KeyStore file
+     *            the KeyStore file.
      * @param keyManagerPassword
-     *            the KeyManager password
+     *            the KeyManager password.
      */
 	public ScannerClient(int maxConnections, int socketBufferSize, int socketTimeout,
 			String trustStoreType, String trustStorePassword, String trustStoreResource,
