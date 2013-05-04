@@ -67,7 +67,10 @@ import org.apache.http.util.EntityUtils;
  *
  */
 public class JakartaClient {
-    // client used to connect with the tagfiler server
+	/**
+	 * The HTTP client.
+	 * 
+	 */
 	protected DefaultHttpClient httpclient;
 	
 	// error description header
@@ -79,29 +82,46 @@ public class JakartaClient {
 	// error description end message
 	private static final String error_description_end = "</p>";
 	
-	// the cookie value
+	/**
+	 * The cookie.
+	 * 
+	 */
 	protected String cookieValue;
 	
-	// number of retries if the connection is broken
+	/**
+	 * The maximum number of retries in case of a transient network failure.
+	 * 
+	 */
 	protected int retries = 10;
 	
-	// exception messages got during the retries if the connection is broken
+	/**
+	 * The last connect exception message.
+	 * 
+	 */
 	protected String connectException;
+	/**
+	 * The last client protocol exception message.
+	 * 
+	 */
 	protected String clientProtocolException;
+	/**
+	 * The last I/O exception message.
+	 * 
+	 */
 	protected String ioException;
 	
 	public JakartaClient() {
 		
 	}
 	/**
-     * Constructor
+     * Constructor.
      * 
-     * @param connections
-     *            the maximum number of HTTP connections
+     * @param maxConnections
+     *            the maximum number of HTTP connections.
      * @param socketBufferSize
-     *            the socket buffer size
+     *            the socket buffer size.
      * @param socketTimeout
-     *            the socket buffer timeout
+     *            the socket buffer timeout.
      */
 	public JakartaClient(int maxConnections, int socketBufferSize, int socketTimeout) {
 		try {
@@ -112,14 +132,14 @@ public class JakartaClient {
 	}
 	
     /**
-     * Initialize the HTTP client
+     * Initialize the HTTP client.
      * 
      * @param connections
-     *            the maximum number of HTTP connections
+     *            the maximum number of HTTP connections.
      * @param socketBufferSize
-     *            the socket buffer size
+     *            the socket buffer size.
      * @param socketTimeout
-     *            the socket buffer timeout
+     *            the socket buffer timeout.
      */
 	private void init(int maxConnections, int socketBufferSize, int socketTimeout) throws Throwable {
 		TrustManager easyTrustManager = new X509TrustManager() {
@@ -174,15 +194,15 @@ public class JakartaClient {
 
     /**
      * Execute a login request.
-     * If success, it will get a cookie
+     * <br/>If success, it will get a cookie
      * 
      * @param url
-     *            the query url
+     *            the request URL.
      * @param user
-     *            the userid
+     *            the userid.
      * @param password
-     *            the password
-     * @return the HTTP Response
+     *            the password.
+     * @return The HTTP response.
      */
     public ClientURLResponse login(String url, String user, String password) {
         HttpPost httppost = new HttpPost(url);
@@ -200,12 +220,13 @@ public class JakartaClient {
     }
     
     /**
-     * Execute a login request.
-     * If success, it will get a cookie
+     * Execute a POST request.
      * 
      * @param url
-     *            the query url
-     * @return the HTTP Response
+     *            the query URL.
+     * @param cookie
+     *            the request cookie.
+     * @return The HTTP response.
      */
     public ClientURLResponse postResource(String url, String cookie) {
     	ClientURLResponse response = null;
@@ -227,11 +248,12 @@ public class JakartaClient {
     
     /**
      * Execute a PUT request.
-     * If success, it will get a cookie
      * 
      * @param url
-     *            the query url
-     * @return the HTTP Response
+     *            the request URL.
+     * @param cookie
+     *            the request cookie.
+     * @return The HTTP response.
      */
     public ClientURLResponse putResource(String url, String cookie) {
     	ClientURLResponse response = null;
@@ -245,12 +267,12 @@ public class JakartaClient {
      * Execute a SCANNER network request.
      * 
      * @param url
-     *            the query url
+     *            the query URL.
      * @param targets
-     *            the targets in the request header 
+     *            the targets in the request header. 
      * @param body
-     *            the request body
-     * @return the HTTP Response
+     *            the request body.
+     * @return The HTTP response.
      */
     public ClientURLResponse postScannerQuery(String url, String targets, String body) {
         HttpPost httppost = new HttpPost(url);
@@ -272,13 +294,13 @@ public class JakartaClient {
     }
     
     /**
-     * Delete a resource
+     * Delete a resource.
      * 
      * @param url
-     *            the url of the resource to be deleted
+     *            the URL of the resource to be deleted.
      * @param cookie
-     *            the cookie to be set in the request
-     * @return the HTTP Response
+     *            the cookie to be set in the request.
+     * @return The HTTP response.
      */
     public ClientURLResponse delete(String url, String cookie) {
 		HttpDelete httpdelete = new HttpDelete(url);
@@ -289,10 +311,10 @@ public class JakartaClient {
      * Execute a GET request.
      * 
      * @param url
-     *            the query url
+     *            the query URL.
      * @param cookie
-     *            the cookie to be set in the request
-     * @return the HTTP Response
+     *            the cookie to be set in the request.
+     * @return The HTTP response.
      */
     public ClientURLResponse get(String url, String cookie) {
 		HttpGet httpget = new HttpGet(url);
@@ -304,8 +326,8 @@ public class JakartaClient {
      * Execute a GET request.
      * 
      * @param url
-     *            the query url
-     * @return the HTTP Response
+     *            the query URL.
+     * @return The HTTP response.
      */
     public ClientURLResponse get(String url) {
 		HttpGet httpget = new HttpGet(url);
@@ -392,13 +414,13 @@ public class JakartaClient {
     }
     
     /**
-     * Get the content of a file to be downloaded
+     * Get the content of a file to be downloaded.
      * 
      * @param url
-     *            the query url
+     *            the query URL.
      * @param cookie
-     *            the cookie to be set in the request
-     * @return the HTTP Response
+     *            the cookie to be set in the request.
+     * @return The HTTP response.
      */
     public ClientURLResponse downloadFile(String url, String cookie) {
 		HttpGet httpget = new HttpGet(url);
@@ -422,68 +444,85 @@ public class JakartaClient {
     }
     
 	/**
-	 * @return the cookieValue
+     * Get the response cookie.
+	 * @return The response cookie.
 	 */
 	public String getCookieValue() {
 		return cookieValue;
 	}
 
 	/**
-	 * @param cookieValue the cookieValue to set
+     * Set the request cookie.
+	 * @param 
+	 * 		cookieValue the cookie to be set in the request.
 	 */
 	public void setCookieValue(String cookieValue) {
 		this.cookieValue = cookieValue;
 	}
 
+	/**
+     * Class for wrapping the HTTP response.
+	 */
 	public class ClientURLResponse {
     	private HttpResponse response;
     	private Exception exception;
     	
+    	/**
+         * Constructor for the HTTP response.
+         * 
+         * @param response
+         *            the HTTP response.
+         */
     	ClientURLResponse(HttpResponse response) {
     		this.response = response;
     	}
     	
+    	/**
+         * Constructor for an exception.
+         * 
+         * @param exception
+         *            the raised exception.
+         */
     	ClientURLResponse(Exception exception) {
     		this.exception = exception;
     	}
     	
-        /**
-         * Return the HTTP status code
-         * 
-         */
+    	/**
+         * Get the response status code.
+    	 * @return The response status code.
+    	 */
         public int getStatus() {
     		return response.getStatusLine().getStatusCode();
     	}
-
     	
-        /**
-         * Return the true if it is a HTTP error code; false otherwise
-         * 
-         */
+    	/**
+         * Check the response status code.
+    	 * @return TRUE if it is a server error; FALSE otherwise.
+    	 */
     	public boolean isError() {
     		return getStatus() > 400;
     	}
 
-        /**
-         * Return the true if an exception was thrown during the execution of the HTTP request; false otherwise
-         * 
-         */
+    	/**
+         * Check the response status.
+    	 * @return TRUE if an exception was thrown during the execution of the HTTP request; FALSE otherwise.
+    	 */
     	public boolean isException() {
     		return exception != null;
     	}
 
-        /**
-         * Return the exception
-         * 
-         */
+    	/**
+         * Get the response status.
+    	 * @return The exception thrown during the execution of the HTTP request.
+    	 */
     	public Exception getException() {
     		return exception;
     	}
 
-        /**
-         * Return the body as a string
-         * 
-         */
+    	/**
+         * Get the response body.
+    	 * @return The string representing the HTTP response body.
+    	 */
         public String getEntityString() {
         	if (response.getEntity() != null) {
                	try {
@@ -499,10 +538,10 @@ public class JakartaClient {
     	}
 
         
-        /**
-         * Return the InputStream from where the body can be read
-         * 
-         */
+    	/**
+         * Get the response input stream.
+    	 * @return The HTTP response input stream.
+    	 */
         public InputStream getEntityInputStream() {
         	InputStream inputStream = null;
         	try {
@@ -516,10 +555,10 @@ public class JakartaClient {
     		return inputStream;
     	}
 
-        /**
-         * Return the error message of an HTTP Request
-         * 
-         */
+    	/**
+         * Get the error message.
+    	 * @return The HTTP error message.
+    	 */
         public String getErrorMessage() {
         	String errormessage = "";
         	
@@ -549,17 +588,17 @@ public class JakartaClient {
     		return errormessage;
     	}
 
-        /**
-         * Get the response size
-         * 
-         */
+    	/**
+         * Get the response size.
+    	 * @return The HTTP response body size.
+    	 */
         public long getResponseSize() {
         	long length = Long.parseLong(response.getFirstHeader("Content-Length").getValue());
         	return length;
     	}
         
         /**
-         * Release the responses
+         * Release the response resources.
          * 
          */
         public void release() {
@@ -572,10 +611,10 @@ public class JakartaClient {
             }
     	}
         
-        /**
-         * Get the cookie value.
-         * 
-         */
+    	/**
+         * Get the response cookie.
+    	 * @return The HTTP response cookie.
+    	 */
         public String getCookieValue() {
         	String res = null;
         	try {
@@ -591,8 +630,9 @@ public class JakartaClient {
         }
 
         /**
-         * Get the value for the "id" header
+         * Get the value for the "id" header.
          * 
+    	 * @return The value for the "id" header.
          */
         public String getIdHeader() {
         	String res = null;
@@ -604,7 +644,23 @@ public class JakartaClient {
         }
 
         /**
-         * Utility to print the status as well as the headers
+         * Get the value for a request header.
+         * 
+         * @param name
+         *            the header name.
+    	 * @return The value of the header.
+         */
+        public String getHeader(String name) {
+        	String res = null;
+        	Header value = response.getFirstHeader(name);
+			if (value != null) {
+				res = value.getValue();
+    		}
+			return res;
+        }
+
+        /**
+         * Print the response status, cookie and headers.
          */
         public void debug() {
         	if (response != null) {
