@@ -4,12 +4,12 @@ package edu.isi.misd.scanner.network.base.master.routes;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils.ErrorProcessor;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Map;
 import org.apache.camel.Body;
 import org.apache.camel.Properties;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.builder.ValueBuilder;
-import org.apache.camel.component.http4.HttpOperationFailedException;
 import org.apache.camel.component.jackson.JacksonDataFormat;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.apache.camel.dataformat.xmljson.XmlJsonDataFormat;
@@ -51,13 +51,29 @@ public class DefaultRoute extends RouteBuilder
     protected String getRouteName() {
         return getClass().getName();
     }
-    
+
     /**
      *
      * @return
      */
     protected String getAggregatorRouteName() {
         return getClass().getSimpleName() + "Aggregator";
+    } 
+    
+    /**
+     *
+     * @return
+     */
+    protected String getGETRouteName() {
+        return getClass().getSimpleName() + "GET";
+    }     
+    
+    /**
+     *
+     * @return
+     */
+    protected String getPOSTRouteName() {
+        return getClass().getSimpleName() + "POST";
     }   
     
     /**
@@ -150,60 +166,77 @@ public class DefaultRoute extends RouteBuilder
         xmlToJson.setSkipNamespaces(true);
         xmlToJson.setRemoveNamespacePrefixes(true);
 
+        from("direct:" + getGETRouteName()).
+            choice().
+                when().simple(TARGET_PARAMS_NULL_CLAUSE).
+                    processRef(getCacheReadProcessorRef()).
+                    choice().
+                        when().simple(JSON_CONTENT_TYPE_CLAUSE).
+                            marshal(xmlToJson).
+                        endChoice().
+                    stop().
+                endChoice().
+            end();
+        
+        from("direct:" + getPOSTRouteName()).
+            choice().
+                when().simple(JSON_CONTENT_TYPE_CLAUSE).
+                    doTry().
+                        unmarshal(json).             
+                    doCatch(Exception.class).
+                        process(new ErrorProcessor()).
+                        stop().
+                    end().
+                    marshal(jaxb).
+                endChoice().
+            end();
+        
         from("direct:" + getRouteName()).
             convertBodyTo(String.class).
             processRef(getRequestProcessorRef()).            
             choice().
                 when().simple(HTTP_METHOD_GET_CLAUSE).
-                    choice().
-                        when().simple(TARGET_PARAMS_NULL_CLAUSE).
-                            processRef(getCacheReadProcessorRef()).
-                            choice().
-                                when().simple(JSON_CONTENT_TYPE_CLAUSE).
-                                    marshal(xmlToJson).
-                            endChoice().
-                            stop().
-                    endChoice().
+                    to("direct:" + getGETRouteName()).
                 when().simple(HTTP_METHOD_POST_CLAUSE).
-                    choice().
-                        when().simple(JSON_CONTENT_TYPE_CLAUSE).
-                            doTry().
-                                unmarshal(json).             
-                            doCatch(Exception.class).
-                                process(new ErrorProcessor()).
-                                stop().
-                            end().
-                            marshal(jaxb).
-                    endChoice().
+                    to("direct:" + getPOSTRouteName()).
             end().
         dynamicRouter(getDynamicRouter());
         
-        configureAggregation();
+        multicast();
     }
 
     /**
      *
+     * TODO: make redeliveries and redeliveryDelay for onException clauses 
+     *  externally configurable via master.properties
      * @throws Exception
      */
-    protected void configureAggregation() throws Exception
+    protected void multicast() throws Exception
     {
         from("direct:" + getAggregatorRouteName()).
-            // dont retry remote exceptions
-            onException(HttpOperationFailedException.class).
-            maximumRedeliveries(0).
-            continued(true).
-            end().
             // dont retry connects for now
             onException(HttpHostConnectException.class).
             maximumRedeliveries(0).
+            redeliveryDelay(1000).            
             continued(true).
             end().            
-            // do retry socket/io errors (at least once)
+            // do retry SocketException (by default once)
             onException(SocketException.class).
-            maximumRedeliveries(1).
+            maximumRedeliveries(1).            
             redeliveryDelay(1000).
             continued(true).
-            end().   
+            end().
+            // do retry SocketTimeoutExceptions (by default twice)
+            onException(SocketTimeoutException.class).
+            maximumRedeliveries(2).
+            redeliveryDelay(1000).
+            continued(true).
+            end().            
+            // don't retry anything else
+            onException(Exception.class).
+            maximumRedeliveries(0).
+            continued(true).
+            end().            
             // recipientList does the actual multicast
             recipientList(getRecipientList()).          
                 parallelProcessing().
@@ -216,9 +249,9 @@ public class DefaultRoute extends RouteBuilder
                     choice().
                         when().simple(JSON_CONTENT_TYPE_CLAUSE).
                             marshal(xmlToJson).
-                    endChoice().
+                        endChoice().
                 end().
-        end();
+            end();
     }
         
     /**

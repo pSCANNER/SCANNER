@@ -21,8 +21,7 @@
         <camel:packageScan>
             <camel:package>edu.isi.misd.scanner.network.modules.master</camel:package>            
             <camel:package>edu.isi.misd.scanner.network.modules.worker</camel:package>
-            <camel:excludes>**.*Iteration*</camel:excludes>
-            <camel:includes>**.*</camel:includes>
+            <camel:includes>**.Echo*</camel:includes>
         </camel:packageScan>
         
         <camel:route streamCache="true">

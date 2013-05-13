@@ -1,10 +1,8 @@
 package edu.isi.misd.scanner.network.base.master.aggregators;
 
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
-import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import java.util.ArrayList;
 import org.apache.camel.Exchange;
-import org.apache.camel.component.http4.HttpOperationFailedException;
 import org.apache.camel.processor.aggregate.AggregationStrategy;
 
 import org.slf4j.Logger;
@@ -27,18 +25,27 @@ public class BaseResultsAggregator implements AggregationStrategy
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) 
     {  
-        Object newBody;
+        Object newBody = newExchange.getIn().getBody(String.class);
         
-        Throwable cause =
-            newExchange.getProperty(
-                Exchange.EXCEPTION_CAUGHT,
-                Throwable.class);
-        if (cause != null) {
-            newBody = ErrorUtils.formatErrorResponse(newExchange, cause);
-        } else {
-            newBody = newExchange.getIn().getBody(String.class); 
+        String failureEndpoint = 
+            newExchange.getProperty(Exchange.FAILURE_ENDPOINT, String.class); 
+        
+        String endpoint = (failureEndpoint != null) ? failureEndpoint :
+            newExchange.getProperty(Exchange.TO_ENDPOINT, String.class);
+        
+        if (failureEndpoint != null) {
+            Throwable cause =
+                newExchange.getProperty(
+                    Exchange.EXCEPTION_CAUGHT,
+                    Throwable.class);
+
+            newBody = 
+                ErrorUtils.formatErrorResponse(
+                    newExchange,
+                    (cause != null) ? cause : 
+                    new RuntimeException("Source: " + failureEndpoint));          
         }
-              
+        
         ArrayList list;
         if (oldExchange == null) 
         {

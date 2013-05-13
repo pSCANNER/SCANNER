@@ -20,7 +20,8 @@
         <camel:packageScan>
             <camel:package>edu.isi.misd.scanner.network.base.worker</camel:package>
             <camel:package>edu.isi.misd.scanner.network.modules.worker</camel:package>
-            <camel:excludes>**.*Iteration*</camel:excludes>           
+            <camel:excludes>**.*Iteration*</camel:excludes> 
+            <camel:excludes>**.*Default*</camel:excludes>                       
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
                 
@@ -33,5 +34,20 @@
         <camel:routeContextRef ref="GloreSecureRouteContext"/> 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
     </camel:camelContext>
-  
+
+    <camel:errorHandler id="deadLetterErrorHandler"
+                        type="DeadLetterChannel" 
+                        deadLetterUri="log:WorkerDebugLog?showAll=true&amp;multiline=true&amp;maxChars=100000&amp;level=DEBUG">
+
+        <camel:redeliveryPolicy asyncDelayedRedelivery="true" 
+                                maximumRedeliveries="0" 
+                                redeliveryDelay="1000" 
+                                logHandled="false"
+                                logContinued="false"  
+                                logStackTrace="true"                                 
+                                logRetryStackTrace="false" 
+                                logRetryAttempted="true"
+                                retryAttemptedLogLevel="WARN"/>                 
+    </camel:errorHandler>
+        
 </beans>

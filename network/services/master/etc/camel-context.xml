@@ -22,7 +22,8 @@
         <camel:packageScan>
             <camel:package>edu.isi.misd.scanner.network.base.master</camel:package>
             <camel:package>edu.isi.misd.scanner.network.modules.master</camel:package>
-            <camel:excludes>**.*Iteration*</camel:excludes>          
+            <camel:excludes>**.*Iteration*</camel:excludes> 
+            <camel:excludes>**.*Default*</camel:excludes>                      
             <camel:includes>**.*</camel:includes>
         </camel:packageScan>
         
@@ -34,7 +35,31 @@
         <camel:routeContextRef ref="ExampleSecureRouteContext"/>       
         <camel:routeContextRef ref="OceansSecureRouteContext"/>                
         <camel:routeContextRef ref="GloreSecureRouteContext"/>
-                              
+            
+        <camel:threadPoolProfile 
+            id="defaultThreadPoolProfile" 
+            defaultProfile="true"
+            poolSize="100" 
+            maxPoolSize="200" 
+            maxQueueSize="1000"
+            rejectedPolicy="CallerRuns"/>
+                                
     </camel:camelContext>
 
+    <camel:errorHandler id="deadLetterErrorHandler"
+                        type="DeadLetterChannel" 
+                        deadLetterUri="log:MasterDebugLog?showAll=true&amp;multiline=true&amp;maxChars=100000&amp;level=DEBUG">
+
+        <camel:redeliveryPolicy asyncDelayedRedelivery="true" 
+                                maximumRedeliveries="0" 
+                                redeliveryDelay="1000" 
+                                logHandled="false"
+                                logContinued="false"  
+                                logStackTrace="false"                                 
+                                logRetryStackTrace="false" 
+                                logRetryAttempted="true"
+                                retryAttemptedLogLevel="WARN"/> 
+                
+    </camel:errorHandler>
+        
 </beans>

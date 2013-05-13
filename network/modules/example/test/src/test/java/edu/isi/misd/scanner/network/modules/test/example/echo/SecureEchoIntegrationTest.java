@@ -57,7 +57,7 @@ public class SecureEchoIntegrationTest extends BaseIntegrationTest
         return targets;
     } 
     
-        @Test       
+    @Test       
     public void testSecureEchoXML() throws Exception 
     {
         doPost("application/xml",

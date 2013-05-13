@@ -15,6 +15,12 @@ public class DefaultRoute extends RouteBuilder
     private static final transient Logger log = 
         LoggerFactory.getLogger(DefaultRoute.class);
         
+    protected static final String HTTP_METHOD_GET_CLAUSE = 
+        "${in.header.CamelHttpMethod} == 'GET'";
+    
+    protected static final String HTTP_METHOD_POST_CLAUSE = 
+        "${in.header.CamelHttpMethod} == 'POST'";
+    
     /**
      *
      * @return
@@ -69,22 +75,22 @@ public class DefaultRoute extends RouteBuilder
         jaxb.setContextPath(getJAXBContext());           
         
         from("direct:" + getRouteName()).
-        choice().
-            when().simple("${in.headers.CamelHttpMethod} == 'GET'").
-                processRef(getCacheReadProcessorRef()).
-                stop().    
-            when().simple("${in.headers.CamelHttpMethod} == 'POST'").
-                doTry().
-                    unmarshal(jaxb).              
-                    processRef(getComputeProcessorRef()).
-                    marshal(jaxb).    
-                    removeHeader(BaseConstants.DATASOURCE).            
-                doCatch(Exception.class).
-                    process(new ErrorProcessor()).
-                    stop().
-                end().                 
-                processRef(getCacheWriteProcessorRef()).
-            stop().
-        end();
+            choice().
+                when().simple(HTTP_METHOD_GET_CLAUSE).
+                    processRef(getCacheReadProcessorRef()).
+                    stop().    
+                when().simple(HTTP_METHOD_POST_CLAUSE).
+                    doTry().
+                        unmarshal(jaxb).              
+                        processRef(getComputeProcessorRef()).
+                        marshal(jaxb).    
+                        removeHeader(BaseConstants.DATASOURCE).            
+                    doCatch(Exception.class).
+                        process(new ErrorProcessor()).
+                        stop().
+                    end().                 
+                    processRef(getCacheWriteProcessorRef()).
+                stop().
+            end();
     }    
 }
