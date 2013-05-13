@@ -20,7 +20,8 @@ public class BaseRecipientList
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseRecipientList.class); 
     
-    private static String options = "bridgeEndpoint=true";
+    private static String options = 
+        "bridgeEndpoint=true&httpClient.soTimeout=20000";
     private static String sslOptions = 
         "sslContextParametersRef=sslContextParameters";
     
@@ -58,7 +59,9 @@ public class BaseRecipientList
                 continue;
             }
         }
-        log.debug("Recipient list created: " + results);
+        if (log.isDebugEnabled()) {
+            log.debug("Recipient list created: " + results);
+        }
         return results;
     }    
 }

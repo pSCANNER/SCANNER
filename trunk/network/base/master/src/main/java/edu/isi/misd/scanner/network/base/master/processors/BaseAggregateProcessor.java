@@ -37,7 +37,7 @@ public class BaseAggregateProcessor implements Processor
         
         BaseResponse response = new BaseResponse(); 
         ArrayList<SimpleMap> mapResults = new ArrayList<SimpleMap>();
-        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>();        
+        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>(); 
         for (Object result : results)
         {   
             if (result instanceof ErrorDetails)

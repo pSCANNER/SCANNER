@@ -24,13 +24,14 @@ public class BaseComputeProcessor implements Processor
      */
     @Override
     public void process(Exchange exchange) throws Exception 
-    {                
+    {     
         // this processor should be replaced with app-specific code
         // it just echoes the passed-in SimpleMap and adds SiteInfo to it
         SimpleMap request = 
             (SimpleMap)exchange.getIn().getBody(SimpleMap.class); 
         if (request != null) {
             request.setSiteInfo(MessageUtils.getSiteInfo(exchange));
-        }
+        } 
+        exchange.getIn().setBody(request);
     }              
 }

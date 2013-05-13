@@ -21,7 +21,7 @@ import javax.security.auth.spi.LoginModule;
 import org.eclipse.jetty.plus.jaas.JAASPrincipal;
 import org.eclipse.jetty.plus.jaas.JAASRole;
 import org.eclipse.jetty.plus.jaas.callback.ObjectCallback;
-import org.eclipse.jetty.server.HttpConnection;
+import org.eclipse.jetty.server.AbstractHttpConnection;
 import org.eclipse.jetty.server.Request;
 
 import org.slf4j.Logger;
@@ -190,7 +190,8 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
             return;
         }            
             
-        HttpConnection connection = HttpConnection.getCurrentConnection();
+        AbstractHttpConnection connection = 
+            AbstractHttpConnection.getCurrentConnection();
         Request request = (connection == null? null : connection.getRequest());
         if (request != null)
         {

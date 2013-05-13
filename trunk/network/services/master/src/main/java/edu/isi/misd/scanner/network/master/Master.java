@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.component.http4.HttpComponent;
 import org.apache.camel.spring.Main;
 
 /**
@@ -133,7 +134,19 @@ public class Master extends Main
         } else {
             this.camelContext = getCamelContexts().get(0);
             Map contextProps = this.camelContext.getProperties();
-            contextProps.putAll(new HashMap(properties));          
+            contextProps.putAll(new HashMap(properties));   
+            
+            HttpComponent httpComponent = new HttpComponent(); 
+            httpComponent.setConnectionsPerRoute(60);
+            httpComponent.setMaxTotalConnections(600);
+            this.camelContext.addComponent("http4", httpComponent); 
+            httpComponent.doStart();
+            
+            HttpComponent httpsComponent = new HttpComponent(); 
+            httpsComponent.setConnectionsPerRoute(60);
+            httpsComponent.setMaxTotalConnections(600);
+            this.camelContext.addComponent("https4", httpsComponent);
+            httpsComponent.doStart();
         }
         
         try

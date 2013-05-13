@@ -21,11 +21,18 @@ public class ErrorUtils
      * @param e
      * @return
      */
-    public static ErrorDetails formatErrorResponse(Exchange exchange, Throwable e) 
+    public static ErrorDetails formatErrorResponse(Exchange exchange, 
+                                                   Throwable e) 
     {
         ErrorDetails error = new ErrorDetails();
-        error.setErrorSource(
-            exchange.getProperty(Exchange.FAILURE_ENDPOINT, String.class));
+        String errorSource = 
+            exchange.getProperty(Exchange.FAILURE_ENDPOINT, String.class);
+        if ((errorSource == null) || 
+            ((errorSource != null) && (errorSource.isEmpty()))) {
+            errorSource = 
+                exchange.getProperty(Exchange.TO_ENDPOINT, String.class);            
+        }
+        error.setErrorSource(errorSource);
         error.setErrorType(e.getClass().getName());        
         if (e instanceof HttpOperationFailedException) { 
             String desc = " " + 

@@ -108,8 +108,8 @@
     <bean id="identityService" 
           class="org.eclipse.jetty.security.DefaultIdentityService"/> 
         
-    <bean id="constraint" 
-          class="org.eclipse.jetty.http.security.Constraint">
+    <bean id="constraint"
+          class="org.eclipse.jetty.util.security.Constraint">
         <property name="name" value="CLIENT_CERT"/>
         <property name="roles" value="authorized"/>
         <property name="authenticate" value="true"/>

@@ -27,34 +27,6 @@
 
     <bean id="BaseNoOpProcessor" 
           class="edu.isi.misd.scanner.network.base.processors.BaseNoOpProcessor"/>      
-        
-    <camel:errorHandler id="deadLetterErrorHandler"
-                        type="DeadLetterChannel" 
-                        deadLetterUri="mock:err">
-
-        <camel:redeliveryPolicy asyncDelayedRedelivery="true" 
-                                maximumRedeliveries="1" 
-                                redeliveryDelay="1000" 
-                                logHandled="true"
-                                logContinued="false"  
-                                logStackTrace="false"                                 
-                                logRetryStackTrace="false" 
-                                logRetryAttempted="false"/> 
-                
-    </camel:errorHandler>
-
-    <camel:errorHandler id="defaultErrorHandler"
-                        type="DefaultErrorHandler">
-        
-        <camel:redeliveryPolicy asyncDelayedRedelivery="false" 
-                                maximumRedeliveries="1" 
-                                redeliveryDelay="1000" 
-                                logHandled="true"
-                                logContinued="false"  
-                                logStackTrace="false"                                 
-                                logRetryStackTrace="false" 
-                                logRetryAttempted="false"/> 
-    </camel:errorHandler>  
-                  
+                   
 </beans>
 

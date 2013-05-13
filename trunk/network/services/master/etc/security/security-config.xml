@@ -21,19 +21,16 @@
     <camel:sslContextParameters id="sslContextParameters">
       <camel:keyManagers 
             id="master.keyManagerParameters"
-            camelContextId="masterCamelContext"
             keyPassword="{{master.keyManagerParameters.password}}">          
         <camel:keyStore 
             id="master.keyStoreParameters"
-            camelContextId="masterCamelContext"
             type="{{master.keyStoreParameters.type}}"
             resource="{{master.keyStoreParameters.resource}}"
             password="{{master.keyStoreParamerers.password}}"/>
       </camel:keyManagers>
       <camel:trustManagers>
         <camel:keyStore  
-            id="master.trustStoreParameters"
-            camelContextId="masterCamelContext"            
+            id="master.trustStoreParameters"       
             type="{{master.trustStoreParameters.type}}"
             resource="{{master.trustStoreParameters.resource}}"
             password="{{master.trustStoreParamerers.password}}"/>
@@ -57,8 +54,8 @@
     <bean id="identityService" 
           class="org.eclipse.jetty.security.DefaultIdentityService"/> 
         
-    <bean id="constraint" 
-          class="org.eclipse.jetty.http.security.Constraint">
+    <bean id="constraint"
+          class="org.eclipse.jetty.util.security.Constraint">
         <property name="name" value="CLIENT_CERT"/>
         <property name="roles" value="authorized"/>
         <property name="authenticate" value="true"/>
