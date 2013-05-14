@@ -16,6 +16,10 @@ public class BaseNoOpProcessor implements Processor
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseNoOpProcessor.class);   
 
+    /**
+     * Does nothing, logs the invocation to the debug log.
+     * @throws Exception 
+     */
     @Override
     public void process(Exchange exchng) throws Exception 
     {

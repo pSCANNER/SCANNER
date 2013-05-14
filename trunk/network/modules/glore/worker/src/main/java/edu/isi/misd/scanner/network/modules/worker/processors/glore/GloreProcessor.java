@@ -26,22 +26,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class does the work of the "Client" in the GLORE network model.  
+ * It calculates a portion of the logistic regression and sends the results
+ * back to the "Server" (Master) node, where those results are combined with 
+ * the results from other nodes.  The master node then sends back a new set of
+ * refined variables and the process begins again, repeating until the epsilon
+ * convergence (or maximum number of iterations) is reached.
+ * 
  */
 public class GloreProcessor implements Processor
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(GloreProcessor.class); 
         
-    /**
-     *
-     */
     public static Map<String, Object> dataStore = new HashMap<String, Object>();
 
     /**
-     *
-     * @param exchange
-     * @throws Exception
+     * Camel {@link org.apache.camel.Processor} implementation,
+     * invokes {@link GloreProcessor#executeAnalysis(org.apache.camel.Exchange)}.
      */
     @Override
     public void process(Exchange exchange) throws Exception 
@@ -55,10 +57,17 @@ public class GloreProcessor implements Processor
                     "Unhandled exception during GLORE processing. Caused by [" + 
                     e.toString() + "]");
             ErrorUtils.setHttpError(exchange, rtex, 500);
+            removeState(exchange);
         }                
     }
-    
-    private GloreLogisticRegressionRequest executeAnalysis(Exchange exchange) 
+    /**
+     * Performs the statistical analysis (logistic regression) using GLORE.
+     * 
+     * @param exchange The current exchange.
+     * @return The formatted response.
+     * @throws Exception 
+     */
+    protected GloreLogisticRegressionRequest executeAnalysis(Exchange exchange) 
         throws Exception
     {
         GloreLogisticRegressionRequest request = 
@@ -171,9 +180,11 @@ public class GloreProcessor implements Processor
     }
 
     /**
-     *
-     * @param exchange
-     * @throws Exception
+     *  Reads the specified input file stored as the value of the 
+     * {@link BaseConstants#DATASOURCE} header and stores it in a 
+     * {@link HashMap} containing the {@link GloreStateData}.  This is done on 
+     * a per-transaction basis, so each incoming transaction will have its own
+     * runtime copy of {@link GloreStateData}.
      */
     protected void readDataFile(Exchange exchange) throws Exception
     {
@@ -294,9 +305,8 @@ public class GloreProcessor implements Processor
     }
     
     /**
-     *
-     * @param exchange
-     * @return
+     * Gets the state from the internal data store {@link HashMap}. 
+     * If the state does not exist, a new {@link GloreStateData} object is created.
      */
     protected static GloreStateData getState(Exchange exchange)
     {
@@ -312,9 +322,8 @@ public class GloreProcessor implements Processor
     }
     
     /**
-     *
-     * @param exchange
-     * @return
+     * Remove the state from the internal data store.  This is done at the end 
+     * of processing or on a processing error.
      */
     protected static GloreStateData removeState(Exchange exchange)
     {
@@ -325,7 +334,8 @@ public class GloreProcessor implements Processor
     }
     
     /**
-     *
+     * This class contains all of the runtime variables used during the GLORE
+     * logistic regression analysis.
      */
     protected static class GloreStateData
     {

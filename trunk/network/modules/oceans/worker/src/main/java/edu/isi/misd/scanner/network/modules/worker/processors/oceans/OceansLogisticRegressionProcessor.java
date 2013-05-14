@@ -31,7 +31,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
+ * This class uses the OCEANS Java library to run a logistic regression analysis 
+ * on the data source specified as the value of the 
+ * {@link BaseConstants#DATASOURCE} header.
  */
 public class OceansLogisticRegressionProcessor implements Processor
 {
@@ -39,9 +41,8 @@ public class OceansLogisticRegressionProcessor implements Processor
         LogFactory.getLog(OceansLogisticRegressionProcessor.class.getName());
         
     /**
-     *
-     * @param exchange
-     * @throws Exception
+     * Camel {@link org.apache.camel.Processor} implementation,
+     * invokes {@link OceansLogisticRegressionProcessor#executeAnalysis(org.apache.camel.Exchange)}.
      */
     @Override
     public void process(Exchange exchange) throws Exception 
@@ -59,6 +60,13 @@ public class OceansLogisticRegressionProcessor implements Processor
         }                
     }
     
+    /**
+     * Performs the statistical analysis (logistic regression) using OCEANS.
+     * 
+     * @param exchange The current exchange.
+     * @return The formatted response.
+     * @throws Exception 
+     */    
     private OceansLogisticRegressionResponse executeAnalysis(Exchange exchange) 
         throws Exception
     {

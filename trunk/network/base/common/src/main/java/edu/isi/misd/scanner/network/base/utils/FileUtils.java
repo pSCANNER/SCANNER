@@ -11,7 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ *  Utility class for common file reading and writing operations 
+ *  based on the context of the current exchange.
  */
 public class FileUtils 
 {
@@ -19,9 +20,11 @@ public class FileUtils
         LoggerFactory.getLogger(FileUtils.class);
         
     /**
-     *
-     * @param exchange
-     * @param baseDir
+     * Reads a file and returns the contents as the body of an HTTP response.
+     * Used to read cached output of previously executed pipeline results.
+     * 
+     * @param exchange The current exchange
+     * @param baseDir The base directory
      * @throws Exception
      */
     public static void readFile(Exchange exchange, String baseDir)
@@ -54,9 +57,11 @@ public class FileUtils
     }
     
     /**
-     *
-     * @param exchange
-     * @param baseDir
+     * Writes the body of the passed-in exchange to a file.  
+     * Used for caching output of pipeline results.
+     * 
+     * @param exchange The current exchange
+     * @param baseDir The base directory
      * @throws Exception
      */
     public static void writeFile(Exchange exchange, String baseDir)

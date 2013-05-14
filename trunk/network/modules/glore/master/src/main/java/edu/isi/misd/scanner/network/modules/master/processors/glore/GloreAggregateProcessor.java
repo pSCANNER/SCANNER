@@ -22,23 +22,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
     
 /**
- *
+ * This class does the work of the "Server" in the GLORE network model.  It uses
+ * a looping Dynamic Routing Slip and simple state machine to iterate over partial
+ * aggregate results from the GLORE computational (worker) nodes until the Beta 
+ * value is less than the target Epsilon value, after which the final states 
+ * are processed in sequence.  Upon success, the result of the distributed 
+ * computation is collated in to a single response message and returned to the 
+ * client.
  */
 public class GloreAggregateProcessor implements Processor 
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(GloreAggregateProcessor.class);
     
-    /**
-     *
-     */
-    public static final double epsilon = Math.pow(10.0, -6.0);
-    public static final int max_iter = 20;
+    private static final double epsilon = Math.pow(10.0, -6.0);
+    private static final int max_iter = 20;
     
     /**
-     *
-     * @param exchange
-     * @throws Exception
+     * Camel {@link org.apache.camel.Processor} implementation -- 
+     * the majority of the work is handled in this function implementation.
      */
     @Override
     public void process(Exchange exchange) throws Exception
@@ -367,7 +369,7 @@ public class GloreAggregateProcessor implements Processor
      * @param x - input value
      * @return - Probability that normal random variable is less than x
      */
-    public static double getCDF(double x) {
+    private static double getCDF(double x) {
         double tolerance = 1e-15;
         int maxCycles = 100;
         return 0.5 * (1.0 + getERF(x/Math.sqrt(2.0), tolerance, maxCycles));

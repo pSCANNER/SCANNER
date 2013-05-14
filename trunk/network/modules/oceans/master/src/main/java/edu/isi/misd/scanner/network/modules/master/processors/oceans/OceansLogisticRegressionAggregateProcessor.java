@@ -11,14 +11,18 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
 /**
- *
+ * This class collects and collates the individual OCEANS processing 
+ * responses of the remote worker nodes. It aggregates either 
+ * {@link LogisticRegressionOutput} objects or 
+ * {@link edu.isi.misd.scanner.network.types.base.ErrorDetails}
+ * objects into an {@link OceansLogisticRegressionResponse}, 
+ * and returns the response object to the caller.
  */
 public class OceansLogisticRegressionAggregateProcessor implements Processor 
 {
     /**
-     *
-     * @param exchange
-     * @throws Exception
+     * Camel {@link org.apache.camel.Processor} implementation -- 
+     * the majority of the work is handled in this function implementation.
      */
     @Override
     public void process(Exchange exchange) throws Exception 

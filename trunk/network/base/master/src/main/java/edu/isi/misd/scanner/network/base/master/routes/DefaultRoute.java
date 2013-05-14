@@ -18,7 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class implements most of the default pipeline processing for the master 
+ * network node.  Most "get" methods can be overridden to allow for delegation
+ * of specific logic to custom components, rather than duplicating or 
+ * re-implementing the core route logic when integrating custom code.
  */
 public class DefaultRoute extends RouteBuilder 
 {
@@ -44,112 +47,63 @@ public class DefaultRoute extends RouteBuilder
     protected JacksonDataFormat json = new JacksonDataFormat();        
     protected XmlJsonDataFormat xmlToJson = new XmlJsonDataFormat();    
 
-    /**
-     *
-     * @return
-     */
     protected String getRouteName() {
         return getClass().getName();
     }
 
-    /**
-     *
-     * @return
-     */
     protected String getAggregatorRouteName() {
         return getClass().getSimpleName() + "Aggregator";
     } 
     
-    /**
-     *
-     * @return
-     */
     protected String getGETRouteName() {
         return getClass().getSimpleName() + "GET";
     }     
     
-    /**
-     *
-     * @return
-     */
     protected String getPOSTRouteName() {
         return getClass().getSimpleName() + "POST";
     }   
     
-    /**
-     *
-     * @return
-     */
     protected String getRequestProcessorRef() {
         return "BaseRequestProcessor";
     }
     
-    /**
-     *
-     * @return
-     */
     protected String getCacheReadProcessorRef() {
         return "BaseCacheReadProcessor";
     }
 
-    /**
-     *
-     * @return
-     */
     protected String getCacheWriteProcessorRef() {
         return "BaseCacheWriteProcessor";
     } 
-       
-    /**
-     *
-     * @return
-     */
+
     protected String getAggregationStrategyRef() {
         return "BaseResultsAggregator";
     }
-   
-    /**
-     *
-     * @return
-     */
+
     protected String getPostAggregationProcessorRef() {
         return "BaseAggregateProcessor";
     }
 
-    /**
-     *
-     * @return
-     */
     public String getJAXBContext() {
         return "edu.isi.misd.scanner.network.types.base";
     }
-    
-    /**
-     *
-     * @return
-     */
+
     public String getJSONUnmarshallType() {
         return "edu.isi.misd.scanner.network.types.base.SimpleMap";
     }
-    
-    /**
-     *
-     * @return
-     */
+
     protected ValueBuilder getRecipientList() {
         return method("BaseRecipientList","list");
     }
 
-    /**
-     *
-     * @return
-     */
     protected ValueBuilder getDynamicRouter() {
         return method(getClass(),"defaultRoutingSlip");
     }
     
     /**
-     *
+     * Sets up the route using Camel Java DSL.  Creates routes to handle HTTP 
+     * GET/POST requests and process those requests via configured dynamic 
+     * router and recipient list Camel EIPs.
+     * 
      * @throws Exception
      */
     @Override
@@ -202,16 +156,22 @@ public class DefaultRoute extends RouteBuilder
             end().
         dynamicRouter(getDynamicRouter());
         
-        multicast();
+        aggregate();
     }
 
     /**
-     *
+     * The aggregating route sub-component.  This function creates
+     * the route that handles the delegation of the submitted request to the 
+     * worker nodes specified in the 
+     * {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} header of
+     * the original request.  It uses the {@link org.apache.camel.RecipientList}
+     * enterprise integration pattern.
+     * 
      * TODO: make redeliveries and redeliveryDelay for onException clauses 
-     *  externally configurable via master.properties
+     * externally configurable via master.properties
      * @throws Exception
      */
-    protected void multicast() throws Exception
+    protected void aggregate() throws Exception
     {
         from("direct:" + getAggregatorRouteName()).
             // dont retry connects for now
@@ -255,10 +215,11 @@ public class DefaultRoute extends RouteBuilder
     }
         
     /**
-     *
-     * @param body
-     * @param properties
-     * @return
+     * The defaultRoutingSlip runs the aggregation route once and stops.
+     * 
+     * @param body The message body
+     * @param properties The message properties
+     * @return The route to process, or null to stop routing.
      */
     public String defaultRoutingSlip(@Body String body, 
                                      @Properties Map<String, Object> properties) 
@@ -275,10 +236,12 @@ public class DefaultRoute extends RouteBuilder
     }   
     
     /**
-     *
-     * @param body
-     * @param properties
-     * @return
+     * The loopingRoutingSlip runs the aggregation route continuously until the
+     * property named "status" is set with the value "complete".
+     * 
+     * @param body The message body
+     * @param properties The message properties
+     * @return The route to process, or null to stop routing.
      */
     public String loopingRoutingSlip(@Body String body, 
                                      @Properties Map<String, Object> properties) 

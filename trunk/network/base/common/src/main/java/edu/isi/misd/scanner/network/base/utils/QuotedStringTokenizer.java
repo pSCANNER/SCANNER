@@ -2,8 +2,8 @@ package edu.isi.misd.scanner.network.base.utils;
 
 import java.util.Enumeration;
 
-/*
- * This class is not thread safe.
+/**
+ * Tokenizes quoted portions of a string. NOTE: This class is not thread safe.
  */
 public class QuotedStringTokenizer implements Enumeration 
 {    

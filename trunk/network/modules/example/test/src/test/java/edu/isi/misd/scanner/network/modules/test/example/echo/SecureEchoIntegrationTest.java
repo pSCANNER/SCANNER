@@ -7,7 +7,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- *
+ * Integration test for Echo service (HTTPS)
  */
 public class SecureEchoIntegrationTest extends BaseIntegrationTest 
 { 
@@ -56,7 +56,7 @@ public class SecureEchoIntegrationTest extends BaseIntegrationTest
                 "https4://{{worker.address}}:{{worker.ssl.port4}}/{{worker.appDomain}}/{{worker.appContext}}/example/echo?sslContextParametersRef=sslContextParametersMaster");
         return targets;
     } 
-    
+       
     @Test       
     public void testSecureEchoXML() throws Exception 
     {
@@ -65,7 +65,7 @@ public class SecureEchoIntegrationTest extends BaseIntegrationTest
                "EchoIntegrationTestOutput.xml");
         assertMockEndpointsSatisfied(60, TimeUnit.SECONDS);         
     }
-   
+     
     @Test    
     public void testSecureEchoJSON() throws Exception 
     {

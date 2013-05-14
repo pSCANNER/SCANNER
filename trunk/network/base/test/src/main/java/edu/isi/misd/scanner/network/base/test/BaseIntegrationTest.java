@@ -14,17 +14,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Base class for end-to-end integration tests.  Submits a request to a master 
+ * node using a specified input file as the message body, and validates the 
+ * resulting output against a specified output file.
  */
 public abstract class BaseIntegrationTest extends CamelSpringTestSupport
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseIntegrationTest.class);
     
+    /**
+     * 
+     * @return The URL of the master node to invoke.
+     * @throws Exception 
+     */
     protected abstract String getMasterUrl() throws Exception;
     
+    /**
+     * 
+     * @return The URLs of the worker nodes to set as the targets.
+     * @throws Exception 
+     */
     protected abstract String getWorkerUrls() throws Exception;
     
+    /**
+     * Issues an HTTP POST but does not validate the response.
+     * @param contentType The HTTP ContentType for the request and response.
+     * @param inputFileName The input file name to use as the parameters.
+     * @throws Exception 
+     */
     protected void doPost(String contentType,
                           String inputFileName) 
         throws Exception
@@ -32,6 +50,13 @@ public abstract class BaseIntegrationTest extends CamelSpringTestSupport
         doPost(contentType, inputFileName, null);
     }  
     
+    /**
+     * Issues an HTTP POST and validates the response.
+     * @param contentType The HTTP ContentType for the request and response.
+     * @param inputFileName The input file name to use as the parameters.
+     * @param outputFileName The output file name to use for the validation of output.
+     * @throws Exception 
+     */
     protected void doPost(String contentType,
                           String inputFileName,
                           String outputFileName) 

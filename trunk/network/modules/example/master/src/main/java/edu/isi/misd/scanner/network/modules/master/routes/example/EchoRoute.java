@@ -6,7 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ *  This route overrides 
+ * {@link edu.isi.misd.scanner.network.base.master.routes.DefaultRoute#getCacheReadProcessorRef()}
+ * and {@link edu.isi.misd.scanner.network.base.master.routes.DefaultRoute#getCacheWriteProcessorRef()}
+ * to use the {@link edu.isi.misd.scanner.network.base.processors.BaseNoOpProcessor}
+ * so that echo service responses are not written to nor read from the cache.
  */
 public class EchoRoute extends DefaultRoute 
 {

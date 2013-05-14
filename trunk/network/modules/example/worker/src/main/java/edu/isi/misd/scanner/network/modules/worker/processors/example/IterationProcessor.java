@@ -9,17 +9,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This processor simply generates a random number between 1 and 10 and returns
+ * it as a value of a 
+ * {@link edu.isi.misd.scanner.network.types.example.ExampleIterationMessage}.
  */
 public class IterationProcessor implements Processor
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(IterationProcessor.class); 
-        
     /**
-     *
-     * @param exchange
-     * @throws Exception
+     * Camel {@link org.apache.camel.Processor} implementation,
+     * invokes {@link IterationProcessor#executeAnalysis(org.apache.camel.Exchange)}.
      */
     @Override
     public void process(Exchange exchange) throws Exception 
@@ -32,7 +32,13 @@ public class IterationProcessor implements Processor
         }                
     }
     
-    private ExampleIterationMessage executeAnalysis(Exchange exchange) 
+    /**
+     * Generates a random number from 1 to 10.
+     * @param exchange
+     * @return The formatted response message.
+     * @throws Exception 
+     */
+    protected ExampleIterationMessage executeAnalysis(Exchange exchange) 
         throws Exception
     {
         ExampleIterationMessage message = 

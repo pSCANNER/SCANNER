@@ -15,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * A collection of utility functions for working with Camel message exchanges
+ * and the headers contained within those exchanges that are specific to the 
+ * operation of the SCANNER Network.
  */
 public class MessageUtils 
 {
@@ -25,7 +27,7 @@ public class MessageUtils
     /**
      *
      * @param exchange The current message exchange.
-     * @return
+     * @return The ID header.
      */
     public static String getID(Exchange exchange)
     {
@@ -45,7 +47,7 @@ public class MessageUtils
     /**
      *
      * @param exchange The current message exchange.
-     * @return
+     * @return The timestamp header.
      */
     public static String getTimestamp(Exchange exchange) 
     {
@@ -53,7 +55,9 @@ public class MessageUtils
     }
 
     /**
-     *
+     * Sets the timestamp header using the current time.
+     * @see MessageUtils#setTimestamp(org.apache.camel.Exchange, java.util.Date) 
+     * 
      * @param exchange The current message exchange.
      */
     public static void setTimestamp(Exchange exchange) 
@@ -62,7 +66,9 @@ public class MessageUtils
     }
     
     /**
-     *
+     * Sets the timestamp header using ISO 8601 formatting.
+     * For example: {@code 2013-05-13T14:45:00.799-0700}
+     * 
      * @param exchange The current message exchange.
      * @param date
      */
@@ -74,9 +80,9 @@ public class MessageUtils
     }
     
     /**
-     *
+     * Gets the source URL header from an exchange.
      * @param exchange The current message exchange.
-     * @return
+     * @return The value of the {@link edu.isi.misd.scanner.network.base.BaseConstants#SOURCE} header.
      */
     public static String getSource(Exchange exchange)
     {
@@ -84,7 +90,7 @@ public class MessageUtils
     }
     
     /**
-     *
+     * Sets the source URL header on the exchange.
      * @param exchange The current message exchange.
      */
     public static void setSource(Exchange exchange)
@@ -93,7 +99,9 @@ public class MessageUtils
     }
     
     /**
-     *
+     * Sets the source URL header on the exchange, optionally appending the 
+     * transaction ID to the URL path.
+     * 
      * @param exchange The current message exchange. 
      * @param appendID
      */
@@ -110,10 +118,12 @@ public class MessageUtils
     } 
 
     /**
-     *
+     * Gets the list of targets as specified by the 
+     * {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} header.
+     * 
      * @param exchange The current message exchange.
      * @return A comma delimited string of target URLS that is the value of the 
-     * header {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} or NULL/
+     * header {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} or NULL
      */
     public static String getTargets(Exchange exchange)
     {
@@ -121,9 +131,9 @@ public class MessageUtils
     }
     
     /**
-     *
+     * Sets the {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} header.
      * @param exchange The current message exchange.
-     * @param targetURLS
+     * @param targetURLS A comma-delimited list of target URLs
      */
     public static void setTargets(Exchange exchange, String targetURLS) 
     {
@@ -131,11 +141,13 @@ public class MessageUtils
     }  
 
     /**
-     *
+     * Uses the Camel type converter system to serialize and deserialize from 
+     * one object type to another.
+     * 
      * @param toType
      * @param fromType
      * @param exchange The current message exchange.
-     * @return
+     * @return The converted object.
      * @throws Exception
      */
     public static Object convertTo(Class<?> toType,
@@ -153,9 +165,9 @@ public class MessageUtils
     }    
     
     /**
-     *
-     * @param path
-     * @return
+     * Parses only the transaction ID out of a full URL.
+     * @param path The full URL path.
+     * @return The parsed ID.
      */
     public static String parseIdFromUrlPath(String path) 
     {
@@ -169,15 +181,21 @@ public class MessageUtils
             path.substring(idIndex + BaseConstants.ID.length()+2) : "");
     }
    
+    /**
+     * @see MessageUtils#parseIdFromUrlPath(String path) 
+     * @param message The inbound Camel message.
+     * @return The parsed ID.
+     * @throws Exception 
+     */
     public static String parseIdFromMessageURL(Message message) throws Exception
     {
         return parseIdFromUrlPath(getPathFromMessageURL(message));
     }
     
     /**
-     *
-     * @param message
-     * @return
+     * Gets the host name from the URL of the request message.
+     * @param message The inbound Camel message.
+     * @return The host name.
      * @throws Exception
      */
     public static String getHostFromMessageURL(Message message) 
@@ -188,9 +206,9 @@ public class MessageUtils
     }
     
     /**
-     *
-     * @param message
-     * @return
+     * Gets the port from the URL of the request message.
+     * @param message The inbound Camel message.
+     * @return The port number.
      * @throws Exception
      */
     public static int getPortFromMessageURL(Message message) 
@@ -201,9 +219,9 @@ public class MessageUtils
     }
     
     /**
-     *
-     * @param message
-     * @return
+     * Gets the path component from the URL of the request message.
+     * @param message The inbound Camel message.
+     * @return The path component of the URL.
      * @throws Exception
      */
     public static String getPathFromMessageURL(Message message) 
@@ -213,6 +231,16 @@ public class MessageUtils
         return req.getPathInfo();         
     }
     
+    /**
+     * Populates a {@link edu.isi.misd.scanner.network.types.base.SiteInfo}
+     * object with values resolved from the properties of the current 
+     * {@link org.apache.camel.CamelContext}.
+     * 
+     * 
+     * @param exchange The current exchange.
+     * @return The populated SiteInfo.
+     * @throws Exception 
+     */
     public static SiteInfo getSiteInfo(Exchange exchange) 
         throws Exception
     {

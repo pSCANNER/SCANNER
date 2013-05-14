@@ -10,23 +10,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class is basically a NOOP processor which should be replaced with 
+ * application-specific code. Functionally, it just echoes an expected 
+ * {@link edu.isi.misd.scanner.network.types.base.SimpleMap} parameter and adds 
+ * a populated {@link edu.isi.misd.scanner.network.types.base.SiteInfo} to it.
  */
 public class BaseComputeProcessor implements Processor
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseComputeProcessor.class);
         
-    /**
-     *
-     * @param exchange
-     * @throws Exception
-     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {     
-        // this processor should be replaced with app-specific code
-        // it just echoes the passed-in SimpleMap and adds SiteInfo to it
         SimpleMap request = 
             (SimpleMap)exchange.getIn().getBody(SimpleMap.class); 
         if (request != null) {
