@@ -8,7 +8,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- *
+ * Integration test for example Iteration service (HTTPS).
  */
 public class SecureIterationIntegrationTest extends BaseIntegrationTest 
 {

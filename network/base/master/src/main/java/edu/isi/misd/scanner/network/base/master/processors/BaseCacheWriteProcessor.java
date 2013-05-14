@@ -6,15 +6,10 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
 /**
- *
+ *  This class writes the results of a processing pipeline to a local file.
  */
 public  class BaseCacheWriteProcessor implements Processor
 {
-    /**
-     *
-     * @param exchange
-     * @throws Exception
-     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {        

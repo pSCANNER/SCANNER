@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 
 /**
- *
+ * Tests end-to-end GLORE functionality with a complex set of variables.
  */
 public class GloreVariableTest extends GloreIntegrationTest 
 {       

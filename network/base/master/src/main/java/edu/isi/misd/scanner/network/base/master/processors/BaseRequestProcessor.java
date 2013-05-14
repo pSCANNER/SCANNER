@@ -15,7 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class inspects certain header values on inbound requests and performs
+ * some basic validation and syntax checking.
  */
 public class BaseRequestProcessor implements Processor 
 {
@@ -25,11 +26,6 @@ public class BaseRequestProcessor implements Processor
     // consider making this an externally configurable value
     private static final boolean USE_CAMEL_UUID_GENERATOR = false;
     
-    /**
-     *
-     * @param exchange
-     * @throws Exception
-     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {        

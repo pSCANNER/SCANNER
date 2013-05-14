@@ -16,7 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ *  This class provides an extension of 
+ *  {@link edu.isi.misd.scanner.network.base.security.AbstractRoleBasedCertificateLoginModule} 
+ *  that provides the list of configured roles via a text file that maps 
+ *  Distinguished Names to a comma-delimited list of role names.
+ *  <br/><br/>
+ *  Example:
+ *  <br/><br/>
+ *  {@code  "CN=scanner.misd.isi.edu, OU=SCANNER Test Network, O=SCANNER Project, C=US" authorized,admin }
+ * 
  */
 public class TextFileRoleBasedCertLoginModule 
     extends AbstractRoleBasedCertificateLoginModule
@@ -24,9 +32,12 @@ public class TextFileRoleBasedCertLoginModule
     private static final transient Logger log = 
         LoggerFactory.getLogger(TextFileRoleBasedCertLoginModule.class);
         
-    private static final String ROLES_FILE = 
+    protected static final String ROLES_FILE = 
         "edu.isi.misd.scanner.network.base.security.roles.map.file";   
 
+    /**
+     *  A map of user names to a {@link java.util.List} of roles
+     */
     protected Map<String, List<String>> map;
 
     // the file the map was loaded from
@@ -38,14 +49,25 @@ public class TextFileRoleBasedCertLoginModule
     
     private static final String COMMENT_CHARS = "#";
     
+    /**
+     * Whether or not to ignore errors encountered while parsing the role map file.
+     */
     public void setIgnoreErrors(boolean ignoreErrors) {
         this.ignoreErrors = ignoreErrors;
     }
     
+    /**
+     * Whether or not to ignore errors encountered while parsing the role map file.
+     */
     public boolean getIgnoreErrors() {
         return this.ignoreErrors;
     }
 
+    /**
+     * @see edu.isi.misd.scanner.network.base.security.TextFileRoleBasedCertLoginModule#load(java.lang.String) 
+     * 
+     * @return The role map file name.
+     */
     public String getFileName() {
         
         if (this.file == null) {
@@ -55,12 +77,41 @@ public class TextFileRoleBasedCertLoginModule
         return this.file.getAbsolutePath();
     }
 
+    /**
+     * Reread the map file and refresh the map.
+     * 
+     * @return Whether the file is current or not
+     * @throws IOException
+     */
+    public boolean refresh() 
+        throws IOException 
+    {
+        if (this.file != null &&
+            this.file.lastModified() != this.lastModified) {
+            return load(this.file);
+        } else {
+            return true;
+        }
+    }
+    
+    /**
+     * Reads and parses the roles file.
+     * @see edu.isi.misd.scanner.network.base.security.TextFileRoleBasedCertLoginModule#load(java.io.File) 
+     * @param file The file path
+     * @throws IOException
+     */
     public boolean load(String file)
         throws IOException 
     {
         return load(new File(file));
     }
 
+    /**
+     * Reads and parses the roles file.      
+     * @see edu.isi.misd.scanner.network.base.security.TextFileRoleBasedCertLoginModule#load(java.io.InputStream) 
+     * @param file The file to load
+     * @throws IOException
+     */
     public boolean load(File file)
         throws IOException 
     {
@@ -76,18 +127,13 @@ public class TextFileRoleBasedCertLoginModule
             }
         }
     }
-
-    public boolean refresh() 
-        throws IOException 
-    {
-        if (this.file != null &&
-            this.file.lastModified() != this.lastModified) {
-            return load(this.file);
-        } else {
-            return true;
-        }
-    }
     
+    /**
+     * Reads and parses the roles file.
+     * @param input The input stream of the file
+     * @return If the file was parsed successfully or not.
+     * @throws IOException
+     */
     public boolean load(InputStream input) 
         throws IOException 
     {
@@ -155,6 +201,12 @@ public class TextFileRoleBasedCertLoginModule
         return success;
     }
     
+    /**
+     * Gets the list of roles for the passed in user, based on the current state of the map.
+     * @param user The userName
+     * @return The list of roles for the user 
+     * @throws Exception
+     */    
     @Override
     public List<String> getRolesForUser(String user) throws Exception 
     {

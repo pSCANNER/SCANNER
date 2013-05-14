@@ -7,7 +7,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- *
+ * Tests end-to-end GLORE functionality with a simple set of variables using (HTTPS).
  */
 public class SecureGloreIntegrationTest extends BaseIntegrationTest 
 {   

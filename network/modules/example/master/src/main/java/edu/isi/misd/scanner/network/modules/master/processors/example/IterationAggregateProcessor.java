@@ -10,18 +10,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
     
 /**
- *
+ * An example aggregation processor that uses Camel's Dynamic Routing EIP to
+ * loop and continuously process responses via a state machine, signaling 
+ * a completion state after the appropriate condition is met, thereby terminating
+ * the loop.  This example simply averages the result of random numbers generated
+ * at the worker nodes and stops once the average is sufficiently narrowed.
+ * 
  */
 public class IterationAggregateProcessor implements Processor 
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(IterationAggregateProcessor.class);
-    
-    /**
-     *
-     * @param exchange
-     * @throws Exception
-     */
+
     @Override
     public void process(Exchange exchange) throws Exception 
     {

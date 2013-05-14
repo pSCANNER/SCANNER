@@ -11,16 +11,12 @@ import edu.isi.misd.scanner.network.types.base.MatrixType;
 import edu.isi.misd.scanner.network.types.base.MatrixRowType;
 
 /**
- *
+ *  A collection of utility functions for working with GLORE structures.
  */
 public class GloreUtils 
 {
     /**
-     *
-     * @param matrix
-     * @param w
-     * @param d
-     * @return
+     * Prints a string representation of a {@link Jama.Matrix}
      */
     public static String matrixToString(Matrix matrix, int w, int d)
     {
@@ -44,9 +40,8 @@ public class GloreUtils
     }
 
     /**
-     *
-     * @param matrix
-     * @return
+     * Converts a {@link Jama.Matrix} to a 
+     * {@link edu.isi.misd.scanner.network.types.base.MatrixType}.
      */
     public static MatrixType convertMatrixToMatrixType(Matrix matrix)
     {
@@ -72,7 +67,11 @@ public class GloreUtils
         matrixType.getMatrixRow().addAll(matrixRowsList);
         return matrixType;    
     }
-    
+    /**
+     * Converts a {@link edu.isi.misd.scanner.network.types.base.MatrixType} 
+     * to a{@link Jama.Matrix}.
+     * 
+     */
     public static Matrix convertMatrixTypeToMatrix(MatrixType baseMatrixType)
     {
         List<MatrixRowType> rowArrays = baseMatrixType.getMatrixRow();
@@ -90,12 +89,9 @@ public class GloreUtils
         return matrix;
     }
     
-    /* Returns the absolute maximum of the elements in the two dimensional
-       array matrix. */
     /**
-     *
-     * @param matrix
-     * @return
+     * Returns the absolute maximum of the elements in the two dimensional
+     * array matrix.
      */
     public static double max_abs(double[][] matrix) 
     {
@@ -120,12 +116,9 @@ public class GloreUtils
         }
         return max;
     }
-
-    /* Convert a 2D ArrayList of Doubles into a 2D array of doubles. */
+    
     /**
-     *
-     * @param V
-     * @return
+     * Convert a 2D ArrayList of Doubles into a 2D array of doubles.
      */
     public static double[][] two_dim_list_to_arr(List<List<Double>>V) 
     {
@@ -142,11 +135,8 @@ public class GloreUtils
         return A;
     }
 
-    /* Convert a ArrayList of Doubles into an array of doubles. */
     /**
-     *
-     * @param V
-     * @return
+     * Convert an ArrayList of Doubles into an array of doubles.
      */
     public static double[] one_dim_list_to_arr(List<Double> V) 
     {
@@ -161,11 +151,9 @@ public class GloreUtils
         return A;
     }
 
-    /* Set each element of the 2D double array to e^a where a is the value of
-       an element. */
     /**
-     *
-     * @param A
+     * Set each element of the 2D double array to e^a where a is the value of
+     * an element.
      */
     public static void exp(double[][] A) 
     {
@@ -177,11 +165,9 @@ public class GloreUtils
         }
     }
 
-    /* Set each element of the 2D double array to 1 + a where a is the value of
-       an element. */
     /**
-     *
-     * @param A
+     * Set each element of the 2D double array to 1 + a where a is the value of
+     * an element.
      */
     public static void add_one(double[][] A) 
     {
@@ -193,11 +179,9 @@ public class GloreUtils
         }
     }
 
-    /* Set each element of the 2D double array to 1/a where a is the value of
-       an element. */
     /**
-     *
-     * @param A
+     * Set each element of the 2D double array to 1/a where a is the value of
+     * an element.
      */
     public static void div_one(double[][] A) 
     {
@@ -209,12 +193,9 @@ public class GloreUtils
         }
     }
 
-    /* Given an array of length n, returns an n by n matrix M where
-       M[i][j] = A[i] if i = j and 0 otherwise. */
     /**
-     *
-     * @param A
-     * @return
+     * Given an array of length n, returns an n by n matrix M where
+     * M[i][j] = A[i] if i = j and 0 otherwise.
      */
     public static Matrix diag(double[] A) 
     {

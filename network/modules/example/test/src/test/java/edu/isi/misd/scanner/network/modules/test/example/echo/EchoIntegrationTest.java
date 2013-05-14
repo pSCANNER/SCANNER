@@ -7,7 +7,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- *
+ *  Integration test for Echo service.
  */
 public class EchoIntegrationTest extends BaseIntegrationTest 
 { 
@@ -64,7 +64,7 @@ public class EchoIntegrationTest extends BaseIntegrationTest
                "EchoIntegrationTestOutput.xml");
         assertMockEndpointsSatisfied(60, TimeUnit.SECONDS);         
     }
-   
+       
     @Test    
     public void testEchoJSON() throws Exception 
     {

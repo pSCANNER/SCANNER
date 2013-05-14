@@ -29,12 +29,25 @@ import org.slf4j.LoggerFactory;
 
 /**
  *  An abstract class that implements a Jetty JAAS login module.
+ * 
+ *  This class adds an additional security constraint consisting of
+ *  a "Host Authorization" check, which assumes that SSL is configured to use
+ *  Client Authentication (the client presents a client cert at during the SSL 
+ *  handshake) and that the CN in the client certificate matches a reverse DNS 
+ *  lookup of the connecting client's host name.  If the validation fails, a 
+ *  403 Unauthorized will be returned.
  */
 public abstract class AbstractRoleBasedCertificateLoginModule implements LoginModule 
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(AbstractRoleBasedCertificateLoginModule.class);
     
+    /**
+     *
+     * @param user The user name
+     * @return The list of roles for the given user name
+     * @throws Exception
+     */
     public abstract List<String> getRolesForUser(String user) throws Exception;
     
     private CallbackHandler callbackHandler;
@@ -47,12 +60,22 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
     private static final String HOST_AUTHZ = 
         "edu.isi.misd.scanner.network.base.security.HostAuthorization";   
 
+    /**
+     *  A class encapsulating the user name, 
+     *  the [@link import java.security.Principal} for the user, and a list of
+     *  {@link org.eclipse.jetty.plus.jaas.JAASRole} for the user.
+     */
     public class JAASUserInfo
     {
         private String userName;
         private Principal principal;
         private List<JAASRole> roles;
               
+        /**
+         *
+         * @param user
+         * @param roleNames
+         */
         public JAASUserInfo (String user, List<String> roleNames)
         {
             setUserRoles(user,roleNames);
@@ -68,6 +91,11 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
             return this.principal;
         }
         
+        /**
+         * Sets the list of role names that are assigned to this user
+         * @param userName The user name
+         * @param roleNames A {@code List<String>} of role names
+         */
         public void setUserRoles (String userName, List<String> roleNames)
         {
             this.userName = userName;
@@ -82,12 +110,20 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
             }
         }
                
+        /**
+         * Adds the Principle and Roles to the Subject.
+         * @param subject
+         */
         public void setJAASInfo (Subject subject)
         {
             subject.getPrincipals().add(this.principal);
             subject.getPrincipals().addAll(roles);
         }
         
+        /**
+         * Removes the Principle and Roles from the Subject.
+         * @param subject
+         */
         public void unsetJAASInfo (Subject subject)
         {
             subject.getPrincipals().remove(this.principal);
@@ -114,6 +150,12 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
         return this.currentUser;
     }
     
+    /**
+     * Sets the user details as represented by 
+     * {@link edu.isi.misd.scanner.network.base.security.AbstractRoleBasedCertificateLoginModule.JAASUserInfo}
+     * 
+     * @param u The user details
+     */
     public void setCurrentUser (JAASUserInfo u)
     {
         this.currentUser = u;
@@ -158,7 +200,13 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
         return callbacks;
     }
     
-    private String getCommonNameFromDN(String dn)
+    /**
+     *
+     * @param dn
+     * @return The Common Name (CN) component of the certificate 
+     *         Distinguished Name, assumed to be the host name of the client.
+     */    
+    protected String getCommonNameFromDN(String dn)
     {
         String cn = "CN=";
         StringTokenizer tokenizer = new StringTokenizer(dn, ",");
@@ -181,6 +229,13 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
         return result;
     }
     
+    /**
+     * Checks that the CN of the current connection's certificate DN matches the
+     * host name of the current client connection.
+     * 
+     * @param subjectDN The Distinguished Name of the client certificate
+     * @throws Exception
+     */
     protected void doHostAuthorization(String subjectDN) throws Exception
     {
         if (this.getOptions() == null) {
@@ -226,11 +281,9 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
     }
     
     /** 
+     * Standard JAAS override.
+     * 
      * @see javax.security.auth.spi.LoginModule#initialize(javax.security.auth.Subject, javax.security.auth.callback.CallbackHandler, java.util.Map, java.util.Map)
-     * @param subject
-     * @param callbackHandler
-     * @param sharedState
-     * @param options
      */
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler,
@@ -242,6 +295,8 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
     }
     
     /** 
+     * Standard JAAS override.
+     * 
      * @see javax.security.auth.spi.LoginModule#abort()
      * @throws LoginException
      */
@@ -253,6 +308,8 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
     }
 
     /** 
+     * Standard JAAS override.
+     * 
      * @see javax.security.auth.spi.LoginModule#commit()
      * @return true if committed, false if not (likely not authenticated)
      * @throws LoginException
@@ -274,6 +331,8 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
     }    
     
     /** 
+     * Standard JAAS override.
+     * 
      * @see javax.security.auth.spi.LoginModule#login()
      * @return true if is authenticated, false otherwise
      * @throws LoginException
@@ -328,6 +387,8 @@ public abstract class AbstractRoleBasedCertificateLoginModule implements LoginMo
     }
 
     /** 
+     * Standard JAAS override.
+     *  
      * @see javax.security.auth.spi.LoginModule#logout()
      * @return true always
      * @throws LoginException

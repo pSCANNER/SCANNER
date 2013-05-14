@@ -7,7 +7,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- *
+ * Tests end-to-end OCEANS functionality.
  */
 public class OceansIntegrationTest extends BaseIntegrationTest 
 {

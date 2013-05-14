@@ -7,7 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This route overrides various methods of {@link DefaultRoute} to facilitate
+ * the processing of aggregate results specific to the GLORE module.
+ * It also makes use of a looping routing slip as part of Camel's Dynamic Router
+ * EIP, in order to provide the "iterating" behavior.
  */
 public class GloreRoute extends DefaultRoute 
 {

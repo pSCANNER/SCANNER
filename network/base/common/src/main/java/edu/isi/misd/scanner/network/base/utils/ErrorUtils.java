@@ -8,18 +8,24 @@ import org.apache.camel.component.http4.HttpOperationFailedException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 /**
- *
+ * Utility functions for creating and formatting error responses.
  */
 public class ErrorUtils 
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(ErrorUtils.class);  
+    
     /**
-     *
-     * @param exchange
-     * @param e
-     * @return
+     * Creates and formats a serializable error message of the type 
+     * {@link edu.isi.misd.scanner.network.types.base.ErrorDetails} based on
+     * information in the current {@link org.apache.camel.Exchange} and the 
+     * thrown exception.
+     * 
+     * @param exchange The current exchange
+     * @param e The caused exception
+     * @return The formatted ErrorDetails
      */
     public static ErrorDetails formatErrorResponse(Exchange exchange, 
                                                    Throwable e) 
@@ -54,10 +60,8 @@ public class ErrorUtils
     }  
     
     /**
-     *
-     * @param exchange
-     * @param ex
-     * @param httpResponseCode
+     * Sets the HTTP error and propagates it to the caller.
+     * @see edu.isi.misd.scanner.network.base.utils.ErrorUtils#setHttpError(org.apache.camel.Exchange, java.lang.Throwable, int, java.lang.String, boolean) 
      */
     public static void setHttpError(Exchange exchange,
                                     Throwable ex, 
@@ -67,10 +71,8 @@ public class ErrorUtils
     }
     
     /**
-     *
-     * @param exchange
-     * @param ex
-     * @param httpResponseCode
+     * Sets the HTTP error and propagates it to the caller, using the provided error description.
+     * @see edu.isi.misd.scanner.network.base.utils.ErrorUtils#setHttpError(org.apache.camel.Exchange, java.lang.Throwable, int, java.lang.String, boolean) 
      */
     public static void setHttpError(Exchange exchange,
                                     Throwable ex, 
@@ -81,11 +83,14 @@ public class ErrorUtils
     }
     
     /**
-     *
-     * @param exchange
-     * @param ex
-     * @param httpResponseCode
-     * @param setException
+     * Sets the current Camel exception as an HTTP error that will be propagated,
+     * as an HTTP error message to the caller, or just logs the passed-in Exception.
+     * 
+     * @param exchange The current exchange
+     * @param ex The exception to set
+     * @param httpResponseCode The HTTP response code to set
+     * @param errorDesc An optionally provided description, or the the exception message if not provided.
+     * @param setException Whether to have Camel propagate and return the HTTP error to the client, or just log the error to the error log.
      */
     public static void setHttpError(Exchange exchange,
                                     Throwable ex, 
@@ -108,7 +113,9 @@ public class ErrorUtils
     }
     
     /**
-     *
+     *  A Camel processor that can be used to return errors in the processing 
+     *  pipeline as 500 errors with the message body being the Exception detail 
+     *  message.
      */
     public static class ErrorProcessor implements Processor
     {

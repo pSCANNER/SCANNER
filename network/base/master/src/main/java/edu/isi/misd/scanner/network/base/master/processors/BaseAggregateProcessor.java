@@ -13,18 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class combines either {@link edu.isi.misd.scanner.network.types.base.SimpleMap} 
+ * or {@link edu.isi.misd.scanner.network.types.base.ErrorDetails} instances 
+ * into a {@link edu.isi.misd.scanner.network.types.base.BaseResponse} object 
+ * and sets it as the response body for the message exchange.
  */
 public class BaseAggregateProcessor implements Processor 
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseAggregateProcessor.class); 
 
-    /**
-     *
-     * @param exchange
-     * @throws Exception
-     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {                
@@ -52,7 +50,7 @@ public class BaseAggregateProcessor implements Processor
 
                 if (mapResult != null) {
                     mapResults.add(mapResult);
-                }
+                } 
             }
         }
         response.getSimpleMap().addAll(mapResults);

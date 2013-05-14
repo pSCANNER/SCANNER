@@ -8,7 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class implements most of the default pipeline processing for the worker 
+ * network node.  Most "get" methods can be overridden to allow for delegation
+ * of specific logic to custom components, rather than duplicating or 
+ * re-implementing the core route logic when integrating custom code.
  */
 public class DefaultRoute extends RouteBuilder 
 {
@@ -20,49 +23,31 @@ public class DefaultRoute extends RouteBuilder
     
     protected static final String HTTP_METHOD_POST_CLAUSE = 
         "${in.header.CamelHttpMethod} == 'POST'";
-    
-    /**
-     *
-     * @return
-     */
+
     protected String getRouteName() {
         return this.getClass().getName();
     }
     
-    /**
-     *
-     * @return
-     */
     public String getComputeProcessorRef() {
         return "BaseComputeProcessor";
     }      
        
-    /**
-     *
-     * @return
-     */
     protected String getCacheReadProcessorRef() {
         return "BaseWorkerCacheReadProcessor";
     }
 
-    /**
-     *
-     * @return
-     */
     protected String getCacheWriteProcessorRef() {
         return "BaseWorkerCacheWriteProcessor";
     }
     
-    /**
-     *
-     * @return
-     */
     public String getJAXBContext() {
         return "edu.isi.misd.scanner.network.types.base";
     }
     
     /**
-     *
+     * Sets up the route using Camel Java DSL.  Creates routes to handle HTTP 
+     * GET/POST requests and process those requests via delegated methods.
+     * 
      * @throws Exception
      */
     @Override

@@ -9,18 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class sets a message response body by reading it from a 
+ * local file cache.
  */
 public class BaseCacheReadProcessor implements Processor 
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(BaseCacheReadProcessor.class);    
     
-    /**
-     *
-     * @param exchange
-     * @throws Exception
-     */
     @Override
     public void process(Exchange exchange) throws Exception 
     {

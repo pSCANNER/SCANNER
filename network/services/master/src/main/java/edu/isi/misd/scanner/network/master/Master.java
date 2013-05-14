@@ -19,7 +19,11 @@ import org.apache.camel.component.http4.HttpComponent;
 import org.apache.camel.spring.Main;
 
 /**
- *
+ * This class provides the executable entry point for the Master node of the 
+ * SCANNER network.  It can take a single argument "cfg [filename]", which 
+ * points to a supplemental properties file containing additional runtime options.  
+ * Currently, this argument is not used in the actual network deployment, though
+ * it is included for expansion.
  */
 public class Master extends Main
 {
@@ -38,30 +42,24 @@ public class Master extends Main
         {
             @Override
             protected void doProcess(
-                String arg, String parameter, LinkedList<String> remainingArgs) {
+                String arg, String parameter, LinkedList<String> remainingArgs) 
+            {
                 setPropertiesFile(parameter);
             }
         });
     }
 
-    /**
-     *
-     * @return
-     */
     public String getPropertiesFile() {
         return this.propertiesFile;
     }
 
-    /**
-     *
-     * @param propertiesFile
-     */
     public void setPropertiesFile(String propertiesFile) {
         this.propertiesFile = propertiesFile;
     }
 
     /**
-     *
+     * The main entry point.  Wraps the Camel Spring-based executable startup 
+     * sequence of {@link org.apache.camel.spring.Main}.
      * @param args
      * @throws Exception
      */
@@ -74,7 +72,7 @@ public class Master extends Main
     }
 
     /**
-     *
+     * @see org.apache.camel.spring.Main#doStart() 
      * @throws Exception
      */
     @Override
@@ -85,7 +83,7 @@ public class Master extends Main
     }
 
     /**
-     *
+     * @see org.apache.camel.spring.Main#doStop() 
      * @throws Exception
      */
     @Override
@@ -101,7 +99,8 @@ public class Master extends Main
     }
 
 	/**
-	 *
+	 * Reads the supplemental properties file (if provided) and adds them to 
+     * the current {@link CamelContext} before completing the startup sequence.
 	 * @exception	Exception
      * @exception	IOException
 	 */
@@ -121,7 +120,9 @@ public class Master extends Main
             }
             catch (IOException e)
             {
-                log.warn("Could not load configuration properties file: " + this.propertiesFile, e);
+                log.warn(
+                    "Could not load configuration properties file: " +
+                    this.propertiesFile, e);
             }
         } 
 
@@ -130,7 +131,8 @@ public class Master extends Main
         }
 
         if (getCamelContexts().isEmpty()) {
-            throw new IllegalArgumentException("No CamelContexts are configured!");
+            throw new IllegalArgumentException(
+                "No CamelContexts are configured!");
         } else {
             this.camelContext = getCamelContexts().get(0);
             Map contextProps = this.camelContext.getProperties();

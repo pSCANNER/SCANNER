@@ -7,7 +7,7 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- *
+ * Tests end-to-end OCEANS functionality using HTTPS.
  */
 public class SecureOceansIntegrationTest extends BaseIntegrationTest 
 {

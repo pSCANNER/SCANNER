@@ -13,7 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * This class prepares a {@link org.apache.camel.RecipientList} from a
+ * comma-delimited list of URLs as specified in the 
+ * {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} header.  
+ * It decorates the base URLs with the appropriate Camel-specific HTTP Client 
+ * URLs, and also does some basic validity checks of the URL syntax.
  */
 public class BaseRecipientList 
 {
@@ -27,9 +31,9 @@ public class BaseRecipientList
     
     /**
      *
-     * @param targetURLS
-     * @param body
-     * @return
+     * @param targetURLS The list of targets from the {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} header.
+     * @param body The message body (currently ignored)
+     * @return An ArrayList of decorated URLs suitable for use with the {@link org.apache.camel.RecipientList} processor.
      */
     public ArrayList<String> list(
         @Header(BaseConstants.TARGETS) String targetURLS, String body) 
