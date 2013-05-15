@@ -194,7 +194,7 @@ public class JakartaClient {
 
     /**
      * Execute a login request.
-     * <br/>If success, it will get a cookie
+     * <br/>If success, it will get a cookie.
      * 
      * @param url
      *            the request URL.
@@ -414,7 +414,7 @@ public class JakartaClient {
     }
     
     /**
-     * Get the content of a file to be downloaded.
+     * Gets the content of a file to be downloaded.
      * 
      * @param url
      *            the query URL.
@@ -428,7 +428,7 @@ public class JakartaClient {
 	}
     
     /**
-     * Set the cookie for the request
+     * Sets the cookie for the request
      * 
      * @param cookie
      *            the cookie to be set in the request
@@ -444,7 +444,7 @@ public class JakartaClient {
     }
     
 	/**
-     * Get the response cookie.
+     * Gets the response cookie.
 	 * @return The response cookie.
 	 */
 	public String getCookieValue() {
@@ -452,7 +452,7 @@ public class JakartaClient {
 	}
 
 	/**
-     * Set the request cookie.
+     * Sets the request cookie.
 	 * @param 
 	 * 		cookieValue the cookie to be set in the request.
 	 */
@@ -488,7 +488,7 @@ public class JakartaClient {
     	}
     	
     	/**
-         * Get the response status code.
+         * Gets the response status code.
     	 * @return The response status code.
     	 */
         public int getStatus() {
@@ -496,7 +496,7 @@ public class JakartaClient {
     	}
     	
     	/**
-         * Check the response status code.
+         * Checks the response status code.
     	 * @return TRUE if it is a server error; FALSE otherwise.
     	 */
     	public boolean isError() {
@@ -504,7 +504,7 @@ public class JakartaClient {
     	}
 
     	/**
-         * Check the response status.
+         * Checks the response status.
     	 * @return TRUE if an exception was thrown during the execution of the HTTP request; FALSE otherwise.
     	 */
     	public boolean isException() {
@@ -512,7 +512,7 @@ public class JakartaClient {
     	}
 
     	/**
-         * Get the response status.
+         * Gets the response status.
     	 * @return The exception thrown during the execution of the HTTP request.
     	 */
     	public Exception getException() {
@@ -520,7 +520,7 @@ public class JakartaClient {
     	}
 
     	/**
-         * Get the response body.
+         * Gets the response body.
     	 * @return The string representing the HTTP response body.
     	 */
         public String getEntityString() {
@@ -539,7 +539,7 @@ public class JakartaClient {
 
         
     	/**
-         * Get the response input stream.
+         * Gets the response input stream.
     	 * @return The HTTP response input stream.
     	 */
         public InputStream getEntityInputStream() {
@@ -556,7 +556,7 @@ public class JakartaClient {
     	}
 
     	/**
-         * Get the error message.
+         * Gets the error message.
     	 * @return The HTTP error message.
     	 */
         public String getErrorMessage() {
@@ -589,7 +589,7 @@ public class JakartaClient {
     	}
 
     	/**
-         * Get the response size.
+         * Gets the response size.
     	 * @return The HTTP response body size.
     	 */
         public long getResponseSize() {
@@ -598,7 +598,7 @@ public class JakartaClient {
     	}
         
         /**
-         * Release the response resources.
+         * Releases the response resources.
          * 
          */
         public void release() {
@@ -612,7 +612,7 @@ public class JakartaClient {
     	}
         
     	/**
-         * Get the response cookie.
+         * Gets the response cookie.
     	 * @return The HTTP response cookie.
     	 */
         public String getCookieValue() {
@@ -630,7 +630,7 @@ public class JakartaClient {
         }
 
         /**
-         * Get the value for the "id" header.
+         * Gets the value for the "id" header.
          * 
     	 * @return The value for the "id" header.
          */
@@ -644,7 +644,7 @@ public class JakartaClient {
         }
 
         /**
-         * Get the value for a request header.
+         * Gets the value for a request header.
          * 
          * @param name
          *            the header name.

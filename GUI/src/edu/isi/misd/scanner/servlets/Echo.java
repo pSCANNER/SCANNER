@@ -49,6 +49,9 @@ public class Echo extends HttpServlet {
 	private String keyManagerPassword;
 	
 	private RegistryClient registryClient;
+	/**
+	 * The client to execute the network requests.
+	 */
 	ScannerClient scannerClient;
        
     /**

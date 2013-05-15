@@ -60,7 +60,7 @@ public class Registry extends HttpServlet {
     }
 
 	/**
-	 * Initialize the servlet with the configuration values.
+	 * Initializes the servlet with the configuration values.
 	 * @param config
      *            the servlet configuration.
 	 */
@@ -73,7 +73,7 @@ public class Registry extends HttpServlet {
 	}
 
 	/**
-	 * Retrieves registry entries.
+	 * Retrieves the registry entries.
 	 * <br/>Default method called by the server (via the service method) to allow a servlet to handle a GET request.
 	 * @param request
 	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
@@ -179,7 +179,7 @@ public class Registry extends HttpServlet {
 	}
 
 	/**
-	 * Creates, updates or deletes entries in the registry.
+	 * Creates, updates or deletes the entries in the registry.
 	 * <br/>Called by the server (via the service method) to allow a servlet to handle a POST request.
 	 * @param request
 	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.

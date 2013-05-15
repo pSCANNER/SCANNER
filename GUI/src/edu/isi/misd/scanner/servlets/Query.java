@@ -102,7 +102,7 @@ public class Query extends HttpServlet {
 	}
 
 	/**
-	 * Retrieves registry entries.
+	 * Retrieves the registry entries.
 	 * <br/>Default method called by the server (via the service method) to allow a servlet to handle a GET request.
 	 * @param request
 	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
@@ -178,7 +178,7 @@ public class Query extends HttpServlet {
 	}
 
 	/**
-	 * Submits queries to the master node.
+	 * Submits the queries to the master node.
 	 * <br/>Called by the server (via the service method) to allow a servlet to handle a POST request.
 	 * @param request
 	 * 		an HttpServletRequest object that contains the request the client has made of the servlet.
