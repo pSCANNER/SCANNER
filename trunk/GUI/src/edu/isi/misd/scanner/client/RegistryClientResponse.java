@@ -48,7 +48,7 @@ public interface RegistryClientResponse {
     public String getErrorMessage();
     
     /**
-     * Release the response resourses.
+     * Releases the response resourses.
      * 
      */
     public void release();
@@ -243,7 +243,6 @@ public interface RegistryClientResponse {
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"dataset":"MTM_SIMULATED",
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"method":"Logistic Regression"
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;},
-     * <br/>&nbsp;&nbsp;&nbsp;&nbsp;
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;{
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"study":"MTM",
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"site":"UCSD",
@@ -256,7 +255,6 @@ public interface RegistryClientResponse {
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;{
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"study":"MTM",
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"site":"RAND",
-     * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"library":["OCEANS"],
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"id":568,
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"datasource":"MTM_SIMULATED_RAND.csv",
@@ -720,7 +718,7 @@ public interface RegistryClientResponse {
     
 
     /**
-     * Return the unique id of the resource in the registry.
+     * Returns the unique id of the resource in the registry.
      * The method will be called for a RegistryClientResponse from one of the following requests:
      * <ul>
      * 		<li> getStudy(String name)</li>
