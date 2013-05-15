@@ -156,6 +156,9 @@ public class Echo extends HttpServlet {
 					params.put("value", "Test");
 					System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nBody: "+body);
 					ClientURLResponse rsp = scannerClient.postScannerQuery(url, targetsURLs, body.toString());
+					if (rsp.isException()) {
+						continue;
+					}
 					String contentType = rsp.getHeader("Content-Type");
 					System.out.println("contentType received: " + contentType);
 					res = rsp.getEntityString();
