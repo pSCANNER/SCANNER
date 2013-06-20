@@ -127,9 +127,10 @@ public class DefaultRoute extends RouteBuilder
                     choice().
                         when().simple(JSON_CONTENT_TYPE_CLAUSE).
                             marshal(xmlToJson).
-                        endChoice().
-                    stop().
-                endChoice().
+                            stop().
+                        otherwise().
+                            stop().
+                    endChoice().
             end();
         
         from("direct:" + getPOSTRouteName()).
