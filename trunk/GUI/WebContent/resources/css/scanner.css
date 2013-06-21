@@ -96,3 +96,12 @@ table.sitesStatus td, table.sitesStatus th {
 	padding:5px;
 }
 
+a.banner-text {
+	font-size: 0.88em !important;
+	font-weight: bold;
+	font-family: georgia, trebichet ms, serif;
+}
+a.mailto {
+	text-decoration:none;
+	color: #800000;
+}
