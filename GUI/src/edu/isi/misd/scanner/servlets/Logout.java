@@ -45,9 +45,11 @@ public class Logout extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
-		String user = (String) session.getAttribute("user");
-		session.invalidate();
-		System.out.println("User " + user + " has logged out.");
+		if (session != null) {
+			String user = (String) session.getAttribute("user");
+			session.invalidate();
+			System.out.println("User " + user + " has logged out.");
+		}
 		PrintWriter out = response.getWriter();
 		out.print("Logged out");
 	}
