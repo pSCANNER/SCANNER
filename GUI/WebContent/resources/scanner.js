@@ -360,12 +360,17 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 	$.each(data, function(name, value) {
 		names.push(name);
 	});
-	names.sort(compareIgnoreCase);
-	loadDatasets(emptyValue);
-	loadLibraries(emptyValue);
-	loadMethods(emptyValue);
-	loadSites(emptyValue, false);
-	loadStudies(names);
+	if (names.length > 0) {
+		names.sort(compareIgnoreCase);
+		loadDatasets(emptyValue);
+		loadLibraries(emptyValue);
+		loadMethods(emptyValue);
+		loadSites(emptyValue, false);
+		loadStudies(names);
+	} else {
+		$('#ui').hide();
+		$('#authorizationDiv').show();
+	}
 }
 
 /**
