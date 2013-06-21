@@ -105,3 +105,23 @@ a.mailto {
 	text-decoration:none;
 	color: #800000;
 }
+
+div.topMenu {
+	float: right;
+}
+
+a.link-style:link {
+	text-decoration:none;
+	color: #024A68;
+}
+
+a.link-style:visited {
+	text-decoration:none;
+	color: #800000;
+}
+
+a.link-style:hover {
+	/*text-decoration:underline;*/
+	color: #800000;
+}
+
