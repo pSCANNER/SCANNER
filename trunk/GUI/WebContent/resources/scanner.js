@@ -417,7 +417,7 @@ function renderAvailableLibraries() {
 	// send the request
 	var dataset = getSelectedDatasetName();
 	$('#datasetHelp').html(availableDatasets[dataset]);
-	if (dataset != null) {
+	if (dataset != null && dataset.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && dataset != emptyValue) {
 		var url = HOME + '/query?action=getLibraries' +
 		'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
 		'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
@@ -457,7 +457,7 @@ function renderAvailableMethods() {
 	// send the request
 	var lib = getSelectedLibraryName();
 	$('#libraryHelp').html(availableLibraries[lib]);
-	if (lib != null) {
+	if (lib != null && lib.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && lib != emptyValue) {
 		var url = HOME + '/query?action=getMethods&library=' + encodeSafeURIComponent(lib) +
 			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
 			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
@@ -497,7 +497,7 @@ function renderAvailableParameters() {
 	var func = getSelectedMethodName();
 	var lib = getSelectedLibraryName();
 	var dataset = getSelectedDatasetName();
-	if (func != '') {
+	if (func != '' && func.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && func != emptyValue) {
 		var url = HOME + '/query?action=getParameters&method=' + encodeSafeURIComponent(func) + 
 			'&library=' + encodeSafeURIComponent(lib) +
 			'&dataset=' + encodeSafeURIComponent(dataset);
@@ -690,13 +690,16 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
  * Send the request to get the available sites
  */
 function renderAvailableSites() {
-	$('#methodHelp').html(availableMethods[getSelectedMethodName()]);
-	var url = HOME + '/query?action=getSites' +
-			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
-			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName()) +
-			'&library=' + encodeSafeURIComponent(getSelectedLibraryName()) +
-			'&method=' + encodeSafeURIComponent(getSelectedMethodName());
-	scanner.GET(url, true, postRenderSites, null, null, 0);
+	var method = getSelectedMethodName();
+	if (method != null && method.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && method != emptyValue) {
+		$('#methodHelp').html(availableMethods[getSelectedMethodName()]);
+		var url = HOME + '/query?action=getSites' +
+				'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+				'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName()) +
+				'&library=' + encodeSafeURIComponent(getSelectedLibraryName()) +
+				'&method=' + encodeSafeURIComponent(getSelectedMethodName());
+		scanner.GET(url, true, postRenderSites, null, null, 0);
+	}
 }
 
 /**
