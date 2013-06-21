@@ -2335,3 +2335,15 @@ function disableIndependentVariableName() {
 		$('#param_' + makeId(val)).attr('disabled', 'disabled');
 	}
 }
+
+function submitLogout() {
+	var url = HOME + '/logout';
+	document.body.style.cursor = "wait";
+	scanner.POST(url, null, true, postSubmitLogout, null, null, 0);
+}
+
+function postSubmitLogout(data, textStatus, jqXHR, param) {
+	document.body.style.cursor = "default";
+	window.location = HOME;
+}
+
