@@ -2345,5 +2345,6 @@ function submitLogout() {
 function postSubmitLogout(data, textStatus, jqXHR, param) {
 	document.body.style.cursor = "default";
 	window.location = HOME;
+	alert('Please close your browser to logoff.');
 }
 
