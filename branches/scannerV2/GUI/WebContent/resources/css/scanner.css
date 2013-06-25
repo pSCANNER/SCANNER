@@ -1,0 +1,127 @@
+body {
+    background: url("../images/headerbg.png") repeat-x scroll 0% 0% rgb(255, 255, 255);
+    font-family: Tahoma,Verdana,Arial,sans-serif;
+    margin: 0px;
+    padding: 0px;
+    font-size: 11px;
+    color: rgb(66, 66, 66);
+    text-align: left;
+    line-height: 1.4;
+}
+
+
+div#wrapper {
+    padding: 0px;
+    width: 940px;
+    margin: 0px auto;
+}
+
+#tophead {
+    background-color: rgb(247, 246, 244);
+    clear: both;
+    text-align: left;
+    line-height: normal;
+    background-image: url("../images/header_ban.png");
+    background-repeat: repeat-x;
+    position: relative;
+    height: 100px;
+}
+
+#content {
+    border-top: 2px solid rgb(244,244,244);
+}
+
+#footer {
+    margin: 0px auto;
+    height: 70px;
+    text-align: left;
+    line-height: 20px;
+    color: rgb(0, 0, 0);
+    font-size: 10px;
+    background: rgb(244, 244, 244);
+    padding-top: 10px;
+    padding-left: 165px;
+}
+
+.double_bottom_border {
+	border-bottom: 3px double;
+}
+
+.method_border {
+	border: 1px solid gray;
+}
+
+.method_margin {
+	margin: 5px;
+}
+
+#ajaxSpinnerContainer, #ajaxHistorySpinnerContainer {
+	height:11px;
+	margin: 25px;
+}
+
+#ajaxSpinnerImage, #ajaxHistorySpinnerImage {
+	display:none;
+}
+
+#profileTable td.nowrap {
+	white-space:nowrap;
+}
+
+#profileTable {
+	border-spacing: 5px 10px;
+}
+
+#profileTable td {
+	background-color: white;
+	border: none;
+	vertical-align:text-top;
+}
+
+#paramsHelpDiv {
+	margin: 25px;
+}
+
+.contactsTable {
+	border-spacing: 5px 0px;
+}
+
+table.sitesStatus {
+	border-collapse:collapse;
+	width:85%;
+}
+
+table.sitesStatus td, table.sitesStatus th {
+	border:1px solid black;
+	padding:5px;
+}
+
+a.banner-text {
+	font-size: 0.88em !important;
+	font-weight: bold;
+	font-family: georgia, trebichet ms, serif;
+}
+a.mailto {
+	text-decoration:none;
+	color: #800000;
+}
+
+div.topMenu {
+	float: right;
+}
+
+a.link-style:link {
+	text-decoration:none;
+	color: #024A68;
+}
+
+a.link-style:visited {
+	text-decoration:none;
+	color: #800000;
+}
+
+a.link-style:hover {
+	/*text-decoration:underline;*/
+	color: #800000;
+}
+

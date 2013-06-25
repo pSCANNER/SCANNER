@@ -1,0 +1,14 @@
+{
+    "logisticRegressionInput":
+    {
+        "inputDescription":
+        {
+            "id":"001","name":"Test","description":"Test Parameters"
+        },
+        "inputParameters":
+        {
+            "dependentVariableName":"Outcome",
+            "independentVariableName":["g1","g2"]
+        }
+    }
+}
