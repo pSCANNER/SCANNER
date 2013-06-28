@@ -864,13 +864,21 @@ function getRowsValues(res, columns, rows, sites) {
 					coefficient = output['Coefficient'];
 					siteInfo = output['SiteInfo'];
 					var group = [];
-					$.each(coefficient, function(i, obj) {
+					if ($.isArray(coefficient)) {
+						$.each(coefficient, function(i, obj) {
+							var row = [];
+							$.each(columns, function(j, col) {
+								row.push(obj[col]);
+							});
+							group.push(row);
+						});
+					} else {
 						var row = [];
 						$.each(columns, function(j, col) {
-							row.push(obj[col]);
+							row.push(coefficient[col]);
 						});
 						group.push(row);
-					});
+					}
 					rows.push(group);
 					var site = [];
 					if (siteInfo != null) {
@@ -882,13 +890,21 @@ function getRowsValues(res, columns, rows, sites) {
 				coefficient = res['Output']['Coefficient'];
 				var group = [];
 				siteInfo = res['Output']['SiteInfo'];
-				$.each(coefficient, function(i, obj) {
+				if ($.isArray(coefficient)) {
+					$.each(coefficient, function(i, obj) {
+						var row = [];
+						$.each(columns, function(j, col) {
+							row.push(obj[col]);
+						});
+						group.push(row);
+					});
+				} else {
 					var row = [];
 					$.each(columns, function(j, col) {
-						row.push(obj[col]);
+						row.push(coefficient[col]);
 					});
 					group.push(row);
-				});
+				}
 				rows.push(group);
 				var site = [];
 				if (siteInfo != null) {
