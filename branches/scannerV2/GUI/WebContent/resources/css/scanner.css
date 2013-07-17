@@ -5,7 +5,7 @@ body {
     padding: 0px;
     font-size: 11px;
     color: rgb(66, 66, 66);
-    text-align: left;
+    text-align: center;
     line-height: 1.4;
 }
 
@@ -14,6 +14,7 @@ div#wrapper {
     padding: 0px;
     width: 940px;
     margin: 0px auto;
+    text-align: left;
 }
 
 #tophead {
