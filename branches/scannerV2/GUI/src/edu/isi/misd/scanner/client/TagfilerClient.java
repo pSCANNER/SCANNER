@@ -1639,9 +1639,12 @@ public class TagfilerClient implements RegistryClient {
 			JSONArray arr = new JSONArray(rsp.getEntityString());
 			ArrayList<String> methods = new ArrayList<String>();
 			for (int i=0; i < arr.length(); i++) {
-				String method = arr.getJSONObject(i).getString("method");
-				if (!methods.contains(method)) {
-					methods.add(method);
+				JSONArray methodValues = arr.getJSONObject(i).getJSONArray("method");
+				for (int j=0; j < methodValues.length(); j++) {
+					String method = methodValues.getString(j);
+					if (!methods.contains(method)) {
+						methods.add(method);
+					}
 				}
 			}
 			String cname = ";cname=";
@@ -1676,7 +1679,7 @@ public class TagfilerClient implements RegistryClient {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;cname;minOccurs;maxOccurs;values;description;path)";
+			String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;parentParameter;cname;minOccurs;maxOccurs;position;parameterType;description;selected;linkedParameter;quickHelp;arrayParameter)?limit=none";
 			ClientURLResponse rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {

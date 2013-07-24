@@ -2,6 +2,10 @@ package edu.isi.misd.scanner.client;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.json.JSONArray;
@@ -345,56 +349,99 @@ public class TagfilerClientResponse implements RegistryClientResponse {
      * <br/>}
      */
 	@Override
-	public String toParameters(String variables) {
+	public String toParameters() {
 		String result = null;
 		try {
 			String res = response.getEntityString();
 			System.out.println("Params:\n"+res);
 			JSONArray arr = new JSONArray(res);
-			JSONObject params = new JSONObject();
-			JSONObject paramsDescription = new JSONObject();
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject obj = arr.getJSONObject(i);
-				String cname = obj.getString("cname");
-				if (!obj.isNull("description")) {
-					paramsDescription.put(cname, obj.getString("description"));
-				}
-				String path = obj.getString("path");
-				StringTokenizer tokenizer = new StringTokenizer(path, "|");
-				JSONObject crtParam = params;
-				while (tokenizer.hasMoreTokens()) {
-					String token = tokenizer.nextToken();
-					if (!crtParam.has(token)) {
-						crtParam.put(token, new JSONObject());
-					}
-					crtParam = crtParam.getJSONObject(token);
-				}
-				if (obj.isNull("values")) {
-					JSONArray resourceValues = new JSONArray(variables);
-					if (resourceValues.length() > 0) {
-						JSONObject resourceObj = resourceValues.getJSONObject(0);
-						resourceValues = resourceObj.getJSONArray("variables");
-					}
-					crtParam.put(cname, resourceValues);
-				} else {
-					JSONArray resourceValues = obj.getJSONArray("values");
-					if (resourceValues.length() == 1 && !resourceValues.getString(0).equals("string")) {
-						crtParam.put(cname, resourceValues.getString(0));
-					} else {
-						crtParam.put(cname, resourceValues);
-					}
-				}
-			}
-			JSONObject ret = new JSONObject();
-			ret.put("description", paramsDescription);
-			ret.put("params", params);
-			result = ret.toString();
+			JSONArray params = buildParameters(arr, null);
+			result = params.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return result;
 	}
 	
+	static JSONArray buildParameters(JSONArray arr, String parent) {
+		JSONArray ret = new JSONArray();
+		try {
+			JSONArray params = getParameter(arr, parent);
+			for (int i=0; i < params.length(); i++) {
+				JSONObject param = params.getJSONObject(i);
+				String cname = param.getString("cname");
+				JSONObject rootObj = new JSONObject();
+				JSONObject paramNode = new JSONObject();
+				rootObj.put(cname, paramNode);
+				paramNode.put("metadata", param);
+				JSONArray data = buildParameters(arr, cname);
+				if (data.length() > 0) {
+					paramNode.put("data", data);
+				}
+				ret.put(rootObj);
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	static JSONArray getParameter( JSONArray arr, String parent) {
+		JSONArray ret = new JSONArray();
+		JSONArray enumArray = new JSONArray();
+		try {
+			for (int i=0; i < arr.length(); i++) {
+				JSONObject obj = arr.getJSONObject(i);
+				JSONArray parents = obj.optJSONArray("parentParameter");
+				if (parents != null && parent != null) {
+					for (int j=0; j < parents.length(); j++) {
+						if (parents.getString(j).equals(parent)) {
+							Integer position = obj.optInt("position");
+							if (position != null && position > 0) {
+								ret.put(--position, obj);
+							} else if (obj.optString("parameterType") != null && obj.optString("parameterType").equals("enum")){
+								enumArray.put(obj);
+							} else {
+								ret.put(obj);
+							}
+						}
+					}
+				} else if (parent == null && parents == null) {
+					ret.put(obj);
+				}
+			}
+			if (enumArray.length() > 0) {
+				enumArray = sortParameters(enumArray);
+				for (int i=0; i < enumArray.length(); i++) {
+					ret.put(enumArray.getJSONObject(i));
+				}
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
+	static JSONArray sortParameters(JSONArray arr) {
+		JSONArray ret = new JSONArray();
+		List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+		try {
+			for (int i=0; i < arr.length(); i++) {
+				jsonValues.add(arr.getJSONObject(i));
+			}
+			Collections.sort(jsonValues, new JSONComparator());
+			for (int i=0; i < jsonValues.size(); i++) {
+				ret.put(jsonValues.get(i));
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
 	String toResource() {
 		String ret = null;
 		try {
@@ -959,3 +1006,21 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	}
 
 }
+
+class JSONComparator implements Comparator<JSONObject>
+{
+
+    public int compare(JSONObject a, JSONObject b)
+    {
+		try {
+			String valA = a.getString("cname");
+		    String valB = b.getString("cname");
+	        return valA.compareToIgnoreCase(valB);    
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return 0;
+ 
+    }
+}
+

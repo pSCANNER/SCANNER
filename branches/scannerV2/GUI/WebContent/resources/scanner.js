@@ -170,39 +170,72 @@ function getSelectedSitesNames() {
    }
  */
 function getSelectedParameters() {
-	var params = copyObject(parametersBody);
-	$.each(params, function(key2, res2) {
-		$.each(res2, function(key3, res3) {
-			$.each(res3, function(key, res) {
-				if ($.type(res) == 'string') {
-					//params[key2][key3][key] = '' + $('#param_'+key).html();
-					params[key2][key3][key] = '' + $('#param_'+makeId(key)).val();
-				}
-				else if (res.length == 1 && res[0] == 'string') {
-					/*
-					if ($.isNumeric($('#param_'+key).val())) {
-						params[key2][key3][key] = '"' + $('#param_'+key).val() + '"';
-					} else {
-						params[key2][key3][key] = $('#param_'+key).val();
-					}
-					*/
-					params[key2][key3][key] = $('#param_'+makeId(key)).val();
-				} else {
-					var values = [];
-					var checkboxes = $('input:checkbox', $('#param_'+makeId(key))).length;
-					if (checkboxes > 0) {
-						$.each($('input:checked', $('#param_'+makeId(key))), function(i, elem) {
-							values.push($(elem).attr('parValue'));
-						});
-					} else {
-						values = $('#param_'+makeId(key)).val();
-					}
-					params[key2][key3][key] = values;
-				}
-			});
-		});
+	var query = {};
+	var ret = true;
+	$.each(parametersBody, function(i, param) {
+		ret = buildParameterBody(param, query);
+		if (!ret) {
+			return false;
+		}
 	});
-	return valueToString(params);
+	var result = null;
+	if (ret) {
+		result = valueToString(query);
+	}
+	return result;
+}
+
+function buildParameterBody(param, query) {
+	var ret = true;
+	$.each(param, function(key, value) {
+	var metadata = value['metadata'];
+		if (metadata['parameterType'] == 'group') {
+			if (metadata['linkedParameter'] != null) {
+				// dependentVariableName
+				query[metadata['cname']] = $('#select_'+makeId(metadata['cname'])).val();
+			} else if (metadata['arrayParameter'] != null) {
+				// independentVariableName
+				var values = [];
+				$.each($('input:checked', $('#table_'+makeId(metadata['cname']))), function(i, elem) {
+					values.push($(elem).attr('parValue'));
+				});
+				query[metadata['cname']] = values;
+			} else {
+				var obj = {};
+				query[metadata['cname']] = obj;
+				$.each(value['data'], function(i, elem) {
+					ret = buildParameterBody(elem, obj);
+					if (!ret) {
+						return false;
+					}
+				});
+			}
+		} else if (metadata['parameterType'] == 'enum') {
+			var values = [];
+			$.each($('input:checked', $('#table_'+makeId(metadata['cname']))), function(i, elem) {
+				values.push($(elem).attr('parValue'));
+			});
+			if (values.length > 0) {
+				query[metadata['cname']] = values[0];
+			}
+		} else if (metadata['parameterType'] == 'auto') {
+			query[metadata['cname']] = $('#param_'+makeId(metadata['cname'])).val();
+		} else if (metadata['parameterType'] == 'integer') {
+			var val = $('#param_'+makeId(metadata['cname'])).val().replace(/^\s*/, "").replace(/\s*$/, "");
+			if (!isNaN(parseInt(val))) {
+				query[metadata['cname']] = parseInt(val);
+			} else if (val.length > 0) {
+				alert('Invalid integer value for "' + metadata['cname'] + '": "' + val + '".');
+				ret = false;
+			} else if (val.length == 0 && metadata['minOccurs'] == 1) {
+				alert('Please specify a value for "' + metadata['cname'] + '".');
+				ret = false;
+			}
+		} else if (metadata['parameterType'] == 'text') {
+			query[metadata['cname']] = $('#param_'+makeId(metadata['cname'])).val();
+		}
+	});
+	return ret;
 }
 
 /**
@@ -527,9 +560,10 @@ function renderAvailableParameters() {
                                                          "maxOccurs":-1}}
    ]
  */
+var linkedParameters = {};
+
 function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
-	parametersDescription = data['description'];
-	parametersBody = data['params'];
+	parametersBody = data;
 	$('#paramsHelpDiv').css('display', '');
 	$('#paramsDiv').css('display', '');
 	var paramsTitle = $('#paramsTitle');
@@ -539,151 +573,121 @@ function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 	var paramsHelp = $('#paramsHelp');
 	paramsDiv.html('');
 	paramsHelp.html('');
-	$.each(parametersBody, function(key2, res2) {
-		var h2 = $('<h2>');
-		paramsDiv.append(h2);
-		var title = key2;
-		if (key2 == 'logisticRegressionInput') {
-			title = 'Logistic Regression Input';
-		}
-		h2.html(title);
-		$.each(res2, function(key3, res3) {
-			var h3 = $('<h3>');
-			paramsDiv.append(h3);
-			var title = key3;
-			if (key3 == 'inputParameters') {
-				title = 'Input Parameters';
-			} else if (key3 == 'inputDescription') {
-				title = 'Input Description';
-			}
-			h3.html(title);
-			var stringDiv = null;
-			var tbody = null;
-			$.each(res3, function(key, res) {
-				if (parametersDescription[key] != null) {
-					paramsHelp.append(parametersDescription[key]).append($('<br/><br/>'));
-				}
-				if ($.type(res) == 'string') {
-					var h4 = $('<h4>');
-					paramsDiv.append(h4);
-					var title = key;
-					if (key == 'dependentVariableName') {
-						title = 'Dependent Variable';
-					} else if (key == 'independentVariableName') {
-						title = 'Independent Variables';
-					}
-					h4.html(title);
-					if (key == 'dependentVariableName') {
-						var dependentVariableName = $('<select>');
-						dependentVariableName.attr('id', 'param_'+makeId(key));
-						paramsDiv.append(dependentVariableName);
-						var option = $('<option>');
-						option.text(res);
-						option.attr('value', res);
-						dependentVariableName.append(option);
-					} else {
-						var checkboxDiv = $('<div>');
-						//checkboxDiv.attr({'id': 'param_'+key});
-						paramsDiv.append(checkboxDiv);
-						var div = $('<div>');
-						checkboxDiv.append(div);
-						var input = $('<input>');
-						input.attr({'type': 'checkbox',
-							'checked': 'checked',
-							'parName': res,
-							'parValue': res});
-						div.append(input);
-						var label = $('<label>');
-						label.attr({'id': 'param_'+makeId(key)});
-						div.append(label);
-						label.html(res);
-					}
-				} else if (res.length == 1 && res[0] == 'string') {
-					if (stringDiv == null) {
-						stringDiv = $('<div>');
-						paramsDiv.append(stringDiv);
-						var table = $('<table>');
-						stringDiv.append(table);
-						tbody = $('<tbody>');
-						table.append(tbody);
-					}
-					var tr = $('<tr>');
-					tbody.append(tr);
-					var td = $('<td>');
-					tr.append(td);
-					td.html(key + ':');
-					var td = $('<td>');
-					tr.append(td);
-					var input = $('<input>');
-					input.attr({'type': 'text',
-						'parName': key,
-						'id': 'param_'+makeId(key)});
-					if (key == 'id' && key3 == 'inputDescription') {
-						input.val(++descriptionId);
-						input.attr('disabled', 'disabled');
-					}
-					td.append(input);
-				} else {
-					var h4 = $('<h4>');
-					paramsDiv.append(h4);
-					var title = key;
-					if (key == 'dependentVariableName') {
-						title = 'Dependent Variable';
-					} else if (key == 'independentVariableName') {
-						title = 'Independent Variables';
-					}
-					h4.html(title);
-					if (key == 'dependentVariableName') {
-						var dependentVariableName = $('<select>');
-						dependentVariableName.change(function(event) {disableIndependentVariableName();});
-						dependentVariableName.attr('id', 'param_'+makeId(key));
-						paramsDiv.append(dependentVariableName);
-						res.sort(compareIgnoreCase);
-						$.each(res, function(j, val) {
-							var option = $('<option>');
-							var arr = val.split('<br/>');
-							option.text(arr[0]);
-							option.attr('value', arr[0]);
-							var description = '';
-							if (arr.length > 1) {
-								description = arr[1];
-							}
-							option.attr('description', description);
-							dependentVariableName.append(option);
-						});
-					} else if (key == 'independentVariableName') {
-						var checkboxDiv = $('<div>');
-						checkboxDiv.attr({'id': 'param_'+makeId(key)});
-						paramsDiv.append(checkboxDiv);
-						res.sort(compareIgnoreCase);
-						$.each(res, function(j, val) {
-							var div = $('<div>');
-							checkboxDiv.append(div);
-							var arr = val.split('<br/>');
-							var input = $('<input>');
-							input.attr({'type': 'checkbox',
-								'checked': 'checked',
-								'parName': arr[0],
-								'parValue': arr[0],
-								'id': 'param_' + makeId(arr[0])});
-							div.append(input);
-							var label = $('<label>');
-							div.append(label);
-							label.html(arr[0]);
-							var description = '';
-							if (arr.length > 1) {
-								description = arr[1];
-							}
-							label.hover(
-									function(event) {DisplayTipBox(event, description);}, 
-									function(){HideTipBox();});
-						});
-					}
-				}
-			});
-		});
+	linkedParameters = {};
+	
+	var table = $('<table>');
+	table.attr('id', 'table_');
+	paramsDiv.append(table);
+
+	$.each(data, function(i, param) {
+		renderParam(paramsDiv, param, 1, table, null);
 	});
-	disableIndependentVariableName();
+
+	$.each(linkedParameters, function(id, linkedParameter) {
+		disableLinkedVariableName(id, linkedParameter);
+	});
+
+}
+
+function disableLinkedVariableName(id, linkedParameter) {
+	var val = $('#'+id).val();
+	if (val != null) {
+		$('input:checkbox', $('#table_' + makeId(linkedParameter))).removeAttr('disabled');
+		$('#param_' + makeId(linkedParameter) + '_' + makeId(val)).removeAttr('checked');
+		$('#param_' + makeId(linkedParameter) + '_' + makeId(val)).attr('disabled', 'disabled');
+	}
+}
+
+function renderParam(div, param, index, table, select) {
+	$.each(param, function(key, value) {
+		var metadata = value['metadata'];
+		if (metadata['quickHelp'] == 'true') {
+			$('#paramsHelp').append(metadata['description']).append($('<br/><br/>'));
+		}
+		if (metadata['parameterType'] == 'group') {
+			table.remove();
+			var h = $('<h'+index+'>');
+			div.append(h);
+			h.html(metadata['cname']);
+			var parTable = $('<table>');
+			parTable.attr('id', 'table_'+makeId(metadata['cname']));
+			div.append(parTable);
+			var selectPar = null;
+			if (metadata['linkedParameter'] != null) {
+				var tr = $('<tr>');
+				parTable.append(tr);
+				var td = $('<td>');
+				tr.append(td);
+				selectPar = $('<select>');
+				selectPar.attr('id', 'select_'+makeId(metadata['cname']));
+				selectPar.change({'id': 'select_'+makeId(metadata['cname']),
+							'linkedParameter': metadata['linkedParameter']}, function(event) {disableLinkedVariableName(event.data.id, event.data.linkedParameter);});
+				td.append(selectPar);
+				linkedParameters['select_'+makeId(metadata['cname'])] = metadata['linkedParameter'];
+			}
+			$.each(value['data'], function(i, elem) {
+				renderParam(div, elem, index+1, parTable, selectPar);
+			});
+		} else if (metadata['parameterType'] == 'enum') {
+			if (select != null) {
+				var option = $('<option>');
+				option.text(metadata['cname']);
+				option.attr('value', metadata['cname']);
+				if (metadata['selected'] != null) {
+					option.attr('selected', 'selected');
+				}
+				select.append(option);
+			} else {
+				var tr = $('<tr>');
+				table.append(tr);
+				var td = $('<td>');
+				tr.append(td);
+				var tableId = table.attr('id');
+				tableId = tableId.substring('table_'.length);
+				var input = $('<input>');
+				input.attr({'type': 'checkbox',
+					'checked': 'checked',
+					'parName': metadata['cname'],
+					'id': 'param_' + tableId + '_' + makeId(metadata['cname']),
+					'parValue': metadata['cname']});
+				td.append(input);
+				var label = $('<label>');
+				td.append(label);
+				label.html(metadata['cname']);
+				label.hover(
+						function(event) {DisplayTipBox(event, metadata['description']);}, 
+						function(){HideTipBox();});
+			}
+		} else if (metadata['parameterType'] == 'auto') {
+			var tr = $('<tr>');
+			table.append(tr);
+			var td = $('<td>');
+			tr.append(td);
+			td.html(metadata['cname'] + ':');
+			td = $('<td>');
+			tr.append(td);
+			var input = $('<input>');
+			input.attr({'type': 'text',
+				'parName': metadata['cname'],
+				'id': 'param_'+makeId(metadata['cname'])});
+			input.val(++descriptionId);
+			input.attr('disabled', 'disabled');
+			td.append(input);
+		} else {
+			var tr = $('<tr>');
+			table.append(tr);
+			var td = $('<td>');
+			tr.append(td);
+			td.html(metadata['cname'] + ':');
+			td = $('<td>');
+			tr.append(td);
+			var input = $('<input>');
+			input.attr({'type': 'text',
+				'parName': metadata['cname'],
+				'id': 'param_'+makeId(metadata['cname'])});
+			td.append(input);
+		}
+	});
 }
 
 /**
@@ -750,6 +754,9 @@ function submitQuery(div, replay) {
 			return;
 		}
 		var params = getSelectedParameters();
+		if (params == null) {
+			return;
+		}
 		obj['parameters'] = params;
 		obj['study'] = getSelectedStudyName();
 		obj['dataset'] = getSelectedDatasetName();

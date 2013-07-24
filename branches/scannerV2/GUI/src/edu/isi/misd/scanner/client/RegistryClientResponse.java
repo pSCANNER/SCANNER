@@ -225,7 +225,7 @@ public interface RegistryClientResponse {
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;}
      * <br/>}
      */
-    public String toParameters(String variables);
+    public String toParameters();
 
     /**
      * Returns a string representing a JSONArray for the workers.
