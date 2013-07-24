@@ -180,55 +180,33 @@ public class MessageUtils
             ((idIndex > 0) ? 
             path.substring(idIndex + BaseConstants.ID.length()+2) : "");
     }
-   
-    /**
-     * @see MessageUtils#parseIdFromUrlPath(String path) 
-     * @param message The inbound Camel message.
-     * @return The parsed ID.
-     * @throws Exception 
-     */
-    public static String parseIdFromMessageURL(Message message) throws Exception
-    {
-        return parseIdFromUrlPath(getPathFromMessageURL(message));
-    }
     
     /**
-     * Gets the host name from the URL of the request message.
+     * Gets the request URL from the HTTPServletRequest.
      * @param message The inbound Camel message.
-     * @return The host name.
+     * @return The request URL.
      * @throws Exception
      */
-    public static String getHostFromMessageURL(Message message) 
-        throws Exception
-    {      
-        HttpServletRequest req = message.getBody(HttpServletRequest.class);  
-        return req.getLocalName();
-    }
-    
-    /**
-     * Gets the port from the URL of the request message.
-     * @param message The inbound Camel message.
-     * @return The port number.
-     * @throws Exception
-     */
-    public static int getPortFromMessageURL(Message message) 
+    public static String getRequestURL(Message message) 
         throws Exception
     {
         HttpServletRequest req = message.getBody(HttpServletRequest.class);  
-        return req.getLocalPort();        
+        return req.getRequestURL().toString();         
     }
     
-    /**
-     * Gets the path component from the URL of the request message.
-     * @param message The inbound Camel message.
-     * @return The path component of the URL.
-     * @throws Exception
-     */
-    public static String getPathFromMessageURL(Message message) 
+    public static String getResultURL(Exchange exchange) 
         throws Exception
     {
-        HttpServletRequest req = message.getBody(HttpServletRequest.class);  
-        return req.getPathInfo();         
+        String resultURL = 
+            (String)exchange.getProperty(BaseConstants.REQUEST_URL);
+        String id = (String)exchange.getIn().getHeader(BaseConstants.ID);
+        if ((resultURL == null) || (id == null)) {
+            throw new Exception(
+                "Unable to create result URL from header values");            
+        }
+        resultURL += 
+            "/id/" + (String)exchange.getIn().getHeader(BaseConstants.ID);
+        return resultURL;
     }
     
     /**

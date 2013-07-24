@@ -5,18 +5,6 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-    <import resource="file:etc/camel-context.xml"/>
-
-    <bean id="BaseComputeProcessor" 
-          class="edu.isi.misd.scanner.network.base.worker.processors.BaseComputeProcessor"/> 
-                
-    <bean id="BaseWorkerCacheReadProcessor" 
-          class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheReadProcessor"/>        
-    
-    <bean id="BaseWorkerCacheWriteProcessor" 
-          class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheWriteProcessor"/>  
-    
-    <bean id="BaseNoOpProcessor" 
-          class="edu.isi.misd.scanner.network.base.processors.BaseNoOpProcessor"/>          
-    
+    <import resource="file:etc/camel-context.xml"/>       
+                  
 </beans>

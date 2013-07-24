@@ -5,8 +5,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import org.apache.camel.Exchange;
-
+import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,26 +28,16 @@ public class FileUtils
      * @param baseDir The base directory
      * @throws Exception
      */
-    public static void readFile(Exchange exchange, String baseDir)
+    public static void readFile(Exchange exchange, String dirName)
         throws Exception
     {
         try 
-        {            
-            String path = MessageUtils.getPathFromMessageURL(exchange.getIn());
-            int idIndex = path.lastIndexOf("/" + BaseConstants.ID + "/");
-            String dirName = 
-                ConfigUtils.getBaseOutputDir(exchange, baseDir) + 
-                    "/" + MessageUtils.getHostFromMessageURL(exchange.getIn()) +
-                    "/" + MessageUtils.getPortFromMessageURL(exchange.getIn()) + 
-                    "/" + ((idIndex > 0) ? path.substring(0,idIndex) : path);
-            
-            String fileName = MessageUtils.parseIdFromUrlPath(path);            
-            File file = new File(dirName, fileName);
-            
+        {
+            String fileName = getFileNameForRequest(exchange,dirName);
+            File file = new File(dirName, fileName);            
             BufferedInputStream bis = 
                 new BufferedInputStream(new FileInputStream(file));                        
-            exchange.getIn().setBody(bis);
-            
+            exchange.getIn().setBody(bis);            
         }
         catch (FileNotFoundException fnf) {
             ErrorUtils.setHttpError(exchange, fnf, 404);
@@ -64,23 +55,65 @@ public class FileUtils
      * @param baseDir The base directory
      * @throws Exception
      */
-    public static void writeFile(Exchange exchange, String baseDir)
+    public static void writeFile(Exchange exchange, String dirName)
         throws Exception
-    {      
-        String path = MessageUtils.getPathFromMessageURL(exchange.getIn());
-        int idIndex = path.lastIndexOf("/" + BaseConstants.ID + "/");
-        String dirName = 
-            ConfigUtils.getBaseOutputDir(exchange, baseDir) + 
-                "/" + MessageUtils.getHostFromMessageURL(exchange.getIn()) +
-                "/" + MessageUtils.getPortFromMessageURL(exchange.getIn()) + 
-                "/" + ((idIndex > 0) ? path.substring(0,idIndex) : path);
-          
-        String fileName = MessageUtils.parseIdFromUrlPath(path); 
-        if (fileName.isEmpty()) {
+    {        
+        String fileName = null;
+        if (exchange.getIn().getHeader(BaseConstants.ID) != null) {
             fileName = "${in.headers." + BaseConstants.ID + "}";
+        } else {
+            fileName=getFileNameForRequest(exchange,dirName);
         }
         String outputURI = "file://" + dirName + "/?fileName=" + fileName;
-        exchange.getContext().createProducerTemplate().sendBodyAndHeaders(
-            outputURI,exchange.getIn().getBody(), exchange.getIn().getHeaders());            
+        ProducerTemplate template = 
+            exchange.getContext().createProducerTemplate();
+        template.send(outputURI, exchange);            
+    }
+    
+    public static String getDirPathForRequest(Exchange exchange,
+                                              String baseDir)
+        throws Exception
+    {   
+            String url = 
+                (String)exchange.getProperty(BaseConstants.REQUEST_URL);
+            URL requestURL = new URL(url);            
+            String path = requestURL.getPath();
+            int idIndex = path.lastIndexOf("/" + BaseConstants.ID + "/");
+            String dirName = 
+                ConfigUtils.getBaseOutputDir(exchange, baseDir) + 
+                    "/" + requestURL.getHost() +
+                    "/" + requestURL.getPort() + 
+                    "/" + ((idIndex > 0) ? path.substring(0,idIndex) : path);
+            
+            return dirName;
+    }    
+    
+    public static String getFileNameForRequest(Exchange exchange,
+                                               String baseDir)
+        throws Exception
+    {
+            String url = 
+                (String)exchange.getProperty(BaseConstants.REQUEST_URL);
+            URL requestURL = new URL(url);            
+            String path = requestURL.getPath();            
+            String fileName = MessageUtils.parseIdFromUrlPath(path);  
+            
+            return fileName;
+    }
+    
+    public static String getHoldingDirPathForRequest(Exchange exchange,
+                                                     String baseDir)
+        throws Exception
+    {            
+            String url = 
+                (String)exchange.getProperty(BaseConstants.REQUEST_URL);
+            URL requestURL = new URL(url);            
+
+            String dirName = 
+                ConfigUtils.getBaseHoldingDir(exchange, baseDir) + 
+                    "/" + requestURL.getHost() +
+                    "/" + requestURL.getPort();
+            
+            return dirName;                  
     }
 }

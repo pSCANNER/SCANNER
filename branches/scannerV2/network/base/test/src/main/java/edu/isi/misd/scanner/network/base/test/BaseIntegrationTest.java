@@ -47,7 +47,7 @@ public abstract class BaseIntegrationTest extends CamelSpringTestSupport
                           String inputFileName) 
         throws Exception
     {
-        doPost(contentType, inputFileName, null);
+        doPost(contentType, inputFileName, null, false);
     }  
     
     /**
@@ -60,6 +60,22 @@ public abstract class BaseIntegrationTest extends CamelSpringTestSupport
     protected void doPost(String contentType,
                           String inputFileName,
                           String outputFileName) 
+        throws Exception
+    {
+        doPost(contentType, inputFileName, outputFileName, false);        
+    }    
+    
+    /**
+     * Issues an HTTP POST and validates the response.
+     * @param contentType The HTTP ContentType for the request and response.
+     * @param inputFileName The input file name to use as the parameters.
+     * @param outputFileName The output file name to use for the validation of output.
+     * @throws Exception 
+     */
+    protected void doPost(String contentType,
+                          String inputFileName,
+                          String outputFileName,
+                          boolean asynchronous) 
         throws Exception
     {
         MockEndpoint resultEndpoint = this.getMockEndpoint("mock:result");    
@@ -84,9 +100,12 @@ public abstract class BaseIntegrationTest extends CamelSpringTestSupport
         String targets = this.getWorkerUrls();
         headers.put(BaseConstants.TARGETS, targets);
 
+        String masterUrl = this.getMasterUrl();
+        if (asynchronous) {
+            headers.put(BaseConstants.ASYNC, "true");
+        }
         try {
-            template.sendBodyAndHeaders(
-                this.getMasterUrl(),input,headers);
+            template.sendBodyAndHeaders(masterUrl,input,headers);
         } catch (CamelExecutionException e) {
             log.error(e.getCause().getMessage());
         }

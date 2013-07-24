@@ -6,6 +6,7 @@ import edu.isi.misd.scanner.network.types.base.BaseResponse;
 import edu.isi.misd.scanner.network.types.base.ErrorDetails;
 import edu.isi.misd.scanner.network.types.base.SimpleMap;
 import java.util.ArrayList;
+import java.util.List;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
@@ -25,19 +26,12 @@ public class BaseAggregateProcessor implements Processor
 
     @Override
     public void process(Exchange exchange) throws Exception 
-    {                
-        ArrayList<String> results = exchange.getIn().getBody(ArrayList.class);
-        if (results == null) {
-            ErrorUtils.setHttpError(
-                exchange, 
-                new NullPointerException("No result data (null aggregate results array)"), 500);
-        }
-        
-        BaseResponse response = new BaseResponse(); 
+    {                        
+        List results = getResults(exchange);           
         ArrayList<SimpleMap> mapResults = new ArrayList<SimpleMap>();
-        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>(); 
+        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>();
         for (Object result : results)
-        {   
+        {          
             if (result instanceof ErrorDetails)
             {
                 errors.add((ErrorDetails)result);
@@ -53,8 +47,20 @@ public class BaseAggregateProcessor implements Processor
                 } 
             }
         }
-        response.getSimpleMap().addAll(mapResults);
-        response.getError().addAll(errors);        
+        BaseResponse response = new BaseResponse();        
+        response.getSimpleMap().addAll(mapResults);        
+        response.getError().addAll(errors);         
         exchange.getIn().setBody(response);                
     }
+    
+    protected static List getResults(Exchange exchange)
+    {
+        ArrayList results = exchange.getIn().getBody(ArrayList.class);
+        if (results == null) {
+            ErrorUtils.setHttpError(
+                exchange, 
+                new NullPointerException("No result data (null aggregate results array)"), 500);
+        }
+        return results;
+    }        
 }

@@ -42,6 +42,9 @@ public class DefaultRoute extends RouteBuilder
     
     protected static final String ROUTE_COMPLETE_CLAUSE = 
         "${property.status} contains 'complete'";    
+
+    protected static final String ASYNC_INVOCATION_CLAUSE = 
+        "${in.headers." + BaseConstants.ASYNC + "} == 'true'";
     
     protected JaxbDataFormat jaxb = new JaxbDataFormat(); 
     protected JacksonDataFormat json = new JacksonDataFormat();        
@@ -52,15 +55,15 @@ public class DefaultRoute extends RouteBuilder
     }
 
     protected String getAggregatorRouteName() {
-        return getClass().getSimpleName() + "Aggregator";
+        return getRouteName() + "Aggregator";
     } 
     
     protected String getGETRouteName() {
-        return getClass().getSimpleName() + "GET";
+        return getRouteName() + "Get";
     }     
     
     protected String getPOSTRouteName() {
-        return getClass().getSimpleName() + "POST";
+        return getRouteName() + "Post";
     }   
     
     protected String getRequestProcessorRef() {
@@ -82,7 +85,11 @@ public class DefaultRoute extends RouteBuilder
     protected String getPostAggregationProcessorRef() {
         return "BaseAggregateProcessor";
     }
-
+    
+    protected String getAsyncResponseProcessorRef() {
+        return "BaseAsyncResponseProcessor";
+    }
+    
     public String getJAXBContext() {
         return "edu.isi.misd.scanner.network.types.base";
     }
@@ -101,8 +108,9 @@ public class DefaultRoute extends RouteBuilder
     
     /**
      * Sets up the route using Camel Java DSL.  Creates routes to handle HTTP 
-     * GET/POST requests and process those requests via configured dynamic 
-     * router and recipient list Camel EIPs.
+     * GET/POST requests and potentially reissue those requests via 
+     * delegated dynamic router and recipient list Camel EIPs, and then 
+     * aggregate the results.
      * 
      * @throws Exception
      */
@@ -120,6 +128,17 @@ public class DefaultRoute extends RouteBuilder
         xmlToJson.setSkipNamespaces(true);
         xmlToJson.setRemoveNamespacePrefixes(true);
 
+        from("direct:" + getRouteName()).
+            convertBodyTo(String.class).
+            processRef(getRequestProcessorRef()).            
+            choice().
+                when().simple(HTTP_METHOD_GET_CLAUSE).
+                    to("direct:" + getGETRouteName()).
+                when().simple(HTTP_METHOD_POST_CLAUSE).
+                    to("direct:" + getPOSTRouteName()).
+            end().
+        dynamicRouter(getDynamicRouter());
+        
         from("direct:" + getGETRouteName()).
             choice().
                 when().simple(TARGET_PARAMS_NULL_CLAUSE).
@@ -146,24 +165,9 @@ public class DefaultRoute extends RouteBuilder
                 endChoice().
             end();
         
-        from("direct:" + getRouteName()).
-            convertBodyTo(String.class).
-            processRef(getRequestProcessorRef()).            
-            choice().
-                when().simple(HTTP_METHOD_GET_CLAUSE).
-                    to("direct:" + getGETRouteName()).
-                when().simple(HTTP_METHOD_POST_CLAUSE).
-                    to("direct:" + getPOSTRouteName()).
-            end().
-        dynamicRouter(getDynamicRouter());
-        
-        aggregate();
-    }
-
     /**
-     * The aggregating route sub-component.  This function creates
-     * the route that handles the delegation of the submitted request to the 
-     * worker nodes specified in the 
+     * The aggregating route sub-component.  This route handles the delegation
+     * of the submitted request to the worker nodes specified in the 
      * {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} header of
      * the original request.  It uses the {@link org.apache.camel.RecipientList}
      * enterprise integration pattern.
@@ -171,50 +175,55 @@ public class DefaultRoute extends RouteBuilder
      * TODO: make redeliveries and redeliveryDelay for onException clauses 
      * externally configurable via master.properties
      * @throws Exception
-     */
-    protected void aggregate() throws Exception
-    {
-        from("direct:" + getAggregatorRouteName()).
-            // dont retry connects for now
-            onException(HttpHostConnectException.class).
-            maximumRedeliveries(0).
-            redeliveryDelay(1000).            
-            continued(true).
-            end().            
-            // do retry SocketException (by default once)
-            onException(SocketException.class).
-            maximumRedeliveries(1).            
-            redeliveryDelay(1000).
-            continued(true).
+     */    
+    from("direct:" + getAggregatorRouteName()).
+        // dont retry connects for now
+        onException(HttpHostConnectException.class).
+        maximumRedeliveries(0).
+        redeliveryDelay(1000).            
+        continued(true).
+        end().            
+        // do retry SocketException (by default once)
+        onException(SocketException.class).
+        maximumRedeliveries(1).            
+        redeliveryDelay(1000).
+        continued(true).
+        end().
+        // do retry SocketTimeoutExceptions (by default twice)
+        onException(SocketTimeoutException.class).
+        maximumRedeliveries(2).
+        redeliveryDelay(1000).
+        continued(true).
+        end().            
+        // don't retry anything else
+        onException(Exception.class).
+        maximumRedeliveries(0).
+        continued(true).
+        end().            
+        // recipientList does the actual multicast
+        recipientList(
+            getRecipientList()).          
+            parallelProcessing().
+            aggregationStrategyRef(
+                getAggregationStrategyRef()). 
+        choice().
+            when().simple(ASYNC_INVOCATION_CLAUSE).
+                processRef(getAsyncResponseProcessorRef()).           
+            otherwise().
+                processRef(getPostAggregationProcessorRef()).
+                marshal(jaxb).       
+        end().
+        processRef(getCacheWriteProcessorRef()).            
+        choice().
+            when().simple(ROUTE_COMPLETE_CLAUSE). 
+                choice().
+                    when().simple(JSON_CONTENT_TYPE_CLAUSE).
+                        marshal(xmlToJson).
+                    endChoice().
             end().
-            // do retry SocketTimeoutExceptions (by default twice)
-            onException(SocketTimeoutException.class).
-            maximumRedeliveries(2).
-            redeliveryDelay(1000).
-            continued(true).
-            end().            
-            // don't retry anything else
-            onException(Exception.class).
-            maximumRedeliveries(0).
-            continued(true).
-            end().            
-            // recipientList does the actual multicast
-            recipientList(getRecipientList()).          
-                parallelProcessing().
-                aggregationStrategyRef(getAggregationStrategyRef()). 
-            processRef(getPostAggregationProcessorRef()).
-            marshal(jaxb).
-            processRef(getCacheWriteProcessorRef()).            
-            choice().
-                when().simple(ROUTE_COMPLETE_CLAUSE). 
-                    choice().
-                        when().simple(JSON_CONTENT_TYPE_CLAUSE).
-                            marshal(xmlToJson).
-                        endChoice().
-                end().
-            end();
+        end();
     }
-        
+ 
     /**
      * The defaultRoutingSlip runs the aggregation route once and stops.
      * 

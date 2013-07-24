@@ -15,12 +15,7 @@
             <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/echo?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.example.EchoRoute"/>
         </camel:route>
-<!--                         
-        <camel:route>
-            <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
-            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.example.IterationRoute"/>
-        </camel:route>
--->        
+
     </camel:routeContext>
     
     <camel:routeContext id="ExampleSecureRouteContext">
@@ -29,12 +24,7 @@
             <camel:from uri="jetty:https://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/echo?handlers=securityHandler&amp;sslContextParametersRef=sslContextParameters&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>          
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.example.EchoRoute"/>
         </camel:route>
-<!--                         
-        <camel:route>
-            <camel:from uri="jetty:https://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/example/iteration?handlers=securityHandler&amp;sslContextParametersRef=sslContextParameters&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>          
-            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.example.IterationRoute"/>
-        </camel:route>
--->        
+      
     </camel:routeContext>
         
 </beans>

@@ -24,6 +24,9 @@
     <bean id="BaseAggregateProcessor" 
           class="edu.isi.misd.scanner.network.base.master.processors.BaseAggregateProcessor"/>                     
 
+    <bean id="BaseAsyncResponseProcessor" 
+          class="edu.isi.misd.scanner.network.base.master.processors.BaseAsyncResponseProcessor"/> 
+        
     <bean id="BaseComputeProcessor" 
           class="edu.isi.misd.scanner.network.base.worker.processors.BaseComputeProcessor"/> 
                 
@@ -33,9 +36,12 @@
     <bean id="BaseWorkerCacheWriteProcessor" 
           class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheWriteProcessor"/> 
     
+    <bean id="BaseWorkerAsyncResponseProcessor" 
+          class="edu.isi.misd.scanner.network.base.worker.processors.BaseAsyncResponseProcessor"/> 
+        
     <bean id="BaseNoOpProcessor" 
           class="edu.isi.misd.scanner.network.base.processors.BaseNoOpProcessor"/>      
-                
+                        
     <!-- error handler -->      
     <camel:errorHandler id="testErrorHandler"
                         type="DefaultErrorHandler">

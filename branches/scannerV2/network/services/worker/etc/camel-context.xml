@@ -5,18 +5,16 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
-
+  
+    <import resource="file:etc/activiti-context.xml"/>    
     <import resource="file:etc/security/security-config.xml"/>
     <import resource="classpath:META-INF/spring/ExampleRouteContext.xml"/>                                                
     <import resource="classpath:META-INF/spring/OceansRouteContext.xml"/>  
     <import resource="classpath:META-INF/spring/GloreRouteContext.xml"/>     
-          
+    
     <camel:camelContext id="workerCamelContext" 
                         errorHandlerRef="deadLetterErrorHandler">
-        
-        <camel:propertyPlaceholder id="properties" 
-                                   location="file:etc/worker.properties"/>     
-        
+              
         <camel:packageScan>
             <camel:package>edu.isi.misd.scanner.network.base.worker</camel:package>
             <camel:package>edu.isi.misd.scanner.network.modules.worker</camel:package>
@@ -28,7 +26,7 @@
         <!--<camel:routeContextRef ref="OceansRouteContext"/>-->
         <!--<camel:routeContextRef ref="GloreRouteContext"/>-->        
         <!--<camel:routeContextRef ref="ExampleRouteContext"/>-->        
-
+        
         <camel:routeContextRef ref="ExampleSecureRouteContext"/>        
         <camel:routeContextRef ref="OceansSecureRouteContext"/>
         <camel:routeContextRef ref="GloreSecureRouteContext"/> 
@@ -44,10 +42,36 @@
                                 redeliveryDelay="1000" 
                                 logHandled="false"
                                 logContinued="false"  
-                                logStackTrace="true"                                 
+                                logExhausted="true"                                  
+                                logStackTrace="false"                                 
                                 logRetryStackTrace="false" 
                                 logRetryAttempted="true"
-                                retryAttemptedLogLevel="WARN"/>                 
+                                retriesExhaustedLogLevel="WARN"                           
+                                retryAttemptedLogLevel="DEBUG"/>             
     </camel:errorHandler>
         
+    <bean id="BaseRequestProcessor" 
+          class="edu.isi.misd.scanner.network.base.worker.processors.BaseRequestProcessor"/>             
+              
+    <bean id="BaseComputeProcessor" 
+          class="edu.isi.misd.scanner.network.base.worker.processors.BaseComputeProcessor"/> 
+                
+    <bean id="BaseWorkerCacheReadProcessor" 
+          class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheReadProcessor"/>        
+    
+    <bean id="BaseWorkerCacheWriteProcessor" 
+          class="edu.isi.misd.scanner.network.base.worker.processors.BaseCacheWriteProcessor"/>  
+    
+    <bean id="BaseWorkerAsyncResponseProcessor" 
+          class="edu.isi.misd.scanner.network.base.worker.processors.BaseAsyncResponseProcessor"/> 
+        
+    <bean id="BaseNoOpProcessor" 
+          class="edu.isi.misd.scanner.network.base.processors.BaseNoOpProcessor"/>         
+                 
+    <!-- bridge spring property placeholder with Camel -->
+    <bean id="properties" 
+          class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer">
+        <property name="location" value="file:etc/worker.properties"/>
+    </bean>                                                         
+
 </beans>

@@ -26,17 +26,20 @@ public class BaseRecipientList
     
     private static String options = 
         "bridgeEndpoint=true&httpClient.soTimeout=20000";
+    private static String async = 
+        "async=true";    
     private static String sslOptions = 
         "sslContextParametersRef=sslContextParameters";
     
     /**
      *
      * @param targetURLS The list of targets from the {@link edu.isi.misd.scanner.network.base.BaseConstants#TARGETS} header.
-     * @param body The message body (currently ignored)
+     * @param async using async invocation or not
      * @return An ArrayList of decorated URLs suitable for use with the {@link org.apache.camel.RecipientList} processor.
      */
     public ArrayList<String> list(
-        @Header(BaseConstants.TARGETS) String targetURLS, String body) 
+        @Header(BaseConstants.TARGETS) String targetURLS,
+        @Header(BaseConstants.ASYNC) String async) 
     {
         Iterator iter = ObjectHelper.createIterator(targetURLS);
         ArrayList<String> results = new ArrayList<String>();
@@ -56,7 +59,7 @@ public class BaseRecipientList
                     if (target.indexOf("sslContextParametersRef=")==-1) {
                         target += "&" + sslOptions;
                     }
-                }                
+                }
                 results.add(target);                
             } catch (URISyntaxException e) {
                 log.warn("Invalid URI syntax: " + target,e);
