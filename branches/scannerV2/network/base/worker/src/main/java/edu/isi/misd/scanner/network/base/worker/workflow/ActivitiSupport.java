@@ -39,16 +39,21 @@ public class ActivitiSupport implements ApplicationContextAware
     protected transient ProcessEngine processEngine;
     protected transient IdentityService identityService;
     protected transient RepositoryService repositoryService;
-
+    protected String databaseURL;
+    
     protected boolean activitiSupportEnabled;  
     protected boolean createDefaultUsersAndGroups;
     protected boolean createDefaultProcessDefinitions;
     protected boolean createDefaultModels;
     protected boolean generateReportData;
-
+    
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
         this.applicationContext = ac;
+    }
+    
+    public void setDatabaseURL(String databaseURL) {
+        this.databaseURL = databaseURL;
     }
     
     public void setActivitiSupportEnabled(boolean activitiSupportEnabled) {
@@ -69,6 +74,14 @@ public class ActivitiSupport implements ApplicationContextAware
             return;
         }
 
+        // if we are using H2, spawn the server from this process
+        if (this.databaseURL != null) {
+            if (databaseURL.startsWith("jdbc:h2:tcp")) {
+                log.info("Starting H2 database server for Activiti...");
+                applicationContext.getBean("h2Server");
+            }
+        }
+        
         log.info("Initializing Activiti engine");
         this.processEngine =
             applicationContext.getBean("processEngine",ProcessEngine.class);
