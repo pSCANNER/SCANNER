@@ -35,16 +35,8 @@ public class BaseRequestProcessor implements Processor
                     new IllegalArgumentException(
                         "Message body cannot be empty when invoking POST");                
                 ErrorUtils.setHttpError(exchange, iae, 500);
-                return;
             }            
-        } 
-        
-        String contentType = 
-            (String)exchange.getIn().getHeader(Exchange.CONTENT_TYPE);
-        if (contentType == null) {
-            exchange.getIn().setHeader(
-                Exchange.CONTENT_TYPE, "application/xml"); 
-        }       
+        }           
         
     }    
 }
