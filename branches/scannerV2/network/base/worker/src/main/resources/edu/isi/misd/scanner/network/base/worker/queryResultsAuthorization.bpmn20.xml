@@ -67,7 +67,7 @@
               activiti:candidateUsers="scanner" 
               activiti:candidateGroups="results-authorization">
         <documentation>
-            Approve or reject the release of the attached dataset.
+            Approve or reject the release of the attached dataset: ${id}
         </documentation>
         <extensionElements>   
           <activiti:formProperty id="approved" 
@@ -82,21 +82,7 @@
     </userTask>
     <sequenceFlow id="flow5" 
                   sourceRef="queryResultsReleaseTask" 
-                  targetRef="queryResultsReleaseApproval">
-    </sequenceFlow>
-    
-    <exclusiveGateway id="queryResultsReleaseApproval" 
-                      name="Query Results Release Approval Decision" />
-    <sequenceFlow id="flow6" 
-                  sourceRef="queryResultsReleaseApproval" 
                   targetRef="queryResultsReleaseAction">
-      <conditionExpression xsi:type="tFormalExpression">${approved == 'true'}</conditionExpression>
-    </sequenceFlow>
-    
-    <sequenceFlow id="flow7" 
-                  sourceRef="queryResultsReleaseApproval" 
-                  targetRef="end">
-      <conditionExpression xsi:type="tFormalExpression">${approved == 'false'}</conditionExpression>
     </sequenceFlow>
     
     <serviceTask id="queryResultsReleaseAction" 
@@ -121,9 +107,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
         <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="48.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="queryResultsReleaseApproval" id="BPMNShape_queryResultsReleaseApproval">
-        <omgdc:Bounds height="40.0" width="40.0" x="550.0" y="45.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="queryResultsReleaseTask" id="BPMNShape_queryResultsReleaseTask">
         <omgdc:Bounds height="76.0" width="161.0" x="274.0" y="28.0"></omgdc:Bounds>
@@ -157,14 +140,6 @@
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="35.0" y="65.0"></omgdi:waypoint>
         <omgdi:waypoint x="120.0" y="65.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
-        <omgdi:waypoint x="590.0" y="65.0"></omgdi:waypoint>
-        <omgdi:waypoint x="710.0" y="65.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
-        <omgdi:waypoint x="570.0" y="85.0"></omgdi:waypoint>
-        <omgdi:waypoint x="570.0" y="130.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
         <omgdi:waypoint x="651.0" y="168.0"></omgdi:waypoint>
