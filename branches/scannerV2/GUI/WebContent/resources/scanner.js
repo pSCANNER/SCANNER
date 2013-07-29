@@ -86,6 +86,7 @@ var analyzeDataStore = {
 		identifier: "id",
 		items: []
 };
+var intervalVariable;
 
 var historyGrid = null;
 var analyzeGrid = null;
@@ -842,17 +843,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 		getRowsErrors(temp['data'], columns, rows, sites);
 		if (rows.length == 0) {
 			postRefreshQueryStatus(param['checkStatus'], 'Completed');
-		} else {
-			/*
-			var row = rows[0];
-			if (row[2] == 404) {
-				postRefreshQueryStatus(param['checkStatus'], 'In Progress');
-			} else {
-				alert('ErrorCode: ' + row[2] + '\ErrorDescription: ' + row[3]);
-			}
-			*/
 		}
-		//return;
 	}
 	var resultDiv = param['resultDiv'];
 	var errorDiv = param['errorDiv'];
@@ -865,9 +856,11 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	dict['errorTableId'] = param.errorTableId;
 	var tab;
 	var obj = param['history'];
+	var index;
 	if (obj != null) {
 		obj['trxId'] = data['trxId'];
 		pushHistory(obj);
+		index = analyzeDataStore.items.length + 1;
 		pushAnalyze(obj);
 		queryResult = dict;
 		tab = 'Query';
@@ -895,7 +888,15 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	} else {
 		if (async != null) {
 			scannerTabContainer.forward();
+			intervalVariable = setInterval(function(){checkAnalyzeDataStore(index);},1);
 		}
+	}
+}
+
+function checkAnalyzeDataStore(index) {
+	if (analyzeDataStore.items.length == index) {
+		clearInterval(intervalVariable);
+		refreshQueryStatus(index-1);
 	}
 }
 
@@ -2453,7 +2454,6 @@ function pushAnalyze(obj) {
 		item.sites = obj.sites;
 		item.date = getDateString(new Date());
 		item.status = 'In Progress';
-		//item.options = '<a href="javascript:replayQuery(' + index + ')" >See results</a>';
 		item.options = '<a href="javascript:refreshQueryStatus(' + index + ')" >Refresh</a>';
 		item.id = index;
 		analyzeDataStore.items.unshift(item);
