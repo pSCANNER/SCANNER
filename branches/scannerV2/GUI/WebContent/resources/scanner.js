@@ -41,6 +41,8 @@ var datasetsMultiSelect = null;
 var librariesMultiSelect = null;
 var methodsMultiSelect = null;
 var sitesMultiSelect = null;
+var queryResult = {};
+var historyResult = {};
 
 var availableStudies = {};
 var availableDatasets = {};
@@ -65,12 +67,28 @@ var historyLayout = [[
                       {'name': 'Privacy budget', 'field': 'budget', 'width': '15%'}
                       ]];
 
+var analyzeLayout = [[
+                      {'name': 'Date', 'field': 'date', 'width': '15%'},
+                      {'name': 'Study', 'field': 'study', 'width': '15%'},
+                      {'name': 'Dataset', 'field': 'dataset', 'width': '15%'},
+                      {'name': 'Library', 'field': 'library','width': '10%'},
+                      {'name': 'Method', 'field': 'method', 'width': '15%'},
+                      {'name': 'Status', 'field': 'status', 'width': '15%'},
+                      {'name': 'Options', 'field': 'options', 'width': '15%'}
+                      ]];
+
 var historyDataStore = {
 		identifier: "id",
 		items: []
 };
 
+var analyzeDataStore = {
+		identifier: "id",
+		items: []
+};
+
 var historyGrid = null;
+var analyzeGrid = null;
 var queriesCounter = 0;
 var studiesCounter = [];
 
@@ -638,8 +656,19 @@ function renderParam(div, param, index, table, select) {
 				}
 				select.append(option);
 			} else {
-				var tr = $('<tr>');
-				table.append(tr);
+				var trNo = $('tr', table).length;
+				var tr = null;
+				if (trNo == 0) {
+					table.css('border-spacing', '10px 0px');
+					tr = $('<tr>');
+					table.append(tr);
+				} else {
+					tr = $($('tr', table)[trNo-1]);
+					if ($('td', tr).length != 1) {
+						tr = $('<tr>');
+						table.append(tr);
+					}
+				}
 				var td = $('<td>');
 				tr.append(td);
 				var tableId = table.attr('id');
@@ -732,7 +761,7 @@ function postRenderSites(data, textStatus, jqXHR, param) {
 /**
  * Send the request to get the data from the SCANNER
  */
-function submitQuery(div, replay) {
+function submitQuery(div, replay, checkStatus) {
 	var obj = {};
 	var param = {};
 	if (replay == null) {
@@ -746,7 +775,7 @@ function submitQuery(div, replay) {
 		param.tableId = 'historyExample';
 		param.errorTableId = 'errorHistoryExample';
 	}
-	obj['action'] = 'getResults';
+	obj['action'] = ($('#asyncCheckBox').attr('checked') == 'checked') ? 'getResultsAsync' : 'getResults';
 	if (replay == null) {
 		var sites = getSelectedSitesNames();
 		if (sites.length == 0) {
@@ -784,6 +813,7 @@ function submitQuery(div, replay) {
 	param['resultDiv'].parent().hide();
 	param['errorDiv'].parent().hide();
 	param['library'] = obj['library'];
+	param['checkStatus'] = checkStatus;
 	param.spinner.show();
 	var url = HOME + '/query';
 	scanner.POST(url, obj, true, postSubmitQuery, param, null, 0);
@@ -803,17 +833,148 @@ function submitQuery(div, replay) {
  */
 function postSubmitQuery(data, textStatus, jqXHR, param) {
 	param.spinner.hide();
+	if (param['checkStatus'] != -1) {
+		// check if completed
+		var temp = $.parseJSON(data);
+		var columns = ['ErrorSource', 'ErrorType', 'ErrorCode', 'ErrorDescription'];
+		var rows = [];
+		var sites = [];
+		getRowsErrors(temp['data'], columns, rows, sites);
+		if (rows.length == 0) {
+			postRefreshQueryStatus(param['checkStatus'], 'Completed');
+		} else {
+			/*
+			var row = rows[0];
+			if (row[2] == 404) {
+				postRefreshQueryStatus(param['checkStatus'], 'In Progress');
+			} else {
+				alert('ErrorCode: ' + row[2] + '\ErrorDescription: ' + row[3]);
+			}
+			*/
+		}
+		//return;
+	}
 	var resultDiv = param['resultDiv'];
 	var errorDiv = param['errorDiv'];
 	data = $.parseJSON(data);
+	var dict = {};
+	dict['data'] = data['data'];
+	dict['resultDiv'] = resultDiv;
+	dict['tableId'] = param.tableId;
+	dict['errorDiv'] = errorDiv;
+	dict['errorTableId'] = param.errorTableId;
+	var tab;
 	var obj = param['history'];
 	if (obj != null) {
 		obj['trxId'] = data['trxId'];
 		pushHistory(obj);
+		pushAnalyze(obj);
+		queryResult = dict;
+		tab = 'Query';
+	} else {
+		historyResult = dict;
+		tab = 'History';
 	}
+	var async = data['async'];
 	data = data['data'];
-	buildDataTable(data, resultDiv, param.tableId);
-	buildErrorDataTable(data, errorDiv, param.errorTableId);
+	resultDiv.html('');
+	if (tab == 'History' || $('#asyncCheckBox').attr('checked') != 'checked') {
+		var a = $('<a>');
+		a.addClass('link-style banner-text');
+		a.attr('href', 'javascript:buildTable("'+tab+'");');
+		a.html('Data table');
+		resultDiv.append(a);
+		resultDiv.append('&nbsp;&nbsp;');
+		a = $('<a>');
+		a.addClass('link-style banner-text');
+		a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
+		a.html('Box plot');
+		resultDiv.append(a);
+		buildErrorDataTable(tab);
+		buildDataTable(tab);
+	} else {
+		if (async != null) {
+			scannerTabContainer.forward();
+		}
+	}
+}
+
+function buildTable(tab) {
+	var resultDiv;
+	if (tab == 'Query') {
+		resultDiv = queryResult['resultDiv'];
+	} else {
+		resultDiv = historyResult['resultDiv'];
+	}
+	resultDiv.html('');
+	var a = $('<a>');
+	a.addClass('link-style banner-text');
+	a.attr('href', 'javascript:buildTable("'+tab+'");');
+	a.html('Data table');
+	resultDiv.append(a);
+	resultDiv.append('&nbsp;&nbsp;');
+	a = $('<a>');
+	a.addClass('link-style banner-text');
+	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
+	a.html('Box plot');
+	resultDiv.append(a);
+	buildErrorDataTable(tab);
+	buildDataTable(tab);
+}
+
+function buildBoxPlot(tab) {
+	var resultDiv, responseBody;
+	if (tab == 'Query') {
+		resultDiv = queryResult['resultDiv'];
+		responseBody = queryResult['data'];
+	} else {
+		resultDiv = historyResult['resultDiv'];
+		responseBody = historyResult['data'];
+	}
+	resultDiv.html('');
+	var a = $('<a>');
+	a.addClass('link-style banner-text');
+	a.attr('href', 'javascript:buildTable("'+tab+'");');
+	a.html('Data table');
+	resultDiv.append(a);
+	resultDiv.append('&nbsp;&nbsp;');
+	a = $('<a>');
+	a.addClass('link-style banner-text');
+	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
+	a.html('Box plot');
+	resultDiv.append(a);
+	var sitesNames = [];
+	var sitesCoeficients = [];
+	var output = getOutput(responseBody);
+	if (!$.isArray(output)) {
+		var temp = [];
+		temp.push(output);
+		output = temp;
+	}
+	$.each(output, function(i, value) {
+		if (value['SiteInfo'] != null) {
+			var key = value['SiteInfo']['SiteName'];
+			if (key != null) {
+				sitesNames.push(key);
+			}
+		}
+		var coeficient = value['Coefficient'];
+		if (!$.isArray(coeficient)) {
+			coeficient = [].push(coeficient);
+		}
+		sitesCoeficients.push(coeficient);
+	});
+	var allColumns = ['p-value', 't-statistics', 'B', 'SE', 'degreeOfFreedom'];
+	$.each(allColumns, function(i, col) {
+		resultDiv.append($('<br>'));
+		var h3 = $('<h3>');
+		resultDiv.append(h3);
+		h3.html(col);
+		var boxChart = $('<div>');
+		boxChart.addClass('results_border');
+		resultDiv.append(boxChart);
+		drawBox(sitesCoeficients, col, boxChart);
+	});
 }
 
 /**
@@ -839,7 +1000,7 @@ function getColumnsNames(res, columns) {
 		} else {
 			$.each(res, function(key, value) {
 				getColumnsNames(value, columns);
-				if (columns.lengthlength > 0) {
+				if (columns.length > 0) {
 					return false;
 				}
 			});
@@ -984,7 +1145,16 @@ function getRowsErrors(res, columns, rows, sites) {
  * 	the id of the table
  */
 
-function buildDataTable(res, resultDiv, tableId) {
+function buildDataTable(tab) {
+	var res, resultDiv, tableId, dict;
+	if (tab == 'Query') {
+		dict = queryResult;
+	} else {
+		dict = historyResult;
+	}
+	res = dict['data'];
+	resultDiv = dict['resultDiv'];
+	tableId = dict['tableId'];
 	var columns = ['name', 'B', 'SE', 'p-value', 't-statistics', 'degreeOfFreedom'];
 	//var columns = [];
 	//getColumnsNames(res, columns);
@@ -1006,7 +1176,7 @@ function buildDataTable(res, resultDiv, tableId) {
 		}
 	}
 	resultDiv.parent().css('display', '');
-	resultDiv.html('');
+	//resultDiv.html('');
 	var table = $('<table>');
 	resultDiv.append(table);
 	table.attr({	'cellpadding': '0',
@@ -1131,7 +1301,16 @@ function buildDataTable(res, resultDiv, tableId) {
  * 	the id of the table
  */
 
-function buildErrorDataTable(res, resultDiv, tableId) {
+function buildErrorDataTable(tab) {
+	var res, resultDiv, tableId, dict;
+	if (tab == 'Query') {
+		dict = queryResult;
+	} else {
+		dict = historyResult;
+	}
+	res = dict['data'];
+	resultDiv = dict['errorDiv'];
+	tableId = dict['errorTableId'];
 	var columns = ['ErrorSource', 'ErrorType', 'ErrorCode', 'ErrorDescription'];
 	var rows = [];
 	var sites = [];
@@ -1696,6 +1875,7 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 		setContacts(res['contacts']);
 		renderAvailableStudies();
 		renderSitesStatus();
+		$('#logoutButton').show();
 	} else {
 		alert(res['status']);
 	}
@@ -2174,6 +2354,7 @@ function hideQuery() {
 	$('#resultWrapperDiv').hide();
 	$('#errorWrapperDiv').hide();
 	$('#replayDivWrapper').show();
+	$('#replayTitle').hide();
 	$('#errorReplayWrapperDiv').show();
 }
 
@@ -2250,15 +2431,90 @@ function pushHistory(obj) {
 }
 
 /**
+ * Push an entry in the analyze table
+ * 
+ * @param obj
+ * 	the object with the columns values
+ */
+function pushAnalyze(obj) {
+	require(['dojox/grid/DataGrid', 'dojo/data/ItemFileWriteStore'], function(DataGrid, ItemFileWriteStore) {
+		var index = analyzeDataStore.items.length;
+		if (analyzeGrid != null) {
+			analyzeGrid.destroyRecursive();
+		}
+		var item = {};
+		item.trxId = obj.trxId;
+		item.parameters = obj.parameters;
+		item.action = obj.action;
+		item.study = obj.study;
+		item.dataset = obj.dataset;
+		item.library = obj.library;
+		item.method = obj.method;
+		item.sites = obj.sites;
+		item.date = getDateString(new Date());
+		item.status = 'In Progress';
+		//item.options = '<a href="javascript:replayQuery(' + index + ')" >See results</a>';
+		item.options = '<a href="javascript:refreshQueryStatus(' + index + ')" >Refresh</a>';
+		item.id = index;
+		analyzeDataStore.items.unshift(item);
+		var store = new ItemFileWriteStore({data: analyzeDataStore});
+		analyzeGrid = new DataGrid({
+			id: 'analyzeGrid',
+			store: store,
+			structure: analyzeLayout,
+			escapeHTMLInData: false,
+			rowSelector: '20px'});
+
+		/*append the new grid to the div*/
+		analyzeGrid.placeAt("analyzeGridDiv");
+
+		/*Call startup() to render the grid*/
+		analyzeGrid.startup();
+	});
+}
+
+function refreshQueryStatus(index) {
+	var tableIndex = analyzeDataStore.items.length - index - 1;
+	var item = analyzeDataStore.items[tableIndex];
+	$('#replayTitle').show();
+	submitQuery('replayDivContent', item, index);
+}
+
+function postRefreshQueryStatus(index, status) {
+	var tableIndex = analyzeDataStore.items.length - index - 1;
+	var item = analyzeDataStore.items[tableIndex];
+	var val = [];
+	if (status == 'Completed') {
+		val.push('Completed');
+		item.status = val;
+		val = [];
+		val.push('<a href="javascript:analyzeQuery(' + index + ')" >See results</a>');
+		item.options = val;
+	}
+	val = [];
+	val.push(getDateString(new Date()));
+	item.date = val;
+	analyzeGrid.update();
+}
+
+function replayQuery(index) {
+	var tableIndex = historyDataStore.items.length - index - 1;
+	var item = historyDataStore.items[tableIndex];
+	$('#replayTitle').show();
+	submitQuery('replayDivContent', item, -1);
+}
+
+/**
  * Function to be called when a query is replayed
  * 
  * @param index
  * 	the row index in the history table
  */
-function replayQuery(index) {
-	var tableIndex = historyDataStore.items.length - index - 1;
-	var item = historyDataStore.items[tableIndex];
-	submitQuery('replayDivContent', item);
+function analyzeQuery(index) {
+	var tableIndex = analyzeDataStore.items.length - index - 1;
+	var item = analyzeDataStore.items[tableIndex];
+	$('#replayTitle').show();
+	submitQuery('replayDivContent', item, -1);
 }
 
 function copyValue(val) {
@@ -2351,7 +2607,83 @@ function submitLogout() {
 
 function postSubmitLogout(data, textStatus, jqXHR, param) {
 	document.body.style.cursor = "default";
-	window.location = HOME;
 	alert('Please close your browser to logoff.');
+	$('#logoutButton').hide();
+	window.location = HOME;
+}
+
+function drawBox(csv, column, boxDiv) {
+	var boxChart = boxDiv.get(0);
+	var margin = {top: 10, right: 50, bottom: 20, left: 50},
+	    width = 120 - margin.left - margin.right,
+	    height = 500 - margin.top - margin.bottom;
+
+	var min = Infinity,
+	    max = -Infinity;
+
+	var chart = d3.box()
+	    .whiskers(iqr(1.5))
+	    .width(width)
+	    .height(height);
+
+		var data = [];
+		min = Infinity;
+		max = -Infinity;
+		$.each(csv, function(i, site) {
+			data[i] = [];
+			$.each(site, function(k, row) {
+				var s = +row[column];
+				data[i].push(s);
+				if (s > max) {
+					max = s;
+				}
+				if (s < min) {
+					min = s;
+				}
+			});
+		});
+	  chart.domain([min, max]);
+
+	  var svg = d3.select(boxChart).selectAll("svg")
+	      .data(data)
+	    .enter().append("svg")
+	      .attr("class", "box")
+	      .attr("width", width + margin.left + margin.right)
+	      .attr("height", height + margin.bottom + margin.top)
+	    .append("g")
+	      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+	      .call(chart);
+}
+
+//Returns a function to compute the interquartile range.
+function iqr(k) {
+  return function(d, i) {
+    var q1 = d.quartiles[0],
+        q3 = d.quartiles[2],
+        iqr = (q3 - q1) * k,
+        i = -1,
+        j = d.length;
+    while (d[++i] < q1 - iqr);
+    while (d[--j] > q3 + iqr);
+    return [i, j];
+  };
+}
+
+function getOutput(data) {
+	var ret = null;
+	if ($.isPlainObject(data)) {
+		$.each(data, function(key, value) {
+			if (key == 'Output') {
+				ret = value;
+				return false;
+			} else {
+				ret = getOutput(value);
+				if (ret != null) {
+					return false;
+				}
+			}
+		});
+	}
+	return ret;
 }
 

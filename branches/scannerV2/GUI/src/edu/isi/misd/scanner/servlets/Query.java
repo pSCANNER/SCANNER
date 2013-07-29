@@ -377,6 +377,163 @@ public class Query extends HttpServlet {
 					e.printStackTrace();
 					throw(new ServletException(e));
 				}
+			} else if (action.equals("getResultsAsync")) {
+				try {
+					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
+					if (!registryClient.hasRoles()) {
+						response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+						return;
+					}
+					String params = request.getParameter("parameters");
+					String sites = request.getParameter("sites");
+					String lib = request.getParameter("library");
+					String func = request.getParameter("method");
+					String study = request.getParameter("study");
+					String dataset = request.getParameter("dataset");
+					RegistryClientResponse clientResponse = registryClient.getMasterObject();
+					String res = clientResponse.toMasterString();
+					System.out.println("master string: " + res);
+					JSONObject temp = new JSONObject(res);
+					String masterURL = temp.getString("rURL");
+					clientResponse = registryClient.getMethodObject(func, lib);
+					res = clientResponse.toMethodString();
+					System.out.println("method string: " + res);
+					temp = new JSONObject(res);
+					String funcPath = temp.getString("rpath");
+					clientResponse = registryClient.getLibraryObject(lib);
+					res = clientResponse.toLibraryString();
+					System.out.println("library string: " + res);
+					temp = new JSONObject(res);
+					String libPath = temp.getString("rpath");
+					ArrayList<String> values = null;
+					if (sites != null) {
+						JSONArray arr = new JSONArray(sites);
+						if (arr.length() > 0) {
+							values = new ArrayList<String>();
+							for (int i=0; i < arr.length(); i++) {
+								values.add(arr.getString(i));
+							}
+						}
+					}
+					clientResponse = registryClient.getSiteObject(values);
+					res = clientResponse.toSiteString();
+					System.out.println("site string: " + res);
+					HashMap<String, String> sitesMap = new HashMap<String, String>();
+					JSONArray tempArray = new JSONArray(res);
+					for (int i=0; i < tempArray.length(); i++) {
+						temp = tempArray.getJSONObject(i);
+						sitesMap.put(temp.getString("cname"), temp.getString("rURL"));
+					}
+					clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
+					res = clientResponse.toWorkers();
+					System.out.println("workers string: " + res);
+					StringBuffer buff = new StringBuffer();
+					JSONArray targets= new JSONArray(res);
+					if (targets.length() == 0) {
+						response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+						return;
+					}
+					for (int i=0; i < targets.length(); i++) {
+						if (i > 0) {
+							buff.append(",");
+						}
+						temp = targets.getJSONObject(i);
+						String dataSource = temp.getString("datasource");
+						buff.append(sitesMap.get(temp.getString("site"))).append("/dataset/").append(libPath).append("/").append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
+						if (sitesMap.get(temp.getString("site")).equals("https://scanner-node1.misd.isi.edu:8888/scanner")) {
+							buff.append("&resultsReleaseAuthReq=true");
+						}
+					}
+					String targetsURLs = buff.toString();
+					buff = new StringBuffer();
+					buff.append(masterURL).append("/query/").append(libPath).append("/").append(funcPath);
+					String trxId = request.getParameter("trxId");
+					String url = null;
+					ClientURLResponse rsp = null;
+					String rspId = null;
+					obj = new JSONObject();
+					if (trxId != null) {
+						// check that the user authorization for this trxId
+						boolean isAuthorized = false;
+						Hashtable<String, List<String>> trxTable = (Hashtable<String, List<String>>) session.getAttribute("trxIdTable");
+						if (trxTable != null) {
+							List<String> trxRoles = trxTable.get(trxId);
+							if (trxRoles != null) {
+								isAuthorized = true;
+								List<String> userRoles = registryClient.getRoles();
+								// check that the user has all the transaction roles
+								for (int i=0; i < trxRoles.size(); i++) {
+									if (!userRoles.contains(trxRoles.get(i))) {
+										isAuthorized = false;
+										break;
+									}
+								}
+							}
+						}
+						if (!isAuthorized) {
+							response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+							return;
+						}
+						trxId = Utils.urlEncode(trxId);
+						buff.append("/id/" + trxId);
+						url = buff.toString();
+						System.out.println("URL: " + url);
+						buff = new StringBuffer();
+						for (int i=0; i < targets.length(); i++) {
+							if (i > 0) {
+								buff.append(",");
+							}
+							temp = targets.getJSONObject(i);
+							buff.append(sitesMap.get(temp.getString("site"))).append("/dataset/").append(libPath).append("/").append(funcPath);
+						}
+						System.out.println("GET Targets: "+buff.toString());
+						rsp = scannerClient.get(url, buff);
+					} else {
+						url = buff.toString();
+						System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nParams: "+params);
+						rsp = scannerClient.postScannerQuery(url, targetsURLs, params);
+						if (!rsp.isException()) {
+							rspId = rsp.getIdHeader();
+							System.out.println("Response Id: "+rspId);
+							if (rspId != null) {
+								obj.put("trxId", rspId);
+								Hashtable<String, List<String>> trxTable = (Hashtable<String, List<String>>) session.getAttribute("trxIdTable");
+								if (trxTable == null) {
+									trxTable = new Hashtable<String, List<String>>();
+									session.setAttribute("trxIdTable", trxTable);
+								}
+								trxTable.put(rspId, registryClient.getRoles());
+							}
+						}
+					}
+					if (rsp.isException()) {
+						throw(new ServletException(rsp.getException()));
+					} else if (rsp.isError()) {
+						response.sendError(rsp.getStatus(), rsp.getEntityString());
+						return;
+					}
+					res = rsp.getEntityString();
+					System.out.println("Response Body: \n"+res);
+					try {
+						JSONObject body = new JSONObject(res);
+						obj.put("data", body);
+					} catch (JSONException e) {
+						obj.put("data", res);
+					}
+					try {
+						obj.put("async", true);
+						PrintWriter out = response.getWriter();
+						out.print(obj.toString());
+						return;
+					} catch (JSONException e) {
+						e.printStackTrace();
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+						return;
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+					throw(new ServletException(e));
+				}
 			} else if (action.equals("displaySitesStatus")) {
 				obj = (JSONObject) servletConfig.getServletContext().getAttribute("echo");
 				if (obj == null) {

@@ -294,6 +294,28 @@ public class JakartaClient {
     }
     
     /**
+     * Execute a SCANNER network request.
+     * 
+     * @param url
+     *            the query URL.
+     * @param targets
+     *            the targets in the request header. 
+     * @param body
+     *            the request body.
+     * @return The HTTP response.
+     */
+    public ClientURLResponse get(String url, StringBuffer targets) {
+    	HttpGet httpget = new HttpGet(url);
+    	httpget.setHeader("Accept", "application/json");
+    	httpget.setHeader("Content-Type", "application/json; charset=UTF-8");
+    	httpget.setHeader("targets", targets.toString());
+        retries = 0;
+        ClientURLResponse rsp = execute(httpget, null);
+        retries = 10;
+		return rsp;
+    }
+    
+    /**
      * Delete a resource.
      * 
      * @param url
