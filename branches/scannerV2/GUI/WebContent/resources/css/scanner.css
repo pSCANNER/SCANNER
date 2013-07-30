@@ -56,12 +56,12 @@ div#wrapper {
 	margin: 5px;
 }
 
-#ajaxSpinnerContainer, #ajaxHistorySpinnerContainer {
+#ajaxSpinnerContainer, #ajaxAnalyzeSpinnerContainer {
 	height:11px;
 	margin: 25px;
 }
 
-#ajaxSpinnerImage, #ajaxHistorySpinnerImage {
+#ajaxSpinnerImage, #ajaxAnalyzeSpinnerImage {
 	display:none;
 }
 

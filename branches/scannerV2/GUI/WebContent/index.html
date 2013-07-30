@@ -31,7 +31,7 @@
 @import
 	"resources/dojo-release-1.8.3/dojox/grid/resources/claroGrid.css";
 
-#historyGridDiv, #analyzeGridDiv {
+#analyzeGridDiv {
 	height: 20em;
 }
 </style>
@@ -193,10 +193,6 @@
 							title="Products" onShow="hideQuery();">
 							<div id="productsDiv"></div>
 						</div>
-						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Query History" onShow="hideQuery();">
-							<div id="historyGridDiv"></div>
-						</div>
 						<div data-dojo-type="dijit/layout/ContentPane" title="Profile" onShow="hideQuery();">
 							<div id="profileDiv" class="method_border method_margin">
 								<table id="profileTable">
@@ -312,8 +308,8 @@
 		</div>
 		<div id="replayDivWrapper">
 			<br style="clear: left;" />
-			<div id="ajaxHistorySpinnerContainer">
-				<img src="resources/images/ajax-loader.gif" id="ajaxHistorySpinnerImage"
+			<div id="ajaxAnalyzeSpinnerContainer">
+				<img src="resources/images/ajax-loader.gif" id="ajaxAnalyzeSpinnerImage"
 					title="Processing..." alt="Spinner" />
 			</div>
 			<div id="replayDiv" style="display: none;" >

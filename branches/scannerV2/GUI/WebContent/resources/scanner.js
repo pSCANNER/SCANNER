@@ -26,10 +26,10 @@ var AJAX_TIMEOUT = 300000;
 var HOME;
 
 var oQueryTable = null;
-var oHistoryTable = null;
+var oAnalyzeTable = null;
 
 var oErrorQueryTable = null;
-var oErrorHistoryTable = null;
+var oErrorAnalyzeTable = null;
 
 var selStudies = null;
 var selDatasets = null;
@@ -42,7 +42,7 @@ var librariesMultiSelect = null;
 var methodsMultiSelect = null;
 var sitesMultiSelect = null;
 var queryResult = {};
-var historyResult = {};
+var analyzeResult = {};
 
 var availableStudies = {};
 var availableDatasets = {};
@@ -57,16 +57,6 @@ var alertErrorDialog;
 
 var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
 
-var historyLayout = [[
-                      {'name': 'Date', 'field': 'date', 'width': '15%'},
-                      {'name': 'Study', 'field': 'study', 'width': '15%'},
-                      {'name': 'Dataset', 'field': 'dataset', 'width': '15%'},
-                      {'name': 'Library', 'field': 'library','width': '10%'},
-                      {'name': 'Method', 'field': 'method', 'width': '15%'},
-                      {'name': 'Options', 'field': 'options', 'width': '15%'},
-                      {'name': 'Privacy budget', 'field': 'budget', 'width': '15%'}
-                      ]];
-
 var analyzeLayout = [[
                       {'name': 'Date', 'field': 'date', 'width': '15%'},
                       {'name': 'Study', 'field': 'study', 'width': '15%'},
@@ -77,18 +67,12 @@ var analyzeLayout = [[
                       {'name': 'Options', 'field': 'options', 'width': '15%'}
                       ]];
 
-var historyDataStore = {
-		identifier: "id",
-		items: []
-};
-
 var analyzeDataStore = {
 		identifier: "id",
 		items: []
 };
 var intervalVariable;
 
-var historyGrid = null;
 var analyzeGrid = null;
 var queriesCounter = 0;
 var studiesCounter = [];
@@ -771,10 +755,10 @@ function submitQuery(div, replay, checkStatus) {
 		param.tableId = 'queryExample';
 		param.errorTableId = 'errorQueryExample';
 	} else {
-		param.spinner = $('#ajaxHistorySpinnerImage');
-		param.treeId = 'historyNavigation';
-		param.tableId = 'historyExample';
-		param.errorTableId = 'errorHistoryExample';
+		param.spinner = $('#ajaxAnalyzeSpinnerImage');
+		param.treeId = 'analyzeNavigation';
+		param.tableId = 'analyzeExample';
+		param.errorTableId = 'errorAnalyzeExample';
 	}
 	obj['action'] = ($('#asyncCheckBox').attr('checked') == 'checked') ? 'getResultsAsync' : 'getResults';
 	if (replay == null) {
@@ -799,7 +783,7 @@ function submitQuery(div, replay, checkStatus) {
 			$('#profileStudyCount').html('' + studiesCounter.length);
 		}
 		$('#profileLastActivity').html(getDateString(new Date()));
-		param['history'] = obj;
+		param['analyze'] = obj;
 	} else {
 		obj['trxId'] = replay['trxId'][0];
 		obj['parameters'] = replay['parameters'][0];
@@ -855,23 +839,22 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	dict['errorDiv'] = errorDiv;
 	dict['errorTableId'] = param.errorTableId;
 	var tab;
-	var obj = param['history'];
+	var obj = param['analyze'];
 	var index;
 	if (obj != null) {
 		obj['trxId'] = data['trxId'];
-		pushHistory(obj);
 		index = analyzeDataStore.items.length + 1;
 		pushAnalyze(obj);
 		queryResult = dict;
 		tab = 'Query';
 	} else {
-		historyResult = dict;
-		tab = 'History';
+		analyzeResult = dict;
+		tab = 'Analyze';
 	}
 	var async = data['async'];
 	data = data['data'];
 	resultDiv.html('');
-	if (tab == 'History' || $('#asyncCheckBox').attr('checked') != 'checked') {
+	if (tab == 'Analyze' || $('#asyncCheckBox').attr('checked') != 'checked') {
 		var a = $('<a>');
 		a.addClass('link-style banner-text');
 		a.attr('href', 'javascript:buildTable("'+tab+'");');
@@ -905,7 +888,7 @@ function buildTable(tab) {
 	if (tab == 'Query') {
 		resultDiv = queryResult['resultDiv'];
 	} else {
-		resultDiv = historyResult['resultDiv'];
+		resultDiv = analyzeResult['resultDiv'];
 	}
 	resultDiv.html('');
 	var a = $('<a>');
@@ -929,8 +912,8 @@ function buildBoxPlot(tab) {
 		resultDiv = queryResult['resultDiv'];
 		responseBody = queryResult['data'];
 	} else {
-		resultDiv = historyResult['resultDiv'];
-		responseBody = historyResult['data'];
+		resultDiv = analyzeResult['resultDiv'];
+		responseBody = analyzeResult['data'];
 	}
 	resultDiv.html('');
 	var a = $('<a>');
@@ -1151,7 +1134,7 @@ function buildDataTable(tab) {
 	if (tab == 'Query') {
 		dict = queryResult;
 	} else {
-		dict = historyResult;
+		dict = analyzeResult;
 	}
 	res = dict['data'];
 	resultDiv = dict['resultDiv'];
@@ -1171,9 +1154,9 @@ function buildDataTable(tab) {
 			oQueryTable = null;
 		}
 	} else {
-		if (oHistoryTable != null) {
+		if (oAnalyzeTable != null) {
 			$('#' + tableId).remove();
-			oHistoryTable = null;
+			oAnalyzeTable = null;
 		}
 	}
 	resultDiv.parent().css('display', '');
@@ -1287,7 +1270,7 @@ function buildDataTable(tab) {
 	if (tableId == 'queryExample') {
 		oQueryTable = oTable;
 	} else {
-		oHistoryTable = oTable;
+		oAnalyzeTable = oTable;
 	}
 }
 
@@ -1307,7 +1290,7 @@ function buildErrorDataTable(tab) {
 	if (tab == 'Query') {
 		dict = queryResult;
 	} else {
-		dict = historyResult;
+		dict = analyzeResult;
 	}
 	res = dict['data'];
 	resultDiv = dict['errorDiv'];
@@ -1325,9 +1308,9 @@ function buildErrorDataTable(tab) {
 			oErrorQueryTable = null;
 		}
 	} else {
-		if (oErrorHistoryTable != null) {
+		if (oErrorAnalyzeTable != null) {
 			$('#' + tableId).remove();
-			oErrorHistoryTable = null;
+			oErrorAnalyzeTable = null;
 		}
 	}
 	resultDiv.parent().css('display', '');
@@ -1438,7 +1421,7 @@ function buildErrorDataTable(tab) {
 	if (tableId == 'errorQueryExample') {
 		oErrorQueryTable = oTable;
 	} else {
-		oErrorHistoryTable = oTable;
+		oErrorAnalyzeTable = oTable;
 	}
 }
 
@@ -2390,48 +2373,6 @@ function getDateString(date) {
 }
 
 /**
- * Push an entry in the history table
- * 
- * @param obj
- * 	the object with the columns values
- */
-function pushHistory(obj) {
-	require(['dojox/grid/DataGrid', 'dojo/data/ItemFileWriteStore'], function(DataGrid, ItemFileWriteStore) {
-		var index = historyDataStore.items.length;
-		if (historyGrid != null) {
-			historyGrid.destroyRecursive();
-		}
-		var item = {};
-		item.trxId = obj.trxId;
-		item.parameters = obj.parameters;
-		item.action = obj.action;
-		item.study = obj.study;
-		item.dataset = obj.dataset;
-		item.library = obj.library;
-		item.method = obj.method;
-		item.sites = obj.sites;
-		item.date = getDateString(new Date());
-		item.options = '<a href="javascript:replayQuery(' + index + ')" >See results</a>';
-		item.budget = 'xxxxx';
-		item.id = index;
-		historyDataStore.items.unshift(item);
-		var store = new ItemFileWriteStore({data: historyDataStore});
-		historyGrid = new DataGrid({
-			id: 'historyGrid',
-			store: store,
-			structure: historyLayout,
-			escapeHTMLInData: false,
-			rowSelector: '20px'});
-
-		/*append the new grid to the div*/
-		historyGrid.placeAt("historyGridDiv");
-
-		/*Call startup() to render the grid*/
-		historyGrid.startup();
-	});
-}
-
-/**
  * Push an entry in the analyze table
  * 
  * @param obj
@@ -2497,18 +2438,11 @@ function postRefreshQueryStatus(index, status) {
 	analyzeGrid.update();
 }
 
-function replayQuery(index) {
-	var tableIndex = historyDataStore.items.length - index - 1;
-	var item = historyDataStore.items[tableIndex];
-	$('#replayTitle').show();
-	submitQuery('replayDivContent', item, -1);
-}
-
 /**
  * Function to be called when a query is replayed
  * 
  * @param index
- * 	the row index in the history table
+ * 	the row index in the analyze table
  */
 function analyzeQuery(index) {
 	var tableIndex = analyzeDataStore.items.length - index - 1;
