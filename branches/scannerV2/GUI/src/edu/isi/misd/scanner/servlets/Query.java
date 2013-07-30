@@ -125,6 +125,7 @@ public class Query extends HttpServlet {
 		if (action.equals("getStudies")) {
 			RegistryClientResponse clientResponse = registryClient.getStudies();
 			String ret = clientResponse.toStudies();
+			clientResponse.release();
 			System.out.println("Get Studies:\n"+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
@@ -132,6 +133,7 @@ public class Query extends HttpServlet {
 			String study = request.getParameter("study");
 			RegistryClientResponse clientResponse = registryClient.getDatasets(study);
 			String ret = clientResponse.toDatasets();
+			clientResponse.release();
 			System.out.println("Get Datasets: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
@@ -140,6 +142,7 @@ public class Query extends HttpServlet {
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset);
 			String ret = clientResponse.toLibraries();
+			clientResponse.release();
 			System.out.println("Get Libraries: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
@@ -149,6 +152,7 @@ public class Query extends HttpServlet {
 			String lib = request.getParameter("library");
 			RegistryClientResponse clientResponse = registryClient.getMethods(study, dataset, lib);
 			String ret = clientResponse.toMethods();
+			clientResponse.release();
 			System.out.println("Get Methods: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
@@ -158,6 +162,7 @@ public class Query extends HttpServlet {
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib);
 			String ret = clientResponse.toParameters();
+			clientResponse.release();
 			System.out.println("Get Parameters:\n"+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
@@ -168,6 +173,7 @@ public class Query extends HttpServlet {
 			String func = request.getParameter("method");
 			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset, lib, func);
 			String ret = clientResponse.toSites();
+			clientResponse.release();
 			System.out.println("Get Sites:\n"+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
@@ -202,6 +208,7 @@ public class Query extends HttpServlet {
 					session.setAttribute("registryClient", registryClient);
 					RegistryClientResponse clientResponse = registryClient.getContacts();
 					String ret = clientResponse.toContacts();
+					clientResponse.release();
 					JSONArray arr = new JSONArray(ret);
 					obj.put("contacts", arr);
 					System.out.println("Get Contacts:\n"+ret);
@@ -252,16 +259,19 @@ public class Query extends HttpServlet {
 					String dataset = request.getParameter("dataset");
 					RegistryClientResponse clientResponse = registryClient.getMasterObject();
 					String res = clientResponse.toMasterString();
+					clientResponse.release();
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("rURL");
 					clientResponse = registryClient.getMethodObject(func, lib);
 					res = clientResponse.toMethodString();
+					clientResponse.release();
 					System.out.println("method string: " + res);
 					temp = new JSONObject(res);
 					String funcPath = temp.getString("rpath");
 					clientResponse = registryClient.getLibraryObject(lib);
 					res = clientResponse.toLibraryString();
+					clientResponse.release();
 					System.out.println("library string: " + res);
 					temp = new JSONObject(res);
 					String libPath = temp.getString("rpath");
@@ -277,6 +287,7 @@ public class Query extends HttpServlet {
 					}
 					clientResponse = registryClient.getSiteObject(values);
 					res = clientResponse.toSiteString();
+					clientResponse.release();
 					System.out.println("site string: " + res);
 					HashMap<String, String> sitesMap = new HashMap<String, String>();
 					JSONArray tempArray = new JSONArray(res);
@@ -286,6 +297,7 @@ public class Query extends HttpServlet {
 					}
 					clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
 					res = clientResponse.toWorkers();
+					clientResponse.release();
 					System.out.println("workers string: " + res);
 					StringBuffer buff = new StringBuffer();
 					JSONArray targets= new JSONArray(res);
@@ -392,16 +404,19 @@ public class Query extends HttpServlet {
 					String dataset = request.getParameter("dataset");
 					RegistryClientResponse clientResponse = registryClient.getMasterObject();
 					String res = clientResponse.toMasterString();
+					clientResponse.release();
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("rURL");
 					clientResponse = registryClient.getMethodObject(func, lib);
 					res = clientResponse.toMethodString();
+					clientResponse.release();
 					System.out.println("method string: " + res);
 					temp = new JSONObject(res);
 					String funcPath = temp.getString("rpath");
 					clientResponse = registryClient.getLibraryObject(lib);
 					res = clientResponse.toLibraryString();
+					clientResponse.release();
 					System.out.println("library string: " + res);
 					temp = new JSONObject(res);
 					String libPath = temp.getString("rpath");
@@ -417,6 +432,7 @@ public class Query extends HttpServlet {
 					}
 					clientResponse = registryClient.getSiteObject(values);
 					res = clientResponse.toSiteString();
+					clientResponse.release();
 					System.out.println("site string: " + res);
 					HashMap<String, String> sitesMap = new HashMap<String, String>();
 					JSONArray tempArray = new JSONArray(res);
@@ -426,6 +442,7 @@ public class Query extends HttpServlet {
 					}
 					clientResponse = registryClient.getWorkers(study, dataset, lib, func, values);
 					res = clientResponse.toWorkers();
+					clientResponse.release();
 					System.out.println("workers string: " + res);
 					StringBuffer buff = new StringBuffer();
 					JSONArray targets= new JSONArray(res);
@@ -535,11 +552,15 @@ public class Query extends HttpServlet {
 					throw(new ServletException(e));
 				}
 			} else if (action.equals("displaySitesStatus")) {
+				// keep Tagfiler's session alive
+				RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
+				RegistryClientResponse clientResponse = registryClient.getSitesMap();
+				clientResponse.release();
 				obj = (JSONObject) servletConfig.getServletContext().getAttribute("echo");
 				if (obj == null) {
 					obj = new JSONObject();
 				}
-				System.out.println("Return: "+obj.toString());
+				//System.out.println("Return: "+obj.toString());
 			}
 
 		} catch (JSONException e) {

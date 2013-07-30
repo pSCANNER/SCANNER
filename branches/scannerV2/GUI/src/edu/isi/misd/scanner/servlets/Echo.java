@@ -128,11 +128,13 @@ public class Echo extends HttpServlet {
 					count++;
 					RegistryClientResponse clientResponse = registryClient.getSitesMap();
 					JSONObject sites = clientResponse.toSitesMap();
+					clientResponse.release();
 					JSONObject sitesMap = sites.getJSONObject("map");
 					JSONObject targets = sites.getJSONObject("targets");
 					ret.put("sitesMap", sitesMap);
 					clientResponse = registryClient.getMasterObject();
 					String res = clientResponse.toMasterString();
+					clientResponse.release();
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("rURL");

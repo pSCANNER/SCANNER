@@ -2187,7 +2187,7 @@ public class TagfilerClient implements RegistryClient {
 		client.setCookieValue(cookie);
 		String url = tagfilerURL + "/query/rtype=site" +
 			"(rURL;cname)";
-		System.out.println("url: " + url);
+		//System.out.println("url: " + url);
 		ClientURLResponse rsp = client.get(url, cookie);
 		clientResponse = new TagfilerClientResponse(rsp);
 		return clientResponse;
