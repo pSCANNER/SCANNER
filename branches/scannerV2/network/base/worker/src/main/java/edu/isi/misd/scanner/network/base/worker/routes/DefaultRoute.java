@@ -2,6 +2,7 @@ package edu.isi.misd.scanner.network.base.worker.routes;
 
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils.ErrorProcessor;
+import edu.isi.misd.scanner.network.base.worker.processors.HoldingDirectoryWriteProcessor;
 import edu.isi.misd.scanner.network.base.worker.workflow.ActivitiAuthorizationTaskCreationProcessor;
 import java.io.FileNotFoundException;
 import org.apache.camel.builder.RouteBuilder;
@@ -45,6 +46,10 @@ public class DefaultRoute extends RouteBuilder
         return getRouteName() + "Queue";
     }
        
+    protected String getCacheRouteName() {
+        return getRouteName() + "Cache";
+    }
+    
     protected String getGETRouteName() {
         return getRouteName() + "Get";
     }     
@@ -88,9 +93,9 @@ public class DefaultRoute extends RouteBuilder
     {
         JaxbDataFormat jaxb = new JaxbDataFormat();     
         jaxb.setFragment(true);
-        jaxb.setPrettyPrint(true);        
+        jaxb.setPrettyPrint(false);        
         jaxb.setIgnoreJAXBElement(false);
-        jaxb.setContextPath(getJAXBContext());           
+        jaxb.setContextPath(getJAXBContext());            
         
         from("direct:" + getRouteName()).
             processRef(getBaseRequestProcessorRef()).
@@ -115,7 +120,9 @@ public class DefaultRoute extends RouteBuilder
                 when().simple(ASYNC_INVOCATION_CLAUSE).
                     to("seda:" + getQueueRouteName() +
                        "?waitForTaskToComplete=Never").
-                    processRef(getAsyncResponseProcessorRef()).           
+                    processRef(getAsyncResponseProcessorRef()).
+                    marshal(jaxb).
+                    processRef(getCacheWriteProcessorRef()).
                 otherwise().
                     to("direct:" + getComputeRouteName()).
             end();
@@ -128,23 +135,32 @@ public class DefaultRoute extends RouteBuilder
                 end().
             end();  
         
+        // run the computation processor        
         from("direct:" + getComputeRouteName()).                    
-            // 1. run the computation processor
             doTry().              
-                processRef(getComputeProcessorRef()).
-                marshal(jaxb).              
+                processRef(getComputeProcessorRef()).             
             doCatch(Exception.class).
                 process(new ErrorProcessor()).
-                stop().
+                //stop().
             doFinally().
                 removeHeader(BaseConstants.DATASOURCE).  
-            end().  
-            // 2. write the results to the output cache
-            doTry().             
-                processRef(getCacheWriteProcessorRef()).
-            doCatch(Exception.class).
-                process(new ErrorProcessor()).
-                stop(). 
-            end();                                                      
+            end().
+            to("direct:" + getCacheRouteName());
+        
+        // write the results to the output cache
+        from("direct:" + getCacheRouteName()). 
+            onException(Exception.class).
+            maximumRedeliveries(0).
+            handled(true).
+            process(new ErrorProcessor()).
+            stop().
+            end().              
+            marshal(jaxb).            
+            choice().
+                when().simple(RELEASE_AUTH_INVOCATION_CLAUSE).
+                    process(new HoldingDirectoryWriteProcessor()).
+                otherwise().
+                    processRef(getCacheWriteProcessorRef()).
+            end();                                                               
     }    
 }

@@ -61,7 +61,7 @@ public class SecureOceansIntegrationTest extends BaseIntegrationTest
     {
         doPost("application/xml",
                "OceansLogisticRegressionIntegrationTestInput.xml",
-               "OceansLogisticRegressionIntegrationTestOutput.xml");
+               "SecureOceansLogisticRegressionIntegrationTestOutput.xml");
         assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);         
     }
     
@@ -70,7 +70,7 @@ public class SecureOceansIntegrationTest extends BaseIntegrationTest
     {
         doPost("application/json",
                "OceansLogisticRegressionIntegrationTestInput.json",
-               "OceansLogisticRegressionIntegrationTestOutput.json");
+               "SecureOceansLogisticRegressionIntegrationTestOutput.json");
         assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);   
     }       
 }

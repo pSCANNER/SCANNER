@@ -103,8 +103,7 @@
                </xsd:documentation>
             </xsd:annotation>
             <xsd:sequence>                                        
-              <xsd:element name="LogisticRegressionResponse"
-                           type="regr:LogisticRegressionResponse"
+              <xsd:element ref="regr:LogisticRegressionResponse"
                            minOccurs="1"
                            maxOccurs="1"/>
             </xsd:sequence>                     

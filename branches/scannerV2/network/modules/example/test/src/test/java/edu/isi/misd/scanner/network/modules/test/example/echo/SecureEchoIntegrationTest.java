@@ -62,7 +62,7 @@ public class SecureEchoIntegrationTest extends BaseIntegrationTest
     {
         doPost("application/xml",
                "EchoIntegrationTestInput.xml",
-               "EchoIntegrationTestOutput.xml");
+               "SecureEchoIntegrationTestOutput.xml");
         assertMockEndpointsSatisfied(60, TimeUnit.SECONDS);         
     }
      
@@ -71,7 +71,7 @@ public class SecureEchoIntegrationTest extends BaseIntegrationTest
     {
         doPost("application/json",
                "EchoIntegrationTestInput.json",
-               "EchoIntegrationTestOutput.json");
+               "SecureEchoIntegrationTestOutput.json");
         assertMockEndpointsSatisfied(60, TimeUnit.SECONDS);   
     }         
 }

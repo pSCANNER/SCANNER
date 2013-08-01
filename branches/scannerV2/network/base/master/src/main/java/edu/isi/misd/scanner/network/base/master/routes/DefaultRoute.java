@@ -123,7 +123,7 @@ public class DefaultRoute extends RouteBuilder
         jaxb.setContextPath(getJAXBContext());               
         json.setUnmarshalType(Class.forName(getJSONUnmarshallType()));
 
-        xmlToJson.setForceTopLevelObject(false);
+        xmlToJson.setForceTopLevelObject(true);
         xmlToJson.setTrimSpaces(true);
         xmlToJson.setSkipNamespaces(true);
         xmlToJson.setRemoveNamespacePrefixes(true);
@@ -206,13 +206,8 @@ public class DefaultRoute extends RouteBuilder
             parallelProcessing().
             aggregationStrategyRef(
                 getAggregationStrategyRef()). 
-        choice().
-            when().simple(ASYNC_INVOCATION_CLAUSE).
-                processRef(getAsyncResponseProcessorRef()).           
-            otherwise().
-                processRef(getPostAggregationProcessorRef()).
-                marshal(jaxb).       
-        end().
+        processRef(getPostAggregationProcessorRef()).
+        marshal(jaxb).       
         processRef(getCacheWriteProcessorRef()).            
         choice().
             when().simple(ROUTE_COMPLETE_CLAUSE). 

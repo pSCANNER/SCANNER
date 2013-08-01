@@ -67,7 +67,7 @@ public class ResultsReleaseDelegate implements JavaDelegate
         }
         
         if (outputFile.exists()) {
-            log.warn(
+            log.info(
                 "The output file " + outputFile.getCanonicalPath() + 
                 " already exisits.  The file will be deleted.");
             try {

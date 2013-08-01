@@ -60,7 +60,7 @@ public class SecureGloreIntegrationTest extends BaseIntegrationTest
     {
         doPost("application/xml",
                "GloreIntegrationTestInput.xml",
-               "GloreIntegrationTestOutput.xml");
+               "SecureGloreIntegrationTestOutput.xml");
         assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);         
     }
     
@@ -69,7 +69,7 @@ public class SecureGloreIntegrationTest extends BaseIntegrationTest
     {
         doPost("application/json",
                "GloreIntegrationTestInput.json",
-               "GloreIntegrationTestOutput.json");
+               "SecureGloreIntegrationTestOutput.json");
         assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);   
     }      
 }

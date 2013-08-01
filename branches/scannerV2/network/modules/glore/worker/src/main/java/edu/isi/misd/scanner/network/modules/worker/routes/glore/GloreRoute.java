@@ -16,6 +16,7 @@ public class GloreRoute extends DefaultRoute
     
     @Override
     public String getJAXBContext() {
-        return "edu.isi.misd.scanner.network.types.glore";
+        return super.getJAXBContext() + ":" + 
+            "edu.isi.misd.scanner.network.types.glore";
     }    
 }

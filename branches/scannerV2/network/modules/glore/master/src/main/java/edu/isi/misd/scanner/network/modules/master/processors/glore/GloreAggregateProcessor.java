@@ -4,7 +4,11 @@ import Jama.Matrix;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
-import edu.isi.misd.scanner.network.types.base.ErrorDetails;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseMetadata;
+import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
+import edu.isi.misd.scanner.network.types.base.ServiceResponse;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseData;
+import edu.isi.misd.scanner.network.types.base.ServiceResponses;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionResponse;
@@ -47,16 +51,16 @@ public class GloreAggregateProcessor implements Processor
     {
         // fail fast - treating GLORE as transactional for now,
         // so if any part of the request fails, the entire request fails.
-        List<ErrorDetails> errors = getGloreErrorList(exchange);
+        List<ServiceResponseMetadata> errors = getGloreErrorList(exchange);
         if (!errors.isEmpty()) 
         {
-            GloreLogisticRegressionResponse gloreResponse =
-                new GloreLogisticRegressionResponse();
-            LogisticRegressionResponse response =
-                new LogisticRegressionResponse();
-            response.getError().addAll(errors);
-            gloreResponse.setLogisticRegressionResponse(response);
-            exchange.getIn().setBody(gloreResponse);  
+            ServiceResponses responses = new ServiceResponses();                     
+            for (ServiceResponseMetadata error : errors) {
+                ServiceResponse response = new ServiceResponse();    
+                response.setServiceResponseMetadata(error);         
+                responses.getServiceResponse().add(response);
+            }
+            exchange.getIn().setBody(responses);  
             
             // signal complete
             exchange.setProperty("status", "complete");           
@@ -138,18 +142,18 @@ public class GloreAggregateProcessor implements Processor
             }
             gloreData.setState("complete");
 
-            // prepare GLORE outputs
+            // prepare GLORE outputs            
             GloreLogisticRegressionResponse gloreResponse =
                 new GloreLogisticRegressionResponse();
-            LogisticRegressionResponse response =
+            LogisticRegressionResponse lrResponse =
                 new LogisticRegressionResponse();
             // need to decide how best to handle the DataSetID
             //response.setDataSetID("GLORE server");  
-            response.setInput(request.getLogisticRegressionInput());
-            response.getOutput().add(new LogisticRegressionOutput());
+            lrResponse.setInput(request.getLogisticRegressionInput());
+            lrResponse.setOutput(new LogisticRegressionOutput());
 
             List<Coefficient> target = 
-                response.getOutput().get(0).getCoefficient();
+                lrResponse.getOutput().getCoefficient();
             Matrix fBeta = 
                 GloreUtils.convertMatrixTypeToMatrix(gloreData.getBeta());
 
@@ -174,9 +178,17 @@ public class GloreAggregateProcessor implements Processor
                 coefficient.setPValue(ztest(fBeta.get(i,0)/SD.get(0,i)));
                 coefficient.setName(independentVariables.get(i-1));
                 target.add(coefficient);
-            }
-            gloreResponse.setLogisticRegressionResponse(response);
-            exchange.getIn().setBody(gloreResponse);   
+            }            
+            gloreResponse.setLogisticRegressionResponse(lrResponse);
+            
+            // format the service response objects and set as the result body
+            ServiceResponseData responseData = new ServiceResponseData();           
+            responseData.setAny(gloreResponse);            
+            ServiceResponse response = new ServiceResponse();
+            response.setServiceResponseData(responseData);            
+            ServiceResponses responses = new ServiceResponses();              
+            responses.getServiceResponse().add(response);
+            exchange.getIn().setBody(responses);   
             
             // signal complete
             exchange.setProperty("status", "complete");           
@@ -279,27 +291,33 @@ public class GloreAggregateProcessor implements Processor
         
         for (Object result : resultsInput) 
         {
-            if (result instanceof ErrorDetails) {
+            if (result instanceof ServiceResponse) {
                 continue;
             }
             GloreLogisticRegressionRequest request = 
                 (GloreLogisticRegressionRequest)MessageUtils.convertTo(
                     GloreLogisticRegressionRequest.class, result, exchange);
             resultsOutput.add(request);
-        }
+        }        
         return resultsOutput; 
     }
 
-    private List<ErrorDetails> getGloreErrorList(Exchange exchange)
+    private List<ServiceResponseMetadata> getGloreErrorList(Exchange exchange)
     {
         ArrayList resultsInput = 
             exchange.getIn().getBody(ArrayList.class);        
-        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>(); 
+        ArrayList<ServiceResponseMetadata> errors = 
+            new ArrayList<ServiceResponseMetadata>(); 
         
         for (Object result : resultsInput) 
         {
-            if (result instanceof ErrorDetails) {
-                errors.add((ErrorDetails)result);                
+            if (result instanceof ServiceResponse) {
+                ServiceResponseMetadata status = 
+                    ((ServiceResponse)result).getServiceResponseMetadata();
+                if (ServiceRequestStateType.ERROR.equals(
+                    status.getRequestState())) {
+                        errors.add(status);
+                }
             }
         }
         return errors;         

@@ -2,9 +2,8 @@ package edu.isi.misd.scanner.network.base.master.processors;
 
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
-import edu.isi.misd.scanner.network.types.base.BaseResponse;
-import edu.isi.misd.scanner.network.types.base.ErrorDetails;
-import edu.isi.misd.scanner.network.types.base.SimpleMap;
+import edu.isi.misd.scanner.network.types.base.ServiceResponse;
+import edu.isi.misd.scanner.network.types.base.ServiceResponses;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.camel.Exchange;
@@ -14,10 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class combines either {@link edu.isi.misd.scanner.network.types.base.SimpleMap} 
- * or {@link edu.isi.misd.scanner.network.types.base.ErrorDetails} instances 
- * into a {@link edu.isi.misd.scanner.network.types.base.BaseResponse} object 
- * and sets it as the response body for the message exchange.
+ * This class aggregates {@link edu.isi.misd.scanner.network.types.base.ServiceResponse} 
+ * objects into a {@link edu.isi.misd.scanner.network.types.base.ServiceResponses} 
+ * object and sets the result as the response body for the message exchange.
  */
 public class BaseAggregateProcessor implements Processor 
 {
@@ -27,30 +25,16 @@ public class BaseAggregateProcessor implements Processor
     @Override
     public void process(Exchange exchange) throws Exception 
     {                        
-        List results = getResults(exchange);           
-        ArrayList<SimpleMap> mapResults = new ArrayList<SimpleMap>();
-        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>();
+        List results = getResults(exchange);   
+        ServiceResponses serviceResponses = new ServiceResponses();           
         for (Object result : results)
-        {          
-            if (result instanceof ErrorDetails)
-            {
-                errors.add((ErrorDetails)result);
-            } 
-            else 
-            {            
-                SimpleMap mapResult = 
-                    (SimpleMap)MessageUtils.convertTo(
-                        SimpleMap.class, result, exchange);
-
-                if (mapResult != null) {
-                    mapResults.add(mapResult);
-                } 
-            }
+        {  
+            ServiceResponse response = 
+                (ServiceResponse)MessageUtils.convertTo(
+                    ServiceResponse.class, result, exchange);
+            serviceResponses.getServiceResponse().add(response);
         }
-        BaseResponse response = new BaseResponse();        
-        response.getSimpleMap().addAll(mapResults);        
-        response.getError().addAll(errors);         
-        exchange.getIn().setBody(response);                
+        exchange.getIn().setBody(serviceResponses);                
     }
     
     protected static List getResults(Exchange exchange)

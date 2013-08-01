@@ -29,6 +29,8 @@ public class BaseRecipientList
         "bridgeEndpoint=true&httpClient.soTimeout=20000"; 
     private static String sslOptions = 
         "sslContextParametersRef=sslContextParameters";    
+    private static String ASYNC_ENABLED = 
+        BaseConstants.ASYNC + "=true";      
     private static String RELEASE_REQ_ENABLED = 
         BaseConstants.RESULTS_RELEASE_AUTH_REQUIRED + "=true";     
     /**
@@ -56,8 +58,8 @@ public class BaseRecipientList
                         (!("true".equalsIgnoreCase(async))))) {
                         // TODO: make it work mixed sync/async, 
                         // but for now just set all to run async                    
-                        //target+= "&" + ASYNC_ENABLED; 
-                        headers.put(BaseConstants.ASYNC, "true");
+                        target+= "&" + ASYNC_ENABLED; 
+                        //headers.put(BaseConstants.ASYNC, "true");
                     }
                 }
                 String protocol = uri.getScheme();

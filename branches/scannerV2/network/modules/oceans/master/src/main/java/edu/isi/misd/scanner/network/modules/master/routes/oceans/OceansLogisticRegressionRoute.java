@@ -8,15 +8,11 @@ import edu.isi.misd.scanner.network.base.master.routes.DefaultRoute;
  */
 public class OceansLogisticRegressionRoute extends DefaultRoute 
 {
-
-    @Override
-    protected String getPostAggregationProcessorRef() {
-        return "OceansLogisticRegressionAggregateProcessor";
-    }
     
     @Override
     public String getJAXBContext() {
-        return "edu.isi.misd.scanner.network.types.oceans";
+        return super.getJAXBContext() + ":" +
+            "edu.isi.misd.scanner.network.types.oceans";
     }
 
     @Override

@@ -32,15 +32,19 @@ public class BaseConstants
     /**
      *  Status string for a completed transaction
      */
-    public static final String STATUS_COMPLETE  = "complete";
+    public static final String STATUS_COMPLETE  = "The request completed successfully";
     /**
-     *  Status string for a canceled transaction*
+     *  Status string for an in-progress transaction*
      */
-    public static final String STATUS_CANCELED  = "canceled";
+    public static final String STATUS_PROCESSING  = "The request is being processed";
     /**
-     *  Status string for an error transaction result
+     *  Status string for an held transaction result
      */
-    public static final String STATUS_ERROR     = "error"; 
+    public static final String STATUS_HELD      = "The results of this request are being held pending document release approval at the remote site."; 
+    /**
+     *  Status string for a completed transaction
+     */
+    public static final String STATUS_REJECTED  = "The publishing of the result document was rejected by an authority the remote site.";    
     /**
      *  Boolean parameter indicating async mode should be used
      */

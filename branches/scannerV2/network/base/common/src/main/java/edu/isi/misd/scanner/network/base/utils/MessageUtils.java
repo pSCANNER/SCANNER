@@ -1,6 +1,8 @@
 package edu.isi.misd.scanner.network.base.utils;
 
 import edu.isi.misd.scanner.network.base.BaseConstants;
+import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseMetadata;
 import edu.isi.misd.scanner.network.types.base.SiteInfo;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -153,7 +155,6 @@ public class MessageUtils
     public static Object convertTo(Class<?> toType,
                                    Object fromType,                                 
                                    Exchange exchange)
-        throws Exception
     {
         // avoid the overhead of type conversion if already same type
         if (toType.isInstance(fromType)) {
@@ -161,7 +162,7 @@ public class MessageUtils
         }
 
         TypeConverter converter = exchange.getContext().getTypeConverter();
-        return converter.mandatoryConvertTo(toType, exchange, fromType);
+        return converter.tryConvertTo(toType, exchange, fromType);
     }    
     
     /**
@@ -223,6 +224,7 @@ public class MessageUtils
         throws Exception
     {
         CamelContext context = exchange.getContext();
+        SiteInfo siteInfo = new SiteInfo();
         
         String siteID =
             context.resolvePropertyPlaceholders(
@@ -234,11 +236,32 @@ public class MessageUtils
             context.resolvePropertyPlaceholders(
                 BaseConstants.SITE_DESC_PROPERTY);
         
-        SiteInfo siteInfo = new SiteInfo();
         siteInfo.setSiteID(siteID);
         siteInfo.setSiteName(siteName);
         siteInfo.setSiteDescription(siteDesc);
         
         return siteInfo;
+    }
+    
+    public static ServiceResponseMetadata createServiceResponseMetadata(
+        Exchange exchange,
+        ServiceRequestStateType state,
+        String stateDetail)
+    {
+        ServiceResponseMetadata serviceResponseMetadata = 
+            new ServiceResponseMetadata();
+        serviceResponseMetadata.setRequestID(MessageUtils.getID(exchange));  
+        serviceResponseMetadata.setRequestURL(
+            exchange.getProperty(BaseConstants.REQUEST_URL,String.class));             
+        serviceResponseMetadata.setRequestState(state);
+        serviceResponseMetadata.setRequestStateDetail(stateDetail);  
+        try {
+            serviceResponseMetadata.setRequestSiteInfo(
+                MessageUtils.getSiteInfo(exchange));
+        } catch (Exception ex) {
+            log.warn(
+                "Exception while getting local SiteInfo: " + ex.toString());
+        } 
+        return serviceResponseMetadata;
     }
 }

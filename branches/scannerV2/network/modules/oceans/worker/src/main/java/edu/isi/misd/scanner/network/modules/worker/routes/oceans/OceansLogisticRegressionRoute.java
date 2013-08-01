@@ -16,6 +16,7 @@ public class OceansLogisticRegressionRoute extends DefaultRoute
     
     @Override
     public String getJAXBContext() {
-        return "edu.isi.misd.scanner.network.types.oceans";
+        return super.getJAXBContext() + 
+            ":edu.isi.misd.scanner.network.types.oceans";
     }
 }

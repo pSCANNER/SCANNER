@@ -97,6 +97,7 @@ public abstract class BaseIntegrationTest extends CamelSpringTestSupport
         headers.put(Exchange.CONTENT_TYPE, contentType);
         resultEndpoint.expectedHeaderReceived(Exchange.CONTENT_TYPE, contentType); 
         
+        headers.put(BaseConstants.ID, this.getClass().getName());
         String targets = this.getWorkerUrls();
         headers.put(BaseConstants.TARGETS, targets);
 

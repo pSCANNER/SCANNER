@@ -1,10 +1,8 @@
 package edu.isi.misd.scanner.network.base.utils;
 
-import edu.isi.misd.scanner.network.types.base.ErrorDetails;
 import java.nio.charset.Charset;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-import org.apache.camel.component.http4.HttpOperationFailedException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,48 +14,6 @@ public class ErrorUtils
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(ErrorUtils.class);  
-    
-    /**
-     * Creates and formats a serializable error message of the type 
-     * {@link edu.isi.misd.scanner.network.types.base.ErrorDetails} based on
-     * information in the current {@link org.apache.camel.Exchange} and the 
-     * thrown exception.
-     * 
-     * @param exchange The current exchange
-     * @param e The caused exception
-     * @return The formatted ErrorDetails
-     */
-    public static ErrorDetails formatErrorResponse(Exchange exchange, 
-                                                   Throwable e) 
-    {
-        ErrorDetails error = new ErrorDetails();
-        String errorSource = 
-            exchange.getProperty(Exchange.FAILURE_ENDPOINT, String.class);
-        if ((errorSource == null) || 
-            ((errorSource != null) && (errorSource.isEmpty()))) {
-            errorSource = 
-                exchange.getProperty(Exchange.TO_ENDPOINT, String.class);            
-        }
-        error.setErrorSource(errorSource);
-        error.setErrorType(e.getClass().getName());        
-        if (e instanceof HttpOperationFailedException) { 
-            String desc = " " + 
-                ((HttpOperationFailedException)e).getStatusText() + ": " +
-                ((HttpOperationFailedException)e).getResponseBody();
-            error.setErrorDescription(desc);
-            error.setErrorCode(
-                Integer.toString(
-                    ((HttpOperationFailedException)e).getStatusCode()));
-        } else {         
-            error.setErrorDescription(e.getLocalizedMessage());
-        }
-        try {
-            error.setSiteInfo(MessageUtils.getSiteInfo(exchange));
-        } catch (Exception ex) {
-            log.warn("Exception while getting local SiteInfo: " + ex.toString());
-        }        
-        return error;    
-    }  
     
     /**
      * Sets the HTTP error and propagates it to the caller.
