@@ -169,18 +169,21 @@ public class Echo extends HttpServlet {
 					if (contentType != null && contentType.indexOf("application/json") != -1) {
 						JSONObject echoResult = new JSONObject(res);
 						ret.put("echo", echoResult);
-						if (echoResult.has("Error")) {
+						JSONArray serviceResponse = echoResult.getJSONObject("ServiceResponses").getJSONArray("ServiceResponse");
+						JSONArray errors = new JSONArray();
+						for (int i=0; i < serviceResponse.length(); i++) {
+							JSONObject serviceResponseMetadata = serviceResponse.getJSONObject(i).getJSONObject("ServiceResponseMetadata");
+							if (!serviceResponseMetadata.getString("RequestState").equals("Complete")) {
+								errors.put(serviceResponseMetadata);
+							}
+						}
+						if (errors.length() > 0) {
 							JSONObject errorsStatistics = new JSONObject();
 							ret.put("errorsStatistics", errorsStatistics);
 							errorsStatistics.put("total", count);
-							JSONArray errors = echoResult.optJSONArray("Error");
-							if (errors == null) {
-								errors = new JSONArray();
-								errors.put(echoResult.getJSONObject("Error"));
-							}
 							for (int i=0; i < errors.length(); i++) {
 								JSONObject obj = errors.getJSONObject(i);
-								URI error_url = new URI(obj.getString("ErrorSource"));
+								URI error_url = new URI(obj.getString("RequestURL"));
 								String host = error_url.getHost();
 								int port = error_url.getPort();
 								String key = host + (port == -1 ? "" : ":" + port);

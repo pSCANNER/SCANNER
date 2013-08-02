@@ -28,8 +28,10 @@ var HOME;
 var oQueryTable = null;
 var oAnalyzeTable = null;
 
-var oErrorQueryTable = null;
-var oErrorAnalyzeTable = null;
+var oStatusQueryTable = null;
+var oStatusAnalyzeTable = null;
+
+var sitesMap = null;
 
 var selStudies = null;
 var selDatasets = null;
@@ -67,18 +69,38 @@ var analyzeLayout = [[
                       {'name': 'Options', 'field': 'options', 'width': '15%'}
                       ]];
 
+var slicesLayout = [[
+                     {'name': '#', 'field': 'no', 'width': '5%'},
+                     {'name': 'Study', 'field': 'study', 'width': '15%'},
+                     {'name': 'Dataset', 'field': 'dataset', 'width': '15%'},
+                     {'name': 'Library', 'field': 'library','width': '10%'},
+                     {'name': 'Method', 'field': 'method', 'width': '15%'},
+                     {'name': 'Site', 'field': 'site', 'width': '10%'},
+                     {'name': 'Datasource', 'field': 'datasource', 'width': '15%'},
+                     {'name': 'Users', 'field': 'users', 'width': '15%'}
+                     ]];
+
 var analyzeDataStore = {
 		identifier: "id",
 		items: []
 };
+
+var slicesDataStore = {
+		identifier: "id",
+		items: []
+};
+
 var intervalVariable;
 
 var analyzeGrid = null;
+var slicesGrid = null;
 var queriesCounter = 0;
 var studiesCounter = [];
 
 var parametersDescription = null;
 var parametersBody = null;
+
+var postResult = null;
 
 /**
  * Method "contains" for the Array object
@@ -268,90 +290,86 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	var tbody = $('#sitesStatusBody');
 	tbody.html('');
-	var sitesStatus = data['echo'];
-	var sitesMap = data['sitesMap'];
+	sitesMap = data['sitesMap'];
+	var sitesStatus = data['echo']['ServiceResponses']['ServiceResponse'];
+	sitesStatus.sort(compareServiceResponseMetadata);
 	var refreshTimestamp = $('#refreshTimestamp');
 	refreshTimestamp.html(data['timestamp']);
-	if (sitesStatus['SimpleMap'] != null) {
-		var successSites = sitesStatus['SimpleMap'];
-		var successConnections = [];
-		if (successSites['SiteInfo'] != null) {
-			successConnections.push(successSites);
+	var successConnections = [];
+	var errorConnections = [];
+	$.each(sitesStatus, function(i, elem) {
+		if (elem['ServiceResponseMetadata']['RequestState'] == 'Complete') {
+			successConnections.push(elem['ServiceResponseMetadata']);
 		} else {
-			successConnections = successSites;
+			errorConnections.push(elem['ServiceResponseMetadata']);
 		}
-		$.each(successConnections, function(i, site) {
-			var siteInfo = site['SiteInfo'];
-			var tr = $('<tr>');
-			tbody.append(tr);
-			var td = $('<td>');
-			tr.append(td);
-			var img = $('<img>');
-			img.attr({'alt': 'Up',
-				'title': 'Status Up',
-				'src': 'resources/images/green_circle.png',
-				'height': '10'
-				});
-			td.append(img);
-			var label = $('<label>');
-			td.append(label);
-			label.html(siteInfo['SiteName']);
-			var description = 'Status: Up<br/>Description: ' + siteInfo['SiteDescription']; 
-			label.hover(
-					function(event) {DisplayTipBox(event, description);}, 
-					function(){HideTipBox();});
-		});
-	}
-	if (sitesStatus['Error'] != null) {
+	});
+	$.each(successConnections, function(i, siteInfo) {
+		var siteName = siteInfo['RequestSiteInfo']['SiteName'];
+		var url = siteInfo['RequestURL'];
+		url = url.split('//');
+		url = url[1].split('/');
+		var value = sitesMap[url[0]];
+		if (value != null) {
+			siteName = value;
+		}
+		var tr = $('<tr>');
+		tbody.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var img = $('<img>');
+		img.attr({'alt': 'Up',
+			'title': 'Status Up',
+			'src': 'resources/images/green_circle.png',
+			'height': '10'
+			});
+		td.append(img);
+		var label = $('<label>');
+		td.append(label);
+		label.html(siteName);
+		var description = 'Status: Up<br/>Description: ' + siteInfo['RequestSiteInfo']['SiteDescription']; 
+		label.hover(
+				function(event) {DisplayTipBox(event, description);}, 
+				function(){HideTipBox();});
+	});
+	$.each(errorConnections, function(i, siteInfo) {
+		var siteName = siteInfo['RequestSiteInfo']['SiteName'];
+		var url = siteInfo['RequestURL'];
+		url = url.split('//');
+		url = url[1].split('/');
+		var value = sitesMap[url[0]];
+		if (value != null) {
+			siteName = value;
+		}
+		var tr = $('<tr>');
+		tbody.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var img = $('<img>');
+		img.attr({'alt': 'Down',
+			'title': 'Status Down',
+			'src': 'resources/images/red_circle.png',
+			'height': '10'
+			});
+		td.append(img);
+		var label = $('<label>');
+		td.append(label);
+		label.html(siteName);
 		var errorsStatistics = data['errorsStatistics'];
 		var total = errorsStatistics['total'];
-		var errorSites = sitesStatus['Error'];
-		var errorConnections = [];
-		if (errorSites['SiteInfo'] != null) {
-			errorConnections.push(errorSites);
-		} else {
-			errorConnections = errorSites;
+		var rate = null;
+		if (url != null) {
+			rate = Math.floor(errorsStatistics[url[0]] * 100 / total);
 		}
-		$.each(errorConnections, function(i, site) {
-			var siteInfo = site['SiteInfo'];
-			var tr = $('<tr>');
-			tbody.append(tr);
-			var td = $('<td>');
-			tr.append(td);
-			var img = $('<img>');
-			img.attr({'alt': 'Down',
-				'title': 'Status Down',
-				'src': 'resources/images/red_circle.png',
-				'height': '10'
-				});
-			td.append(img);
-			var label = $('<label>');
-			td.append(label);
-			var siteName = siteInfo != null ? siteInfo['SiteName'] : null;
-			var url = null;
-			if (site['ErrorSource'] != null) {
-				url = site['ErrorSource'].split('//');
-				url = url[1].split('/');
-				var value = sitesMap[url[0]];
-				if (value != null) {
-					siteName = value;
-				}
-			}
-			label.html(siteName);
-			var rate = null;
-			if (url != null) {
-				rate = Math.floor(errorsStatistics[url[0]] * 100 / total);
-			}
-			var description = 'Status: Down<br/>' + 
-				(url != null ? 'Failure Rate: ' + errorsStatistics[url[0]] + ' of ' + total + ' (' + rate + '%)<br/>' : '') +
-				'ErrorSource: ' + site['ErrorSource'] + '<br/>' + 
-				'ErrorType: ' + site['ErrorType'] + '<br/>' + 
-				'ErrorDescription: ' + site['ErrorDescription'];
-			label.hover(
-					function(event) {DisplayTipBox(event, description);}, 
-					function(){HideTipBox();});
-		});
-	}
+		var description = 'Status: Down<br/>' + 
+			(url != null ? 'Failure Rate: ' + errorsStatistics[url[0]] + ' of ' + total + ' (' + rate + '%)<br/>' : '') +
+			'RequestURL: ' + siteInfo['RequestURL'] + '<br/>' + 
+			'RequestStateDetail: ' + siteInfo['RequestStateDetail'];
+		label.hover(
+				function(event) {DisplayTipBox(event, description);}, 
+				function(){HideTipBox();});
+	});
+
 	// refresh every minute
 	setTimeout("renderSitesStatus()", 2*60*1000);
 }
@@ -368,8 +386,6 @@ function renderAvailableStudies() {
 	$('#paramsHelpDiv').css('display', 'none');
 	$('#paramsTitle').css('display', 'none');
 	$('#paramsDiv').css('display', 'none');
-	$('#resultDiv').css('display', 'none');
-	$('#errorQueryDiv').css('display', 'none');
 	
 	// send the request
 	var url = HOME + '/query?action=getStudies';
@@ -405,7 +421,7 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 		loadStudies(names);
 	} else {
 		$('#ui').hide();
-		$('#authorizationDiv').show();
+		$('#authorizationWrapperDiv').show();
 	}
 }
 
@@ -746,19 +762,19 @@ function postRenderSites(data, textStatus, jqXHR, param) {
 /**
  * Send the request to get the data from the SCANNER
  */
-function submitQuery(div, replay, checkStatus) {
+function submitQuery(div, replay, checkStatus, resultData) {
 	var obj = {};
 	var param = {};
 	if (replay == null) {
 		param.spinner = $('#ajaxSpinnerImage');
 		param.treeId = 'navigation';
 		param.tableId = 'queryExample';
-		param.errorTableId = 'errorQueryExample';
+		param.statusTableId = 'statusQueryExample';
 	} else {
 		param.spinner = $('#ajaxAnalyzeSpinnerImage');
 		param.treeId = 'analyzeNavigation';
 		param.tableId = 'analyzeExample';
-		param.errorTableId = 'errorAnalyzeExample';
+		param.statusTableId = 'statusAnalyzeExample';
 	}
 	obj['action'] = ($('#asyncCheckBox').attr('checked') == 'checked') ? 'getResultsAsync' : 'getResults';
 	if (replay == null) {
@@ -794,14 +810,19 @@ function submitQuery(div, replay, checkStatus) {
 		obj['sites'] = replay['sites'][0];
 	}
 	param['resultDiv'] = $('#' + div);
-	param['errorDiv'] = $('#' + (div == 'resultDivContent' ? 'errorDivContent' : 'errorReplayDivContent'));
+	param['statusDiv'] = $('#statusReplayDivContent');
 	param['resultDiv'].parent().hide();
-	param['errorDiv'].parent().hide();
+	param['statusDiv'].parent().hide();
 	param['library'] = obj['library'];
 	param['checkStatus'] = checkStatus;
+	param.spinner.parent().show();
 	param.spinner.show();
 	var url = HOME + '/query';
-	scanner.POST(url, obj, true, postSubmitQuery, param, null, 0);
+	if (resultData == null) {
+		scanner.POST(url, obj, true, postSubmitQuery, param, null, 0);
+	} else {
+		postSubmitQuery(resultData, null, null, param);
+	}
 }
 
 /**
@@ -818,26 +839,34 @@ function submitQuery(div, replay, checkStatus) {
  */
 function postSubmitQuery(data, textStatus, jqXHR, param) {
 	param.spinner.hide();
+	param.spinner.parent().hide();
 	if (param['checkStatus'] != -1) {
 		// check if completed
 		var temp = $.parseJSON(data);
-		var columns = ['ErrorSource', 'ErrorType', 'ErrorCode', 'ErrorDescription'];
-		var rows = [];
-		var sites = [];
-		getRowsErrors(temp['data'], columns, rows, sites);
-		if (rows.length == 0) {
-			postRefreshQueryStatus(param['checkStatus'], 'Completed');
+		var serviceResponse = temp['data']['ServiceResponses']['ServiceResponse'];
+		var complete = true;
+		$.each(serviceResponse, function(i, elem) {
+			if (elem['ServiceResponseMetadata'] != null && elem['ServiceResponseMetadata']['RequestState'] != 'Complete') {
+				complete = false;
+				return false;
+			}
+		});
+
+		if (complete) {
+			postRefreshQueryStatus(param['checkStatus'], 'Complete');
 		}
+	} else {
+		postResult = data;
 	}
 	var resultDiv = param['resultDiv'];
-	var errorDiv = param['errorDiv'];
+	var statusDiv = param['statusDiv'];
 	data = $.parseJSON(data);
 	var dict = {};
 	dict['data'] = data['data'];
 	dict['resultDiv'] = resultDiv;
 	dict['tableId'] = param.tableId;
-	dict['errorDiv'] = errorDiv;
-	dict['errorTableId'] = param.errorTableId;
+	dict['statusDiv'] = statusDiv;
+	dict['statusTableId'] = param.statusTableId;
 	var tab;
 	var obj = param['analyze'];
 	var index;
@@ -866,7 +895,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 		a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
 		a.html('Box plot');
 		resultDiv.append(a);
-		buildErrorDataTable(tab);
+		buildStatusDataTable(tab);
 		buildDataTable(tab);
 	} else {
 		if (async != null) {
@@ -879,7 +908,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 function checkAnalyzeDataStore(index) {
 	if (analyzeDataStore.items.length == index) {
 		clearInterval(intervalVariable);
-		refreshQueryStatus(index-1);
+		displayQueryStatus(index-1);
 	}
 }
 
@@ -902,7 +931,7 @@ function buildTable(tab) {
 	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
 	a.html('Box plot');
 	resultDiv.append(a);
-	buildErrorDataTable(tab);
+	buildStatusDataTable(tab);
 	buildDataTable(tab);
 }
 
@@ -927,24 +956,15 @@ function buildBoxPlot(tab) {
 	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
 	a.html('Box plot');
 	resultDiv.append(a);
-	var sitesNames = [];
 	var sitesCoeficients = [];
-	var output = getOutput(responseBody);
-	if (!$.isArray(output)) {
-		var temp = [];
-		temp.push(output);
-		output = temp;
-	}
+	var output = [];
+	getOutput(responseBody, output);
 	$.each(output, function(i, value) {
-		if (value['SiteInfo'] != null) {
-			var key = value['SiteInfo']['SiteName'];
-			if (key != null) {
-				sitesNames.push(key);
-			}
-		}
 		var coeficient = value['Coefficient'];
 		if (!$.isArray(coeficient)) {
-			coeficient = [].push(coeficient);
+			var temp = [];
+			temp.push(coeficient);
+			coeficient = temp;
 		}
 		sitesCoeficients.push(coeficient);
 	});
@@ -1007,14 +1027,21 @@ function getColumnsNames(res, columns) {
  * @return the array with the columns values
 */
 function getRowsValues(res, columns, rows, sites) {
+	var serviceResponse = res['ServiceResponses']['ServiceResponse'];
+	$.each(serviceResponse, function(i, elem) {
+		if (elem['ServiceResponseData'] != null) {
+			sites.push(elem['ServiceResponseMetadata']['RequestSiteInfo']);
+			getSiteRowsValues(elem['ServiceResponseData'], columns, rows);
+		}
+	});
+}
+function getSiteRowsValues(res, columns, rows) {
 	if ($.isPlainObject(res)) {
 		if (res['Output'] != null) {
 			var coefficient = null;
-			var siteInfo = null;
 			if ($.isArray(res['Output'])) {
 				$.each(res['Output'], function(i, output) {
 					coefficient = output['Coefficient'];
-					siteInfo = output['SiteInfo'];
 					var group = [];
 					$.each(coefficient, function(i, obj) {
 						var row = [];
@@ -1024,16 +1051,10 @@ function getRowsValues(res, columns, rows, sites) {
 						group.push(row);
 					});
 					rows.push(group);
-					var site = [];
-					if (siteInfo != null) {
-						site.push(siteInfo);
-					}
-					sites.push(site);
 				});
 			} else {
 				coefficient = res['Output']['Coefficient'];
 				var group = [];
-				siteInfo = res['Output']['SiteInfo'];
 				$.each(coefficient, function(i, obj) {
 					var row = [];
 					$.each(columns, function(j, col) {
@@ -1042,78 +1063,15 @@ function getRowsValues(res, columns, rows, sites) {
 					group.push(row);
 				});
 				rows.push(group);
-				var site = [];
-				if (siteInfo != null) {
-					site.push(siteInfo);
-				}
-				sites.push(site);
 			}
 		} else {
 			$.each(res, function(key, value) {
-				getRowsValues(value, columns, rows, sites);
+				getSiteRowsValues(value, columns, rows);
 			});
 		}
 	} else if ($.isArray(res)) {
 		$.each(res, function(i, val) {
-			getRowsValues(val, columns, rows, sites);
-		});
-	}	
-}
-
-/**
- * Get the column values of a JSONObject 
- * 
- * @param res
- * 	the data of a row
- * @param columns
- * 	the name of the columns
- * @param rows
- * 	the output parameter to collect the values
- * 
- * @return the array with the columns values
-*/
-function getRowsErrors(res, columns, rows, sites) {
-	if ($.isPlainObject(res)) {
-		if (res['Error'] != null) {
-			var siteInfo = null;
-			if ($.isArray(res['Error'])) {
-				var arr = res['Error'];
-				$.each(arr, function(i, obj) {
-					siteInfo = obj['SiteInfo'];
-					var row = [];
-					$.each(columns, function(j, col) {
-						row.push(obj[col] == null ? '' : obj[col]);
-					});
-					rows.push(row);
-					var site = [];
-					if (siteInfo != null) {
-						site.push(siteInfo);
-					}
-					sites.push(site);
-				});
-				
-			} else if ($.isPlainObject(res['Error'])) {
-				var obj = res['Error'];
-				siteInfo = obj['SiteInfo'];
-				var row = [];
-				$.each(columns, function(j, col) {
-					row.push(obj[col] == null ? '' : obj[col]);
-				});
-				rows.push(row);
-				var site = [];
-				if (siteInfo != null) {
-					site.push(siteInfo);
-				}
-				sites.push(site);
-			}
-		} else {
-			$.each(res, function(key, value) {
-				getRowsErrors(value, columns, rows, sites);
-			});
-		}
-	} else if ($.isArray(res)) {
-		$.each(res, function(i, val) {
-			getRowsErrors(val, columns, rows, sites);
+			getSiteRowsValues(val, columns, rows);
 		});
 	}	
 }
@@ -1160,7 +1118,6 @@ function buildDataTable(tab) {
 		}
 	}
 	resultDiv.parent().css('display', '');
-	//resultDiv.html('');
 	var table = $('<table>');
 	resultDiv.append(table);
 	table.attr({	'cellpadding': '0',
@@ -1237,10 +1194,9 @@ function buildDataTable(tab) {
 				var td = $('<td>');
 				td.attr({'colSpan': columns.length+1});
 				td.addClass('group');
-				var site = sites[siteNo++];
-				if (site.length > 0) {
+				var siteInfo = sites[siteNo++];
+				if (siteInfo != null) {
 					var value = '';
-					var siteInfo = site[0];
 					if (siteInfo['SiteName'] != null) {
 						value = 'Site Name: ' + siteInfo['SiteName'];
 					}
@@ -1274,18 +1230,7 @@ function buildDataTable(tab) {
 	}
 }
 
-/**
- * Build a data table for a JSONObject
- * 
- * @param res
- * 	the JSONObject for the tree
- * @param resultDiv
- * 	the div to place the tree
- * @param tableId
- * 	the id of the table
- */
-
-function buildErrorDataTable(tab) {
+function buildStatusDataTable(tab) {
 	var res, resultDiv, tableId, dict;
 	if (tab == 'Query') {
 		dict = queryResult;
@@ -1293,24 +1238,47 @@ function buildErrorDataTable(tab) {
 		dict = analyzeResult;
 	}
 	res = dict['data'];
-	resultDiv = dict['errorDiv'];
-	tableId = dict['errorTableId'];
-	var columns = ['ErrorSource', 'ErrorType', 'ErrorCode', 'ErrorDescription'];
+	resultDiv = dict['statusDiv'];
+	tableId = dict['statusTableId'];
+	var columns = ['Site', 'Site Description', 'State', 'State Detail'];
 	var rows = [];
-	var sites = [];
-	getRowsErrors(res, columns, rows, sites);
-	if (rows.length == 0) {
+	var complete = true;
+	var serviceResponse = res['ServiceResponses']['ServiceResponse'];
+	$.each(serviceResponse, function(i, elem) {
+		var serviceResponseMetadata = elem['ServiceResponseMetadata'];
+		if (serviceResponseMetadata != null) {
+			var siteName = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
+			var url = serviceResponseMetadata['RequestURL'];
+			url = url.split('//');
+			url = url[1].split('/');
+			var value = sitesMap[url[0]];
+			if (value != null) {
+				siteName = value;
+			}
+			var row = [];
+			row.push(siteName);
+			row.push(serviceResponseMetadata['RequestSiteInfo']['SiteDescription']);
+			row.push(serviceResponseMetadata['RequestState']);
+			row.push(serviceResponseMetadata['RequestStateDetail']);
+			rows.push(row);
+			if (serviceResponseMetadata['RequestState'] != 'Complete') {
+				complete = false;
+			}
+		}
+	});
+	if (complete) {
 		return;
 	}
-	if (tableId == 'errorQueryExample') {
-		if (oErrorQueryTable != null) {
+	$('#statusReplayWrapperDiv').show();
+	if (tableId == 'statusQueryExample') {
+		if (oStatusQueryTable != null) {
 			$('#' + tableId).remove();
-			oErrorQueryTable = null;
+			oStatusQueryTable = null;
 		}
 	} else {
-		if (oErrorAnalyzeTable != null) {
+		if (oStatusAnalyzeTable != null) {
 			$('#' + tableId).remove();
-			oErrorAnalyzeTable = null;
+			oStatusAnalyzeTable = null;
 		}
 	}
 	resultDiv.parent().css('display', '');
@@ -1326,9 +1294,6 @@ function buildErrorDataTable(tab) {
 	table.append(thead);
 	var tr = $('<tr>');
 	thead.append(tr);
-	var th = $('<th>');
-	tr.append(th);
-	th.html('Sample');
 	for (var i=0; i < columns.length; i++) {
 		var th = $('<th>');
 		tr.append(th);
@@ -1336,25 +1301,9 @@ function buildErrorDataTable(tab) {
 	}
 	var tbody = $('<tbody>');
 	table.append(tbody);
-	var groupNo = 0;
 	$.each(rows, function(i, row) {
-		groupNo++;
 		var tr = $('<tr>');
-		tr.addClass('group');
 		tbody.append(tr);
-		var td = $('<td>');
-		td.html(''+groupNo);
-		tr.append(td);
-		for (var k=0; k < columns.length; k++) {
-			var td = $('<td>');
-			td.html('');
-			tr.append(td);
-		}
-		tr = $('<tr>');
-		tbody.append(tr);
-		var td = $('<td>');
-		tr.append(td);
-		td.html(''+groupNo);
 		$.each(row, function(j, col) {
 			var td = $('<td>');
 			td.html(col);
@@ -1367,61 +1316,21 @@ function buildErrorDataTable(tab) {
 		                ['All']
 		                ],
 		'iDisplayLength': -1,
-		"fnDrawCallback": function ( oSettings ) {
-		    if ( oSettings.aiDisplay.length == 0 )
-		    {
-		        return;
-		    }
-		     
-		    var nTrs = $('#' + tableId + ' tbody tr');
-		    var iColspan = nTrs[0].getElementsByTagName('td').length;
-		    var sLastGroup = "";
-		    var siteNo = 0;
-		    for ( var i=0 ; i<nTrs.length ; i++ )
-		    {
-		        var iDisplayIndex = oSettings._iDisplayStart + i;
-		        var sGroup = oSettings.aoData[ oSettings.aiDisplay[iDisplayIndex] ]._aData[0];
-		        if ($(nTrs[i]).hasClass('group')) {
-				var tr = $(nTrs[i]);
-				tr.removeClass('group');
-				tr.html('');
-				var td = $('<td>');
-				td.attr({'colSpan': columns.length+1});
-				td.addClass('group');
-				var site = sites[siteNo++];
-				if (site.length > 0) {
-					var value = '';
-					var siteInfo = site[0];
-					if (siteInfo['SiteName'] != null) {
-						value = 'Site Name: ' + siteInfo['SiteName'];
-					}
-					if (siteInfo['SiteDescription'] != null) {
-						if (value.length > 0) {
-							value += '<br/>';
-						}
-						value += 'Site Description: ' + siteInfo['SiteDescription'];
-					}
-					td.html(value);
-				} else {
-					td.html('&nbsp;');
-				}
-				tr.append(td);
-		        }
-		    }
-		},
-		"aoColumnDefs": [
-		    { "bVisible": false, "aTargets": [ 0 ] }
-		],
-		"aaSortingFixed": [[ 0, 'asc' ]],
-		"aaSorting": [[ 1, 'asc' ]],
 		"bInfo": false,
 		"bPaginate": false,
+		"bFilter": false,
+		"aoColumns": [
+		              	{ "sWidth": "20%" },
+		              	{ "sWidth": "30%" },
+		              	{ "sWidth": "10%" },
+		              	{ "sWidth": "40%" }
+		              ],
         'sDom': 'lfr<"giveHeight"t>ip'
 	});
-	if (tableId == 'errorQueryExample') {
-		oErrorQueryTable = oTable;
+	if (tableId == 'statusQueryExample') {
+		oStatusQueryTable = oTable;
 	} else {
-		oErrorAnalyzeTable = oTable;
+		oStatusAnalyzeTable = oTable;
 	}
 }
 
@@ -1506,6 +1415,9 @@ function handleError(jqXHR, textStatus, errorThrown, retryCallback, url, obj, as
 		msg += 'URL: ' + url + '\n';
 		document.body.style.cursor = "default";
 		$('#ajaxSpinnerImage').hide();
+		$('#ajaxSpinnerImage').parent().hide();
+		$('#ajaxAnalyzeSpinnerImage').hide();
+		$('#ajaxAnalyzeSpinnerImage').parent().hide();
 		var alertMessage = getHTMLErrorMessage(jqXHR.responseText);
 		$('#errorMessage').html(alertMessage);
 		alertErrorDialog.dialog('open');
@@ -2024,6 +1936,48 @@ function compareIgnoreCase(str1, str2) {
 }
 
 /**
+ * Compares two strings lexicographically, ignoring case differences.
+ * 
+ * @param str1
+ * 	the left operand string
+ * @param str2
+ * 	the right operand string
+ * @return: 
+ * 	0 if str1 == str2
+ * 	-1 if the str1 < str2
+ * 	1 if str1 > str2
+ */
+function compareServiceResponseMetadata(obj1, obj2) {
+	var serviceResponseMetadata = obj1['ServiceResponseMetadata'];
+	var val1 = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
+	var url = serviceResponseMetadata['RequestURL'];
+	url = url.split('//');
+	url = url[1].split('/');
+	var value = sitesMap[url[0]];
+	if (value != null) {
+		val1 = value;
+	}
+	serviceResponseMetadata = obj2['ServiceResponseMetadata'];
+	var val2 = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
+	url = serviceResponseMetadata['RequestURL'];
+	url = url.split('//');
+	url = url[1].split('/');
+	var value = sitesMap[url[0]];
+	if (value != null) {
+		val2 = value;
+	}
+	var val1 = val1.toLowerCase();
+	var val2 = val2.toLowerCase();
+	if (val1 == val2) {
+		return 0;
+	} else if (val1 < val2) {
+		return -1;
+	} else {
+		return 1;
+	}
+}
+
+/**
  * Expand a tree
  * 
  * @param id
@@ -2140,7 +2094,6 @@ function loadStudies(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
-				$('#errorQueryDiv').css('display', 'none');
 				var selValues = studiesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2186,7 +2139,6 @@ function loadDatasets(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
-				$('#errorQueryDiv').css('display', 'none');
 				var selValues = datasetsMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2230,7 +2182,6 @@ function loadLibraries(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
-				$('#errorQueryDiv').css('display', 'none');
 				var selValues = librariesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2273,7 +2224,6 @@ function loadMethods(values) {
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
 				$('#resultDiv').css('display', 'none');
-				$('#errorQueryDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
 						renderAvailableSites();
@@ -2323,11 +2273,9 @@ function loadSites(values, selectAll) {
  */
 function showQuery() {
 	$('#paramsWrapperDiv').show();
-	$('#resultWrapperDiv').show();
-	$('#errorWrapperDiv').show();
 	$('#replayDivContent').html('');
 	$('#replayDivWrapper').hide();
-	$('#errorReplayWrapperDiv').hide();
+	$('#statusReplayWrapperDiv').hide();
 }
 
 /**
@@ -2335,11 +2283,8 @@ function showQuery() {
  */
 function hideQuery() {
 	$('#paramsWrapperDiv').hide();
-	$('#resultWrapperDiv').hide();
-	$('#errorWrapperDiv').hide();
 	$('#replayDivWrapper').show();
 	$('#replayTitle').hide();
-	$('#errorReplayWrapperDiv').show();
 }
 
 /**
@@ -2418,15 +2363,22 @@ function refreshQueryStatus(index) {
 	var tableIndex = analyzeDataStore.items.length - index - 1;
 	var item = analyzeDataStore.items[tableIndex];
 	$('#replayTitle').show();
-	submitQuery('replayDivContent', item, index);
+	submitQuery('replayDivContent', item, index, null);
+}
+
+function displayQueryStatus(index) {
+	var tableIndex = analyzeDataStore.items.length - index - 1;
+	var item = analyzeDataStore.items[tableIndex];
+	$('#replayTitle').show();
+	submitQuery('replayDivContent', item, index, postResult);
 }
 
 function postRefreshQueryStatus(index, status) {
 	var tableIndex = analyzeDataStore.items.length - index - 1;
 	var item = analyzeDataStore.items[tableIndex];
 	var val = [];
-	if (status == 'Completed') {
-		val.push('Completed');
+	if (status == 'Complete') {
+		val.push('Complete');
 		item.status = val;
 		val = [];
 		val.push('<a href="javascript:analyzeQuery(' + index + ')" >See results</a>');
@@ -2448,7 +2400,7 @@ function analyzeQuery(index) {
 	var tableIndex = analyzeDataStore.items.length - index - 1;
 	var item = analyzeDataStore.items[tableIndex];
 	$('#replayTitle').show();
-	submitQuery('replayDivContent', item, -1);
+	submitQuery('replayDivContent', item, -1, null);
 }
 
 function copyValue(val) {
@@ -2603,21 +2555,97 @@ function iqr(k) {
   };
 }
 
-function getOutput(data) {
-	var ret = null;
+function getOutput(data, ret) {
 	if ($.isPlainObject(data)) {
 		$.each(data, function(key, value) {
 			if (key == 'Output') {
-				ret = value;
-				return false;
+				ret.push(value);
 			} else {
-				ret = getOutput(value);
-				if (ret != null) {
-					return false;
-				}
+				getOutput(value, ret);
+			}
+		});
+	} else if ($.isArray(data)) {
+		$.each(data, function(i, value) {
+			if ($.isPlainObject(value)) {
+				getOutput(value, ret);
 			}
 		});
 	}
-	return ret;
+}
+
+function showProjects() {
+	hideQuery();
+	$('#newProjectDiv').hide();
+	$('#projectsListDiv').show();
+	$('#projectsList').html('');
+	var h6 = $('<h6>');
+	h6.html('No projects are available.');
+	$('#projectsList').append(h6);
+}
+
+function newProject() {
+	var url = HOME + '/registry?action=getPI';
+	scanner.GET(url, true, postGetPI, null, null, 0);
+}
+
+function postGetPI(data, textStatus, jqXHR, param) {
+	$('#projectsListDiv').hide();
+	$('#newProjectDiv').show();
+	var select = $('#selectProjectInvestigator');
+	select.html('');
+	var option = $('<option>');
+	option.text('Select an user');
+	option.attr('value', '');
+	select.append(option);
+	$.each(data, function(i, user) {
+		var option = $('<option>');
+		option.text(user['firstName'] + ' ' + user['lastName']);
+		option.attr('value', user['id']);
+		select.append(option);
+	});
+	$('#newProjectButtonDiv').width($('#newProjectTable').width());
+}
+
+function showProjectSlices() {
+	if ($('#projectTitle').val().replace(/^\s*/, "").replace(/\s*$/, "").length == 0) {
+		alert('Please supply a value for the "Project Title.');
+		return;
+	}
+	$('#newProjectDiv').hide();
+	$('#projectSlices').show();
+	initSliceGrid();
+}
+
+function previousProject() {
+	$('#newProjectDiv').show();
+	$('#projectSlices').hide();
+}
+
+/**
+ * Push an entry in the analyze table
+ * 
+ * @param obj
+ * 	the object with the columns values
+ */
+function initSliceGrid() {
+	require(['dojox/grid/DataGrid', 'dojo/data/ItemFileWriteStore'], function(DataGrid, ItemFileWriteStore) {
+		slicesDataStore.items = [];
+		if (slicesGrid != null) {
+			slicesGrid.destroyRecursive();
+		}
+		var store = new ItemFileWriteStore({data: slicesDataStore});
+		slicesGrid = new DataGrid({
+			id: 'slicesGrid',
+			store: store,
+			structure: slicesLayout,
+			escapeHTMLInData: false,
+			rowSelector: '20px'});
+
+		/*append the new grid to the div*/
+		slicesGrid.placeAt("slicesGridDiv");
+
+		/*Call startup() to render the grid*/
+		slicesGrid.startup();
+	});
 }
 

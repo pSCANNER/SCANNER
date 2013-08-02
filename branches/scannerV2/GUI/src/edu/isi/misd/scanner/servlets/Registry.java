@@ -158,10 +158,18 @@ public class Registry extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get worker.");
 				return;
 			}
-		}  else if (action.equals("getSite")) {
+		} else if (action.equals("getSite")) {
 			clientResponse = registryClient.getSite(name);
 			if (clientResponse != null) {
 				res = clientResponse.toSite();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site.");
+				return;
+			}
+		} else if (action.equals("getPI")) {
+			clientResponse = registryClient.getPI();
+			if (clientResponse != null) {
+				res = clientResponse.getEntityString();
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site.");
 				return;

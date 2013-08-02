@@ -2193,4 +2193,16 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+	@Override
+	public RegistryClientResponse getPI() {
+		RegistryClientResponse clientResponse = null;
+		client.setCookieValue(cookie);
+		String url = tagfilerURL + "/query/rtype=user;roles=PI" +
+			"(id;firstName;lastName)lastName:asc:";
+		//System.out.println("url: " + url);
+		ClientURLResponse rsp = client.get(url, cookie);
+		clientResponse = new TagfilerClientResponse(rsp);
+		return clientResponse;
+	}
+
 }

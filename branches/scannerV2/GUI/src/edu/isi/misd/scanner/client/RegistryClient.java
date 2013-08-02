@@ -692,4 +692,5 @@ public interface RegistryClient {
      */
 	public RegistryClientResponse getSitesMap();
 
+	public RegistryClientResponse getPI();
 }
