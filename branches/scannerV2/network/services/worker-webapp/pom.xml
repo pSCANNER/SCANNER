@@ -16,6 +16,12 @@
 	</properties>
 
 	<dependencies>
+        <dependency>
+          <groupId>edu.isi.misd.scanner.network.base</groupId>
+          <artifactId>base-common</artifactId>
+          <version>${project.version}</version>
+        </dependency>  
+              
 		<!-- Activiti -->
 		<dependency>
 			<groupId>org.activiti</groupId>

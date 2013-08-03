@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.base.worker.workflow;
 
+import edu.isi.misd.scanner.network.types.base.SiteInfo;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import java.io.BufferedInputStream;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ActivitiAuthorizationTaskCreationProcessor implements Processor 
 {
+    public static final String SITE_ID = "siteID";
     public static final String FILE_PATH = "filePath";
     public static final String HOLDING_PATH = "holdingPath";
     public static final String PROCESS_INSTANCE_KEY = 
@@ -47,10 +49,15 @@ public class ActivitiAuthorizationTaskCreationProcessor implements Processor
     {
         CamelContext context = exchange.getContext();
         String id = exchange.getIn().getHeader(BaseConstants.ID,String.class); 
-        
+        String url = 
+            exchange.getIn().getHeader(BaseConstants.REQUEST_URL, String.class);
+        SiteInfo siteInfo = MessageUtils.getSiteInfo(exchange);
+        String siteID = siteInfo.getSiteName();
         // create Activiti process variables
         HashMap<String, Object> variables = new HashMap<String, Object>();
         variables.put(BaseConstants.ID, id);
+        variables.put(BaseConstants.REQUEST_URL, url);
+        variables.put(SITE_ID, siteID);
         variables.put(FILE_PATH, exchange.getProperty(FILE_PATH));
         variables.put(HOLDING_PATH, exchange.getProperty(HOLDING_PATH));
         variables.put("mailNotificationsEnabled",
