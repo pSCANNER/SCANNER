@@ -80,6 +80,12 @@ var slicesLayout = [[
                      {'name': 'Users', 'field': 'users', 'width': '15%'}
                      ]];
 
+var projectsLayout = [[
+                     {'name': 'Project Title', 'field': 'title', 'width': '20%'},
+                     {'name': 'Principal Investigator', 'field': 'principal', 'width': '30%'},
+                     {'name': 'Project Description', 'field': 'description', 'width': '50%'}
+                     ]];
+
 var analyzeDataStore = {
 		identifier: "id",
 		items: []
@@ -90,10 +96,16 @@ var slicesDataStore = {
 		items: []
 };
 
+var projectsDataStore = {
+		identifier: "id",
+		items: []
+};
+
 var intervalVariable;
 
 var analyzeGrid = null;
 var slicesGrid = null;
+var projectsGrid = null;
 var queriesCounter = 0;
 var studiesCounter = [];
 
@@ -307,12 +319,7 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 	$.each(successConnections, function(i, siteInfo) {
 		var siteName = siteInfo['RequestSiteInfo']['SiteName'];
 		var url = siteInfo['RequestURL'];
-		url = url.split('//');
-		url = url[1].split('/');
-		var value = sitesMap[url[0]];
-		if (value != null) {
-			siteName = value;
-		}
+		siteName = getSiteName(siteName, url);
 		var tr = $('<tr>');
 		tbody.append(tr);
 		var td = $('<td>');
@@ -335,12 +342,7 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 	$.each(errorConnections, function(i, siteInfo) {
 		var siteName = siteInfo['RequestSiteInfo']['SiteName'];
 		var url = siteInfo['RequestURL'];
-		url = url.split('//');
-		url = url[1].split('/');
-		var value = sitesMap[url[0]];
-		if (value != null) {
-			siteName = value;
-		}
+		siteName = getSiteName(siteName, url);
 		var tr = $('<tr>');
 		tbody.append(tr);
 		var td = $('<td>');
@@ -845,15 +847,21 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 		var temp = $.parseJSON(data);
 		var serviceResponse = temp['data']['ServiceResponses']['ServiceResponse'];
 		var complete = true;
+		var state = null;
 		$.each(serviceResponse, function(i, elem) {
 			if (elem['ServiceResponseMetadata'] != null && elem['ServiceResponseMetadata']['RequestState'] != 'Complete') {
 				complete = false;
+				if (elem['ServiceResponseMetadata']['RequestState'] != 'Held') {
+					state = elem['ServiceResponseMetadata']['RequestState'];
+				}
 				return false;
 			}
 		});
 
 		if (complete) {
 			postRefreshQueryStatus(param['checkStatus'], 'Complete');
+		} else if (state != null) {
+			postRefreshQueryStatus(param['checkStatus'], state);
 		}
 	} else {
 		postResult = data;
@@ -1030,7 +1038,7 @@ function getRowsValues(res, columns, rows, sites) {
 	var serviceResponse = res['ServiceResponses']['ServiceResponse'];
 	$.each(serviceResponse, function(i, elem) {
 		if (elem['ServiceResponseData'] != null) {
-			sites.push(elem['ServiceResponseMetadata']['RequestSiteInfo']);
+			sites.push(elem['ServiceResponseMetadata']);
 			getSiteRowsValues(elem['ServiceResponseData'], columns, rows);
 		}
 	});
@@ -1197,14 +1205,17 @@ function buildDataTable(tab) {
 				var siteInfo = sites[siteNo++];
 				if (siteInfo != null) {
 					var value = '';
-					if (siteInfo['SiteName'] != null) {
-						value = 'Site Name: ' + siteInfo['SiteName'];
+					var siteName = siteInfo['RequestSiteInfo']['SiteName'];
+					var url = siteInfo['RequestURL'];
+					siteName = getSiteName(siteName, url);
+					if (siteName != null) {
+						value = 'Site Name: ' + siteName;
 					}
-					if (siteInfo['SiteDescription'] != null) {
+					if (siteInfo['RequestSiteInfo']['SiteDescription'] != null) {
 						if (value.length > 0) {
 							value += '<br/>';
 						}
-						value += 'Site Description: ' + siteInfo['SiteDescription'];
+						value += 'Site Description: ' + siteInfo['RequestSiteInfo']['SiteDescription'];
 					}
 					td.html(value);
 				} else {
@@ -1249,12 +1260,7 @@ function buildStatusDataTable(tab) {
 		if (serviceResponseMetadata != null) {
 			var siteName = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
 			var url = serviceResponseMetadata['RequestURL'];
-			url = url.split('//');
-			url = url[1].split('/');
-			var value = sitesMap[url[0]];
-			if (value != null) {
-				siteName = value;
-			}
+			siteName = getSiteName(siteName, url);
 			var row = [];
 			row.push(siteName);
 			row.push(serviceResponseMetadata['RequestSiteInfo']['SiteDescription']);
@@ -1951,21 +1957,11 @@ function compareServiceResponseMetadata(obj1, obj2) {
 	var serviceResponseMetadata = obj1['ServiceResponseMetadata'];
 	var val1 = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
 	var url = serviceResponseMetadata['RequestURL'];
-	url = url.split('//');
-	url = url[1].split('/');
-	var value = sitesMap[url[0]];
-	if (value != null) {
-		val1 = value;
-	}
+	val1 = getSiteName(val1, url);
 	serviceResponseMetadata = obj2['ServiceResponseMetadata'];
 	var val2 = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
 	url = serviceResponseMetadata['RequestURL'];
-	url = url.split('//');
-	url = url[1].split('/');
-	var value = sitesMap[url[0]];
-	if (value != null) {
-		val2 = value;
-	}
+	val2 = getSiteName(val2, url);
 	var val1 = val1.toLowerCase();
 	var val2 = val2.toLowerCase();
 	if (val1 == val2) {
@@ -2377,8 +2373,8 @@ function postRefreshQueryStatus(index, status) {
 	var tableIndex = analyzeDataStore.items.length - index - 1;
 	var item = analyzeDataStore.items[tableIndex];
 	var val = [];
-	if (status == 'Complete') {
-		val.push('Complete');
+	if (status != 'Held') {
+		val.push(status);
 		item.status = val;
 		val = [];
 		val.push('<a href="javascript:analyzeQuery(' + index + ')" >See results</a>');
@@ -2574,13 +2570,14 @@ function getOutput(data, ret) {
 }
 
 function showProjects() {
-	hideQuery();
+	$('#paramsWrapperDiv').hide();
+	$('#replayDivWrapper').hide();
+	$('#statusReplayWrapperDiv').hide();
 	$('#newProjectDiv').hide();
 	$('#projectsListDiv').show();
-	$('#projectsList').html('');
-	var h6 = $('<h6>');
-	h6.html('No projects are available.');
-	$('#projectsList').append(h6);
+	$('#projectSlices').hide();
+	$('#projectsGridDiv').html('');
+	initProjectsGrid();
 }
 
 function newProject() {
@@ -2591,6 +2588,7 @@ function newProject() {
 function postGetPI(data, textStatus, jqXHR, param) {
 	$('#projectsListDiv').hide();
 	$('#newProjectDiv').show();
+	$('#projectTitle').val('');
 	var select = $('#selectProjectInvestigator');
 	select.html('');
 	var option = $('<option>');
@@ -2647,5 +2645,57 @@ function initSliceGrid() {
 		/*Call startup() to render the grid*/
 		slicesGrid.startup();
 	});
+}
+
+function initProjectsGrid() {
+	require(['dojox/grid/DataGrid', 'dojo/data/ItemFileWriteStore'], function(DataGrid, ItemFileWriteStore) {
+		projectsDataStore.items = [];
+		if (projectsGrid != null) {
+			projectsGrid.destroyRecursive();
+		}
+		var store = new ItemFileWriteStore({data: projectsDataStore});
+		projectsGrid = new DataGrid({
+			id: 'projectsGrid',
+			store: store,
+			structure: projectsLayout,
+			escapeHTMLInData: false,
+			rowSelector: '20px'});
+
+		/*append the new grid to the div*/
+		projectsGrid.placeAt("projectsGridDiv");
+
+		/*Call startup() to render the grid*/
+		projectsGrid.startup();
+	});
+}
+
+function manageStudies() {
+	alert('Not yet implemented: "manageStudies".');
+}
+
+function manageDatasets() {
+	alert('Not yet implemented: "manageDatasets".');
+}
+
+function manageSites() {
+	alert('Not yet implemented: "manageSites".');
+}
+
+function saveProject() {
+	alert('Not yet implemented: "saveProject".');
+}
+
+function newSlice() {
+	alert('Not yet implemented: "newSlice".');
+}
+
+function getSiteName(siteName, url) {
+	url = url.split('//');
+	url = url[1].split('/');
+	var value = sitesMap[url[0]];
+	if (value != null) {
+		siteName = value;
+	}
+	return siteName;
 }
 

@@ -188,7 +188,7 @@ th.attribute_value {
   /* white-space:nowrap; */
 }
 
-tr.odd {
+tr.uneven {
   background-color: #cccccc;
 }
 
