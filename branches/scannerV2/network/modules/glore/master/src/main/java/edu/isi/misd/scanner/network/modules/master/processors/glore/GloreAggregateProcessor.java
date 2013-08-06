@@ -1,6 +1,7 @@
 package edu.isi.misd.scanner.network.modules.master.processors.glore;
 
 import Jama.Matrix;
+import edu.isi.misd.scanner.network.base.master.processors.BaseAggregateProcessor;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * computation is collated in to a single response message and returned to the 
  * client.
  */
-public class GloreAggregateProcessor implements Processor 
+public class GloreAggregateProcessor extends BaseAggregateProcessor 
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(GloreAggregateProcessor.class);
@@ -49,16 +50,17 @@ public class GloreAggregateProcessor implements Processor
     @Override
     public void process(Exchange exchange) throws Exception
     {
+        // creates the aggregate ServiceResponses object
+        super.process(exchange);
+        
         // fail fast - treating GLORE as transactional for now,
         // so if any part of the request fails, the entire request fails.
-        List<ServiceResponseMetadata> errors = getGloreErrorList(exchange);
-        if (!errors.isEmpty()) 
+        List<ServiceResponse> errorResponses = getGloreErrorList(exchange);
+        if (!errorResponses.isEmpty()) 
         {
             ServiceResponses responses = new ServiceResponses();                     
-            for (ServiceResponseMetadata error : errors) {
-                ServiceResponse response = new ServiceResponse();    
-                response.setServiceResponseMetadata(error);         
-                responses.getServiceResponse().add(response);
+            for (ServiceResponse errorResponse : errorResponses) {      
+                responses.getServiceResponse().add(errorResponse);
             }
             exchange.getIn().setBody(responses);  
             
@@ -284,41 +286,56 @@ public class GloreAggregateProcessor implements Processor
         getGloreRequestList(Exchange exchange)
         throws Exception
     {
-        ArrayList resultsInput = 
-            exchange.getIn().getBody(ArrayList.class);
-        ArrayList<GloreLogisticRegressionRequest> resultsOutput = 
-            new ArrayList<GloreLogisticRegressionRequest>();
+        ServiceResponses serviceResponses = 
+            exchange.getIn().getBody(ServiceResponses.class);   
+        if (serviceResponses == null) {
+            throw new NullPointerException(
+                "ServiceResponses aggregate structure was null");
+        }        
+        List<ServiceResponse> resultsInput = 
+            serviceResponses.getServiceResponse();     
         
-        for (Object result : resultsInput) 
+        ArrayList<GloreLogisticRegressionRequest> resultsOutput = 
+            new ArrayList<GloreLogisticRegressionRequest>();        
+        for (ServiceResponse result : resultsInput) 
         {
-            if (result instanceof ServiceResponse) {
-                continue;
+            ServiceResponseData responseData = result.getServiceResponseData();
+            if (responseData != null) {
+                GloreLogisticRegressionRequest request = 
+                        (GloreLogisticRegressionRequest)MessageUtils.convertTo(
+                            GloreLogisticRegressionRequest.class,              
+                            responseData.getAny(),
+                            exchange);
+                resultsOutput.add(request);
+            } else {
+                log.warn("A ServiceResponse was missing the expected ServiceResponseData");
             }
-            GloreLogisticRegressionRequest request = 
-                (GloreLogisticRegressionRequest)MessageUtils.convertTo(
-                    GloreLogisticRegressionRequest.class, result, exchange);
-            resultsOutput.add(request);
         }        
         return resultsOutput; 
     }
 
-    private List<ServiceResponseMetadata> getGloreErrorList(Exchange exchange)
+    private List<ServiceResponse> getGloreErrorList(Exchange exchange)
+        throws Exception
     {
-        ArrayList resultsInput = 
-            exchange.getIn().getBody(ArrayList.class);        
-        ArrayList<ServiceResponseMetadata> errors = 
-            new ArrayList<ServiceResponseMetadata>(); 
+        ServiceResponses serviceResponses = 
+            exchange.getIn().getBody(ServiceResponses.class);   
+        if (serviceResponses == null) {
+            throw new NullPointerException(
+                "ServiceResponses aggregate structure was null");
+        }        
+        List<ServiceResponse> resultsInput = 
+            serviceResponses.getServiceResponse(); 
         
-        for (Object result : resultsInput) 
+        ArrayList<ServiceResponse> errors = 
+            new ArrayList<ServiceResponse>();         
+        for (ServiceResponse result : resultsInput) 
         {
-            if (result instanceof ServiceResponse) {
                 ServiceResponseMetadata status = 
-                    ((ServiceResponse)result).getServiceResponseMetadata();
+                    result.getServiceResponseMetadata();
                 if (ServiceRequestStateType.ERROR.equals(
                     status.getRequestState())) {
-                        errors.add(status);
+                        errors.add(result);
                 }
-            }
         }
         return errors;         
     }
