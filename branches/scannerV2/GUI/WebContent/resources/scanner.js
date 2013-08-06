@@ -161,6 +161,7 @@ function initScanner() {
 		resizable: true,
 		width: 500
 	});
+	submitLogin();
 }
 
 /**
@@ -421,6 +422,7 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 		loadMethods(emptyValue);
 		loadSites(emptyValue, false);
 		loadStudies(names);
+		$('#selectStudies').attr('disabled', 'disabled');
 	} else {
 		$('#ui').hide();
 		$('#authorizationWrapperDiv').show();
@@ -1567,12 +1569,8 @@ var scanner = {
 };
 
 function submitLogin() {
-	var user = $('#username').val();
-	var password = $('#password').val();
 	var url = HOME + '/login';
 	var obj = new Object();
-	obj['username'] = user;
-	obj['password'] = password;
 	document.body.style.cursor = "wait";
 	scanner.POST(url, obj, true, postSubmitLogin, null, null, 0);
 }
@@ -1771,16 +1769,20 @@ function loginRegistry() {
 function postLoginRegistry(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
-		$('#loginForm').css('display', 'none');
-		$('#ui').css('visibility', 'visible');
-		$('#ui').css('display', '');
 		setContacts(res['contacts']);
 		renderAvailableStudies();
 		renderSitesStatus();
-		$('#logoutButton').show();
 	} else {
 		alert(res['status']);
 	}
+}
+
+function analyzeStudy() {
+	$('#loginForm').css('display', 'none');
+	$('#ui').css('visibility', 'visible');
+	$('#ui').css('display', '');
+	$('#logoutButton').show();
+	$('#studyName').html('Study: ' + getSelectedStudyName());
 }
 
 function downloadFile() {
@@ -2094,8 +2096,12 @@ function loadStudies(values) {
 				if (selValues != null) { 
 					if (selValues.length == 1) {
 						renderAvailableDatasets();
+						$('#continueButton').removeAttr('disabled');
 					} else if (selValues.length > 1) {
 						studiesMultiSelect.set('value', '');
+						$('#continueButton').attr('disabled', 'disabled');
+					} else if (selValues.length == 0) {
+						$('#continueButton').attr('disabled', 'disabled');
 					}
 				} 
 			});
@@ -2435,9 +2441,11 @@ function copyObject(obj) {
 
 function enableScanner() {
 	if ($('#acceptConditions').attr('checked') == 'checked') {
-		$('#continueButton').removeAttr('disabled');
+		$('#selectStudies').removeAttr('disabled');
 	} else {
+		studiesMultiSelect.set('value', '');
 		$('#continueButton').attr('disabled', 'disabled');
+		$('#selectStudies').attr('disabled', 'disabled');
 	}
 
 }
@@ -2697,5 +2705,17 @@ function getSiteName(siteName, url) {
 		siteName = value;
 	}
 	return siteName;
+}
+
+function expandQueryResults() {
+	$('#replayDivContent').show();
+	$('#expandResults').hide();
+	$('#collapseResults').show();
+}
+
+function collapseQueryResults() {
+	$('#replayDivContent').hide();
+	$('#expandResults').show();
+	$('#collapseResults').hide();
 }
 
