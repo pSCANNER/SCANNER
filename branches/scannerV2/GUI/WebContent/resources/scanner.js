@@ -305,6 +305,10 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 	tbody.html('');
 	sitesMap = data['sitesMap'];
 	var sitesStatus = data['echo']['ServiceResponses']['ServiceResponse'];
+	if (!$.isArray(sitesStatus)) {
+		sitesStatus = [];
+		sitesStatus.push(data['echo']['ServiceResponses']['ServiceResponse']);
+	}
 	sitesStatus.sort(compareServiceResponseMetadata);
 	var refreshTimestamp = $('#refreshTimestamp');
 	refreshTimestamp.html(data['timestamp']);
@@ -385,7 +389,6 @@ function renderAvailableStudies() {
 	$('#datasetHelp').html('');
 	$('#libraryHelp').html('');
 	$('#methodHelp').html('');
-	$('#paramsHelpDiv').css('display', 'none');
 	$('#paramsTitle').css('display', 'none');
 	$('#paramsDiv').css('display', 'none');
 	
@@ -601,15 +604,14 @@ var linkedParameters = {};
 
 function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 	parametersBody = data;
-	$('#paramsHelpDiv').css('display', '');
 	$('#paramsDiv').css('display', '');
+	$('#statusQueryWrapperDiv').hide();
+	$('#queryDiv').hide();
 	var paramsTitle = $('#paramsTitle');
 	paramsTitle.css('display', '');
 	paramsTitle.html(getSelectedLibraryName() + '/' + getSelectedMethodName());
 	var paramsDiv = $('#paramsDivContent');
-	var paramsHelp = $('#paramsHelp');
 	paramsDiv.html('');
-	paramsHelp.html('');
 	linkedParameters = {};
 	
 	var table = $('<table>');
@@ -639,7 +641,7 @@ function renderParam(div, param, index, table, select) {
 	$.each(param, function(key, value) {
 		var metadata = value['metadata'];
 		if (metadata['quickHelp'] == 'true') {
-			$('#paramsHelp').append(metadata['description']).append($('<br/><br/>'));
+			//$('#paramsHelp').append(metadata['description']).append($('<br/><br/>'));
 		}
 		if (metadata['parameterType'] == 'group') {
 			table.remove();
@@ -777,6 +779,11 @@ function postRenderSites(data, textStatus, jqXHR, param) {
  * Send the request to get the data from the SCANNER
  */
 function submitQuery(div, replay, checkStatus, resultData) {
+	if (div == 'queryDivContent') {
+		$('#queryDivContent').hide();
+		$('#expandQueryResultsArrow').show();
+		$('#collapseQueryResultsArrow').hide();
+	}
 	var obj = {};
 	var param = {};
 	if (replay == null) {
@@ -824,9 +831,10 @@ function submitQuery(div, replay, checkStatus, resultData) {
 		obj['sites'] = replay['sites'][0];
 	}
 	param['resultDiv'] = $('#' + div);
-	param['statusDiv'] = $('#statusReplayDivContent');
+	param['statusDiv'] = (div == 'queryDivContent') ? $('#statusQueryDivContent') : $('#statusReplayDivContent');
 	param['resultDiv'].parent().hide();
 	param['statusDiv'].parent().hide();
+	param['statusDiv'].parent().parent().hide();
 	param['library'] = obj['library'];
 	param['checkStatus'] = checkStatus;
 	param.spinner.parent().show();
@@ -858,6 +866,10 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 		// check if completed
 		var temp = $.parseJSON(data);
 		var serviceResponse = temp['data']['ServiceResponses']['ServiceResponse'];
+		if (!$.isArray(serviceResponse)) {
+			serviceResponse = [];
+			serviceResponse.push(temp['data']['ServiceResponses']['ServiceResponse']);
+		}
 		var complete = true;
 		var state = null;
 		$.each(serviceResponse, function(i, elem) {
@@ -892,6 +904,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	var index;
 	if (obj != null) {
 		obj['trxId'] = data['trxId'];
+		obj['complete'] = checkComplete(data['data']);
 		index = analyzeDataStore.items.length + 1;
 		pushAnalyze(obj);
 		queryResult = dict;
@@ -903,26 +916,25 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	var async = data['async'];
 	data = data['data'];
 	resultDiv.html('');
-	if (tab == 'Analyze' || $('#asyncCheckBox').attr('checked') != 'checked') {
-		var a = $('<a>');
-		a.addClass('link-style banner-text');
-		a.attr('href', 'javascript:buildTable("'+tab+'");');
-		a.html('Data table');
-		resultDiv.append(a);
-		resultDiv.append('&nbsp;&nbsp;');
-		a = $('<a>');
-		a.addClass('link-style banner-text');
-		a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
-		a.html('Box plot');
-		resultDiv.append(a);
-		buildStatusDataTable(tab);
-		buildDataTable(tab);
-	} else {
+	var a = $('<a>');
+	a.addClass('link-style banner-text');
+	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
+	a.html('Box plot');
+	resultDiv.append(a);
+	resultDiv.append('&nbsp;&nbsp;');
+	a = $('<a>');
+	a.addClass('link-style banner-text');
+	a.attr('href', 'javascript:buildTable("'+tab+'");');
+	a.html('Data table');
+	resultDiv.append(a);
+	buildStatusDataTable(tab);
+	buildBoxPlot(tab);
+	/*
 		if (async != null) {
 			scannerTabContainer.forward();
 			intervalVariable = setInterval(function(){checkAnalyzeDataStore(index);},1);
 		}
-	}
+	*/
 }
 
 function checkAnalyzeDataStore(index) {
@@ -942,14 +954,14 @@ function buildTable(tab) {
 	resultDiv.html('');
 	var a = $('<a>');
 	a.addClass('link-style banner-text');
-	a.attr('href', 'javascript:buildTable("'+tab+'");');
-	a.html('Data table');
+	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
+	a.html('Box plot');
 	resultDiv.append(a);
 	resultDiv.append('&nbsp;&nbsp;');
 	a = $('<a>');
 	a.addClass('link-style banner-text');
-	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
-	a.html('Box plot');
+	a.attr('href', 'javascript:buildTable("'+tab+'");');
+	a.html('Data table');
 	resultDiv.append(a);
 	buildStatusDataTable(tab);
 	buildDataTable(tab);
@@ -964,17 +976,18 @@ function buildBoxPlot(tab) {
 		resultDiv = analyzeResult['resultDiv'];
 		responseBody = analyzeResult['data'];
 	}
+	resultDiv.parent().show();
 	resultDiv.html('');
 	var a = $('<a>');
 	a.addClass('link-style banner-text');
-	a.attr('href', 'javascript:buildTable("'+tab+'");');
-	a.html('Data table');
+	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
+	a.html('Box plot');
 	resultDiv.append(a);
 	resultDiv.append('&nbsp;&nbsp;');
 	a = $('<a>');
 	a.addClass('link-style banner-text');
-	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
-	a.html('Box plot');
+	a.attr('href', 'javascript:buildTable("'+tab+'");');
+	a.html('Data table');
 	resultDiv.append(a);
 	var sitesCoeficients = [];
 	var output = [];
@@ -988,7 +1001,8 @@ function buildBoxPlot(tab) {
 		}
 		sitesCoeficients.push(coeficient);
 	});
-	var allColumns = ['p-value', 't-statistics', 'B', 'SE', 'degreeOfFreedom'];
+	//var allColumns = ['p-value', 't-statistics', 'B', 'SE', 'degreeOfFreedom'];
+	var allColumns = ['p-value'];
 	$.each(allColumns, function(i, col) {
 		resultDiv.append($('<br>'));
 		var h3 = $('<h3>');
@@ -1048,6 +1062,10 @@ function getColumnsNames(res, columns) {
 */
 function getRowsValues(res, columns, rows, sites) {
 	var serviceResponse = res['ServiceResponses']['ServiceResponse'];
+	if (!$.isArray(serviceResponse)) {
+		serviceResponse = [];
+		serviceResponse.push(res['ServiceResponses']['ServiceResponse']);
+	}
 	$.each(serviceResponse, function(i, elem) {
 		if (elem['ServiceResponseData'] != null) {
 			sites.push(elem['ServiceResponseMetadata']);
@@ -1267,6 +1285,10 @@ function buildStatusDataTable(tab) {
 	var rows = [];
 	var complete = true;
 	var serviceResponse = res['ServiceResponses']['ServiceResponse'];
+	if (!$.isArray(serviceResponse)) {
+		serviceResponse = [];
+		serviceResponse.push(res['ServiceResponses']['ServiceResponse']);
+	}
 	$.each(serviceResponse, function(i, elem) {
 		var serviceResponseMetadata = elem['ServiceResponseMetadata'];
 		if (serviceResponseMetadata != null) {
@@ -1284,10 +1306,11 @@ function buildStatusDataTable(tab) {
 			}
 		}
 	});
-	if (complete) {
-		return;
+	if (tab == 'Query') {
+		$('#statusQueryWrapperDiv').show();
+	} else {
+		$('#statusReplayWrapperDiv').show();
 	}
-	$('#statusReplayWrapperDiv').show();
 	if (tableId == 'statusQueryExample') {
 		if (oStatusQueryTable != null) {
 			$('#' + tableId).remove();
@@ -1300,6 +1323,7 @@ function buildStatusDataTable(tab) {
 		}
 	}
 	resultDiv.parent().css('display', '');
+	resultDiv.parent().parent().css('display', '');
 	resultDiv.html('');
 	var table = $('<table>');
 	resultDiv.append(table);
@@ -1337,12 +1361,6 @@ function buildStatusDataTable(tab) {
 		"bInfo": false,
 		"bPaginate": false,
 		"bFilter": false,
-		"aoColumns": [
-		              	{ "sWidth": "20%" },
-		              	{ "sWidth": "30%" },
-		              	{ "sWidth": "10%" },
-		              	{ "sWidth": "40%" }
-		              ],
         'sDom': 'lfr<"giveHeight"t>ip'
 	});
 	if (tableId == 'statusQueryExample') {
@@ -2097,10 +2115,10 @@ function loadStudies(values) {
 				$('#datasetHelp').html('');
 				$('#libraryHelp').html('');
 				$('#methodHelp').html('');
-				$('#paramsHelpDiv').css('display', 'none');
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
-				$('#resultDiv').css('display', 'none');
+				$('#statusQueryWrapperDiv').css('display', 'none');
+				$('#queryDiv').css('display', 'none');
 				var selValues = studiesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2146,10 +2164,10 @@ function loadDatasets(values) {
 				$('#datasetHelp').html('');
 				$('#libraryHelp').html('');
 				$('#methodHelp').html('');
-				$('#paramsHelpDiv').css('display', 'none');
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
-				$('#resultDiv').css('display', 'none');
+				$('#statusQueryWrapperDiv').css('display', 'none');
+				$('#queryDiv').css('display', 'none');
 				var selValues = datasetsMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2186,10 +2204,10 @@ function loadLibraries(values) {
 			librariesMultiSelect = new MultiSelect({ name: 'selectLibraries', value: '' }, selLibraries);
 			librariesMultiSelect.watch('value', function () {
 				$('#libraryHelp').html('');
-				$('#paramsHelpDiv').css('display', 'none');
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
-				$('#resultDiv').css('display', 'none');
+				$('#statusQueryWrapperDiv').css('display', 'none');
+				$('#queryDiv').css('display', 'none');
 				var selValues = librariesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
@@ -2228,10 +2246,10 @@ function loadMethods(values) {
 				loadLibraries(emptyValue, false);
 				var selValues = methodsMultiSelect.get('value');
 				$('#methodHelp').html('');
-				$('#paramsHelpDiv').css('display', 'none');
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
-				$('#resultDiv').css('display', 'none');
+				$('#statusQueryWrapperDiv').css('display', 'none');
+				$('#queryDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
 						renderAvailableLibraries();
@@ -2269,10 +2287,10 @@ function loadSites(values, selectAll) {
 				loadMethods(emptyValue, false);
 				loadLibraries(emptyValue, false);
 				var selValues = sitesMultiSelect.get('value');
-				$('#paramsHelpDiv').css('display', 'none');
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
-				$('#resultDiv').css('display', 'none');
+				$('#statusQueryWrapperDiv').css('display', 'none');
+				$('#queryDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length >= 1) {
 						renderAvailableMethods();
@@ -2306,6 +2324,9 @@ function hideQuery() {
 	$('#paramsWrapperDiv').hide();
 	$('#replayDivWrapper').show();
 	$('#replayTitle').hide();
+	$('#expandResults').hide();
+	$('#collapseResults').hide();
+	$('#replayDivContent').hide();
 }
 
 /**
@@ -2360,8 +2381,13 @@ function pushAnalyze(obj) {
 		item.method = obj.method;
 		item.sites = obj.sites;
 		item.date = getDateString(new Date());
-		item.status = 'In Progress';
-		item.options = '<a href="javascript:refreshQueryStatus(' + index + ')" >Refresh</a>';
+		if (obj['complete']) {
+			item.status = 'Complete';
+			item.options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
+		} else {
+			item.status = 'In Progress';
+			item.options = '<a href="javascript:refreshQueryStatus(' + index + ')" >Refresh</a>';
+		}
 		item.id = index;
 		analyzeDataStore.items.unshift(item);
 		var store = new ItemFileWriteStore({data: analyzeDataStore});
@@ -2384,6 +2410,9 @@ function refreshQueryStatus(index) {
 	var tableIndex = analyzeDataStore.items.length - index - 1;
 	var item = analyzeDataStore.items[tableIndex];
 	$('#replayTitle').show();
+	$('#expandResults').show();
+	$('#collapseResults').hide();
+	$('#replayDivContent').hide();
 	submitQuery('replayDivContent', item, index, null);
 }
 
@@ -2391,6 +2420,9 @@ function displayQueryStatus(index) {
 	var tableIndex = analyzeDataStore.items.length - index - 1;
 	var item = analyzeDataStore.items[tableIndex];
 	$('#replayTitle').show();
+	$('#expandResults').show();
+	$('#collapseResults').hide();
+	$('#replayDivContent').hide();
 	submitQuery('replayDivContent', item, index, postResult);
 }
 
@@ -2421,6 +2453,9 @@ function analyzeQuery(index) {
 	var tableIndex = analyzeDataStore.items.length - index - 1;
 	var item = analyzeDataStore.items[tableIndex];
 	$('#replayTitle').show();
+	$('#expandResults').show();
+	$('#collapseResults').hide();
+	$('#replayDivContent').hide();
 	submitQuery('replayDivContent', item, -1, null);
 }
 
@@ -2726,15 +2761,34 @@ function getSiteName(siteName, url) {
 	return siteName;
 }
 
-function expandQueryResults() {
-	$('#replayDivContent').show();
-	$('#expandResults').hide();
-	$('#collapseResults').show();
+function expandQueryResults(divId, expandId, colappseId) {
+	$('#' + divId).show();
+	$('#' + expandId).hide();
+	$('#' + colappseId).show();
 }
 
-function collapseQueryResults() {
-	$('#replayDivContent').hide();
-	$('#expandResults').show();
-	$('#collapseResults').hide();
+function collapseQueryResults(divId, expandId, colappseId) {
+	$('#' + divId).hide();
+	$('#' + expandId).show();
+	$('#' + colappseId).hide();
+}
+
+function checkComplete(data) {
+	var complete = true;
+	var serviceResponse = data['ServiceResponses']['ServiceResponse'];
+	if (!$.isArray(serviceResponse)) {
+		serviceResponse = [];
+		serviceResponse.push(data['ServiceResponses']['ServiceResponse']);
+	}
+	$.each(serviceResponse, function(i, elem) {
+		var serviceResponseMetadata = elem['ServiceResponseMetadata'];
+		if (serviceResponseMetadata != null) {
+			if (serviceResponseMetadata['RequestState'] != 'Complete') {
+				complete = false;
+			}
+		}
+	});
+	return complete;
+	
 }
 
