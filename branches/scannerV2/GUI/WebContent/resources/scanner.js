@@ -382,7 +382,6 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
  */
 function renderAvailableStudies() {
 	// some clean up
-	$('#studyHelp').html('');
 	$('#datasetHelp').html('');
 	$('#libraryHelp').html('');
 	$('#methodHelp').html('');
@@ -435,7 +434,6 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 function renderAvailableDatasets() {
 	// send the request
 	var study = getSelectedStudyName();
-	$('#studyHelp').html(availableStudies[study]);
 	if (study != '') {
 		var url = HOME + '/query?action=getDatasets&study=' + encodeSafeURIComponent(study);
 		scanner.GET(url, true, postRenderAvailableDatasets, null, null, 0);
@@ -471,11 +469,22 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
  */
 function renderAvailableLibraries() {
 	// send the request
-	var dataset = getSelectedDatasetName();
-	$('#datasetHelp').html(availableDatasets[dataset]);
-	if (dataset != null && dataset.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && dataset != emptyValue) {
-		var url = HOME + '/query?action=getLibraries' +
+	var method = getSelectedMethodName();
+	if (method != null && method.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && method != emptyValue) {
+		$('#methodHelp').html(availableMethods[getSelectedMethodName()]);
+		var sites = getSelectedSitesNames();
+		var sitesURL = '';
+		if (sites.length > 0) {
+			sitesURL = '&site=';
+			var encodedSites = [];
+			$.each(sites, function(i, site) {
+				encodedSites.push(encodeSafeURIComponent(site));
+			});
+			sitesURL += valueToString(encodedSites);
+		}
+		var url = HOME + '/query?action=getLibraries' + sitesURL +
 		'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+		'&method=' + encodeSafeURIComponent(getSelectedMethodName()) +
 		'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
 		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
 	}
@@ -510,15 +519,20 @@ function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
  * Send the request to get the available methods
  */
 function renderAvailableMethods() {
-	// send the request
-	var lib = getSelectedLibraryName();
-	$('#libraryHelp').html(availableLibraries[lib]);
-	if (lib != null && lib.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && lib != emptyValue) {
-		var url = HOME + '/query?action=getMethods&library=' + encodeSafeURIComponent(lib) +
-			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
-			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
-		scanner.GET(url, true, postRenderAvailableMethods, null, null, 0);
+	var sites = getSelectedSitesNames();
+	var sitesURL = '';
+	if (sites.length > 0) {
+		sitesURL = '&site=';
+		var encodedSites = [];
+		$.each(sites, function(i, site) {
+			encodedSites.push(encodeSafeURIComponent(site));
+		});
+		sitesURL += valueToString(encodedSites);
 	}
+	var url = HOME + '/query?action=getMethods' + sitesURL +
+		'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+		'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
+	scanner.GET(url, true, postRenderAvailableMethods, null, null, 0);
 }
 
 /**
@@ -553,10 +567,10 @@ function renderAvailableParameters() {
 	var func = getSelectedMethodName();
 	var lib = getSelectedLibraryName();
 	var dataset = getSelectedDatasetName();
-	if (func != '' && func.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && func != emptyValue) {
+	if (lib != '' && lib.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && lib != emptyValue) {
+		$('#libraryHelp').html(availableLibraries[lib]);
 		var url = HOME + '/query?action=getParameters&method=' + encodeSafeURIComponent(func) + 
-			'&library=' + encodeSafeURIComponent(lib) +
-			'&dataset=' + encodeSafeURIComponent(dataset);
+			'&library=' + encodeSafeURIComponent(lib);
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -728,16 +742,12 @@ function renderParam(div, param, index, table, select) {
  * Send the request to get the available sites
  */
 function renderAvailableSites() {
-	var method = getSelectedMethodName();
-	if (method != null && method.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && method != emptyValue) {
-		$('#methodHelp').html(availableMethods[getSelectedMethodName()]);
-		var url = HOME + '/query?action=getSites' +
-				'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
-				'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName()) +
-				'&library=' + encodeSafeURIComponent(getSelectedLibraryName()) +
-				'&method=' + encodeSafeURIComponent(getSelectedMethodName());
-		scanner.GET(url, true, postRenderSites, null, null, 0);
-	}
+	var dataset = getSelectedDatasetName();
+	$('#datasetHelp').html(availableDatasets[dataset]);
+	var url = HOME + '/query?action=getSites' +
+	'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+	'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
+	scanner.GET(url, true, postRenderSites, null, null, 0);
 }
 
 /**
@@ -760,7 +770,7 @@ function postRenderSites(data, textStatus, jqXHR, param) {
 		names.push(name);
 	});
 	names.sort(compareIgnoreCase);
-	loadSites(names, true);
+	loadSites(names, false);
 }
 
 /**
@@ -2084,7 +2094,6 @@ function loadStudies(values) {
 				loadLibraries(emptyValue);
 				loadMethods(emptyValue);
 				loadSites(emptyValue, false);
-				$('#studyHelp').html('');
 				$('#datasetHelp').html('');
 				$('#libraryHelp').html('');
 				$('#methodHelp').html('');
@@ -2144,7 +2153,7 @@ function loadDatasets(values) {
 				var selValues = datasetsMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
-						renderAvailableLibraries();
+						renderAvailableSites();
 					} else if (selValues.length > 1) {
 						datasetsMultiSelect.set('value', '');
 					}
@@ -2176,10 +2185,7 @@ function loadLibraries(values) {
 			});
 			librariesMultiSelect = new MultiSelect({ name: 'selectLibraries', value: '' }, selLibraries);
 			librariesMultiSelect.watch('value', function () {
-				loadMethods(emptyValue);
-				loadSites(emptyValue, false);
 				$('#libraryHelp').html('');
-				$('#methodHelp').html('');
 				$('#paramsHelpDiv').css('display', 'none');
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
@@ -2187,7 +2193,7 @@ function loadLibraries(values) {
 				var selValues = librariesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
-						renderAvailableMethods();
+						renderAvailableParameters();
 					} else if (selValues.length > 1) {
 						librariesMultiSelect.set('value', '');
 					}
@@ -2219,7 +2225,7 @@ function loadMethods(values) {
 			});
 			methodsMultiSelect = new MultiSelect({ name: 'selectMethods', value: '' }, selMethods);
 			methodsMultiSelect.watch('value', function () {
-				loadSites(emptyValue, false);
+				loadLibraries(emptyValue, false);
 				var selValues = methodsMultiSelect.get('value');
 				$('#methodHelp').html('');
 				$('#paramsHelpDiv').css('display', 'none');
@@ -2228,8 +2234,7 @@ function loadMethods(values) {
 				$('#resultDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
-						renderAvailableSites();
-						renderAvailableParameters();
+						renderAvailableLibraries();
 					} else if (selValues.length > 1) {
 						methodsMultiSelect.set('value', '');
 					}
@@ -2260,6 +2265,20 @@ function loadSites(values, selectAll) {
 				selSites.appendChild(c);
 			});
 			sitesMultiSelect = new MultiSelect({ name: 'selectSites'}, selSites);
+			sitesMultiSelect.watch('value', function () {
+				loadMethods(emptyValue, false);
+				loadLibraries(emptyValue, false);
+				var selValues = sitesMultiSelect.get('value');
+				$('#paramsHelpDiv').css('display', 'none');
+				$('#paramsTitle').css('display', 'none');
+				$('#paramsDiv').css('display', 'none');
+				$('#resultDiv').css('display', 'none');
+				if (selValues != null) { 
+					if (selValues.length >= 1) {
+						renderAvailableMethods();
+					}
+				} 
+			});
 			if (!selectAll) {
 				sitesMultiSelect.set('value', '');
 			} else {

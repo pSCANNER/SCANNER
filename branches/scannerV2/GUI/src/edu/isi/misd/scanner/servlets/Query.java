@@ -140,7 +140,9 @@ public class Query extends HttpServlet {
 		} else if (action.equals("getLibraries")) {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
-			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset);
+			String sites = request.getParameter("site");
+			String func = request.getParameter("method");
+			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset, func, sites);
 			String ret = clientResponse.toLibraries();
 			clientResponse.release();
 			System.out.println("Get Libraries: "+ret);
@@ -149,8 +151,8 @@ public class Query extends HttpServlet {
 		} else if (action.equals("getMethods")) {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
-			String lib = request.getParameter("library");
-			RegistryClientResponse clientResponse = registryClient.getMethods(study, dataset, lib);
+			String sites = request.getParameter("site");
+			RegistryClientResponse clientResponse = registryClient.getMethods(study, dataset, sites);
 			String ret = clientResponse.toMethods();
 			clientResponse.release();
 			System.out.println("Get Methods: "+ret);
@@ -159,7 +161,6 @@ public class Query extends HttpServlet {
 		} else if (action.equals("getParameters")) {
 			String func = request.getParameter("method");
 			String lib = request.getParameter("library");
-			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib);
 			String ret = clientResponse.toParameters();
 			clientResponse.release();
@@ -169,9 +170,7 @@ public class Query extends HttpServlet {
 		} else if (action.equals("getSites")) {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
-			String lib = request.getParameter("library");
-			String func = request.getParameter("method");
-			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset, lib, func);
+			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset);
 			String ret = clientResponse.toSites();
 			clientResponse.release();
 			System.out.println("Get Sites:\n"+ret);

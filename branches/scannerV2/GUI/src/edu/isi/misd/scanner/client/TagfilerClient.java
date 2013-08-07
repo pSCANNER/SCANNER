@@ -2,6 +2,9 @@ package edu.isi.misd.scanner.client;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -1577,16 +1580,47 @@ public class TagfilerClient implements RegistryClient {
      * @return The client response.
      */
 	@Override
-	public RegistryClientResponse getLibraries(String study, String dataset) {
+	public RegistryClientResponse getLibraries(String study, String dataset, String method, String sites) {
 		RegistryClientResponse clientResponse = null;
+		ArrayList<String> sitesList = new ArrayList<String>();
 		client.setCookieValue(cookie);
 		try {
+			JSONArray sitesArray = new JSONArray(sites);
+			String sitesURL = ";site=";
+			for (int i=0; i < sitesArray.length(); i++) {
+				if (i != 0) {
+					sitesURL += ",";
+				}
+				sitesURL += Utils.urlEncode(sitesArray.getString(i));
+				sitesList.add(sitesArray.getString(i));
+			}
 			String url = tagfilerURL + "/query/rtype=worker;study=" + Utils.urlEncode(study) + 
-			";dataset=" + Utils.urlEncode(dataset) + getUserPredicate() + "(library)";
+			";dataset=" + Utils.urlEncode(dataset) + ";method=" + Utils.urlEncode(method) + sitesURL + getUserPredicate() + "(id;site;library)";
 			System.out.println("url: " + url);
 			ClientURLResponse rsp = client.get(url, cookie);
 			JSONArray arr = new JSONArray(rsp.getEntityString());
+			HashMap <String, HashSet<String>> sitesMap = new HashMap <String, HashSet<String>>();
+			for (int i=0; i < sitesList.size(); i++) {
+				sitesMap.put(sitesList.get(i), new HashSet<String>());
+			}
+			for (int i=0; i < arr.length(); i++) {
+				JSONArray libraryValues = arr.getJSONObject(i).getJSONArray("library");
+				String site = arr.getJSONObject(i).getString("site");
+				for (int j=0; j < libraryValues.length(); j++) {
+					String library = libraryValues.getString(j);
+					HashSet<String> libraries = sitesMap.get(site);
+					libraries.add(library);
+				}
+			}
+			HashSet<String> librariesSet = sitesMap.get(sitesList.get(0));
+			for (int i=1; i < sitesList.size(); i++) {
+				librariesSet.retainAll(sitesMap.get(sitesList.get(i)));
+			}
 			ArrayList<String> libraries = new ArrayList<String>();
+			Iterator <String> iter = librariesSet.iterator();
+			while (iter.hasNext()) {
+				libraries.add(iter.next());
+			}
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
 				JSONArray values = obj.getJSONArray("library");
@@ -1627,25 +1661,46 @@ public class TagfilerClient implements RegistryClient {
      * @return The client response.
      */
 	@Override
-	public RegistryClientResponse getMethods(String study, String dataset, String lib) {
+	public RegistryClientResponse getMethods(String study, String dataset, String sites) {
 		RegistryClientResponse clientResponse = null;
+		ArrayList<String> sitesList = new ArrayList<String>();
 		try {
+			JSONArray sitesArray = new JSONArray(sites);
+			String sitesURL = ";site=";
+			for (int i=0; i < sitesArray.length(); i++) {
+				if (i != 0) {
+					sitesURL += ",";
+				}
+				sitesURL += Utils.urlEncode(sitesArray.getString(i));
+				sitesList.add(sitesArray.getString(i));
+			}
 			client.setCookieValue(cookie);
 			String url = tagfilerURL + "/query/rtype=worker;study=" + Utils.urlEncode(study) + 
-			";dataset=" + Utils.urlEncode(dataset) + ";library=" + Utils.urlEncode(lib) + getUserPredicate() + 
-			"(method)";
-			System.out.println("url: " + url);
+			";dataset=" + Utils.urlEncode(dataset) + sitesURL + getUserPredicate() + 
+			"(method;site;library)";
 			ClientURLResponse rsp = client.get(url, cookie);
 			JSONArray arr = new JSONArray(rsp.getEntityString());
-			ArrayList<String> methods = new ArrayList<String>();
+			HashMap <String, HashSet<String>> sitesMap = new HashMap <String, HashSet<String>>();
+			for (int i=0; i < sitesList.size(); i++) {
+				sitesMap.put(sitesList.get(i), new HashSet<String>());
+			}
 			for (int i=0; i < arr.length(); i++) {
 				JSONArray methodValues = arr.getJSONObject(i).getJSONArray("method");
+				String site = arr.getJSONObject(i).getString("site");
 				for (int j=0; j < methodValues.length(); j++) {
 					String method = methodValues.getString(j);
-					if (!methods.contains(method)) {
-						methods.add(method);
-					}
+					HashSet<String> methods = sitesMap.get(site);
+					methods.add(method);
 				}
+			}
+			HashSet<String> methodsSet = sitesMap.get(sitesList.get(0));
+			for (int i=1; i < sitesList.size(); i++) {
+				methodsSet.retainAll(sitesMap.get(sitesList.get(i)));
+			}
+			ArrayList<String> methods = new ArrayList<String>();
+			Iterator <String> iter = methodsSet.iterator();
+			while (iter.hasNext()) {
+				methods.add(iter.next());
 			}
 			String cname = ";cname=";
 			for (int i=0; i < methods.size(); i++) {
@@ -1654,7 +1709,7 @@ public class TagfilerClient implements RegistryClient {
 				}
 				cname += Utils.urlEncode(methods.get(i));
 			}
-			url = tagfilerURL + "/query/rtype=method;library=" + Utils.urlEncode(lib) + cname + "(description;cname)";
+			url = tagfilerURL + "/query/rtype=method" + cname + "(description;cname)";
 			rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -1723,19 +1778,16 @@ public class TagfilerClient implements RegistryClient {
      * @return The client response.
      */
 	@Override
-	public RegistryClientResponse getSites(String study, String dataset,
-			String lib, String func) {
+	public RegistryClientResponse getSites(String study, String dataset
+			) {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
 			String url = tagfilerURL + "/query/rtype=worker" +
 				";study=" + Utils.urlEncode(study)  +
 				";dataset=" + Utils.urlEncode(dataset)  +
-				";library=" + Utils.urlEncode(lib)  +
-				";method=" + Utils.urlEncode(func)  +
 				getUserPredicate() +
 				"(id;site)";
-			System.out.println("url: " + url);
 			ClientURLResponse rsp = client.get(url, cookie);
 			clientResponse = new TagfilerClientResponse(rsp);
 			List<String> sites = new ArrayList<String>();
@@ -1743,7 +1795,9 @@ public class TagfilerClient implements RegistryClient {
 			JSONArray arr = new JSONArray(res);
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				sites.add(obj.getString("site"));
+				if (!sites.contains(obj.getString("site"))) {
+					sites.add(obj.getString("site"));
+				}
 			}
 			clientResponse = this.getSiteObject(sites);
 		} catch (UnsupportedEncodingException e) {

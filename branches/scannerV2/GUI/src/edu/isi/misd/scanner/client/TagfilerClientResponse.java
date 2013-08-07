@@ -353,7 +353,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 		String result = null;
 		try {
 			String res = response.getEntityString();
-			System.out.println("Params:\n"+res);
+			//System.out.println("Params:\n"+res);
 			JSONArray arr = new JSONArray(res);
 			JSONArray params = buildParameters(arr, null);
 			result = params.toString();
