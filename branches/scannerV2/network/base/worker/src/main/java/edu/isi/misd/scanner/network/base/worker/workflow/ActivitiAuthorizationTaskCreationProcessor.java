@@ -50,7 +50,7 @@ public class ActivitiAuthorizationTaskCreationProcessor implements Processor
         CamelContext context = exchange.getContext();
         String id = exchange.getIn().getHeader(BaseConstants.ID,String.class); 
         String url = 
-            exchange.getIn().getHeader(BaseConstants.REQUEST_URL, String.class);
+            exchange.getProperty(BaseConstants.REQUEST_URL, String.class);
         SiteInfo siteInfo = MessageUtils.getSiteInfo(exchange);
         String siteID = siteInfo.getSiteName();
         // create Activiti process variables
