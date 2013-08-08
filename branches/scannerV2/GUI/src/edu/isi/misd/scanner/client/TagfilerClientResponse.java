@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +42,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 	 * 
 	 */
 	protected ClientURLResponse response;
+	protected JSONArray jsonResponse;
 
     /**
      * Constructs a response from the HTTP response. 
@@ -52,6 +52,11 @@ public class TagfilerClientResponse implements RegistryClientResponse {
      */
 	public TagfilerClientResponse(ClientURLResponse rsp) {
 		response = rsp;
+		
+	}
+	
+	public TagfilerClientResponse(JSONArray rsp) {
+		jsonResponse = rsp;
 		
 	}
 	
@@ -91,8 +96,9 @@ public class TagfilerClientResponse implements RegistryClientResponse {
      */
 	@Override
 	public void release() {
-		response.release();
-
+		if (response != null) {
+			response.release();
+		}
 	}
 
     /**
@@ -350,6 +356,11 @@ public class TagfilerClientResponse implements RegistryClientResponse {
      */
 	@Override
 	public String toParameters() {
+		JSONArray params = buildParameters(jsonResponse, null);
+		String result = params.toString();
+		return result;
+	}
+	public String toParametersOld() {
 		String result = null;
 		try {
 			String res = response.getEntityString();

@@ -1,5 +1,10 @@
 package edu.isi.misd.scanner.client;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1730,19 +1735,60 @@ public class TagfilerClient implements RegistryClient {
      * @return The client response.
      */
 	@Override
-	public RegistryClientResponse getParameters(String func, String lib) {
+	public RegistryClientResponse getParameters(String func, String lib, String jsonFile) {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);
 			String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;parentParameter;cname;minOccurs;maxOccurs;position;parameterType;description;selected;linkedParameter;quickHelp;arrayParameter)?limit=none";
-			ClientURLResponse rsp = client.get(url, cookie);
-			clientResponse = new TagfilerClientResponse(rsp);
+			//ClientURLResponse rsp = client.get(url, cookie);
+			//clientResponse = new TagfilerClientResponse(rsp);
+			JSONArray jsonRsp = readParameterFile(jsonFile, lib);
+			clientResponse = new TagfilerClientResponse(jsonRsp);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return clientResponse;
 	}
 
+	public static JSONArray readParameterFile(String file, String lib) {
+		JSONArray ret = null;
+		try {
+			File jsonFile = new File(file);
+			StringBuffer buff = new StringBuffer();
+			BufferedReader input =  new BufferedReader(new FileReader(jsonFile));
+			String line = null;
+			while (( line = input.readLine()) != null) {
+				buff.append(line).append(System.getProperty("line.separator"));
+			}
+			input.close();
+			ret = new JSONArray(buff.toString());
+			for (int i=ret.length()-1; i >= 0; i--) {
+				JSONObject param = ret.getJSONObject(i);
+				JSONArray libs = param.getJSONArray("library");
+				boolean hasLib = false;
+				for (int j=0; j < libs.length(); j++) {
+					if (libs.getString(j).equals(lib)) {
+						hasLib = true;
+						break;
+					}
+				}
+				if (!hasLib) {
+					ret.remove(i);
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
     /**
      * Gets the variables of a dataset. 
      * 

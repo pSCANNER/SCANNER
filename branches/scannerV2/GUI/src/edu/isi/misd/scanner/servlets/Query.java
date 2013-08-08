@@ -66,7 +66,9 @@ public class Query extends HttpServlet {
 	private String keyStoreResource;
 	private String keyManagerPassword;
        
-    /**
+	private String webContentPath;
+
+	/**
      * Default constructor. 
      * @see HttpServlet#HttpServlet()
      */
@@ -95,6 +97,7 @@ public class Query extends HttpServlet {
 		String path = servletConfig.getServletContext().getRealPath("/index.html");
 		int index = path.lastIndexOf(File.separator) + 1;
 		path = path.substring(0, index);
+		webContentPath = path;
 		trustStoreResource = path + trustStoreResource;
 		keyStoreResource = path + keyStoreResource;
 		System.out.println("trustStoreResource: " + trustStoreResource);
@@ -161,7 +164,7 @@ public class Query extends HttpServlet {
 		} else if (action.equals("getParameters")) {
 			String func = request.getParameter("method");
 			String lib = request.getParameter("library");
-			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib);
+			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib, webContentPath + "etc/parameterTypes/LogisticRegression.json");
 			String ret = clientResponse.toParameters();
 			clientResponse.release();
 			System.out.println("Get Parameters:\n"+ret);
