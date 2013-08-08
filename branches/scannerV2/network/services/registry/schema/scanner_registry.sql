@@ -99,20 +99,6 @@ COMMENT on column data_set_definition.author_uid is 'Daniella: UID of author';
 COMMENT on column data_set_definition.originating_study_id is 'Daniella: ID of study using this data set';
 COMMENT on column data_set_definition.data_set_confidentiality_level is 'Daniella: This is a key to the type of legal regulations this data set is subject to (safe harbor, limited data set, identified data)';
 
-CREATE TABLE IF NOT EXISTS policy_registry (
-  Policy_ID integer NOT NULL,
-  Authority_Type text not null check (authority_type in ('LEGAL','STUDY','SITE ADMINISTRATION','NETWORK ADMINISTRATION')),
-  Resource_Type_Governed text not null check (resource_type_governed in ('DATA SET INSTANCE','METHOD')),
-  Assertion text NOT NULL,
-  Data_Resource_Instance_Resource_ID integer NOT NULL,
-  Data_Resource_Definition_ID integer NOT NULL,
-  data_resource_confidentiality_level integer not null references confidentiality_levels(level_id),
-  Method_Resource_ID integer NOT NULL,
-  Data_Source_ID integer NOT NULL,
-  Study_ID integer NOT NULL,
-  PRIMARY KEY (Policy_ID)
-);
-
 CREATE TABLE IF NOT EXISTS source_data_warehouse (
   source_data_warehouse_id serial not null primary key,
   Connectivity_Manager_ID integer NOT NULL references users(user_id),
@@ -136,6 +122,30 @@ CREATE TABLE IF NOT EXISTS data_set_instance (
   Data_Slice_ID integer DEFAULT NULL
 );
 
+create table if not exists access_modes (
+  access_mode_id serial not null primary key,
+  access_mode_name text not null unique
+);
+
+insert into access_modes(access_mode_name) values ('synchronous'), ('asynchronous');
+
+create table if not exists policy_statement (
+  policy_statement_id serial not null primary key,
+  data_set_instance_id integer not null references data_set_instance(data_set_instance_id),
+  role_id integer not null references roles(role_id),
+  analysis_tool_id integer not null references analysis_tools(tool_id),
+  access_mode integer not null references access_modes(access_mode_id)
+);
+
+COMMENT on table policy_statement is 'Users in role <role_id> may run toll <tool_id> on data set instance <data_set_instance_id> in mode <access_mode>';
+
+-- Daniella's policy table also had columns for assertion ('e.g. "I as an authority or delegate for --this raw data source-- approve
+-- -this data set- to be accessed by -this method- for members of -this study/group-"')
+-- and for "authority type" (enum('LEGAL','STUDY','SITE ADMINISTRATION','NETWORK ADMINISTRATION')
+-- it's not clear how those map to individual policy statements, or how the assertion would be tied to the person making the assertion.
+-- Some other columns now available as joins to other tables: data resource definition id, data resource confidentiality level, and
+-- data source (which I assume is the source data warehouse) are in the data set instance table; study id is in the roles table).
+
 
 CREATE TABLE IF NOT EXISTS dua_study(
   DUA_ID integer NOT NULL,
@@ -146,9 +156,6 @@ CREATE TABLE IF NOT EXISTS dua_study(
 COMMENT on TABLE dua_study is 'Daniella: Table linking the DUA to the study';
 
 
-comment on column policy_registry.authority_type is 'Daniella: There is a hierarchy of authorities, study authority most commonly';
-comment on column policy_registry.resource_type_governed is 'Daniella: Members of a study group have access to data set instances data set instances, data set instances must be approved for access by methods in a study protocol';
-comment on column policy_registry.assertion is 'Daniella: e.g. "I as an authority or delegate for --this raw data source-- approve -this data set- to be accessed by -this method- for members of -this study/group-"';
 
 
 
