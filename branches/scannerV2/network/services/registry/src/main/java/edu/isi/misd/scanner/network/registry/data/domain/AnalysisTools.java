@@ -1,4 +1,3 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -13,14 +12,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-
 /**
  *
  */
 @Entity
 @Table(name = "analysis_tools", schema = "scanner_registry")
-public class AnalysisTools implements Serializable
-{
+public class AnalysisTools implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -155,5 +153,4 @@ public class AnalysisTools implements Serializable
     public String toString() {
         return "edu.isi.misd.scanner.network.registry.data.domain.AnalysisTools[ toolId=" + toolId + " ]";
     }
-    
 }

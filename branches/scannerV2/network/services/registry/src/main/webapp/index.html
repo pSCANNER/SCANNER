@@ -16,8 +16,8 @@
 			var table_obj = $('#librariesTable');
 			$.each(libraries, function (index, library) {
 				table_obj.append($('<tr><td>' + library.libraryId + '</td><td>' 
-                    + library.libaryName + '</td><td>' + library.libraryVersion 
-                    + '</td><td>' + library.description + '</td></tr>'));
+                    + library.libaryName + '</td><td>' + library.description 
+                    + '</td><td>' + library.libraryVersion  + '</td></tr>'));
 			})
 		})
 	});
@@ -29,8 +29,8 @@
 		<tr>
 			<th>Library ID</th>
 			<th>Library Name</th>
-			<th>Library Version</th>
 			<th>Library Description</th>            
+			<th>Library Version</th>            
 		</tr>
 	</table>
 </form>

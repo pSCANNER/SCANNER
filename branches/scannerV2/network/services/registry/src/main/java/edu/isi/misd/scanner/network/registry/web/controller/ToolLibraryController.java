@@ -1,21 +1,15 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
-import edu.isi.misd.scanner.network.registry.data.repository.ToolLibraryRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
+import java.util.List;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * 
@@ -36,4 +30,15 @@ public class ToolLibraryController
     {
         return registryService.getToolLibraries();
 	}
+    
+    @RequestMapping(value = "/libraries/{id}", method = RequestMethod.GET)
+    public @ResponseBody ToolLibrary getToolLibrary(
+        @PathVariable("id") Integer id) 
+    {
+      // Do null check for id
+      ToolLibrary toolLib = registryService.getToolLibrary(id);
+      
+      // Do null check for toolLib
+      return toolLib;
+    }    
 }

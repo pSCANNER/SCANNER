@@ -16,52 +16,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("registryService")
 public class RegistryServiceImpl implements RegistryService 
 {
-    /**
-     * The User repository.
-     */
+
     @Autowired
     private UsersRepository usersRepository;
-    /**
-     * The Study repository.
-     */
     @Autowired
     private StudyRepository studyRepository;
-    /**
-     * The DataSetDefinition repository.
-     */
     @Autowired
     private DataSetDefinitionRepository dataSetDefinitionRepository;
-    /**
-     * The DataSetInstance repository.
-     */
     @Autowired
     private DataSetInstanceRepository dataSetInstanceRepository;
-    /**
-     * The DuaStudy repository.
-     */
     @Autowired
     private DuaStudyRepository duaStudyRepository;
-    /**
-     * The PolicyRegistry repository.
-     */
     @Autowired
     private PolicyRegistryRepository policyRegistryRepository;
-    /**
-     * The SourceDataWarehouseRepository repository.
-     */
     @Autowired
     private SourceDataWarehouseRepository sourceDataWarehouseRepository;
-    /**
-     * The AnalysisTools repository.
-     */
     @Autowired
     private AnalysisToolsRepository analysisToolsRepository;   
-
-    /**
-     * The ToolLibrary repository.
-     */
     @Autowired
     private ToolLibraryRepository toolLibraryRepository;   
+    
     
     @Override
     @Transactional
@@ -72,5 +46,11 @@ public class RegistryServiceImpl implements RegistryService
         CollectionUtils.addAll(toolLibraries, iter);
 
         return toolLibraries;        
+    }
+
+    @Override
+    @Transactional    
+    public ToolLibrary getToolLibrary(Integer ID) {
+        return toolLibraryRepository.findOne(ID);
     }
 }
