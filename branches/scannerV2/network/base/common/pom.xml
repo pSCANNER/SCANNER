@@ -61,13 +61,7 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-plus</artifactId>
       <version>7.6.8.v20121106</version>
-    </dependency> 
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <type>jar</type>
-    </dependency>    
+    </dependency>  
   </dependencies>
 
   <build>
