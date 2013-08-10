@@ -1,4 +1,3 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
@@ -20,7 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "data_set_definition", schema = "scanner_registry")
-public class DataSetDefinition implements Serializable
+public class DataSetDefinition implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
@@ -37,17 +36,19 @@ public class DataSetDefinition implements Serializable
     @Basic(optional = false)
     @Column(name = "data_processing_program")
     private String dataProcessingProgram;
-    @JoinColumn(name = "author_uid", referencedColumnName = "user_id")
-    @ManyToOne(optional = false)
-    private Users authorUid;
     @JoinColumn(name = "originating_study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study originatingStudyId;
+    @JoinColumn(name = "author_uid", referencedColumnName = "user_id")
+    @ManyToOne(optional = false)
+    private ScannerUser authorUid;
     @JoinColumn(name = "data_set_confidentiality_level", referencedColumnName = "level_id")
     @ManyToOne(optional = false)
-    private ConfidentialityLevels dataSetConfidentialityLevel;
+    private ConfidentialityLevel dataSetConfidentialityLevel;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinitionId")
     private List<DataSetInstance> dataSetInstanceList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinitionId")
+    private List<AbstractPolicy> abstractPolicyList;
 
     public DataSetDefinition() {
     }
@@ -95,14 +96,6 @@ public class DataSetDefinition implements Serializable
         this.dataProcessingProgram = dataProcessingProgram;
     }
 
-    public Users getAuthorUid() {
-        return authorUid;
-    }
-
-    public void setAuthorUid(Users authorUid) {
-        this.authorUid = authorUid;
-    }
-
     public Study getOriginatingStudyId() {
         return originatingStudyId;
     }
@@ -111,11 +104,19 @@ public class DataSetDefinition implements Serializable
         this.originatingStudyId = originatingStudyId;
     }
 
-    public ConfidentialityLevels getDataSetConfidentialityLevel() {
+    public ScannerUser getAuthorUid() {
+        return authorUid;
+    }
+
+    public void setAuthorUid(ScannerUser authorUid) {
+        this.authorUid = authorUid;
+    }
+
+    public ConfidentialityLevel getDataSetConfidentialityLevel() {
         return dataSetConfidentialityLevel;
     }
 
-    public void setDataSetConfidentialityLevel(ConfidentialityLevels dataSetConfidentialityLevel) {
+    public void setDataSetConfidentialityLevel(ConfidentialityLevel dataSetConfidentialityLevel) {
         this.dataSetConfidentialityLevel = dataSetConfidentialityLevel;
     }
 
@@ -125,6 +126,14 @@ public class DataSetDefinition implements Serializable
 
     public void setDataSetInstanceList(List<DataSetInstance> dataSetInstanceList) {
         this.dataSetInstanceList = dataSetInstanceList;
+    }
+
+    public List<AbstractPolicy> getAbstractPolicyList() {
+        return abstractPolicyList;
+    }
+
+    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
+        this.abstractPolicyList = abstractPolicyList;
     }
 
     @Override

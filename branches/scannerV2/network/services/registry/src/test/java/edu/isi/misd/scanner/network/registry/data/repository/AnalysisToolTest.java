@@ -1,12 +1,10 @@
 
 package edu.isi.misd.scanner.network.registry.data.repository;
 
-import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTools;
+import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 import static org.junit.Assert.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,26 +18,26 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-repository-context.xml")
-public class AnalysisToolsRepositoryTest 
+public class AnalysisToolTest 
 {   
 	@Autowired
 	ToolLibraryRepository toolLibraryRepository;
     
 	@Autowired
-	AnalysisToolsRepository analysisToolsRepository;
+	AnalysisToolRepository analysisToolsRepository;
     
-	AnalysisTools tool;
+	AnalysisTool tool;
     ToolLibrary toolLibrary;
     
 	@Before
 	public void setUp() 
     {
         toolLibrary = new ToolLibrary();
-        toolLibrary.setLibaryName("Test Tool Library");
+        toolLibrary.setLibraryName("Test Tool Library");
         toolLibrary.setDescription("Fake tool library description");
         toolLibrary.setLibraryVersion("1");
         
-		tool = new AnalysisTools();
+		tool = new AnalysisTool();
         tool.setToolName("Test Tool");
         tool.setToolDescription("Automated test fake tool");
         tool.setCuratorUid(007);

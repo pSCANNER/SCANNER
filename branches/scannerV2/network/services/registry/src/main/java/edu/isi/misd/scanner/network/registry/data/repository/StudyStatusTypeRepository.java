@@ -1,6 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.repository;
 
-import edu.isi.misd.scanner.network.registry.data.domain.Roles;
+import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +11,8 @@ import org.springframework.data.repository.CrudRepository;
  *
  */
 
-public interface RolesRepository 
-    extends CrudRepository<Roles, Integer> 
+public interface StudyStatusTypeRepository 
+    extends CrudRepository<Study, Integer> 
 {
     
 }

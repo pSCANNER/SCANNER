@@ -1,8 +1,11 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,15 +13,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
  *
  */
 @Entity
-@Table(name = "analysis_tools", schema = "scanner_registry")
-public class AnalysisTools implements Serializable {
-
+@Table(name = "analysis_tool", schema = "scanner_registry")
+public class AnalysisTool implements Serializable 
+{
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,17 +49,23 @@ public class AnalysisTools implements Serializable {
     private String informationEmail;
     @JoinColumn(name = "tool_parent_library_id", referencedColumnName = "library_id")
     @ManyToOne(optional = false)
-    @JsonBackReference("analysis_tools-tool_library")
+    @JsonBackReference("analysis_tool-tool_library")
     private ToolLibrary toolParentLibraryId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
+    @JsonIgnore
+    private List<PolicyStatement> policyStatementList; 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
+    @JsonIgnore       
+    private List<AbstractPolicy> abstractPolicyList;
 
-    public AnalysisTools() {
+    public AnalysisTool() {
     }
 
-    public AnalysisTools(Integer toolId) {
+    public AnalysisTool(Integer toolId) {
         this.toolId = toolId;
     }
 
-    public AnalysisTools(Integer toolId, String toolName, String toolDescription, String inputFormatSpecifications, String outputFormatSpecifications, int curatorUid, String informationEmail) {
+    public AnalysisTool(Integer toolId, String toolName, String toolDescription, String inputFormatSpecifications, String outputFormatSpecifications, int curatorUid, String informationEmail) {
         this.toolId = toolId;
         this.toolName = toolName;
         this.toolDescription = toolDescription;
@@ -129,6 +139,22 @@ public class AnalysisTools implements Serializable {
         this.toolParentLibraryId = toolParentLibraryId;
     }
 
+    public List<PolicyStatement> getPolicyStatementList() {
+        return policyStatementList;
+    }
+
+    public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
+        this.policyStatementList = policyStatementList;
+    }
+
+    public List<AbstractPolicy> getAbstractPolicyList() {
+        return abstractPolicyList;
+    }
+
+    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
+        this.abstractPolicyList = abstractPolicyList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -139,10 +165,10 @@ public class AnalysisTools implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof AnalysisTools)) {
+        if (!(object instanceof AnalysisTool)) {
             return false;
         }
-        AnalysisTools other = (AnalysisTools) object;
+        AnalysisTool other = (AnalysisTool) object;
         if ((this.toolId == null && other.toolId != null) || (this.toolId != null && !this.toolId.equals(other.toolId))) {
             return false;
         }
@@ -151,6 +177,7 @@ public class AnalysisTools implements Serializable {
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.AnalysisTools[ toolId=" + toolId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool[ toolId=" + toolId + " ]";
     }
+    
 }

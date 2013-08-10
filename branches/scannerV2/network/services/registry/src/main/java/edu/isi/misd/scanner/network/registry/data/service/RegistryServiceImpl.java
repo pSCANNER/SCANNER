@@ -18,7 +18,7 @@ public class RegistryServiceImpl implements RegistryService
 {
 
     @Autowired
-    private UsersRepository usersRepository;
+    private ScannerUserRepository scannerUserRepository;
     @Autowired
     private StudyRepository studyRepository;
     @Autowired
@@ -26,13 +26,13 @@ public class RegistryServiceImpl implements RegistryService
     @Autowired
     private DataSetInstanceRepository dataSetInstanceRepository;
     @Autowired
-    private DuaStudyRepository duaStudyRepository;
+    private DuaRepository duaStudyRepository;
     @Autowired
-    private PolicyRegistryRepository policyRegistryRepository;
+    private PolicyStatusTypeRepository policyRegistryRepository;
     @Autowired
     private SourceDataWarehouseRepository sourceDataWarehouseRepository;
     @Autowired
-    private AnalysisToolsRepository analysisToolsRepository;   
+    private AnalysisToolRepository analysisToolRepository;   
     @Autowired
     private ToolLibraryRepository toolLibraryRepository;   
     

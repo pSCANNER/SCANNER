@@ -1,4 +1,3 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
@@ -20,8 +19,8 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "users", schema = "scanner_registry")
-public class Users implements Serializable
+@Table(name = "scanner_user", schema = "scanner_registry")
+public class ScannerUser implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
@@ -60,32 +59,34 @@ public class Users implements Serializable
     private String lastName;
     @Column(name = "pubmed_author_id")
     private String pubmedAuthorId;
-    @ManyToMany(mappedBy = "usersList")
-    private List<Roles> rolesList;
+    @ManyToMany(mappedBy = "scannerUserList")
+    private List<ScannerRole> scannerRoleList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataManagerId")
-    private List<SourceDataWarehouse> sourceDataWarehouseListAsDataManager;
+    private List<SourceDataWarehouse> sourceDataWarehouseList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "connectivityManagerId")
-    private List<SourceDataWarehouse> sourceDataWarehouseListAsConnectivityManager;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportsTo")
-    private List<Users> usersList;
-    @JoinColumn(name = "reports_to", referencedColumnName = "user_id")
-    @ManyToOne(optional = false)
-    private Users reportsTo;
+    private List<SourceDataWarehouse> sourceDataWarehouseList1;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "principalInvestigatorUid")
     private List<Study> studyList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportsTo")
+    private List<ScannerUser> scannerUserList;
+    @JoinColumn(name = "reports_to", referencedColumnName = "user_id")
+    @ManyToOne(optional = false)
+    private ScannerUser reportsTo;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "authorUid")
     private List<DataSetDefinition> dataSetDefinitionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "curatorUid")
     private List<DataSetInstance> dataSetInstanceList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyOriginator")
+    private List<AbstractPolicy> abstractPolicyList;
 
-    public Users() {
+    public ScannerUser() {
     }
 
-    public Users(Integer userId) {
+    public ScannerUser(Integer userId) {
         this.userId = userId;
     }
 
-    public Users(Integer userId, String username, String email, String hspcDocuments, int primaryAffliation, int secondaryAffliliation, String phone, boolean active, String firstName, String lastName) {
+    public ScannerUser(Integer userId, String username, String email, String hspcDocuments, int primaryAffliation, int secondaryAffliliation, String phone, boolean active, String firstName, String lastName) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -194,48 +195,28 @@ public class Users implements Serializable
         this.pubmedAuthorId = pubmedAuthorId;
     }
 
-    public List<Roles> getRolesList() {
-        return rolesList;
+    public List<ScannerRole> getScannerRoleList() {
+        return scannerRoleList;
     }
 
-    public void setRolesList(List<Roles> rolesList) {
-        this.rolesList = rolesList;
+    public void setScannerRoleList(List<ScannerRole> scannerRoleList) {
+        this.scannerRoleList = scannerRoleList;
     }
 
-    public List<SourceDataWarehouse> getSourceDataWarehouseListDataManager() {
-        return sourceDataWarehouseListAsDataManager;
+    public List<SourceDataWarehouse> getSourceDataWarehouseList() {
+        return sourceDataWarehouseList;
     }
 
-    public void setSourceDataWarehouseList(
-        List<SourceDataWarehouse> sourceDataWarehouseListAsDataManager) {
-        this.sourceDataWarehouseListAsDataManager = 
-            sourceDataWarehouseListAsDataManager;
+    public void setSourceDataWarehouseList(List<SourceDataWarehouse> sourceDataWarehouseList) {
+        this.sourceDataWarehouseList = sourceDataWarehouseList;
     }
 
-    public List<SourceDataWarehouse> getSourceDataWarehouseListConnectivityManager() {
-        return sourceDataWarehouseListAsConnectivityManager;
+    public List<SourceDataWarehouse> getSourceDataWarehouseList1() {
+        return sourceDataWarehouseList1;
     }
 
-    public void setSourceDataWarehouseListConnectivityManager(
-        List<SourceDataWarehouse> sourceDataWarehouseListAsConnectivityManager) {
-        this.sourceDataWarehouseListAsConnectivityManager = 
-            sourceDataWarehouseListAsConnectivityManager;
-    }
-
-    public List<Users> getUsersList() {
-        return usersList;
-    }
-
-    public void setUsersList(List<Users> usersList) {
-        this.usersList = usersList;
-    }
-
-    public Users getReportsTo() {
-        return reportsTo;
-    }
-
-    public void setReportsTo(Users reportsTo) {
-        this.reportsTo = reportsTo;
+    public void setSourceDataWarehouseList1(List<SourceDataWarehouse> sourceDataWarehouseList1) {
+        this.sourceDataWarehouseList1 = sourceDataWarehouseList1;
     }
 
     public List<Study> getStudyList() {
@@ -244,6 +225,22 @@ public class Users implements Serializable
 
     public void setStudyList(List<Study> studyList) {
         this.studyList = studyList;
+    }
+
+    public List<ScannerUser> getScannerUserList() {
+        return scannerUserList;
+    }
+
+    public void setScannerUserList(List<ScannerUser> scannerUserList) {
+        this.scannerUserList = scannerUserList;
+    }
+
+    public ScannerUser getReportsTo() {
+        return reportsTo;
+    }
+
+    public void setReportsTo(ScannerUser reportsTo) {
+        this.reportsTo = reportsTo;
     }
 
     public List<DataSetDefinition> getDataSetDefinitionList() {
@@ -262,6 +259,14 @@ public class Users implements Serializable
         this.dataSetInstanceList = dataSetInstanceList;
     }
 
+    public List<AbstractPolicy> getAbstractPolicyList() {
+        return abstractPolicyList;
+    }
+
+    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
+        this.abstractPolicyList = abstractPolicyList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -272,10 +277,10 @@ public class Users implements Serializable
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Users)) {
+        if (!(object instanceof ScannerUser)) {
             return false;
         }
-        Users other = (Users) object;
+        ScannerUser other = (ScannerUser) object;
         if ((this.userId == null && other.userId != null) || (this.userId != null && !this.userId.equals(other.userId))) {
             return false;
         }
@@ -284,7 +289,7 @@ public class Users implements Serializable
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.Users[ userId=" + userId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.ScannerUser[ userId=" + userId + " ]";
     }
     
 }

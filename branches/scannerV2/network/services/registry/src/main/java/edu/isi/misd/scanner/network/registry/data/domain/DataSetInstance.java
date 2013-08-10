@@ -1,8 +1,9 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -30,15 +32,17 @@ public class DataSetInstance implements Serializable
     private String dataSetInstanceLocation;
     @Column(name = "data_slice_id")
     private Integer dataSliceId;
-    @JoinColumn(name = "curator_uid", referencedColumnName = "user_id")
-    @ManyToOne(optional = false)
-    private Users curatorUid;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetInstanceId")
+    private List<PolicyStatement> policyStatementList;
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study studyId;
     @JoinColumn(name = "source_data_warehouse_id", referencedColumnName = "source_data_warehouse_id")
     @ManyToOne(optional = false)
     private SourceDataWarehouse sourceDataWarehouseId;
+    @JoinColumn(name = "curator_uid", referencedColumnName = "user_id")
+    @ManyToOne(optional = false)
+    private ScannerUser curatorUid;
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)
     private DataSetDefinition dataSetDefinitionId;
@@ -79,12 +83,12 @@ public class DataSetInstance implements Serializable
         this.dataSliceId = dataSliceId;
     }
 
-    public Users getCuratorUid() {
-        return curatorUid;
+    public List<PolicyStatement> getPolicyStatementList() {
+        return policyStatementList;
     }
 
-    public void setCuratorUid(Users curatorUid) {
-        this.curatorUid = curatorUid;
+    public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
+        this.policyStatementList = policyStatementList;
     }
 
     public Study getStudyId() {
@@ -101,6 +105,14 @@ public class DataSetInstance implements Serializable
 
     public void setSourceDataWarehouseId(SourceDataWarehouse sourceDataWarehouseId) {
         this.sourceDataWarehouseId = sourceDataWarehouseId;
+    }
+
+    public ScannerUser getCuratorUid() {
+        return curatorUid;
+    }
+
+    public void setCuratorUid(ScannerUser curatorUid) {
+        this.curatorUid = curatorUid;
     }
 
     public DataSetDefinition getDataSetDefinitionId() {

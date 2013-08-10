@@ -1,4 +1,3 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
@@ -11,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -20,7 +21,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "source_data_warehouse", schema = "scanner_registry")
-public class SourceDataWarehouse implements Serializable
+public class SourceDataWarehouse implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
@@ -37,15 +38,20 @@ public class SourceDataWarehouse implements Serializable
     @Basic(optional = false)
     @Column(name = "etl_programs")
     private String etlPrograms;
+    @JoinTable(name = "study_data_warehouse", joinColumns = {
+        @JoinColumn(name = "source_data_warehouse_id", referencedColumnName = "source_data_warehouse_id")}, inverseJoinColumns = {
+        @JoinColumn(name = "study_id", referencedColumnName = "study_id")})
+    @ManyToMany
+    private List<Study> studyList;
     @JoinColumn(name = "data_manager_id", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private Users dataManagerId;
+    private ScannerUser dataManagerId;
     @JoinColumn(name = "connectivity_manager_id", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private Users connectivityManagerId;
+    private ScannerUser connectivityManagerId;
     @JoinColumn(name = "data_warehouse_confidentiality_level", referencedColumnName = "level_id")
     @ManyToOne(optional = false)
-    private ConfidentialityLevels dataWarehouseConfidentialityLevel;
+    private ConfidentialityLevel dataWarehouseConfidentialityLevel;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sourceDataWarehouseId")
     private List<DataSetInstance> dataSetInstanceList;
 
@@ -95,27 +101,35 @@ public class SourceDataWarehouse implements Serializable
         this.etlPrograms = etlPrograms;
     }
 
-    public Users getDataManagerId() {
+    public List<Study> getStudyList() {
+        return studyList;
+    }
+
+    public void setStudyList(List<Study> studyList) {
+        this.studyList = studyList;
+    }
+
+    public ScannerUser getDataManagerId() {
         return dataManagerId;
     }
 
-    public void setDataManagerId(Users dataManagerId) {
+    public void setDataManagerId(ScannerUser dataManagerId) {
         this.dataManagerId = dataManagerId;
     }
 
-    public Users getConnectivityManagerId() {
+    public ScannerUser getConnectivityManagerId() {
         return connectivityManagerId;
     }
 
-    public void setConnectivityManagerId(Users connectivityManagerId) {
+    public void setConnectivityManagerId(ScannerUser connectivityManagerId) {
         this.connectivityManagerId = connectivityManagerId;
     }
 
-    public ConfidentialityLevels getDataWarehouseConfidentialityLevel() {
+    public ConfidentialityLevel getDataWarehouseConfidentialityLevel() {
         return dataWarehouseConfidentialityLevel;
     }
 
-    public void setDataWarehouseConfidentialityLevel(ConfidentialityLevels dataWarehouseConfidentialityLevel) {
+    public void setDataWarehouseConfidentialityLevel(ConfidentialityLevel dataWarehouseConfidentialityLevel) {
         this.dataWarehouseConfidentialityLevel = dataWarehouseConfidentialityLevel;
     }
 

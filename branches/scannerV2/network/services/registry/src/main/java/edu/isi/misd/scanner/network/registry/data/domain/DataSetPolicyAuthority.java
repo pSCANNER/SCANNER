@@ -1,21 +1,23 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
  *
  */
 @Entity
-@Table(name = "data_set_policy_authorities", schema = "scanner_registry")
-public class DataSetPolicyAuthorities implements Serializable
+@Table(name = "data_set_policy_authority", schema = "scanner_registry")
+public class DataSetPolicyAuthority implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
@@ -26,15 +28,17 @@ public class DataSetPolicyAuthorities implements Serializable
     @Basic(optional = false)
     @Column(name = "authority_name")
     private String authorityName;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyAuthority")
+    private List<AbstractPolicy> abstractPolicyList;
 
-    public DataSetPolicyAuthorities() {
+    public DataSetPolicyAuthority() {
     }
 
-    public DataSetPolicyAuthorities(Integer authorityId) {
+    public DataSetPolicyAuthority(Integer authorityId) {
         this.authorityId = authorityId;
     }
 
-    public DataSetPolicyAuthorities(Integer authorityId, String authorityName) {
+    public DataSetPolicyAuthority(Integer authorityId, String authorityName) {
         this.authorityId = authorityId;
         this.authorityName = authorityName;
     }
@@ -55,6 +59,14 @@ public class DataSetPolicyAuthorities implements Serializable
         this.authorityName = authorityName;
     }
 
+    public List<AbstractPolicy> getAbstractPolicyList() {
+        return abstractPolicyList;
+    }
+
+    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
+        this.abstractPolicyList = abstractPolicyList;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -65,10 +77,10 @@ public class DataSetPolicyAuthorities implements Serializable
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof DataSetPolicyAuthorities)) {
+        if (!(object instanceof DataSetPolicyAuthority)) {
             return false;
         }
-        DataSetPolicyAuthorities other = (DataSetPolicyAuthorities) object;
+        DataSetPolicyAuthority other = (DataSetPolicyAuthority) object;
         if ((this.authorityId == null && other.authorityId != null) || (this.authorityId != null && !this.authorityId.equals(other.authorityId))) {
             return false;
         }
@@ -77,7 +89,7 @@ public class DataSetPolicyAuthorities implements Serializable
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.DataSetPolicyAuthorities[ authorityId=" + authorityId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.DataSetPolicyAuthority[ authorityId=" + authorityId + " ]";
     }
     
 }

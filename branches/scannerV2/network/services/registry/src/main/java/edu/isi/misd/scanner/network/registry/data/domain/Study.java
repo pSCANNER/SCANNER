@@ -1,4 +1,3 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
@@ -12,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -51,24 +51,21 @@ public class Study implements Serializable
     @Basic(optional = false)
     @Column(name = "analysis_plan")
     private String analysisPlan;
-    @Basic(optional = false)
-    @Column(name = "grant_ids")
-    private String grantIds;
-    @Basic(optional = false)
-    @Column(name = "data_set_ids")
-    private String dataSetIds;
-    @Basic(optional = false)
-    @Column(name = "dua_ids")
-    private String duaIds;
+    @ManyToMany(mappedBy = "studyList")
+    private List<SourceDataWarehouse> sourceDataWarehouseList;
+    @ManyToMany(mappedBy = "studyList")
+    private List<ScannerGrant> scannerGrantList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyId")
-    private List<Roles> rolesList;
+    private List<ScannerRole> scannerRoleList;
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private Users principalInvestigatorUid;
+    private ScannerUser principalInvestigatorUid;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudyId")
     private List<DataSetDefinition> dataSetDefinitionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyId")
     private List<DataSetInstance> dataSetInstanceList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyId")
+    private List<AbstractPolicy> abstractPolicyList;
 
     public Study() {
     }
@@ -77,7 +74,7 @@ public class Study implements Serializable
         this.studyId = studyId;
     }
 
-    public Study(Integer studyId, int irbId, String protocol, Date startDate, Date endDate, int clinicalTrialsId, String analysisPlan, String grantIds, String dataSetIds, String duaIds) {
+    public Study(Integer studyId, int irbId, String protocol, Date startDate, Date endDate, int clinicalTrialsId, String analysisPlan) {
         this.studyId = studyId;
         this.irbId = irbId;
         this.protocol = protocol;
@@ -85,9 +82,6 @@ public class Study implements Serializable
         this.endDate = endDate;
         this.clinicalTrialsId = clinicalTrialsId;
         this.analysisPlan = analysisPlan;
-        this.grantIds = grantIds;
-        this.dataSetIds = dataSetIds;
-        this.duaIds = duaIds;
     }
 
     public Integer getStudyId() {
@@ -146,43 +140,35 @@ public class Study implements Serializable
         this.analysisPlan = analysisPlan;
     }
 
-    public String getGrantIds() {
-        return grantIds;
+    public List<SourceDataWarehouse> getSourceDataWarehouseList() {
+        return sourceDataWarehouseList;
     }
 
-    public void setGrantIds(String grantIds) {
-        this.grantIds = grantIds;
+    public void setSourceDataWarehouseList(List<SourceDataWarehouse> sourceDataWarehouseList) {
+        this.sourceDataWarehouseList = sourceDataWarehouseList;
     }
 
-    public String getDataSetIds() {
-        return dataSetIds;
+    public List<ScannerGrant> getScannerGrantList() {
+        return scannerGrantList;
     }
 
-    public void setDataSetIds(String dataSetIds) {
-        this.dataSetIds = dataSetIds;
+    public void setScannerGrantList(List<ScannerGrant> scannerGrantList) {
+        this.scannerGrantList = scannerGrantList;
     }
 
-    public String getDuaIds() {
-        return duaIds;
+    public List<ScannerRole> getScannerRoleList() {
+        return scannerRoleList;
     }
 
-    public void setDuaIds(String duaIds) {
-        this.duaIds = duaIds;
+    public void setScannerRoleList(List<ScannerRole> scannerRoleList) {
+        this.scannerRoleList = scannerRoleList;
     }
 
-    public List<Roles> getRolesList() {
-        return rolesList;
-    }
-
-    public void setRolesList(List<Roles> rolesList) {
-        this.rolesList = rolesList;
-    }
-
-    public Users getPrincipalInvestigatorUid() {
+    public ScannerUser getPrincipalInvestigatorUid() {
         return principalInvestigatorUid;
     }
 
-    public void setPrincipalInvestigatorUid(Users principalInvestigatorUid) {
+    public void setPrincipalInvestigatorUid(ScannerUser principalInvestigatorUid) {
         this.principalInvestigatorUid = principalInvestigatorUid;
     }
 
@@ -200,6 +186,14 @@ public class Study implements Serializable
 
     public void setDataSetInstanceList(List<DataSetInstance> dataSetInstanceList) {
         this.dataSetInstanceList = dataSetInstanceList;
+    }
+
+    public List<AbstractPolicy> getAbstractPolicyList() {
+        return abstractPolicyList;
+    }
+
+    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
+        this.abstractPolicyList = abstractPolicyList;
     }
 
     @Override

@@ -1,9 +1,9 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,14 +13,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
  *
  */
 @Entity
-@Table(name = "roles", schema = "scanner_registry")
-public class Roles implements Serializable
+@Table(name = "scanner_role", schema = "scanner_registry")
+public class ScannerRole implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
@@ -31,23 +32,27 @@ public class Roles implements Serializable
     @Basic(optional = false)
     @Column(name = "role_within_study")
     private String roleWithinStudy;
-    @JoinTable(name = "investigator_roles", joinColumns = {
+    @JoinTable(name = "investigator_role", joinColumns = {
         @JoinColumn(name = "role_id", referencedColumnName = "role_id")}, inverseJoinColumns = {
         @JoinColumn(name = "investigator_id", referencedColumnName = "user_id")})
     @ManyToMany
-    private List<Users> usersList;
+    private List<ScannerUser> scannerUserList;
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study studyId;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId")
+    private List<PolicyStatement> policyStatementList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId")
+    private List<AbstractPolicy> abstractPolicyList;
 
-    public Roles() {
+    public ScannerRole() {
     }
 
-    public Roles(Integer roleId) {
+    public ScannerRole(Integer roleId) {
         this.roleId = roleId;
     }
 
-    public Roles(Integer roleId, String roleWithinStudy) {
+    public ScannerRole(Integer roleId, String roleWithinStudy) {
         this.roleId = roleId;
         this.roleWithinStudy = roleWithinStudy;
     }
@@ -68,12 +73,12 @@ public class Roles implements Serializable
         this.roleWithinStudy = roleWithinStudy;
     }
 
-    public List<Users> getUsersList() {
-        return usersList;
+    public List<ScannerUser> getScannerUserList() {
+        return scannerUserList;
     }
 
-    public void setUsersList(List<Users> usersList) {
-        this.usersList = usersList;
+    public void setScannerUserList(List<ScannerUser> scannerUserList) {
+        this.scannerUserList = scannerUserList;
     }
 
     public Study getStudyId() {
@@ -82,6 +87,22 @@ public class Roles implements Serializable
 
     public void setStudyId(Study studyId) {
         this.studyId = studyId;
+    }
+
+    public List<PolicyStatement> getPolicyStatementList() {
+        return policyStatementList;
+    }
+
+    public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
+        this.policyStatementList = policyStatementList;
+    }
+
+    public List<AbstractPolicy> getAbstractPolicyList() {
+        return abstractPolicyList;
+    }
+
+    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
+        this.abstractPolicyList = abstractPolicyList;
     }
 
     @Override
@@ -94,10 +115,10 @@ public class Roles implements Serializable
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Roles)) {
+        if (!(object instanceof ScannerRole)) {
             return false;
         }
-        Roles other = (Roles) object;
+        ScannerRole other = (ScannerRole) object;
         if ((this.roleId == null && other.roleId != null) || (this.roleId != null && !this.roleId.equals(other.roleId))) {
             return false;
         }
@@ -106,7 +127,7 @@ public class Roles implements Serializable
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.Roles[ roleId=" + roleId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.ScannerRole[ roleId=" + roleId + " ]";
     }
     
 }

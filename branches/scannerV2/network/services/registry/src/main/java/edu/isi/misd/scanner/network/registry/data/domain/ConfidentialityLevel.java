@@ -1,4 +1,3 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
@@ -7,8 +6,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -17,12 +14,11 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "confidentiality_levels", schema = "scanner_registry")
-public class ConfidentialityLevels implements Serializable
+@Table(name = "confidentiality_level", schema = "scanner_registry")
+public class ConfidentialityLevel implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "level_id")
     private Integer levelId;
@@ -31,19 +27,17 @@ public class ConfidentialityLevels implements Serializable
     private String levelName;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataWarehouseConfidentialityLevel")
     private List<SourceDataWarehouse> sourceDataWarehouseList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataResourceConfidentialityLevel")
-    private List<PolicyRegistry> policyRegistryList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetConfidentialityLevel")
     private List<DataSetDefinition> dataSetDefinitionList;
 
-    public ConfidentialityLevels() {
+    public ConfidentialityLevel() {
     }
 
-    public ConfidentialityLevels(Integer levelId) {
+    public ConfidentialityLevel(Integer levelId) {
         this.levelId = levelId;
     }
 
-    public ConfidentialityLevels(Integer levelId, String levelName) {
+    public ConfidentialityLevel(Integer levelId, String levelName) {
         this.levelId = levelId;
         this.levelName = levelName;
     }
@@ -72,14 +66,6 @@ public class ConfidentialityLevels implements Serializable
         this.sourceDataWarehouseList = sourceDataWarehouseList;
     }
 
-    public List<PolicyRegistry> getPolicyRegistryList() {
-        return policyRegistryList;
-    }
-
-    public void setPolicyRegistryList(List<PolicyRegistry> policyRegistryList) {
-        this.policyRegistryList = policyRegistryList;
-    }
-
     public List<DataSetDefinition> getDataSetDefinitionList() {
         return dataSetDefinitionList;
     }
@@ -98,10 +84,10 @@ public class ConfidentialityLevels implements Serializable
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ConfidentialityLevels)) {
+        if (!(object instanceof ConfidentialityLevel)) {
             return false;
         }
-        ConfidentialityLevels other = (ConfidentialityLevels) object;
+        ConfidentialityLevel other = (ConfidentialityLevel) object;
         if ((this.levelId == null && other.levelId != null) || (this.levelId != null && !this.levelId.equals(other.levelId))) {
             return false;
         }
@@ -110,7 +96,7 @@ public class ConfidentialityLevels implements Serializable
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.ConfidentialityLevels[ levelId=" + levelId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.ConfidentialityLevel[ levelId=" + levelId + " ]";
     }
     
 }

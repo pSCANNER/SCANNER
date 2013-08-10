@@ -1,4 +1,3 @@
-
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -20,7 +19,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "tool_library", schema = "scanner_registry")
-public class ToolLibrary implements Serializable
+public class ToolLibrary implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
@@ -29,16 +28,16 @@ public class ToolLibrary implements Serializable
     @Column(name = "library_id")
     private Integer libraryId;
     @Basic(optional = false)
-    @Column(name = "libary_name")
-    private String libaryName;
+    @Column(name = "library_name")
+    private String libraryName;
     @Basic(optional = false)
     @Column(name = "library_version")
     private String libraryVersion;
     @Column(name = "description")
     private String description;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "toolParentLibraryId", fetch=FetchType.EAGER)
-    @JsonManagedReference("tool_library-analysis_tools")
-    private List<AnalysisTools> analysisToolsList;
+    @JsonManagedReference("tool_library-analysis_tool")
+    private List<AnalysisTool> analysisTool;
 
     public ToolLibrary() {
     }
@@ -47,9 +46,9 @@ public class ToolLibrary implements Serializable
         this.libraryId = libraryId;
     }
 
-    public ToolLibrary(Integer libraryId, String libaryName, String libraryVersion) {
+    public ToolLibrary(Integer libraryId, String libraryName, String libraryVersion) {
         this.libraryId = libraryId;
-        this.libaryName = libaryName;
+        this.libraryName = libraryName;
         this.libraryVersion = libraryVersion;
     }
 
@@ -61,12 +60,12 @@ public class ToolLibrary implements Serializable
         this.libraryId = libraryId;
     }
 
-    public String getLibaryName() {
-        return libaryName;
+    public String getLibraryName() {
+        return libraryName;
     }
 
-    public void setLibaryName(String libaryName) {
-        this.libaryName = libaryName;
+    public void setLibraryName(String libraryName) {
+        this.libraryName = libraryName;
     }
 
     public String getLibraryVersion() {
@@ -85,12 +84,12 @@ public class ToolLibrary implements Serializable
         this.description = description;
     }
 
-    public List<AnalysisTools> getAnalysisToolsList() {
-        return analysisToolsList;
+    public List<AnalysisTool> getAnalysisToolList() {
+        return analysisTool;
     }
 
-    public void setAnalysisToolsList(List<AnalysisTools> analysisToolsList) {
-        this.analysisToolsList = analysisToolsList;
+    public void setAnalysisToolList(List<AnalysisTool> analysisToolList) {
+        this.analysisTool = analysisToolList;
     }
 
     @Override

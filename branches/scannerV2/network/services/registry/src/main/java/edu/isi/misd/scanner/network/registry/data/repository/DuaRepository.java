@@ -1,6 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.repository;
 
-import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTools;
+import edu.isi.misd.scanner.network.registry.data.domain.Dua;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,8 +11,8 @@ import org.springframework.data.repository.CrudRepository;
  *
  */
 
-public interface AnalysisToolsRepository 
-    extends CrudRepository<AnalysisTools, Integer> 
+public interface DuaRepository 
+    extends CrudRepository<Dua, Integer> 
 {
     
 }
