@@ -38,7 +38,6 @@ public class RegistryServiceImpl implements RegistryService
     
     
     @Override
-    @Transactional
     public List<ToolLibrary> getToolLibraries()
     {
         List<ToolLibrary> toolLibraries = new ArrayList<ToolLibrary>();
@@ -48,8 +47,7 @@ public class RegistryServiceImpl implements RegistryService
         return toolLibraries;        
     }
 
-    @Override
-    @Transactional    
+    @Override  
     public ToolLibrary getToolLibrary(Integer ID) {
         return toolLibraryRepository.findOne(ID);
     }
