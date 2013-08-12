@@ -1,7 +1,5 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -15,12 +13,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import org.codehaus.jackson.annotate.JsonBackReference;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  *
  */
 @Entity
 @Table(name = "analysis_tool", schema = "scanner_registry")
+@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class AnalysisTool implements Serializable 
 {
     private static final long serialVersionUID = 1L;
@@ -49,8 +51,8 @@ public class AnalysisTool implements Serializable
     private String informationEmail;
     @JoinColumn(name = "tool_parent_library_id", referencedColumnName = "library_id")
     @ManyToOne(optional = false)
-    @JsonBackReference("analysis_tool-tool_library")
-    private ToolLibrary toolParentLibraryId;
+    @JsonBackReference("toolParentLibrary")
+    private ToolLibrary toolParentLibrary;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
     @JsonIgnore
     private List<PolicyStatement> policyStatementList; 
@@ -131,12 +133,12 @@ public class AnalysisTool implements Serializable
         this.informationEmail = informationEmail;
     }
 
-    public ToolLibrary getToolParentLibraryId() {
-        return toolParentLibraryId;
+    public ToolLibrary getToolParentLibrary() {
+        return toolParentLibrary;
     }
 
-    public void setToolParentLibraryId(ToolLibrary toolParentLibraryId) {
-        this.toolParentLibraryId = toolParentLibraryId;
+    public void setToolParentLibrary(ToolLibrary toolParentLibrary) {
+        this.toolParentLibrary = toolParentLibrary;
     }
 
     public List<PolicyStatement> getPolicyStatementList() {

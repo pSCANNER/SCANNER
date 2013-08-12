@@ -9,5 +9,5 @@
     
     <mvc:annotation-driven/>
     <context:component-scan base-package="edu.isi.misd.scanner.network.registry" />
-        
+            
 </beans>

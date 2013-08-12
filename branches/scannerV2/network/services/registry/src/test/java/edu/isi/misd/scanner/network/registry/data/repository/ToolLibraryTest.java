@@ -3,6 +3,7 @@ package edu.isi.misd.scanner.network.registry.data.repository;
 
 import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
+import java.util.ArrayList;
 import static org.junit.Assert.*;
 
 
@@ -10,6 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -18,33 +21,37 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-repository-context.xml")
-public class AnalysisToolTest 
+public class ToolLibraryTest 
 {   
 	@Autowired
 	ToolLibraryRepository toolLibraryRepository;
-    
-	@Autowired
-	AnalysisToolRepository analysisToolsRepository;
-    
+        
 	AnalysisTool tool;
     ToolLibrary toolLibrary;
+    
+    MappingJacksonHttpMessageConverter converter = 
+        new MappingJacksonHttpMessageConverter();
     
 	@Before
 	public void setUp() 
     {
         toolLibrary = new ToolLibrary();
+		tool = new AnalysisTool();        
+        ArrayList<AnalysisTool> toolList = new ArrayList<AnalysisTool>();
+        toolList.add(tool);  
+        
         toolLibrary.setLibraryName("Test Tool Library");
         toolLibrary.setDescription("Fake tool library description");
         toolLibrary.setLibraryVersion("1");
-        
-		tool = new AnalysisTool();
+        toolLibrary.setAnalysisToolList(toolList);        
+      
         tool.setToolName("Test Tool");
         tool.setToolDescription("Automated test fake tool");
         tool.setCuratorUid(007);
         tool.setInformationEmail("nobody@localhost");
         tool.setInputFormatSpecifications("input specifications");
         tool.setOutputFormatSpecifications("output specifications");
-        tool.setToolParentLibraryId(toolLibrary);
+        tool.setToolParentLibrary(toolLibrary);
         
 	}
   
@@ -58,9 +65,27 @@ public class AnalysisToolTest
 		assertEquals(toolLibrary, 
             toolLibraryRepository.findOne(toolLibrary.getLibraryId()));
         
-		tool = analysisToolsRepository.save(tool);
-		assertEquals(tool, 
-            analysisToolsRepository.findOne(tool.getToolId()));
 	}
 
+    @Test
+    public void testJacksonConversion() 
+        throws Exception
+    {
+        assertCanBeMapped(ToolLibrary.class);
+        assertCanBeMapped(AnalysisTool.class);
+    }
+
+    private void assertCanBeMapped(Class<?> classToTest)
+    {
+        String deser =
+            String.format("%s is not deserializable, check the swallowed exception in Jackson StdDeserializerProvider.hasValueDeserializerFor",
+            classToTest.getSimpleName());
+        assertTrue(deser, converter.canRead(classToTest, MediaType.APPLICATION_JSON));
+        
+        String ser =
+            String.format("%s is not serializable",
+            classToTest.getSimpleName());
+        assertTrue(ser, converter.canWrite(classToTest, MediaType.APPLICATION_JSON));        
+    }
+    
 }

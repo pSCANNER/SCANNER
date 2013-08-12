@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.service;
 
+import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 import edu.isi.misd.scanner.network.registry.data.repository.*;
 import java.util.ArrayList;
@@ -35,20 +36,21 @@ public class RegistryServiceImpl implements RegistryService
     private AnalysisToolRepository analysisToolRepository;   
     @Autowired
     private ToolLibraryRepository toolLibraryRepository;   
-    
+
     
     @Override
-    public List<ToolLibrary> getToolLibraries()
+    @Transactional
+    public void createToolLibrary(ToolLibrary library) 
     {
-        List<ToolLibrary> toolLibraries = new ArrayList<ToolLibrary>();
-        Iterator iter = toolLibraryRepository.findAll().iterator();
-        CollectionUtils.addAll(toolLibraries, iter);
-
-        return toolLibraries;        
-    }
-
-    @Override  
-    public ToolLibrary getToolLibrary(Integer ID) {
-        return toolLibraryRepository.findOne(ID);
+        List<AnalysisTool> toolList = library.getAnalysisToolList();
+        if ((toolList != null) && (!toolList.isEmpty())) {
+            library.setAnalysisToolList(null);
+            toolLibraryRepository.save(library);              
+            for (AnalysisTool tool : toolList) {
+                tool.setToolParentLibrary(library);
+            }
+            library.setAnalysisToolList(toolList);            
+        }
+        toolLibraryRepository.save(library);
     }
 }

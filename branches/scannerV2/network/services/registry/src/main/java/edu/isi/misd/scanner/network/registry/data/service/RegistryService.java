@@ -8,6 +8,9 @@ import java.util.List;
  */
 public interface RegistryService 
 {
-    public ToolLibrary getToolLibrary(Integer ID);
-    public List<ToolLibrary> getToolLibraries();    
+    /**
+     *
+     * @param library
+     */
+    public void createToolLibrary(ToolLibrary library);  
 }
