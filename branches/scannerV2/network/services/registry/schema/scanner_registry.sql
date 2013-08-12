@@ -1,30 +1,26 @@
-\i constants.sql
-
-create schema scanner_registry;
 set search_path = scanner_registry;
 
 create table if not exists tool_library (
   library_id serial not null primary key,
-  library_name text not null unique,
-  library_version text not null,
+  library_name text not null,
+  version text not null,
   description text,
-  unique(library_name, library_version)
+  unique(library_name, version)
 );
 
 CREATE TABLE IF NOT EXISTS scanner_user (
   user_id serial NOT NULL primary key,
   username text not null unique,
   email text NOT NULL,
-  HSPC_documents text NOT NULL,
-  Primary_Affliation integer NOT NULL,
-  Secondary_Affliliation integer NOT NULL,
-  Phone text NOT NULL,
-  Reports_To integer NOT NULL references scanner_user(user_id),
-  Active boolean NOT NULL,
-  First_Name text NOT NULL,
-  Middle_Initial text,
-  Last_Name text NOT NULL,
-  PubMed_Author_ID text
+  hspc_documents text,
+  phone text NOT NULL,
+  reports_to integer,
+  active boolean NOT NULL,
+  first_name text NOT NULL,
+  middle_initial text,
+  last_name text NOT NULL,
+  pubmed_author_id text,
+  is_superuser boolean not null default false
 );
 
 CREATE TABLE IF NOT EXISTS dua (
@@ -41,20 +37,16 @@ CREATE TABLE IF NOT EXISTS scanner_grant (
 
 COMMENT ON table scanner_grant is 'Placeholder grant table.';
 
-create table study_status_type (
-  study_status_id integer not null primary key,
-  study_status_name text not null unique
-);
-
 CREATE TABLE IF NOT EXISTS study (
-  Study_ID serial NOT NULL primary key,
-  IRB_ID integer NOT NULL,
-  Protocol text NOT NULL,
-  Principal_Investigator_UID integer NOT NULL references scanner_user(user_id),
-  Start_Date date NOT NULL,
-  End_Date date NOT NULL,
-  Clinical_Trials_ID integer NOT NULL,
-  Analysis_Plan text NOT NULL
+  study_id serial NOT NULL primary key,
+  irb_id integer NOT NULL,
+  protocol text NOT NULL,
+  principal_investigator_uid integer NOT NULL references scanner_user(user_id),
+  start_date date NOT NULL,
+  end_date date NOT NULL,
+  clinical_trials_id integer NOT NULL,
+  analysis_plan text NOT NULL,
+  study_status_type_id integer not null references study_status_type(study_status_type_id)
 );
 
 create table study_grant (
@@ -63,24 +55,14 @@ create table study_grant (
   primary key (study_id, grant_id)
 );
 
-create table confidentiality_level (
-  level_id integer not null primary key,
-  level_name text not null unique
-);
-
-insert into confidentiality_level(level_id, level_name) values
-  (:safe_harbor, 'SAFE HARBOR'),
-  (:dua_covered_lds, 'DUA-COVERED LIMITED DATA SET'),
-  (:identified_data, 'IDENTIFIED DATA');
-
 CREATE TABLE IF NOT EXISTS source_data_warehouse (
   source_data_warehouse_id serial not null primary key,
-  Connectivity_Manager_ID integer NOT NULL references scanner_user(user_id),
-  Data_Manager_ID integer NOT NULL references scanner_user(user_id),
+  connectivity_manager_id integer NOT NULL references scanner_user(user_id),
+  data_manager_id integer NOT NULL references scanner_user(user_id),
   data_warehouse_confidentiality_level integer not null references confidentiality_level(level_id),
-  Schema_Documentation text NOT NULL,
-  ETL_Documentation text NOT NULL,
-  ETL_Programs text NOT NULL
+  schema_documentation text NOT NULL,
+  etl_documentation text NOT NULL,
+  etl_programs text NOT NULL
 );
 
 COMMENT on table source_data_warehouse is 'Daniella: Documentation of the data source, points of contact and authorities';
@@ -100,44 +82,32 @@ create table if not exists scanner_role (
 COMMENT on column scanner_role.role_within_study is 'PI, CO-I, PM, etc.';
 
 CREATE TABLE IF NOT EXISTS investigator_role (
-  Investigator_ID integer NOT NULL references scanner_user(user_id),
+  investigator_id integer NOT NULL references scanner_user(user_id),
   role_id integer NOT NULL references scanner_role(role_id),
   primary key (Investigator_ID, role_id)
 );
 
 
 CREATE TABLE IF NOT EXISTS analysis_tool (
-  Tool_ID serial NOT NULL primary key,
+  tool_id serial NOT NULL primary key,
   tool_name text not null,
-  Tool_Parent_Library_ID integer NOT NULL references tool_library(library_id),
-  Tool_Description text NOT NULL,
-  Input_Format_Specifications text NOT NULL,
-  Output_Format_Specifications text NOT NULL,
-  Curator_UID integer NOT NULL,
-  Information_Email text NOT NULL,
+  tool_parent_library_id integer NOT NULL references tool_library(library_id),
+  tool_description text NOT NULL,
+  input_format_specifications text NOT NULL,
+  output_format_specifications text NOT NULL,
+  curator_uid integer NOT NULL,
+  information_email text NOT NULL,
   unique (tool_name, tool_parent_library_id)
 );
 
-create table data_set_policy_authority (
-  authority_id serial not null primary key,
-  authority_name text not null unique
-);
-
-insert into data_set_policy_authority(authority_id, authority_name) values
-  (:legal, 'LEGAL'),
-  (:study, 'STUDY'),
-  (:site_admin, 'SITE ADMINISTRATION'),
-  (:network_admin, 'NETWORK ADMINISTRATION');
-
-  
 CREATE TABLE IF NOT EXISTS data_set_definition (
-  Data_Set_Definition_ID serial NOT NULL primary key,
-  Data_Description_XML text NOT NULL,
-  Data_Processing_XML text NOT NULL,
-  Data_Processing_Program text NOT NULL,
-  Author_UID integer NOT NULL references scanner_user(user_id),
-  Originating_Study_ID integer NOT NULL references study(study_id),
-  Data_Set_Confidentiality_Level integer NOT NULL references confidentiality_level(level_id)
+  data_set_definition_id serial NOT NULL primary key,
+  data_description_xml text NOT NULL,
+  data_processing_xml text NOT NULL,
+  data_processing_program text NOT NULL,
+  author_uid integer NOT NULL references scanner_user(user_id),
+  originating_study_id integer NOT NULL references study(study_id),
+  data_set_confidentiality_level integer NOT NULL references confidentiality_level(level_id)
 );
 
 COMMENT on column data_set_definition.data_description_xml is 'Daniella: Path to XML describing data';
@@ -147,28 +117,11 @@ COMMENT on column data_set_definition.author_uid is 'Daniella: UID of author';
 COMMENT on column data_set_definition.originating_study_id is 'Daniella: ID of study using this data set';
 COMMENT on column data_set_definition.data_set_confidentiality_level is 'Daniella: This is a key to the type of legal regulations this data set is subject to (safe harbor, limited data set, identified data)';
 
-create table policy_status_type (
-  policy_status_type_id integer primary key,
-  policy_status_type_name text not null unique
-);
-
-insert into policy_status_type (policy_status_type_id, policy_status_type_name) values
- (:active, 'active'),
- (:denied, 'denied'),
- (:revoked, 'revoked'),
- (:inconsistent, 'inconsistent');
-
-create table if not exists access_mode (
-  access_mode_id serial not null primary key,
-  access_mode_name text not null unique
-);
-insert into access_mode(access_mode_id, access_mode_name) values (:sync, 'synchronous'), (:async, 'asynchronous');
-
 create table abstract_policy (
   abstract_policy_id serial not null primary key,
   study_id integer not null references study(study_id),
   data_set_definition_id integer not null references data_set_definition(data_set_definition_id),
-  policy_authority integer not null references data_set_policy_authority(authority_id),
+  policy_authority integer not null references data_set_policy_authority(data_set_policy_authority_id),
   policy_originator integer not null references scanner_user(user_id),
   attestation text not null,
   role_id integer not null references scanner_role(role_id),
@@ -179,13 +132,13 @@ create table abstract_policy (
 
 
 CREATE TABLE IF NOT EXISTS data_set_instance (
-  Data_Set_Instance_ID serial NOT NULL primary key,
-  Data_Set_Definition_ID integer NOT NULL references data_set_definition(data_set_definition_id),
-  Data_Set_Instance_Location text NOT NULL,
-  Curator_UID integer NOT NULL references scanner_user(user_id),
-  Study_ID integer NOT NULL references study(study_id),
-  Source_Data_Warehouse_ID integer NOT NULL references source_data_warehouse (source_data_warehouse_id),
-  Data_Slice_ID integer DEFAULT NULL
+  data_set_instance_id serial NOT NULL primary key,
+  data_set_definition_id integer NOT NULL references data_set_definition(data_set_definition_id),
+  data_set_instance_location text NOT NULL,
+  curator_uid integer NOT NULL references scanner_user(user_id),
+  study_id integer NOT NULL references study(study_id),
+  source_data_warehouse_id integer references source_data_warehouse (source_data_warehouse_id),
+  data_slice_id integer DEFAULT NULL
 );
 
 create table if not exists policy_statement (
@@ -193,11 +146,61 @@ create table if not exists policy_statement (
   data_set_instance_id integer not null references data_set_instance(data_set_instance_id),
   role_id integer not null references scanner_role(role_id),
   analysis_tool_id integer not null references analysis_tool(tool_id),
-  access_mode integer not null references access_mode(access_mode_id),
-  policy_status_id integer not null references policy_status_type(policy_status_type_id)
+  access_mode_id integer not null references access_mode(access_mode_id),
+  policy_status_type_id integer not null references policy_status_type(policy_status_type_id),
+  parent_abstract_policy_id integer not null references abstract_policy(abstract_policy_id)
 );
 
 COMMENT on table policy_statement is 'Users in role <role_id> may run toll <tool_id> on data set instance <data_set_instance_id> in mode <access_mode> if status is active';
 
 create or replace view active_policy as
-  select * from policy_statement where policy_status_id = :active;
+  select s.* from policy_statement s join policy_status_type t on s.policy_status_type_id = t.policy_status_type_id
+    where t.policy_status_type_name = 'active';
+
+
+--- Mike-owned tables
+
+CREATE TABLE IF NOT EXISTS node (
+  node_id serial NOT NULL primary key,
+  node_type_id integer NOT NULL references node_type(node_type_id),
+  hostname text NOT NULL,
+  node_port integer NOT NULL,
+  base_path text NOT NULL,
+  description text
+);
+
+CREATE TABLE IF NOT EXISTS analysis_instance (
+  analysis_instance_id serial NOT NULL primary key,
+  -- I don't think abstract_policy_id belongs here, but if it does, it should be a foreign key to the abstract_policy table - LP
+  abstract_policy_id integer NOT NULL,
+  -- Is there some table of states? - LP
+  analysis_instance_state integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS analysis_instance_site_status (
+  analysis_instance_site_status_id serial NOT NULL primary key,
+  analysis_instance_id integer NOT NULL references analysis_instance(analysis_instance_id),
+  -- I don't think abstract_policy_id belongs here, but if it does, it should be a foreign key to the policy table - LP
+  policy_instance_id integer NOT NULL,
+  -- Is there a table of statuses? Are they the same as for analysis_table_state above?
+  analysis_instance_site_status integer NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS result_instance (
+  result_instance_id serial not null primary key,
+  analysis_instance_id integer NOT NULL references analysis_instance(analysis_instance_id),
+  -- What is result_location? Is it a foreign key to some other table?
+  result_location integer NOT NULL,
+  result_instance_url text NOT NULL
+);
+
+---
+
+-- Not Mike-owned
+
+create table if not exists node_policy (
+  node_policy_id serial not null primary key,
+  node_id integer not null references node(node_id),
+  role_id integer not null references scanner_role(role_id)
+);
+-- will eventually include operations, but we're not enforcing those at this point.
