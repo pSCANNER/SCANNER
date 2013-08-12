@@ -1,5 +1,4 @@
--- PGSQL specific import directive below (constants.sql is still a required import)
--- \i constants.sql
+\i constants.sql
 
 create schema scanner_registry;
 set search_path = scanner_registry;
