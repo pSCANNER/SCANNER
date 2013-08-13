@@ -35,7 +35,7 @@ public class ToolLibrary implements Serializable
     @Column(name = "description")
     private String description;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "toolParentLibrary", fetch=FetchType.EAGER)
-    private List<AnalysisTool> analysisTool;
+    private List<AnalysisTool> analysisTools;
 
     public ToolLibrary() {
     }
@@ -81,13 +81,13 @@ public class ToolLibrary implements Serializable
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public List<AnalysisTool> getAnalysisToolList() {
-        return analysisTool;
+ 
+    public List<AnalysisTool> getAnalysisTools() {
+        return analysisTools;
     }
 
-    public void setAnalysisToolList(List<AnalysisTool> analysisToolList) {
-        this.analysisTool = analysisToolList;
+    public void setAnalysisTools(List<AnalysisTool> analysisTools) {
+        this.analysisTools = analysisTools;
     }
 
     @Override

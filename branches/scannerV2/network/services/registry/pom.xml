@@ -14,7 +14,7 @@
 		<spring.data.jpa.version>1.4.0.M1</spring.data.jpa.version>            
 		<jpa.version>2.0.0</jpa.version>
 		<hibernate.version>4.2.2.Final</hibernate.version>        
-        <jackson.version>1.9.13</jackson.version>
+        <jackson.version>2.2.0</jackson.version>
 		<junit.version>4.11</junit.version>
 		<slf4j.version>1.7.5</slf4j.version>        
 		<aspectj.version>1.6.12</aspectj.version>
@@ -46,24 +46,28 @@
     
 	<dependencies>
 		                                 
-		<!-- Jackson JSON Mapper -->
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>        
-<!--
+		<!-- Jackson JSON Mapper -->    
         <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
-          <version>${jackson.version}</version>
+           <groupId>com.fasterxml.jackson.core</groupId>
+           <artifactId>jackson-core</artifactId>
+           <version>${jackson.version}</version>
         </dependency>
         <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-databind</artifactId>
-          <version>${jackson.version}</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
--->                           
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jaxb-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+                                  
         <!-- Spring -->     
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -208,12 +212,7 @@
           <artifactId>base-common</artifactId>
           <version>${project.version}</version>
         </dependency>
-	 <dependency>
-	  <groupId>javax.annotation</groupId>
-	  <artifactId>jsr250-api</artifactId>
-	  <version>1.0</version>
-	  <scope>provided</scope>
-	 </dependency>
+        
 	</dependencies>
 
 	<build>

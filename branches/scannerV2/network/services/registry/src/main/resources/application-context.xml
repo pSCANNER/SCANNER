@@ -7,7 +7,17 @@
     
     <import resource="classpath:repository-context.xml"/>
     
-    <mvc:annotation-driven/>
+    <bean id="customJacksonObjectMapper" 
+          class="edu.isi.misd.scanner.network.registry.web.config.CustomJacksonObjectMapper"/>  
+     
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper" ref="customJacksonObjectMapper" />
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>   
+         
     <context:component-scan base-package="edu.isi.misd.scanner.network.registry" />
             
 </beans>

@@ -42,14 +42,14 @@ public class RegistryServiceImpl implements RegistryService
     @Transactional
     public void createToolLibrary(ToolLibrary library) 
     {
-        List<AnalysisTool> toolList = library.getAnalysisToolList();
+        List<AnalysisTool> toolList = library.getAnalysisTools();
         if ((toolList != null) && (!toolList.isEmpty())) {
-            library.setAnalysisToolList(null);
+            library.setAnalysisTools(null);
             toolLibraryRepository.save(library);              
             for (AnalysisTool tool : toolList) {
                 tool.setToolParentLibrary(library);
             }
-            library.setAnalysisToolList(toolList);            
+            library.setAnalysisTools(toolList);            
         }
         toolLibraryRepository.save(library);
     }

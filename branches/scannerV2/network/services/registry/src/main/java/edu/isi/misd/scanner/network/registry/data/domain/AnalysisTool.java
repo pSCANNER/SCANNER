@@ -1,5 +1,7 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -13,16 +15,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 /**
  *
  */
 @Entity
 @Table(name = "analysis_tool", schema = "scanner_registry")
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
 public class AnalysisTool implements Serializable 
 {
     private static final long serialVersionUID = 1L;
@@ -51,12 +49,12 @@ public class AnalysisTool implements Serializable
     private String informationEmail;
     @JoinColumn(name = "tool_parent_library_id", referencedColumnName = "library_id")
     @ManyToOne(optional = false)
-    @JsonBackReference("toolParentLibrary")
+    @JsonBackReference("toolParentLibrary")  
     private ToolLibrary toolParentLibrary;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
     @JsonIgnore
     private List<PolicyStatement> policyStatementList; 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")  
     @JsonIgnore       
     private List<AbstractPolicy> abstractPolicyList;
 
@@ -132,7 +130,7 @@ public class AnalysisTool implements Serializable
     public void setInformationEmail(String informationEmail) {
         this.informationEmail = informationEmail;
     }
-
+  
     public ToolLibrary getToolParentLibrary() {
         return toolParentLibrary;
     }
@@ -148,11 +146,11 @@ public class AnalysisTool implements Serializable
     public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
         this.policyStatementList = policyStatementList;
     }
-
+  
     public List<AbstractPolicy> getAbstractPolicyList() {
         return abstractPolicyList;
     }
-
+    
     public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
         this.abstractPolicyList = abstractPolicyList;
     }

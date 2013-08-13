@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -29,8 +29,8 @@ public class ToolLibraryTest
 	AnalysisTool tool;
     ToolLibrary toolLibrary;
     
-    MappingJacksonHttpMessageConverter converter = 
-        new MappingJacksonHttpMessageConverter();
+    MappingJackson2HttpMessageConverter converter = 
+        new MappingJackson2HttpMessageConverter();
     
 	@Before
 	public void setUp() 
@@ -43,7 +43,7 @@ public class ToolLibraryTest
         toolLibrary.setLibraryName("Test Tool Library");
         toolLibrary.setDescription("Fake tool library description");
         toolLibrary.setLibraryVersion("1");
-        toolLibrary.setAnalysisToolList(toolList);        
+        toolLibrary.setAnalysisTools(toolList);        
       
         tool.setToolName("Test Tool");
         tool.setToolDescription("Automated test fake tool");
@@ -78,13 +78,13 @@ public class ToolLibraryTest
     private void assertCanBeMapped(Class<?> classToTest)
     {
         String deser =
-            String.format("%s is not deserializable, check the swallowed exception in Jackson StdDeserializerProvider.hasValueDeserializerFor",
-            classToTest.getSimpleName());
+            String.format("%s is not deserializable by Jackson, check @Json annotations",
+            classToTest.getName());
         assertTrue(deser, converter.canRead(classToTest, MediaType.APPLICATION_JSON));
         
         String ser =
-            String.format("%s is not serializable",
-            classToTest.getSimpleName());
+            String.format("%s is not serializable by Jackson, check @Json annotations",
+            classToTest.getName());
         assertTrue(ser, converter.canWrite(classToTest, MediaType.APPLICATION_JSON));        
     }
     
