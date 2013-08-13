@@ -130,10 +130,28 @@ create table abstract_policy (
   policy_status_id integer not null references policy_status_type(policy_status_type_id)
 );
 
+create table if not exists site (
+  site_id serial NOT NULL primary key,
+  site_name text not null unique
+);
+
+-- The node table must have node_id and site_id, but Mike should feel free to change anything else
+
+CREATE TABLE IF NOT EXISTS node (
+  node_id serial NOT NULL primary key,
+  site_id integer not null references site(site_id),
+  node_type_id integer NOT NULL references node_type(node_type_id),
+  hostname text NOT NULL,
+  node_port integer NOT NULL,
+  base_path text NOT NULL,
+  description text
+);
+
 
 CREATE TABLE IF NOT EXISTS data_set_instance (
   data_set_instance_id serial NOT NULL primary key,
   data_set_definition_id integer NOT NULL references data_set_definition(data_set_definition_id),
+  node_id integer not null references node(node_id),
   data_set_instance_location text NOT NULL,
   curator_uid integer NOT NULL references scanner_user(user_id),
   study_id integer NOT NULL references study(study_id),
@@ -157,30 +175,14 @@ create or replace view active_policy as
   select s.* from policy_statement s join policy_status_type t on s.policy_status_type_id = t.policy_status_type_id
     where t.policy_status_type_name = 'active';
 
-create table if not exists site (
-  site_id serial NOT NULL primary key,
-  site_name text not null unique
-);
-  
+ 
 create table if not exists site_policy (
   site_policy_id serial not null primary key,
   site_id integer not null references site(site_id),
   role_id integer not null references scanner_role(site_id)
 );
 
---- Mike-owned tables
-
--- The node table must have node_id and site_id, but Mike should feel free to change anything else
-
-CREATE TABLE IF NOT EXISTS node (
-  node_id serial NOT NULL primary key,
-  site_id integer not null references site(site_id),
-  node_type_id integer NOT NULL references node_type(node_type_id),
-  hostname text NOT NULL,
-  node_port integer NOT NULL,
-  base_path text NOT NULL,
-  description text
-);
+--- More Mike-owned tables
 
 CREATE TABLE IF NOT EXISTS analysis_instance (
   analysis_instance_id serial NOT NULL primary key,
@@ -207,8 +209,3 @@ CREATE TABLE IF NOT EXISTS result_instance (
   result_instance_url text NOT NULL
 );
 
----
-
--- Not Mike-owned
-
--- will eventually include operations, but we're not enforcing those at this point.
