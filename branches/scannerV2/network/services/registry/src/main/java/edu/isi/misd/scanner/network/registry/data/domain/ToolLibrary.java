@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -34,6 +35,7 @@ public class ToolLibrary implements Serializable
     private String libraryVersion;
     @Column(name = "description")
     private String description;
+    @JsonManagedReference("toolParentLibrary")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "toolParentLibrary", fetch=FetchType.EAGER)
     private List<AnalysisTool> analysisTools;
 

@@ -3,10 +3,7 @@ package edu.isi.misd.scanner.network.registry.data.service;
 import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 import edu.isi.misd.scanner.network.registry.data.repository.*;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +37,7 @@ public class RegistryServiceImpl implements RegistryService
     
     @Override
     @Transactional
-    public void createToolLibrary(ToolLibrary library) 
+    public void saveToolLibrary(ToolLibrary library) 
     {
         List<AnalysisTool> toolList = library.getAnalysisTools();
         if ((toolList != null) && (!toolList.isEmpty())) {
@@ -52,5 +49,5 @@ public class RegistryServiceImpl implements RegistryService
             library.setAnalysisTools(toolList);            
         }
         toolLibraryRepository.save(library);
-    }
+    }       
 }

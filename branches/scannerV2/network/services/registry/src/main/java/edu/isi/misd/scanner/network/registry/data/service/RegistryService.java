@@ -9,8 +9,8 @@ import java.util.List;
 public interface RegistryService 
 {
     /**
-     *
+     * Creates or updates a single ToolLibrary, with optional creation of AnalysisTool child relations.
      * @param library
      */
-    public void createToolLibrary(ToolLibrary library);  
+    public void saveToolLibrary(ToolLibrary library);            
 }
