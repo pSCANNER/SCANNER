@@ -192,3 +192,99 @@ tr.uneven {
   background-color: #cccccc;
 }
 
+label.wizard_label {
+	font-weight: bold;
+}
+
+label.wizard_field_required {
+	font-weight: bold;
+	color: red;
+}
+
+div.wizard_layer {
+	/*overflow:auto;*/
+	width: 95%;
+}
+
+p.wizard_heading {
+	width: 100%;
+	/*margin: 1px;*/
+	padding: 3px 10px;
+	cursor: pointer;
+	/*position: relative;*/
+	border-radius: 10px;
+	background-color: rgb(247, 247, 247);
+}
+
+div.wizard_content {
+	width: 95%;
+}
+
+table.add_staff, table.add_protocol {
+	background-color: #CCEEFF;
+}
+
+table.update_study {
+	background-color: #CCEEFF;
+	border-spacing: 5px 0px;
+}
+
+table.manageStudyStaffTable {
+	white-space:nowrap;
+	border-spacing: 5px 10px;
+	width: 100%;
+}
+
+td.role_name {
+	font-weight: bold;
+    text-align: right;
+}
+
+td.tag {
+    text-align: right;
+}
+
+div.placeHolder {
+    text-align: center;
+    width: 100%;
+    background: rgb(244, 244, 244);
+}
+
+table.manageStudyProtocols {
+	border-collapse:collapse;
+	border-spacing: 0px 0px;
+}
+
+td.protocol_border {
+	border:1px solid black;
+	vertical-align: top;
+}
+
+td.protocol_valign, span.protocol_valign {
+	vertical-align: top;
+}
+
+th.protocol_border {
+	border:1px solid black;
+    text-align: center;
+}
+
+span.wizard_heading_protocol {
+	cursor: pointer;
+	/*position: relative;*/
+	border-radius: 10px;
+	background-color: rgb(247, 247, 247);
+}
+
+div.wizard_content_protocol {
+}
+
+span.active {
+    display: block;
+    text-align: right;
+}
+
+ol.blank {
+	list-style-type: none;
+}
+

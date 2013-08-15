@@ -51,6 +51,7 @@
 <script type="text/javascript" src="resources/jquery.treeview.js"></script>
 <script type="text/javascript" src="resources/d3.v3.js"></script>
 <script type="text/javascript" src="resources/box.js"></script>
+  <script type="text/javascript" src="resources/jquery-ui-timepicker-addon.js"></script>
 <script type="text/javascript">
 	dojoConfig = {
 		async : true,
@@ -102,61 +103,153 @@
 				<table><tr><td valign="top">Select study to analize:</td><td> <select id="selectStudies"></select></td></tr>
 				</table>
 				<br/><br />
-				<div><input type="button" id="continueButton" value="Continue" onclick="analyzeStudy();"disabled="disabled" ></div>
+				<div><input type="button" id="continueButton" value="Continue" onclick="analyzeStudy();" disabled="disabled" ></div>
 				<br/><br />
 			</div>
 
 			<div id="ui" style="visibility: hidden;">
-				<div style="width: 100%; height: 300px;" class="claro">
+				<div style="width: 100%; height: 300px;" class="claro" id="tabContainerWrapperDiv">
 					<div id="queryTabContainer"
 						data-dojo-type="dijit/layout/TabContainer" data-dojo-id="scannerTabContainer"
 						style="width: 100%; height: 100%">
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Projects/Studies" onShow="showProjects();">
+							title="Projects/Studies" onShow="showProjects();" onHide="hideProjects()">
 							<div id="projectsListDiv">
-								<div id="projectsMenu">
-									<a class="link-style banner-text" href="javascript:newProject();">New Project</a>&nbsp;&nbsp;
-									<a class="link-style banner-text" href="javascript:manageStudies();">Manage Studies</a>&nbsp;&nbsp;
-									<a class="link-style banner-text" href="javascript:manageDatasets();">Manage Datasets</a>&nbsp;&nbsp;
-									<a class="link-style banner-text" href="javascript:manageSites();">Manage Sites</a>&nbsp;&nbsp;
-									<br/><br/>
-								</div>
-								<div id="projectsList">
-									<div id="projectsGridDiv">
+								<ul>
+									<li><a href="#myStudiesDiv"><span>My Studies</span></a></li>
+									<li><a id="manageStudiesDivLink" href="#manageStudiesDiv"><span>Manage Studies</span></a></li>
+									<li><a href="#newProjectDiv"><span>New Study</span></a></li>
+								</ul>
+								<div id="newProjectDiv" class="wizard_layer">
+									<div id="createStudyDiv">
+										<h1>New Study</h1>
+										<h4>To Get Started, Enter the Title of Your New Study: </h4>
+										<input type="text" id="studyTitleInput">
+										<input type="button" id="createStudyButton" value="Create Study" onclick="createStudy()" disabled="disabled">
 									</div>
 								</div>
-							</div>
-							<div id="newProjectDiv" style="display: none;">
-								<br/>
-								<table id="newProjectTable" class="attributes_list">
-									<thead>
-										<tr class="attribute_heading">
-											<th class="attribute_value">Attribute</th>
-											<th class="attribute_value">Value</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr class="attribute uneven"><td>Project Title</td><td class="attribute"><input type="text" id="projectTitle"></td></tr>
-										<tr class="attribute"><td>Project Description</td><td class="attribute"><input type="text" id="projectDescription"></td></tr>
-										<tr class="attribute uneven"><td>Principal Investigator</td><td class="attribute"><select id="selectProjectInvestigator"></select></td></tr>
-									</tbody>
-								</table>
-								<br/>
-								<div id="newProjectButtonDiv" style="text-align: right;">
-									<input type="button" value="Cancel" onclick="showProjects()">
-									<input type="button" value="Next" onclick="showProjectSlices()">
-									<input type="button" value="Finish" onclick="saveProject()">
+								<div id="manageStudiesDiv" class="wizard_layer">
+									<h2 id="manageStudyH2">Manage Research Study</h2>
+									<div id="updateStudyDiv">
+										<p class="wizard_heading">Enter Basic Information</p>
+										<div class="wizard_content">
+											<table>
+												<tr>
+													<td>
+														<table class="update_study">
+															<tbody>
+																<tr>
+																	<td class="tag">Title:</td>
+																	<td><input type="text" id="projectTitle"></td>
+																	<td class="tag">Start Date:</td>
+																	<td><input type="text" id="projectStartDate" class="datepicker"></td>
+																</tr>
+																<tr>
+																	<td class="tag">Description:</td>
+																	<td><input type="text" id="projectDescription" size="50"></td>
+																	<td class="tag">End Date:</td>
+																	<td><input type="text" id="projectEndDate" class="datepicker"></td>
+																</tr>
+															</tbody>
+														</table>
+													</td>
+												</tr>
+												<tr>
+													<td class="tag">
+														<input type="button" value="Update Study" onclick="updateStudy()">
+													</td>
+												</tr>
+											</table>
+										</div>
+										<p class="wizard_heading">Manage Study Staff</p>
+										<div class="wizard_content">
+											<table class="manageStudyStaffTable">
+												<tbody id="manageStudyStaffTbody"></tbody>
+											</table>
+											<br />
+											<table class="add_staff">
+												<tbody id="addStaffTable">
+													<tr>
+														<td>Add:</td>
+														<td>
+															<select id="staffNames">
+															</select> 
+														</td>
+														<td>as</td>
+														<td>
+															<select id="staffRoles">
+															</select> 
+														</td>
+														<td>in affilation with</td>
+														<td>
+															<select id="studySites">
+															</select> 
+														</td>
+														<td><button id="addStaffButton" onclick="addStaff();">Add Staff</button>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<p class="wizard_heading">Manage Study Protocols</p>
+										<div class="wizard_content">
+											<table id="manageStudyProtocols" class="manageStudyProtocols">
+												<thead>
+													<tr>
+														<th class="protocol_border">Method</th>
+														<th class="protocol_border">Site</th>
+														<th class="protocol_border">Data Set</th>
+														<th class="protocol_border">URL</th>
+														<th class="protocol_border">Node</th>
+														<th class="protocol_border">Result Transfer Policy</th>
+														<th></th>
+														<th></th>
+													</tr>
+												</thead>
+												<tbody id="manageStudyProtocolsTbody"></tbody>
+											</table>
+											<br />
+											<table class="add_protocol">
+												<tbody id="addProtocolTable">
+													<tr>
+														<td>
+															<select id="modelNames">
+															</select> 
+														</td>
+														<td>
+															<select id="siteNames">
+															</select> 
+														</td>
+														<td>
+															<select id="datasetNames">
+															</select> 
+														</td>
+														<td>
+															<select id="datasetInstances">
+															</select> 
+														</td>
+														<td>
+															<select id="studySendOptions">
+															</select> 
+														</td>
+														<td><button id="addProtocolButton" onclick="addProtocol();">Add Protocol</button>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<p class="wizard_heading">Manage Documentation</p>
+										<div class="wizard_content">
+											<div class="placeHolder">
+												<br /><br /><br />
+												Manageament Area Here for IRBs DUAs and BAAs
+												<br /><br /><br />
+											</div>
+										</div>
+									</div>
 								</div>
-							</div>
-							<div id="projectSlices" style="display: none;">
-								<div id="slicesGridDiv">
-								</div>
-								<br/>
-								<div id="newSlicesButtonDiv" style="text-align: right;">
-									<input type="button" value="Cancel" onclick="showProjects()">
-									<input type="button" value="New Slice" onclick="newSlice()">
-									<input type="button" value="Previous" onclick="previousProject()">
-									<input type="button" value="Finish" onclick="saveProject()">
+								<div id="myStudiesDiv" class="wizard_layer">
+									<h1>My Studies</h1>
+									<div id="lisyMyStudiesDiv">
+									</div>
 								</div>
 							</div>
 						</div>
@@ -207,7 +300,7 @@
 											<div id="queryHelp">
 												<span class="double_bottom_border"> Quick Help </span> <br/> <br/>
 												<span>Select dataset, library, method and sites on
-													the left<br/> <br />
+													the left</span><br/> <br />
 												<span id="datasetHelp"></span> <br/> <br/> <span id="methodHelp"></span> <br/> <br/>
 												<span id="libraryHelp"></span> 
 											</div>
