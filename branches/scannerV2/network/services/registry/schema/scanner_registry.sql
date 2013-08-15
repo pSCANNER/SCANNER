@@ -82,9 +82,10 @@ create table if not exists scanner_role (
 COMMENT on column scanner_role.role_within_study is 'PI, CO-I, PM, etc.';
 
 CREATE TABLE IF NOT EXISTS investigator_role (
+  investigator_role_id serial not null primary key,
   investigator_id integer NOT NULL references scanner_user(user_id),
   role_id integer NOT NULL references scanner_role(role_id),
-  primary key (Investigator_ID, role_id)
+  unique (Investigator_ID, role_id)
 );
 
 
