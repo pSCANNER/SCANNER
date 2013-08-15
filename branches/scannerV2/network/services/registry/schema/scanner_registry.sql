@@ -141,8 +141,8 @@ CREATE TABLE IF NOT EXISTS node (
   node_id serial NOT NULL primary key,
   site_id integer not null references site(site_id),
   node_type_id integer NOT NULL references node_type(node_type_id),
-  hostname text NOT NULL,
-  node_port integer NOT NULL,
+  host_name text NOT NULL,
+  host_port integer NOT NULL,
   base_path text NOT NULL,
   description text
 );
@@ -179,7 +179,7 @@ create or replace view active_policy as
 create table if not exists site_policy (
   site_policy_id serial not null primary key,
   site_id integer not null references site(site_id),
-  role_id integer not null references scanner_role(site_id)
+  role_id integer not null references scanner_role(role_id)
 );
 
 --- More Mike-owned tables
