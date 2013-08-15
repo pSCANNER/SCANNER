@@ -1,7 +1,9 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -27,6 +30,8 @@ public class AbstractPolicy implements Serializable
     @Basic(optional = false)
     @Column(name = "attestation")
     private String attestation;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentAbstractPolicyId")
+    private List<PolicyStatement> policyStatementList;
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study studyId;
@@ -39,7 +44,7 @@ public class AbstractPolicy implements Serializable
     @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatusId;
-    @JoinColumn(name = "policy_authority", referencedColumnName = "authority_id")
+    @JoinColumn(name = "policy_authority", referencedColumnName = "data_set_policy_authority_id")
     @ManyToOne(optional = false)
     private DataSetPolicyAuthority policyAuthority;
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
@@ -78,6 +83,14 @@ public class AbstractPolicy implements Serializable
 
     public void setAttestation(String attestation) {
         this.attestation = attestation;
+    }
+
+    public List<PolicyStatement> getPolicyStatementList() {
+        return policyStatementList;
+    }
+
+    public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
+        this.policyStatementList = policyStatementList;
     }
 
     public Study getStudyId() {

@@ -48,13 +48,13 @@ public class AnalysisTool implements Serializable
     @Column(name = "information_email")
     private String informationEmail;
     @JoinColumn(name = "tool_parent_library_id", referencedColumnName = "library_id")
-    @ManyToOne(optional = false) 
+    @ManyToOne(optional = false)
     @JsonBackReference("toolParentLibrary")         
     private ToolLibrary toolParentLibrary;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
     @JsonIgnore
-    private List<PolicyStatement> policyStatementList; 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")  
+    private List<PolicyStatement> policyStatementList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
     @JsonIgnore       
     private List<AbstractPolicy> abstractPolicyList;
 
@@ -130,7 +130,7 @@ public class AnalysisTool implements Serializable
     public void setInformationEmail(String informationEmail) {
         this.informationEmail = informationEmail;
     }
-      
+
     public ToolLibrary getToolParentLibrary() {
         return toolParentLibrary;
     }
@@ -146,11 +146,11 @@ public class AnalysisTool implements Serializable
     public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
         this.policyStatementList = policyStatementList;
     }
-  
+
     public List<AbstractPolicy> getAbstractPolicyList() {
         return abstractPolicyList;
     }
-    
+
     public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
         this.abstractPolicyList = abstractPolicyList;
     }

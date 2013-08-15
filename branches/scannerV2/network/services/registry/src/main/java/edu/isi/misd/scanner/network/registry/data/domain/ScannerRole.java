@@ -41,6 +41,8 @@ public class ScannerRole implements Serializable
     @ManyToOne(optional = false)
     private Study studyId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId")
+    private List<SitePolicy> sitePolicyList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId")
     private List<PolicyStatement> policyStatementList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId")
     private List<AbstractPolicy> abstractPolicyList;
@@ -87,6 +89,14 @@ public class ScannerRole implements Serializable
 
     public void setStudyId(Study studyId) {
         this.studyId = studyId;
+    }
+
+    public List<SitePolicy> getSitePolicyList() {
+        return sitePolicyList;
+    }
+
+    public void setSitePolicyList(List<SitePolicy> sitePolicyList) {
+        this.sitePolicyList = sitePolicyList;
     }
 
     public List<PolicyStatement> getPolicyStatementList() {

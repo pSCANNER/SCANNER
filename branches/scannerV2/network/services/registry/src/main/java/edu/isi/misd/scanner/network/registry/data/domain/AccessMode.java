@@ -6,14 +6,13 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
- * 
+ *
+ * @author mdarcy
  */
 @Entity
 @Table(name = "access_mode", schema = "scanner_registry")
@@ -21,14 +20,16 @@ public class AccessMode implements Serializable
 {
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "access_mode_id")
     private Integer accessModeId;
     @Basic(optional = false)
     @Column(name = "access_mode_name")
     private String accessModeName;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "accessMode")
+    @Basic(optional = false)
+    @Column(name = "description")
+    private String description;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "accessModeId")
     private List<PolicyStatement> policyStatementList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "accessMode")
     private List<AbstractPolicy> abstractPolicyList;
@@ -40,9 +41,10 @@ public class AccessMode implements Serializable
         this.accessModeId = accessModeId;
     }
 
-    public AccessMode(Integer accessModeId, String accessModeName) {
+    public AccessMode(Integer accessModeId, String accessModeName, String description) {
         this.accessModeId = accessModeId;
         this.accessModeName = accessModeName;
+        this.description = description;
     }
 
     public Integer getAccessModeId() {
@@ -59,6 +61,14 @@ public class AccessMode implements Serializable
 
     public void setAccessModeName(String accessModeName) {
         this.accessModeName = accessModeName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<PolicyStatement> getPolicyStatementList() {

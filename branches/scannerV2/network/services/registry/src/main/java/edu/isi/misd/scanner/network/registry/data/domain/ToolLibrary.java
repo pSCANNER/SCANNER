@@ -31,8 +31,8 @@ public class ToolLibrary implements Serializable
     @Column(name = "library_name")
     private String libraryName;
     @Basic(optional = false)
-    @Column(name = "library_version")
-    private String libraryVersion;
+    @Column(name = "version")
+    private String version;
     @Column(name = "description")
     private String description;
     @JsonManagedReference("toolParentLibrary")
@@ -46,10 +46,10 @@ public class ToolLibrary implements Serializable
         this.libraryId = libraryId;
     }
 
-    public ToolLibrary(Integer libraryId, String libraryName, String libraryVersion) {
+    public ToolLibrary(Integer libraryId, String libraryName, String version) {
         this.libraryId = libraryId;
         this.libraryName = libraryName;
-        this.libraryVersion = libraryVersion;
+        this.version = version;
     }
 
     public Integer getLibraryId() {
@@ -68,12 +68,12 @@ public class ToolLibrary implements Serializable
         this.libraryName = libraryName;
     }
 
-    public String getLibraryVersion() {
-        return libraryVersion;
+    public String getVersion() {
+        return version;
     }
 
-    public void setLibraryVersion(String libraryVersion) {
-        this.libraryVersion = libraryVersion;
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String getDescription() {
@@ -83,7 +83,7 @@ public class ToolLibrary implements Serializable
     public void setDescription(String description) {
         this.description = description;
     }
- 
+
     public List<AnalysisTool> getAnalysisTools() {
         return analysisTools;
     }

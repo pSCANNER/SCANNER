@@ -14,6 +14,10 @@ import org.springframework.data.repository.CrudRepository;
 public interface PolicyStatementRepository 
     extends CrudRepository<PolicyStatement, Integer> 
 {    
-    @Query("select * from PolicyStatement ps where ps.policyStatusId = :active")
+   
+    @Query("select s.* from PolicyStatement s " + 
+           "join PolicyStatusType t on " + 
+           "s.PolicyStatusTypeId = t.PolicyStatusTypeId " + 
+           "where t.PolicyStatusTypeName = 'active'")
     List<PolicyStatement> getActivePolicy();
 }

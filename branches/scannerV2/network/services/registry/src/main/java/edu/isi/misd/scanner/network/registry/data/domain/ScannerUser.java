@@ -9,9 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -34,18 +32,13 @@ public class ScannerUser implements Serializable
     @Basic(optional = false)
     @Column(name = "email")
     private String email;
-    @Basic(optional = false)
     @Column(name = "hspc_documents")
     private String hspcDocuments;
     @Basic(optional = false)
-    @Column(name = "primary_affliation")
-    private int primaryAffliation;
-    @Basic(optional = false)
-    @Column(name = "secondary_affliliation")
-    private int secondaryAffliliation;
-    @Basic(optional = false)
     @Column(name = "phone")
     private String phone;
+    @Column(name = "reports_to")
+    private Integer reportsTo;
     @Basic(optional = false)
     @Column(name = "active")
     private boolean active;
@@ -59,6 +52,9 @@ public class ScannerUser implements Serializable
     private String lastName;
     @Column(name = "pubmed_author_id")
     private String pubmedAuthorId;
+    @Basic(optional = false)
+    @Column(name = "is_superuser")
+    private boolean isSuperuser;
     @ManyToMany(mappedBy = "scannerUserList")
     private List<ScannerRole> scannerRoleList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataManagerId")
@@ -67,11 +63,6 @@ public class ScannerUser implements Serializable
     private List<SourceDataWarehouse> sourceDataWarehouseList1;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "principalInvestigatorUid")
     private List<Study> studyList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reportsTo")
-    private List<ScannerUser> scannerUserList;
-    @JoinColumn(name = "reports_to", referencedColumnName = "user_id")
-    @ManyToOne(optional = false)
-    private ScannerUser reportsTo;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "authorUid")
     private List<DataSetDefinition> dataSetDefinitionList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "curatorUid")
@@ -86,17 +77,15 @@ public class ScannerUser implements Serializable
         this.userId = userId;
     }
 
-    public ScannerUser(Integer userId, String username, String email, String hspcDocuments, int primaryAffliation, int secondaryAffliliation, String phone, boolean active, String firstName, String lastName) {
+    public ScannerUser(Integer userId, String username, String email, String phone, boolean active, String firstName, String lastName, boolean isSuperuser) {
         this.userId = userId;
         this.username = username;
         this.email = email;
-        this.hspcDocuments = hspcDocuments;
-        this.primaryAffliation = primaryAffliation;
-        this.secondaryAffliliation = secondaryAffliliation;
         this.phone = phone;
         this.active = active;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.isSuperuser = isSuperuser;
     }
 
     public Integer getUserId() {
@@ -131,28 +120,20 @@ public class ScannerUser implements Serializable
         this.hspcDocuments = hspcDocuments;
     }
 
-    public int getPrimaryAffliation() {
-        return primaryAffliation;
-    }
-
-    public void setPrimaryAffliation(int primaryAffliation) {
-        this.primaryAffliation = primaryAffliation;
-    }
-
-    public int getSecondaryAffliliation() {
-        return secondaryAffliliation;
-    }
-
-    public void setSecondaryAffliliation(int secondaryAffliliation) {
-        this.secondaryAffliliation = secondaryAffliliation;
-    }
-
     public String getPhone() {
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Integer getReportsTo() {
+        return reportsTo;
+    }
+
+    public void setReportsTo(Integer reportsTo) {
+        this.reportsTo = reportsTo;
     }
 
     public boolean getActive() {
@@ -195,6 +176,14 @@ public class ScannerUser implements Serializable
         this.pubmedAuthorId = pubmedAuthorId;
     }
 
+    public boolean getIsSuperuser() {
+        return isSuperuser;
+    }
+
+    public void setIsSuperuser(boolean isSuperuser) {
+        this.isSuperuser = isSuperuser;
+    }
+
     public List<ScannerRole> getScannerRoleList() {
         return scannerRoleList;
     }
@@ -225,22 +214,6 @@ public class ScannerUser implements Serializable
 
     public void setStudyList(List<Study> studyList) {
         this.studyList = studyList;
-    }
-
-    public List<ScannerUser> getScannerUserList() {
-        return scannerUserList;
-    }
-
-    public void setScannerUserList(List<ScannerUser> scannerUserList) {
-        this.scannerUserList = scannerUserList;
-    }
-
-    public ScannerUser getReportsTo() {
-        return reportsTo;
-    }
-
-    public void setReportsTo(ScannerUser reportsTo) {
-        this.reportsTo = reportsTo;
     }
 
     public List<DataSetDefinition> getDataSetDefinitionList() {

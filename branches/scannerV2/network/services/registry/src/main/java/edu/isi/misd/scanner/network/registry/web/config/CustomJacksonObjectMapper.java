@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 public class CustomJacksonObjectMapper extends ObjectMapper 
@@ -13,6 +14,12 @@ public class CustomJacksonObjectMapper extends ObjectMapper
     public CustomJacksonObjectMapper() 
     {
         super();
+        
+        // enable Hibernate4 module to avoid serializing lazy-loaded objects
+        Hibernate4Module hibernate4Module = new Hibernate4Module();
+        hibernate4Module.configure(
+            Hibernate4Module.Feature.FORCE_LAZY_LOADING, false);
+        registerModule(hibernate4Module);        
         
         // do not serialize null valued properties or empty collections
         this.setSerializationInclusion(Include.NON_EMPTY);

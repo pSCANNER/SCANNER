@@ -38,11 +38,14 @@ public class DataSetInstance implements Serializable
     @ManyToOne(optional = false)
     private Study studyId;
     @JoinColumn(name = "source_data_warehouse_id", referencedColumnName = "source_data_warehouse_id")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private SourceDataWarehouse sourceDataWarehouseId;
     @JoinColumn(name = "curator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser curatorUid;
+    @JoinColumn(name = "node_id", referencedColumnName = "node_id")
+    @ManyToOne(optional = false)
+    private Node nodeId;
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)
     private DataSetDefinition dataSetDefinitionId;
@@ -113,6 +116,14 @@ public class DataSetInstance implements Serializable
 
     public void setCuratorUid(ScannerUser curatorUid) {
         this.curatorUid = curatorUid;
+    }
+
+    public Node getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(Node nodeId) {
+        this.nodeId = nodeId;
     }
 
     public DataSetDefinition getDataSetDefinitionId() {

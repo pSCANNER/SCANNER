@@ -4,7 +4,6 @@ import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 import edu.isi.misd.scanner.network.registry.data.repository.ToolLibraryRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
-import edu.isi.misd.scanner.network.registry.web.errors.MethodNotAllowedException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -119,12 +118,5 @@ public class ToolLibraryController extends BaseController
         }
         toolLibraryRepository.delete(id);
     } 
-    
-    @RequestMapping(value = "/libraries/{id}", method = RequestMethod.POST)
-    public void postByIdNotAllowed() 
-    {
-        throw new MethodNotAllowedException(
-            "Resource creation with an explicit ID via POST is not supported.");
-    }  
-    
+  
 }

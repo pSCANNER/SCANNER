@@ -57,6 +57,9 @@ public class Study implements Serializable
     private List<ScannerGrant> scannerGrantList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyId")
     private List<ScannerRole> scannerRoleList;
+    @JoinColumn(name = "study_status_type_id", referencedColumnName = "study_status_type_id")
+    @ManyToOne(optional = false)
+    private StudyStatusType studyStatusTypeId;
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser principalInvestigatorUid;
@@ -162,6 +165,14 @@ public class Study implements Serializable
 
     public void setScannerRoleList(List<ScannerRole> scannerRoleList) {
         this.scannerRoleList = scannerRoleList;
+    }
+
+    public StudyStatusType getStudyStatusTypeId() {
+        return studyStatusTypeId;
+    }
+
+    public void setStudyStatusTypeId(StudyStatusType studyStatusTypeId) {
+        this.studyStatusTypeId = studyStatusTypeId;
     }
 
     public ScannerUser getPrincipalInvestigatorUid() {

@@ -3,7 +3,6 @@ package edu.isi.misd.scanner.network.registry.data.domain;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -52,7 +51,7 @@ public class SourceDataWarehouse implements Serializable
     @JoinColumn(name = "data_warehouse_confidentiality_level", referencedColumnName = "level_id")
     @ManyToOne(optional = false)
     private ConfidentialityLevel dataWarehouseConfidentialityLevel;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sourceDataWarehouseId")
+    @OneToMany(mappedBy = "sourceDataWarehouseId")
     private List<DataSetInstance> dataSetInstanceList;
 
     public SourceDataWarehouse() {

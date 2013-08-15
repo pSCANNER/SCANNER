@@ -25,7 +25,10 @@ public class PolicyStatusType implements Serializable
     @Basic(optional = false)
     @Column(name = "policy_status_type_name")
     private String policyStatusTypeName;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyStatusId")
+    @Basic(optional = false)
+    @Column(name = "description")
+    private String description;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyStatusTypeId")
     private List<PolicyStatement> policyStatementList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyStatusId")
     private List<AbstractPolicy> abstractPolicyList;
@@ -37,9 +40,10 @@ public class PolicyStatusType implements Serializable
         this.policyStatusTypeId = policyStatusTypeId;
     }
 
-    public PolicyStatusType(Integer policyStatusTypeId, String policyStatusTypeName) {
+    public PolicyStatusType(Integer policyStatusTypeId, String policyStatusTypeName, String description) {
         this.policyStatusTypeId = policyStatusTypeId;
         this.policyStatusTypeName = policyStatusTypeName;
+        this.description = description;
     }
 
     public Integer getPolicyStatusTypeId() {
@@ -56,6 +60,14 @@ public class PolicyStatusType implements Serializable
 
     public void setPolicyStatusTypeName(String policyStatusTypeName) {
         this.policyStatusTypeName = policyStatusTypeName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public List<PolicyStatement> getPolicyStatementList() {
