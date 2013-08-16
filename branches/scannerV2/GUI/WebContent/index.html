@@ -216,41 +216,79 @@
 												<tbody id="manageStudyProtocolsTbody"></tbody>
 											</table>
 											<br />
-											<table>
-												<tr>
-													<td>
-														<table class="add_protocol">
-															<tbody id="addProtocolTable">
-																<tr>
-																	<td>
-																		<select id="modelNames">
-																		</select> 
-																	</td>
-																	<td>
-																		<select id="siteNames">
-																		</select> 
-																	</td>
-																	<td>
-																		<select id="datasetNames">
-																		</select> 
-																	</td>
-																	<td>
-																		<select id="datasetInstances">
-																		</select> 
-																	</td>
-																	<td>
-																		<select id="studySendOptions">
-																		</select> 
-																	</td>
-																</tr>
-															</tbody>
-														</table>
-													</td>
-													<td>
-														<button id="addProtocolButton" onclick="addProtocol();">Add Protocol</button>
-													</td>
-												</tr>
-											</table>
+											<div id="add_protocol_div">
+												<table>
+													<tr>
+														<td>
+															<table class="add_protocol">
+																<tbody id="addProtocolTable">
+																	<tr>
+																		<td>
+																			<select id="modelNames">
+																			</select> 
+																		</td>
+																		<td>
+																			<select id="siteNames">
+																			</select> 
+																		</td>
+																		<td>
+																			<select id="datasetNames">
+																			</select> 
+																		</td>
+																		<td>
+																			<select id="datasetInstances">
+																			</select> 
+																		</td>
+																		<td>
+																			<select id="studySendOptions">
+																			</select> 
+																		</td>
+																	</tr>
+																</tbody>
+															</table>
+														</td>
+														<td>
+															<button id="addProtocolButton" onclick="addProtocol();">Add Protocol</button>
+														</td>
+													</tr>
+												</table>
+											</div>
+											<div id="add_instance_div">
+												<table>
+													<tr>
+														<td>
+															<table class="add_instance">
+																<tbody id="addInstanceTable">
+																	<tr>
+																		<td>Data Set Instance Name:
+																			<br />
+																			<input type="text" id="instanceName">
+																		</td>
+																		<td>
+																			<select id="nodeNames">
+																			</select> 
+																		</td>
+																		<td>with URL:
+																			<br />
+																			<input type="text" size="40" id="instanceURL">
+																		</td>
+																		<td>and Description:
+																			<br />
+																			<input type="text" id="instanceDescription">
+																		</td>
+																	</tr>
+																</tbody>
+															</table>
+														</td>
+													</tr>
+													<tr>
+														<td class="tag">
+															<input type="button" value="Cancel" onclick="cancelInstance()">
+															<input type="button" id="addInstanceButton" value="Add Instance" onclick="addInstance()">
+														</td>
+													</tr>
+												</table>
+											</div>
 										</div>
 										<p class="wizard_heading">Manage Documentation</p>
 										<div class="wizard_content">

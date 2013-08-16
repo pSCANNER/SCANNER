@@ -2859,6 +2859,24 @@ function manageStudy() {
 	$.each(activeStudy['protocol'], function(i, protocol) {
 		addProtocolRow(protocol);
 	});
+	var select = $('#nodeNames');
+	select.html('');
+	select.change(function(event) {checkAddInstanceButton();});
+	var option = $('<option>');
+	option.text('for node...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(siteNodes, function(i, name) {
+		option = $('<option>');
+		option.text(name);
+		option.attr('value', name);
+		select.append(option);
+	});
+	$('#instanceName').keyup(function(event) {checkAddInstanceButton();});
+	$('#instanceURL').keyup(function(event) {checkAddInstanceButton();});
+	$('#addInstanceButton').attr('disabled', 'disabled');
+	$('#add_protocol_div').show();
+	$('#add_instance_div').hide();
 }
 
 function checkCreateStudyButton() {
@@ -2878,11 +2896,27 @@ function checkAddStaffButton() {
 }
 
 function checkAddProtocolButton() {
-	if ($('#modelNames').val() != '' && $('#siteNames').val() != '' && $('#datasetNames').val() != '' && 
+	if ($('#datasetInstances').val() == 'Add new...') {
+		$('#instanceName').val('');
+		$('#nodeNames').val('');
+		$('#instanceURL').val('');
+		$('#instanceDescription').val('');
+		$('#add_protocol_div').hide();
+		$('#add_instance_div').show();
+	} else if ($('#modelNames').val() != '' && $('#siteNames').val() != '' && $('#datasetNames').val() != '' && 
 			$('#datasetInstances').val() != '' && $('#studySendOptions').val() != '') {
 		$('#addProtocolButton').removeAttr('disabled');
 	} else {
 		$('#addProtocolButton').attr('disabled', 'disabled');
+	}
+}
+
+function checkAddInstanceButton() {
+	if ($('#instanceName').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && $('#nodeNames').val() != '' && 
+			$('#instanceURL').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
+		$('#addInstanceButton').removeAttr('disabled');
+	} else {
+		$('#addInstanceButton').attr('disabled', 'disabled');
 	}
 }
 
@@ -3068,6 +3102,8 @@ var datasetInstancesMap = {	'MTM 1': {'url': 'https://scanner-node3.misd.isi.edu
 var releaseResultsPolicy = ['instantly',
 		                    'manually'
 		                    ];
+
+var siteNodes = siteNames;
 
 var studyCounter = 200;
 
@@ -3444,5 +3480,30 @@ function appendStudyContent(study) {
 		});
 	}
 	contentDiv.hide();
+}
+
+function addInstance() {
+	addDatasetInstance($('#instanceName').val(), $('#instanceURL').val(), $('#nodeNames').val(), $('#instanceDescription').val());
+}
+function addDatasetInstance(name, url, node, description) {
+	datasetInstances.unshift(name);
+	var obj = {};
+	obj['url'] = url;
+	obj['node'] = node;
+	datasetInstancesMap[name] = obj;
+	var firstOption = $($('option', $('#datasetInstances'))[0]);
+	var option = $('<option>');
+	option.text(name);
+	option.attr('value', name);
+	option.insertAfter(firstOption);
+	$('#datasetInstances').val(name);
+	$('#add_protocol_div').show();
+	$('#add_instance_div').hide();
+}
+
+function cancelInstance() {
+	$('#datasetInstances').val('');
+	$('#add_protocol_div').show();
+	$('#add_instance_div').hide();
 }
 
