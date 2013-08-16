@@ -39,6 +39,7 @@ COMMENT ON table scanner_grant is 'Placeholder grant table.';
 
 CREATE TABLE IF NOT EXISTS study (
   study_id serial NOT NULL primary key,
+  study_name text NOT NULL unique,
   irb_id integer NOT NULL,
   protocol text NOT NULL,
   principal_investigator_uid integer NOT NULL references scanner_user(user_id),
