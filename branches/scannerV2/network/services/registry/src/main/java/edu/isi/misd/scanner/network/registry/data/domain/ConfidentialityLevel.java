@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -28,10 +29,12 @@ public class ConfidentialityLevel implements Serializable
     @Basic(optional = false)
     @Column(name = "description")
     private String description;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataWarehouseConfidentialityLevel")
-    private List<SourceDataWarehouse> sourceDataWarehouseList;
+    private List<SourceDataWarehouse> sourceDataWarehouses;
+    @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetConfidentialityLevel")
-    private List<DataSetDefinition> dataSetDefinitionList;
+    private List<DataSetDefinition> dataSetDefinitions;
 
     public ConfidentialityLevel() {
     }
@@ -70,20 +73,20 @@ public class ConfidentialityLevel implements Serializable
         this.description = description;
     }
 
-    public List<SourceDataWarehouse> getSourceDataWarehouseList() {
-        return sourceDataWarehouseList;
+    public List<SourceDataWarehouse> getSourceDataWarehouses() {
+        return sourceDataWarehouses;
     }
 
-    public void setSourceDataWarehouseList(List<SourceDataWarehouse> sourceDataWarehouseList) {
-        this.sourceDataWarehouseList = sourceDataWarehouseList;
+    public void setSourceDataWarehouse(List<SourceDataWarehouse> sourceDataWarehouses) {
+        this.sourceDataWarehouses = sourceDataWarehouses;
     }
 
-    public List<DataSetDefinition> getDataSetDefinitionList() {
-        return dataSetDefinitionList;
+    public List<DataSetDefinition> getDataSetDefinitions() {
+        return dataSetDefinitions;
     }
 
-    public void setDataSetDefinitionList(List<DataSetDefinition> dataSetDefinitionList) {
-        this.dataSetDefinitionList = dataSetDefinitionList;
+    public void setDataSetDefinitions(List<DataSetDefinition> dataSetDefinitions) {
+        this.dataSetDefinitions = dataSetDefinitions;
     }
 
     @Override

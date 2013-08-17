@@ -1,11 +1,14 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,17 +41,19 @@ public class DataSetDefinition implements Serializable
     private String dataProcessingProgram;
     @JoinColumn(name = "originating_study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
-    private Study originatingStudyId;
+    private Study originatingStudy;
     @JoinColumn(name = "author_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private ScannerUser authorUid;
+    private ScannerUser author;
     @JoinColumn(name = "data_set_confidentiality_level", referencedColumnName = "level_id")
     @ManyToOne(optional = false)
     private ConfidentialityLevel dataSetConfidentialityLevel;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinitionId")
-    private List<DataSetInstance> dataSetInstanceList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinitionId")
-    private List<AbstractPolicy> abstractPolicyList;
+    @JsonManagedReference("DataSetDefinition-DataSetInstance")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition", fetch=FetchType.EAGER)
+    private Set<DataSetInstance> dataSetInstances;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition")
+    private Set<AbstractPolicy> abstractPolicies;
 
     public DataSetDefinition() {
     }
@@ -96,20 +101,20 @@ public class DataSetDefinition implements Serializable
         this.dataProcessingProgram = dataProcessingProgram;
     }
 
-    public Study getOriginatingStudyId() {
-        return originatingStudyId;
+    public Study getOriginatingStudy() {
+        return originatingStudy;
     }
 
-    public void setOriginatingStudyId(Study originatingStudyId) {
-        this.originatingStudyId = originatingStudyId;
+    public void setOriginatingStudy(Study originatingStudy) {
+        this.originatingStudy = originatingStudy;
     }
 
-    public ScannerUser getAuthorUid() {
-        return authorUid;
+    public ScannerUser getAuthor() {
+        return author;
     }
 
-    public void setAuthorUid(ScannerUser authorUid) {
-        this.authorUid = authorUid;
+    public void setAuthor(ScannerUser author) {
+        this.author = author;
     }
 
     public ConfidentialityLevel getDataSetConfidentialityLevel() {
@@ -120,20 +125,20 @@ public class DataSetDefinition implements Serializable
         this.dataSetConfidentialityLevel = dataSetConfidentialityLevel;
     }
 
-    public List<DataSetInstance> getDataSetInstanceList() {
-        return dataSetInstanceList;
+    public Set<DataSetInstance> getDataSetInstances() {
+        return dataSetInstances;
     }
 
-    public void setDataSetInstanceList(List<DataSetInstance> dataSetInstanceList) {
-        this.dataSetInstanceList = dataSetInstanceList;
+    public void setDataSetInstances(Set<DataSetInstance> dataSetInstances) {
+        this.dataSetInstances = dataSetInstances;
     }
 
-    public List<AbstractPolicy> getAbstractPolicyList() {
-        return abstractPolicyList;
+    public Set<AbstractPolicy> getAbstractPolicies() {
+        return abstractPolicies;
     }
 
-    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
-        this.abstractPolicyList = abstractPolicyList;
+    public void setAbstractPolicies(Set<AbstractPolicy> abstractPolicies) {
+        this.abstractPolicies = abstractPolicies;
     }
 
     @Override

@@ -56,14 +56,3 @@ create table study_status_type (
 insert into study_status_type (study_status_type_id, study_status_type_name, description) values
  (1, 'defined', 'defined');
 
-create table node_type (
-  node_type_id integer not null primary key,
-  node_type_name text not null unique,
-  description text not null unique
-);
-
-
--- Mike-owned table
-insert into node_type (node_type_id, node_type_name, description) values
- (0, 'master', 'master'),
- (1, 'worker', 'worker');

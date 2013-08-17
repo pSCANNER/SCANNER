@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -27,10 +28,12 @@ public class Site implements Serializable {
     @Basic(optional = false)
     @Column(name = "site_name")
     private String siteName;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "siteId")
-    private List<SitePolicy> sitePolicyList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "siteId")
-    private List<Node> nodeList;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site")
+    private List<SitePolicy> sitePolicies;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site")
+    private List<Node> nodes;
 
     public Site() {
     }
@@ -60,20 +63,20 @@ public class Site implements Serializable {
         this.siteName = siteName;
     }
 
-    public List<SitePolicy> getSitePolicyList() {
-        return sitePolicyList;
+    public List<SitePolicy> getSitePolicies() {
+        return sitePolicies;
     }
 
-    public void setSitePolicyList(List<SitePolicy> sitePolicyList) {
-        this.sitePolicyList = sitePolicyList;
+    public void setSitePolicies(List<SitePolicy> sitePolicies) {
+        this.sitePolicies = sitePolicies;
     }
 
-    public List<Node> getNodeList() {
-        return nodeList;
+    public List<Node> getNodes() {
+        return nodes;
     }
 
-    public void setNodeList(List<Node> nodeList) {
-        this.nodeList = nodeList;
+    public void setNodes(List<Node> nodes) {
+        this.nodes = nodes;
     }
 
     @Override

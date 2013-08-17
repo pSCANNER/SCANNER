@@ -37,7 +37,7 @@ public class RegistryServiceImpl implements RegistryService
     
     @Override
     @Transactional
-    public void saveToolLibrary(ToolLibrary library) 
+    public ToolLibrary saveToolLibrary(ToolLibrary library) 
     {
         List<AnalysisTool> toolList = library.getAnalysisTools();
         if ((toolList != null) && (!toolList.isEmpty())) {
@@ -48,6 +48,6 @@ public class RegistryServiceImpl implements RegistryService
             }
             library.setAnalysisTools(toolList);            
         }
-        toolLibraryRepository.save(library);
+        return toolLibraryRepository.save(library);
     }       
 }

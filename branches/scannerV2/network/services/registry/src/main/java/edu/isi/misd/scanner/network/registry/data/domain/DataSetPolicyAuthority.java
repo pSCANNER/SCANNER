@@ -29,7 +29,7 @@ public class DataSetPolicyAuthority implements Serializable
     @Column(name = "description")
     private String description;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyAuthority")
-    private List<AbstractPolicy> abstractPolicyList;
+    private List<AbstractPolicy> abstractPolicies;
 
     public DataSetPolicyAuthority() {
     }
@@ -68,12 +68,12 @@ public class DataSetPolicyAuthority implements Serializable
         this.description = description;
     }
 
-    public List<AbstractPolicy> getAbstractPolicyList() {
-        return abstractPolicyList;
+    public List<AbstractPolicy> getAbstractPolicy() {
+        return abstractPolicies;
     }
 
-    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
-        this.abstractPolicyList = abstractPolicyList;
+    public void setAbstractPolicy(List<AbstractPolicy> abstractPolicies) {
+        this.abstractPolicies = abstractPolicies;
     }
 
     @Override

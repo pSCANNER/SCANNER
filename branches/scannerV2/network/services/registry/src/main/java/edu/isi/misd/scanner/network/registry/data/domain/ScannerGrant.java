@@ -32,7 +32,7 @@ public class ScannerGrant implements Serializable
         @JoinColumn(name = "grant_id", referencedColumnName = "grant_id")}, inverseJoinColumns = {
         @JoinColumn(name = "study_id", referencedColumnName = "study_id")})
     @ManyToMany
-    private List<Study> studyList;
+    private List<Study> studies;
 
     public ScannerGrant() {
     }
@@ -57,12 +57,12 @@ public class ScannerGrant implements Serializable
         this.grantDetail = grantDetail;
     }
 
-    public List<Study> getStudyList() {
-        return studyList;
+    public List<Study> getStudies() {
+        return studies;
     }
 
-    public void setStudyList(List<Study> studyList) {
-        this.studyList = studyList;
+    public void setStudies(List<Study> studies) {
+        this.studies = studies;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.repository;
 
-import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
+import edu.isi.misd.scanner.network.registry.data.domain.Site;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +12,7 @@ import org.springframework.data.repository.CrudRepository;
  */
 
 public interface SiteRepository 
-    extends CrudRepository<AnalysisTool, Integer> 
+    extends CrudRepository<Site, Integer> 
 {
     
 }

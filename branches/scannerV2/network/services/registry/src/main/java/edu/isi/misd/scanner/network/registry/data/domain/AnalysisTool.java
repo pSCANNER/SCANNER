@@ -51,12 +51,12 @@ public class AnalysisTool implements Serializable
     @ManyToOne(optional = false)
     @JsonBackReference("toolParentLibrary")         
     private ToolLibrary toolParentLibrary;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
-    @JsonIgnore
-    private List<PolicyStatement> policyStatementList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisToolId")
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
+    private List<PolicyStatement> policyStatements;
     @JsonIgnore       
-    private List<AbstractPolicy> abstractPolicyList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")    
+    private List<AbstractPolicy> abstractPolicies;
 
     public AnalysisTool() {
     }
@@ -139,20 +139,20 @@ public class AnalysisTool implements Serializable
         this.toolParentLibrary = toolParentLibrary;
     }
 
-    public List<PolicyStatement> getPolicyStatementList() {
-        return policyStatementList;
+    public List<PolicyStatement> getPolicyStatements() {
+        return policyStatements;
     }
 
-    public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
-        this.policyStatementList = policyStatementList;
+    public void setPolicyStatements(List<PolicyStatement> policyStatements) {
+        this.policyStatements = policyStatements;
     }
 
-    public List<AbstractPolicy> getAbstractPolicyList() {
-        return abstractPolicyList;
+    public List<AbstractPolicy> getAbstractPolicies() {
+        return abstractPolicies;
     }
 
-    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
-        this.abstractPolicyList = abstractPolicyList;
+    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
+        this.abstractPolicies = abstractPolicies;
     }
 
     @Override

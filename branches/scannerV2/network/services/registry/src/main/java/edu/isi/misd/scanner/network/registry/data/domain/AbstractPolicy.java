@@ -30,29 +30,29 @@ public class AbstractPolicy implements Serializable
     @Basic(optional = false)
     @Column(name = "attestation")
     private String attestation;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentAbstractPolicyId")
-    private List<PolicyStatement> policyStatementList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentAbstractPolicy")
+    private List<PolicyStatement> policyStatements;
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
-    private Study studyId;
+    private Study study;
     @JoinColumn(name = "policy_originator", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser policyOriginator;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
-    private ScannerRole roleId;
+    private ScannerRole role;
     @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
-    private PolicyStatusType policyStatusId;
+    private PolicyStatusType policyStatus;
     @JoinColumn(name = "policy_authority", referencedColumnName = "data_set_policy_authority_id")
     @ManyToOne(optional = false)
     private DataSetPolicyAuthority policyAuthority;
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)
-    private DataSetDefinition dataSetDefinitionId;
+    private DataSetDefinition dataSetDefinition;
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
-    private AnalysisTool analysisToolId;
+    private AnalysisTool analysisTool;
     @JoinColumn(name = "access_mode", referencedColumnName = "access_mode_id")
     @ManyToOne(optional = false)
     private AccessMode accessMode;
@@ -85,20 +85,20 @@ public class AbstractPolicy implements Serializable
         this.attestation = attestation;
     }
 
-    public List<PolicyStatement> getPolicyStatementList() {
-        return policyStatementList;
+    public List<PolicyStatement> getPolicyStatements() {
+        return policyStatements;
     }
 
-    public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
-        this.policyStatementList = policyStatementList;
+    public void setPolicyStatementList(List<PolicyStatement> policyStatements) {
+        this.policyStatements = policyStatements;
     }
 
-    public Study getStudyId() {
-        return studyId;
+    public Study getStudy() {
+        return study;
     }
 
-    public void setStudyId(Study studyId) {
-        this.studyId = studyId;
+    public void setStudy(Study study) {
+        this.study = study;
     }
 
     public ScannerUser getPolicyOriginator() {
@@ -109,20 +109,20 @@ public class AbstractPolicy implements Serializable
         this.policyOriginator = policyOriginator;
     }
 
-    public ScannerRole getRoleId() {
-        return roleId;
+    public ScannerRole getRole() {
+        return role;
     }
 
-    public void setRoleId(ScannerRole roleId) {
-        this.roleId = roleId;
+    public void setRole(ScannerRole role) {
+        this.role = role;
     }
 
-    public PolicyStatusType getPolicyStatusId() {
-        return policyStatusId;
+    public PolicyStatusType getPolicyStatus() {
+        return policyStatus;
     }
 
-    public void setPolicyStatusId(PolicyStatusType policyStatusId) {
-        this.policyStatusId = policyStatusId;
+    public void setPolicyStatusId(PolicyStatusType policyStatus) {
+        this.policyStatus = policyStatus;
     }
 
     public DataSetPolicyAuthority getPolicyAuthority() {
@@ -133,20 +133,20 @@ public class AbstractPolicy implements Serializable
         this.policyAuthority = policyAuthority;
     }
 
-    public DataSetDefinition getDataSetDefinitionId() {
-        return dataSetDefinitionId;
+    public DataSetDefinition getDataSetDefinition() {
+        return dataSetDefinition;
     }
 
-    public void setDataSetDefinitionId(DataSetDefinition dataSetDefinitionId) {
-        this.dataSetDefinitionId = dataSetDefinitionId;
+    public void setDataSetDefinitionId(DataSetDefinition dataSetDefinition) {
+        this.dataSetDefinition = dataSetDefinition;
     }
 
-    public AnalysisTool getAnalysisToolId() {
-        return analysisToolId;
+    public AnalysisTool getAnalysisTool() {
+        return analysisTool;
     }
 
-    public void setAnalysisToolId(AnalysisTool analysisToolId) {
-        this.analysisToolId = analysisToolId;
+    public void setAnalysisToolId(AnalysisTool analysisTool) {
+        this.analysisTool = analysisTool;
     }
 
     public AccessMode getAccessMode() {

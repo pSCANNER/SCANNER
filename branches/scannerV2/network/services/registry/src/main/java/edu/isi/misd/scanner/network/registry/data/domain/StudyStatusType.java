@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -15,7 +16,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "study_status_type", schema = "scanner_registry")
-public class StudyStatusType implements Serializable {
+public class StudyStatusType implements Serializable 
+{
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -27,8 +29,9 @@ public class StudyStatusType implements Serializable {
     @Basic(optional = false)
     @Column(name = "description")
     private String description;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyStatusTypeId")
-    private List<Study> studyList;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyStatusType")
+    private List<Study> studies;
 
     public StudyStatusType() {
     }
@@ -67,12 +70,12 @@ public class StudyStatusType implements Serializable {
         this.description = description;
     }
 
-    public List<Study> getStudyList() {
-        return studyList;
+    public List<Study> getStudies() {
+        return studies;
     }
 
-    public void setStudyList(List<Study> studyList) {
-        this.studyList = studyList;
+    public void setStudies(List<Study> studies) {
+        this.studies = studies;
     }
 
     @Override

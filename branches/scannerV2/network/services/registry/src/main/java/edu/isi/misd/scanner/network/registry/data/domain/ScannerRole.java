@@ -1,5 +1,10 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -32,20 +37,30 @@ public class ScannerRole implements Serializable
     @Basic(optional = false)
     @Column(name = "role_within_study")
     private String roleWithinStudy;
-    @JoinTable(name = "investigator_role", joinColumns = {
+    @JoinTable(name = "investigator_role", schema = "scanner_registry", 
+        joinColumns = {
         @JoinColumn(name = "role_id", referencedColumnName = "role_id")}, inverseJoinColumns = {
         @JoinColumn(name = "investigator_id", referencedColumnName = "user_id")})
     @ManyToMany
-    private List<ScannerUser> scannerUserList;
+    @JsonBackReference("user-role")    
+    private List<ScannerUser> scannerUsers; 
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityReference(alwaysAsId=true)  
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
-    private Study studyId;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId")
-    private List<SitePolicy> sitePolicyList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId")
-    private List<PolicyStatement> policyStatementList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "roleId")
-    private List<AbstractPolicy> abstractPolicyList;
+    private Study study;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    private List<InvestigatorRole> investigatorRoles;    
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    private List<SitePolicy> sitePolicies;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    private List<PolicyStatement> policyStatements;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    private List<AbstractPolicy> abstractPolicies;
 
     public ScannerRole() {
     }
@@ -75,46 +90,54 @@ public class ScannerRole implements Serializable
         this.roleWithinStudy = roleWithinStudy;
     }
 
-    public List<ScannerUser> getScannerUserList() {
-        return scannerUserList;
+    public List<ScannerUser> getScannerUsers() {
+        return scannerUsers;
     }
 
-    public void setScannerUserList(List<ScannerUser> scannerUserList) {
-        this.scannerUserList = scannerUserList;
+    public void setScannerUsers(List<ScannerUser> scannerUsers) {
+        this.scannerUsers = scannerUsers;
     }
 
-    public Study getStudyId() {
-        return studyId;
+    public Study getStudy() {
+        return study;
     }
 
-    public void setStudyId(Study studyId) {
-        this.studyId = studyId;
+    public void setStudy(Study study) {
+        this.study = study;
     }
 
-    public List<SitePolicy> getSitePolicyList() {
-        return sitePolicyList;
+    public List<SitePolicy> getSitePolicies() {
+        return sitePolicies;
     }
 
-    public void setSitePolicyList(List<SitePolicy> sitePolicyList) {
-        this.sitePolicyList = sitePolicyList;
+    public void setSitePolicies(List<SitePolicy> sitePolicies) {
+        this.sitePolicies = sitePolicies;
     }
 
-    public List<PolicyStatement> getPolicyStatementList() {
-        return policyStatementList;
+    public List<PolicyStatement> getPolicyStatements() {
+        return policyStatements;
     }
 
-    public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
-        this.policyStatementList = policyStatementList;
+    public void setPolicyStatements(List<PolicyStatement> policyStatements) {
+        this.policyStatements = policyStatements;
     }
 
-    public List<AbstractPolicy> getAbstractPolicyList() {
-        return abstractPolicyList;
+    public List<AbstractPolicy> getAbstractPolicies() {
+        return abstractPolicies;
     }
 
-    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
-        this.abstractPolicyList = abstractPolicyList;
+    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
+        this.abstractPolicies = abstractPolicies;
     }
 
+    public List<InvestigatorRole> getInvestigatorRoles() {
+        return investigatorRoles;
+    }
+
+    public void setInvestigatorRoles(List<InvestigatorRole> investigatorRoles) {
+        this.investigatorRoles = investigatorRoles;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

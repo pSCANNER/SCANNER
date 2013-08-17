@@ -142,11 +142,11 @@ create table if not exists site (
 CREATE TABLE IF NOT EXISTS node (
   node_id serial NOT NULL primary key,
   site_id integer not null references site(site_id),
-  node_type_id integer NOT NULL references node_type(node_type_id),
-  host_name text NOT NULL,
+  host_url text NOT NULL,
   host_port integer NOT NULL,
   base_path text NOT NULL,
-  description text
+  description text,
+  is_master boolean NOT NULL default false
 );
 
 

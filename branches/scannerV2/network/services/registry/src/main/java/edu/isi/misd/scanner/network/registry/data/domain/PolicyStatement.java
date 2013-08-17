@@ -26,22 +26,22 @@ public class PolicyStatement implements Serializable
     private Integer policyStatementId;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
-    private ScannerRole roleId;
+    private ScannerRole role;
     @JoinColumn(name = "policy_status_type_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
-    private PolicyStatusType policyStatusTypeId;
+    private PolicyStatusType policyStatusType;
     @JoinColumn(name = "data_set_instance_id", referencedColumnName = "data_set_instance_id")
     @ManyToOne(optional = false)
-    private DataSetInstance dataSetInstanceId;
+    private DataSetInstance dataSetInstance;
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
-    private AnalysisTool analysisToolId;
+    private AnalysisTool analysisTool;
     @JoinColumn(name = "access_mode_id", referencedColumnName = "access_mode_id")
     @ManyToOne(optional = false)
-    private AccessMode accessModeId;
+    private AccessMode accessMode;
     @JoinColumn(name = "parent_abstract_policy_id", referencedColumnName = "abstract_policy_id")
     @ManyToOne(optional = false)
-    private AbstractPolicy parentAbstractPolicyId;
+    private AbstractPolicy parentAbstractPolicy;
 
     public PolicyStatement() {
     }
@@ -58,52 +58,52 @@ public class PolicyStatement implements Serializable
         this.policyStatementId = policyStatementId;
     }
 
-    public ScannerRole getRoleId() {
-        return roleId;
+    public ScannerRole getRole() {
+        return role;
     }
 
-    public void setRoleId(ScannerRole roleId) {
-        this.roleId = roleId;
+    public void setRole(ScannerRole role) {
+        this.role = role;
     }
 
-    public PolicyStatusType getPolicyStatusTypeId() {
-        return policyStatusTypeId;
+    public PolicyStatusType getPolicyStatusType() {
+        return policyStatusType;
     }
 
-    public void setPolicyStatusTypeId(PolicyStatusType policyStatusTypeId) {
-        this.policyStatusTypeId = policyStatusTypeId;
+    public void setPolicyStatusType(PolicyStatusType policyStatusType) {
+        this.policyStatusType = policyStatusType;
     }
 
-    public DataSetInstance getDataSetInstanceId() {
-        return dataSetInstanceId;
+    public DataSetInstance getDataSetInstance() {
+        return dataSetInstance;
     }
 
-    public void setDataSetInstanceId(DataSetInstance dataSetInstanceId) {
-        this.dataSetInstanceId = dataSetInstanceId;
+    public void setDataSetInstance(DataSetInstance dataSetInstance) {
+        this.dataSetInstance = dataSetInstance;
     }
 
-    public AnalysisTool getAnalysisToolId() {
-        return analysisToolId;
+    public AnalysisTool getAnalysisTool() {
+        return analysisTool;
     }
 
-    public void setAnalysisToolId(AnalysisTool analysisToolId) {
-        this.analysisToolId = analysisToolId;
+    public void setAnalysisTool(AnalysisTool analysisTool) {
+        this.analysisTool = analysisTool;
     }
 
-    public AccessMode getAccessModeId() {
-        return accessModeId;
+    public AccessMode getAccessMode() {
+        return accessMode;
     }
 
-    public void setAccessModeId(AccessMode accessModeId) {
-        this.accessModeId = accessModeId;
+    public void setAccessMode(AccessMode accessMode) {
+        this.accessMode = accessMode;
     }
 
-    public AbstractPolicy getParentAbstractPolicyId() {
-        return parentAbstractPolicyId;
+    public AbstractPolicy getParentAbstractPolicy() {
+        return parentAbstractPolicy;
     }
 
-    public void setParentAbstractPolicyId(AbstractPolicy parentAbstractPolicyId) {
-        this.parentAbstractPolicyId = parentAbstractPolicyId;
+    public void setParentAbstractPolicy(AbstractPolicy parentAbstractPolicy) {
+        this.parentAbstractPolicy = parentAbstractPolicy;
     }
 
     @Override

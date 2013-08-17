@@ -1,7 +1,9 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -32,23 +34,27 @@ public class DataSetInstance implements Serializable
     private String dataSetInstanceLocation;
     @Column(name = "data_slice_id")
     private Integer dataSliceId;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetInstanceId")
-    private List<PolicyStatement> policyStatementList;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetInstance")
+    private Set<PolicyStatement> policyStatements;
+    @JsonIgnore
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
-    private Study studyId;
+    private Study study;
     @JoinColumn(name = "source_data_warehouse_id", referencedColumnName = "source_data_warehouse_id")
     @ManyToOne
-    private SourceDataWarehouse sourceDataWarehouseId;
+    private SourceDataWarehouse sourceDataWarehouse;
+    @JsonIgnore
     @JoinColumn(name = "curator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private ScannerUser curatorUid;
+    private ScannerUser curator;
     @JoinColumn(name = "node_id", referencedColumnName = "node_id")
     @ManyToOne(optional = false)
-    private Node nodeId;
+    private Node node;
+    @JsonBackReference("DataSetDefinition-DataSetInstance")    
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)
-    private DataSetDefinition dataSetDefinitionId;
+    private DataSetDefinition dataSetDefinition;
 
     public DataSetInstance() {
     }
@@ -86,52 +92,52 @@ public class DataSetInstance implements Serializable
         this.dataSliceId = dataSliceId;
     }
 
-    public List<PolicyStatement> getPolicyStatementList() {
-        return policyStatementList;
+    public Set<PolicyStatement> getPolicyStatements() {
+        return policyStatements;
     }
 
-    public void setPolicyStatementList(List<PolicyStatement> policyStatementList) {
-        this.policyStatementList = policyStatementList;
+    public void setPolicyStatementList(Set<PolicyStatement> policyStatements) {
+        this.policyStatements = policyStatements;
     }
 
-    public Study getStudyId() {
-        return studyId;
+    public Study getStudy() {
+        return study;
     }
 
-    public void setStudyId(Study studyId) {
-        this.studyId = studyId;
+    public void setStudy(Study study) {
+        this.study = study;
     }
 
-    public SourceDataWarehouse getSourceDataWarehouseId() {
-        return sourceDataWarehouseId;
+    public SourceDataWarehouse getSourceDataWarehouse() {
+        return sourceDataWarehouse;
     }
 
-    public void setSourceDataWarehouseId(SourceDataWarehouse sourceDataWarehouseId) {
-        this.sourceDataWarehouseId = sourceDataWarehouseId;
+    public void setSourceDataWarehouse(SourceDataWarehouse sourceDataWarehouse) {
+        this.sourceDataWarehouse = sourceDataWarehouse;
     }
 
-    public ScannerUser getCuratorUid() {
-        return curatorUid;
+    public ScannerUser getCurator() {
+        return curator;
     }
 
-    public void setCuratorUid(ScannerUser curatorUid) {
-        this.curatorUid = curatorUid;
+    public void setCurator(ScannerUser curator) {
+        this.curator = curator;
     }
 
-    public Node getNodeId() {
-        return nodeId;
+    public Node getNode() {
+        return node;
     }
 
-    public void setNodeId(Node nodeId) {
-        this.nodeId = nodeId;
+    public void setNode(Node node) {
+        this.node = node;
     }
 
-    public DataSetDefinition getDataSetDefinitionId() {
-        return dataSetDefinitionId;
+    public DataSetDefinition getDataSetDefinition() {
+        return dataSetDefinition;
     }
 
-    public void setDataSetDefinitionId(DataSetDefinition dataSetDefinitionId) {
-        this.dataSetDefinitionId = dataSetDefinitionId;
+    public void setDataSetDefinition(DataSetDefinition dataSetDefinition) {
+        this.dataSetDefinition = dataSetDefinition;
     }
 
     @Override

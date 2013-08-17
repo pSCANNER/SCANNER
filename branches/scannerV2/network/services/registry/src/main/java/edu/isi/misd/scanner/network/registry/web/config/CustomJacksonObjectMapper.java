@@ -14,15 +14,15 @@ public class CustomJacksonObjectMapper extends ObjectMapper
     public CustomJacksonObjectMapper() 
     {
         super();
-        
+                
+        // do not serialize null valued properties or empty properties/collections
+        this.setSerializationInclusion(Include.NON_EMPTY);    
+     
         // enable Hibernate4 module to avoid serializing lazy-loaded objects
         Hibernate4Module hibernate4Module = new Hibernate4Module();
         hibernate4Module.configure(
             Hibernate4Module.Feature.FORCE_LAZY_LOADING, false);
         registerModule(hibernate4Module);        
-        
-        // do not serialize null valued properties or empty collections
-        this.setSerializationInclusion(Include.NON_EMPTY);
         
         // use JAXB annotations (supposed to be able to use in place of @Json)
         // to support both xml and json at the same time only using JAXB annos

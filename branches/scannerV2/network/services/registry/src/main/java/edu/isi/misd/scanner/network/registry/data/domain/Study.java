@@ -1,5 +1,7 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +9,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,6 +35,9 @@ public class Study implements Serializable
     @Column(name = "study_id")
     private Integer studyId;
     @Basic(optional = false)
+    @Column(name = "study_name")
+    private String studyName;    
+    @Basic(optional = false)
     @Column(name = "irb_id")
     private int irbId;
     @Basic(optional = false)
@@ -51,24 +57,30 @@ public class Study implements Serializable
     @Basic(optional = false)
     @Column(name = "analysis_plan")
     private String analysisPlan;
-    @ManyToMany(mappedBy = "studyList")
-    private List<SourceDataWarehouse> sourceDataWarehouseList;
-    @ManyToMany(mappedBy = "studyList")
-    private List<ScannerGrant> scannerGrantList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyId")
-    private List<ScannerRole> scannerRoleList;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "studies")
+    private List<SourceDataWarehouse> sourceDataWarehouses;
+    @JsonIgnore    
+    @ManyToMany(mappedBy = "studies")
+    private List<ScannerGrant> scannerGrants;   
+    @JsonManagedReference("study-role")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study", fetch=FetchType.EAGER)
+    private List<ScannerRole> scannerRoles;    
     @JoinColumn(name = "study_status_type_id", referencedColumnName = "study_status_type_id")
     @ManyToOne(optional = false)
-    private StudyStatusType studyStatusTypeId;
+    private StudyStatusType studyStatusType;  
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private ScannerUser principalInvestigatorUid;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudyId")
-    private List<DataSetDefinition> dataSetDefinitionList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyId")
-    private List<DataSetInstance> dataSetInstanceList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyId")
-    private List<AbstractPolicy> abstractPolicyList;
+    private ScannerUser principalInvestigator;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudy")
+    private List<DataSetDefinition> dataSetDefinitions;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
+    private List<DataSetInstance> dataSetInstances;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
+    private List<AbstractPolicy> abstractPolicies;
 
     public Study() {
     }
@@ -95,6 +107,14 @@ public class Study implements Serializable
         this.studyId = studyId;
     }
 
+    public String getStudyName() {
+        return studyName;
+    }
+
+    public void setStudyName(String studyName) {
+        this.studyName = studyName;
+    }
+    
     public int getIrbId() {
         return irbId;
     }
@@ -143,68 +163,68 @@ public class Study implements Serializable
         this.analysisPlan = analysisPlan;
     }
 
-    public List<SourceDataWarehouse> getSourceDataWarehouseList() {
-        return sourceDataWarehouseList;
+    public List<SourceDataWarehouse> getSourceDataWarehouses() {
+        return sourceDataWarehouses;
     }
 
-    public void setSourceDataWarehouseList(List<SourceDataWarehouse> sourceDataWarehouseList) {
-        this.sourceDataWarehouseList = sourceDataWarehouseList;
+    public void setSourceDataWarehouses(List<SourceDataWarehouse> sourceDataWarehouses) {
+        this.sourceDataWarehouses = sourceDataWarehouses;
     }
 
-    public List<ScannerGrant> getScannerGrantList() {
-        return scannerGrantList;
+    public List<ScannerGrant> getScannerGrants() {
+        return scannerGrants;
     }
 
-    public void setScannerGrantList(List<ScannerGrant> scannerGrantList) {
-        this.scannerGrantList = scannerGrantList;
+    public void setScannerGrants(List<ScannerGrant> scannerGrants) {
+        this.scannerGrants = scannerGrants;
     }
 
-    public List<ScannerRole> getScannerRoleList() {
-        return scannerRoleList;
+    public List<ScannerRole> getScannerRoles() {
+        return scannerRoles;
     }
 
-    public void setScannerRoleList(List<ScannerRole> scannerRoleList) {
-        this.scannerRoleList = scannerRoleList;
+    public void setScannerRoles(List<ScannerRole> scannerRoles) {
+        this.scannerRoles = scannerRoles;
     }
 
-    public StudyStatusType getStudyStatusTypeId() {
-        return studyStatusTypeId;
+    public StudyStatusType getStudyStatusType() {
+        return studyStatusType;
     }
 
-    public void setStudyStatusTypeId(StudyStatusType studyStatusTypeId) {
-        this.studyStatusTypeId = studyStatusTypeId;
+    public void setStudyStatusType(StudyStatusType studyStatusType) {
+        this.studyStatusType = studyStatusType;
     }
 
-    public ScannerUser getPrincipalInvestigatorUid() {
-        return principalInvestigatorUid;
+    public ScannerUser getPrincipalInvestigator() {
+        return principalInvestigator;
     }
 
-    public void setPrincipalInvestigatorUid(ScannerUser principalInvestigatorUid) {
-        this.principalInvestigatorUid = principalInvestigatorUid;
+    public void setPrincipalInvestigatorUid(ScannerUser principalInvestigator) {
+        this.principalInvestigator = principalInvestigator;
     }
 
-    public List<DataSetDefinition> getDataSetDefinitionList() {
-        return dataSetDefinitionList;
+    public List<DataSetDefinition> getDataSetDefinitions() {
+        return dataSetDefinitions;
     }
 
-    public void setDataSetDefinitionList(List<DataSetDefinition> dataSetDefinitionList) {
-        this.dataSetDefinitionList = dataSetDefinitionList;
+    public void setDataSetDefinition(List<DataSetDefinition> dataSetDefinitions) {
+        this.dataSetDefinitions = dataSetDefinitions;
     }
 
-    public List<DataSetInstance> getDataSetInstanceList() {
-        return dataSetInstanceList;
+    public List<DataSetInstance> getDataSetInstances() {
+        return dataSetInstances;
     }
 
-    public void setDataSetInstanceList(List<DataSetInstance> dataSetInstanceList) {
-        this.dataSetInstanceList = dataSetInstanceList;
+    public void setDataSetInstances(List<DataSetInstance> dataSetInstances) {
+        this.dataSetInstances = dataSetInstances;
     }
 
-    public List<AbstractPolicy> getAbstractPolicyList() {
-        return abstractPolicyList;
+    public List<AbstractPolicy> getAbstractPolicies() {
+        return abstractPolicies;
     }
 
-    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
-        this.abstractPolicyList = abstractPolicyList;
+    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
+        this.abstractPolicies = abstractPolicies;
     }
 
     @Override

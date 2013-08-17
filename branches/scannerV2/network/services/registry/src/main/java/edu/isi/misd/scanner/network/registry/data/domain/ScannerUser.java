@@ -1,11 +1,14 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -55,20 +58,29 @@ public class ScannerUser implements Serializable
     @Basic(optional = false)
     @Column(name = "is_superuser")
     private boolean isSuperuser;
-    @ManyToMany(mappedBy = "scannerUserList")
-    private List<ScannerRole> scannerRoleList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataManagerId")
-    private List<SourceDataWarehouse> sourceDataWarehouseList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "connectivityManagerId")
-    private List<SourceDataWarehouse> sourceDataWarehouseList1;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "principalInvestigatorUid")
-    private List<Study> studyList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "authorUid")
-    private List<DataSetDefinition> dataSetDefinitionList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "curatorUid")
-    private List<DataSetInstance> dataSetInstanceList;
+    @ManyToMany(mappedBy = "scannerUsers", fetch=FetchType.EAGER)
+    private List<ScannerRole> scannerRoles;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "investigator")
+    private List<InvestigatorRole> investigatorRoles;    
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataManager")
+    private List<SourceDataWarehouse> sourceDataWarehousesByDataManager;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "connectivityManager")
+    private List<SourceDataWarehouse> sourceDataWarehousesByConnectivityManager;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "principalInvestigator")
+    private List<Study> studies;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
+    private List<DataSetDefinition> dataSetDefinitions;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "curator")
+    private List<DataSetInstance> dataSetInstances;
+    @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyOriginator")
-    private List<AbstractPolicy> abstractPolicyList;
+    private List<AbstractPolicy> abstractPolicies;
 
     public ScannerUser() {
     }
@@ -184,60 +196,68 @@ public class ScannerUser implements Serializable
         this.isSuperuser = isSuperuser;
     }
 
-    public List<ScannerRole> getScannerRoleList() {
-        return scannerRoleList;
+    public List<ScannerRole> getScannerRoles() {
+        return scannerRoles;
     }
 
-    public void setScannerRoleList(List<ScannerRole> scannerRoleList) {
-        this.scannerRoleList = scannerRoleList;
+    public void setScannerRoles(List<ScannerRole> scannerRoles) {
+        this.scannerRoles = scannerRoles;
     }
 
-    public List<SourceDataWarehouse> getSourceDataWarehouseList() {
-        return sourceDataWarehouseList;
+    public List<InvestigatorRole> getInvestigatorRoles() {
+        return investigatorRoles;
     }
 
-    public void setSourceDataWarehouseList(List<SourceDataWarehouse> sourceDataWarehouseList) {
-        this.sourceDataWarehouseList = sourceDataWarehouseList;
+    public void setInvestigatorRoles(List<InvestigatorRole> investigatorRoles) {
+        this.investigatorRoles = investigatorRoles;
+    }
+    
+    public List<SourceDataWarehouse> getSourceDataWarehousesByDataManager() {
+        return sourceDataWarehousesByDataManager;
     }
 
-    public List<SourceDataWarehouse> getSourceDataWarehouseList1() {
-        return sourceDataWarehouseList1;
+    public void setSourceDataWarehousesByDataManager(List<SourceDataWarehouse> sourceDataWarehousesByDataManager) {
+        this.sourceDataWarehousesByDataManager = sourceDataWarehousesByDataManager;
     }
 
-    public void setSourceDataWarehouseList1(List<SourceDataWarehouse> sourceDataWarehouseList1) {
-        this.sourceDataWarehouseList1 = sourceDataWarehouseList1;
+    public List<SourceDataWarehouse> getSourceDataWarehousesByConnectivityManager() {
+        return sourceDataWarehousesByConnectivityManager;
     }
 
-    public List<Study> getStudyList() {
-        return studyList;
+    public void setSourceDataWarehousesByConnectivityManager(List<SourceDataWarehouse> sourceDataWarehousesByConnectivityManager) {
+        this.sourceDataWarehousesByConnectivityManager = sourceDataWarehousesByConnectivityManager;
     }
 
-    public void setStudyList(List<Study> studyList) {
-        this.studyList = studyList;
+    public List<Study> getStudies() {
+        return studies;
     }
 
-    public List<DataSetDefinition> getDataSetDefinitionList() {
-        return dataSetDefinitionList;
+    public void setStudies(List<Study> studies) {
+        this.studies = studies;
     }
 
-    public void setDataSetDefinitionList(List<DataSetDefinition> dataSetDefinitionList) {
-        this.dataSetDefinitionList = dataSetDefinitionList;
+    public List<DataSetDefinition> getDataSetDefinitions() {
+        return dataSetDefinitions;
     }
 
-    public List<DataSetInstance> getDataSetInstanceList() {
-        return dataSetInstanceList;
+    public void setDataSetDefinitions(List<DataSetDefinition> dataSetDefinitions) {
+        this.dataSetDefinitions = dataSetDefinitions;
     }
 
-    public void setDataSetInstanceList(List<DataSetInstance> dataSetInstanceList) {
-        this.dataSetInstanceList = dataSetInstanceList;
+    public List<DataSetInstance> getDataSetInstances() {
+        return dataSetInstances;
     }
 
-    public List<AbstractPolicy> getAbstractPolicyList() {
-        return abstractPolicyList;
+    public void setDataSetInstances(List<DataSetInstance> dataSetInstances) {
+        this.dataSetInstances = dataSetInstances;
     }
 
-    public void setAbstractPolicyList(List<AbstractPolicy> abstractPolicyList) {
-        this.abstractPolicyList = abstractPolicyList;
+    public List<AbstractPolicy> getAbstractPolicies() {
+        return abstractPolicies;
+    }
+
+    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
+        this.abstractPolicies = abstractPolicies;
     }
 
     @Override
