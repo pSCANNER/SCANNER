@@ -8,12 +8,8 @@ public final class ResourceNotFoundException extends RuntimeException
 
     public ResourceNotFoundException(Object ID) {
         super(
-            "A resource could not be found matching the specified ID: " + 
+            "A resource could not be found matching the specified identifier: " + 
             ID.toString());
-    }
-    
-    public ResourceNotFoundException(String message) {
-        super(message);
     }
 
     public ResourceNotFoundException(String message, Throwable cause) {

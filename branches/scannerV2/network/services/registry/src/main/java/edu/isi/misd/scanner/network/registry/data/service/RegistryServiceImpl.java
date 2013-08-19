@@ -1,9 +1,12 @@
 package edu.isi.misd.scanner.network.registry.data.service;
 
 import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
+import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
+import edu.isi.misd.scanner.network.registry.data.domain.DataSetInstance;
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 import edu.isi.misd.scanner.network.registry.data.repository.*;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +31,6 @@ public class RegistryServiceImpl implements RegistryService
     @Autowired
     private PolicyStatusTypeRepository policyRegistryRepository;
     @Autowired
-    private SourceDataWarehouseRepository sourceDataWarehouseRepository;
-    @Autowired
     private AnalysisToolRepository analysisToolRepository;   
     @Autowired
     private ToolLibraryRepository toolLibraryRepository;   
@@ -49,5 +50,21 @@ public class RegistryServiceImpl implements RegistryService
             library.setAnalysisTools(toolList);            
         }
         return toolLibraryRepository.save(library);
-    }       
+    } 
+    
+    @Override
+    @Transactional
+    public DataSetDefinition saveDataSetDefinition(DataSetDefinition dataSet) 
+    {
+        Set<DataSetInstance> dataSetInstances = dataSet.getDataSetInstances();
+        if ((dataSetInstances != null) && (!dataSetInstances.isEmpty())) {
+            dataSet.setDataSetInstances(dataSetInstances);
+            dataSetDefinitionRepository.save(dataSet);              
+            for (DataSetInstance instance : dataSetInstances) {
+                instance.setDataSetDefinition(dataSet);
+            }
+            dataSet.setDataSetInstances(dataSetInstances);            
+        }
+        return dataSetDefinitionRepository.save(dataSet);
+    }     
 }

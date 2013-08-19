@@ -1,7 +1,10 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -39,12 +42,18 @@ public class DataSetDefinition implements Serializable
     @Basic(optional = false)
     @Column(name = "data_processing_program")
     private String dataProcessingProgram;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "originating_study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study originatingStudy;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
+    @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "author_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser author;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
+    @JsonIdentityReference(alwaysAsId=true)       
     @JoinColumn(name = "data_set_confidentiality_level", referencedColumnName = "level_id")
     @ManyToOne(optional = false)
     private ConfidentialityLevel dataSetConfidentialityLevel;

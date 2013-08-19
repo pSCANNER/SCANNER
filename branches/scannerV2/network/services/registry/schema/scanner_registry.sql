@@ -10,7 +10,7 @@ create table if not exists tool_library (
 
 CREATE TABLE IF NOT EXISTS scanner_user (
   user_id serial NOT NULL primary key,
-  username text not null unique,
+  user_name text not null unique,
   email text NOT NULL,
   hspc_documents text,
   phone text NOT NULL,

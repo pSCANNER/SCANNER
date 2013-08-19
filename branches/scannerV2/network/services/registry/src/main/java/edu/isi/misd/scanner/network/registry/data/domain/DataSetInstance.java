@@ -1,7 +1,10 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -37,14 +40,16 @@ public class DataSetInstance implements Serializable
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetInstance")
     private Set<PolicyStatement> policyStatements;
-    @JsonIgnore
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;
     @JoinColumn(name = "source_data_warehouse_id", referencedColumnName = "source_data_warehouse_id")
     @ManyToOne
     private SourceDataWarehouse sourceDataWarehouse;
-    @JsonIgnore
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
+    @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "curator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser curator;

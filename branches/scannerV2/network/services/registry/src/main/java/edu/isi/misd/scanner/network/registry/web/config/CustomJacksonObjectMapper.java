@@ -15,8 +15,8 @@ public class CustomJacksonObjectMapper extends ObjectMapper
     {
         super();
                 
-        // do not serialize null valued properties or empty properties/collections
-        this.setSerializationInclusion(Include.NON_EMPTY);    
+        // do not serialize null valued properties or collections
+        this.setSerializationInclusion(Include.NON_NULL);    
      
         // enable Hibernate4 module to avoid serializing lazy-loaded objects
         Hibernate4Module hibernate4Module = new Hibernate4Module();

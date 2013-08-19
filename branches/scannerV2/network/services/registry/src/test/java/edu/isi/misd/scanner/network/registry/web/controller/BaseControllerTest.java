@@ -14,7 +14,7 @@ public abstract class BaseControllerTest
         new MappingJackson2HttpMessageConverter();
     
     @Test
-    public abstract void testJacksonConversion() throws Exception;
+    public abstract void testJacksonMapping() throws Exception;
 
     protected void assertCanBeMapped(Class<?> classToTest)
     {

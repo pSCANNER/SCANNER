@@ -10,7 +10,7 @@ INSERT INTO node (site_id,host_url, host_port, base_path, description, is_master
 (1, 'https://scanner-node2.misd.isi.edu', 8888, '/scanner/dataset', 'RAND SIM', false),
 (1, 'https://scanner-node3.misd.isi.edu', 8888, '/scanner/dataset', 'UCSD SIM', false);
 
-INSERT INTO scanner_user (username, email, HSPC_documents, Phone, Reports_To, Active, First_Name, Middle_Initial, Last_Name, PubMed_Author_ID, is_superuser) VALUES
+INSERT INTO scanner_user (user_name, email, HSPC_documents, Phone, Reports_To, Active, First_Name, Middle_Initial, Last_Name, PubMed_Author_ID, is_superuser) VALUES
 ('dmeeker', 'dmeeker@rand.org', '', '2139262658', 0, true, 'Daniella', 'EP', 'Meeker', NULL, true),
 ('laura', 'laura@isi.edu', '', '', 0, true, 'Laura', NULL, 'Pearlman', NULL, true),
 ('mdarcy', 'mdarcy@isi.edu', '', '', 0, true, 'Mike', NULL, 'D''Arcy', NULL, true);
@@ -44,6 +44,6 @@ INSERT INTO abstract_policy (study_id, data_set_definition_id, policy_authority,
 (1, 1, 400, 1, ' Data Set Instance X of DataSetDefinition 1 will be analyzed with with GLORE logistic regression in a mode without approval before transfer of aggregate/patient-level data at node X.  ', 1, 1, 0, 1);
 
 INSERT INTO data_set_instance (Data_Set_Definition_ID, node_id, data_set_instance_location, Curator_UID, Study_ID, Source_Data_Warehouse_ID, data_slice_id) VALUES
-(1, 1, 'MTM_SIMULATED_RAND.csv', 1, 1, NULL, NULL),
-(1, 2, 'MTM_SIMULATED_UCSD.csv', 3, 1, NULL, NULL),
-(1, 3, 'MTM_SIMULATED_ALTAMED.csv', 2, 1, NULL, NULL);
+(1, 2, 'MTM_SIMULATED_ALTAMED.csv', 1, 1, NULL, NULL),
+(1, 3, 'MTM_SIMULATED_RAND.csv', 3, 1, NULL, NULL),
+(1, 4, 'MTM_SIMULATED_UCSD.csv', 2, 1, NULL, NULL);

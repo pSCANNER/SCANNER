@@ -1,7 +1,10 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -63,12 +66,17 @@ public class Study implements Serializable
     @JsonIgnore    
     @ManyToMany(mappedBy = "studies")
     private List<ScannerGrant> scannerGrants;   
-    @JsonManagedReference("study-role")
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study", fetch=FetchType.EAGER)
+    //@JsonManagedReference("study-role")
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
     private List<ScannerRole> scannerRoles;    
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "study_status_type_id", referencedColumnName = "study_status_type_id")
     @ManyToOne(optional = false)
     private StudyStatusType studyStatusType;  
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser principalInvestigator;

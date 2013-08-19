@@ -2,6 +2,7 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
 import edu.isi.misd.scanner.network.registry.data.repository.DataSetDefinitionRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -29,19 +31,26 @@ public class DataSetDefinitionController extends BaseController
 {
     private static final Log log = 
         LogFactory.getLog(DataSetDefinitionController.class.getName());
-   
+
+    @Autowired    
+    private RegistryService registryService;    
     @Autowired
     private DataSetDefinitionRepository dataSetDefinitionRepository;   
     
 	@RequestMapping(value = "/datasets", method = RequestMethod.GET)
-	public @ResponseBody List<DataSetDefinition> getDataSetDefinitions() 
+	public @ResponseBody List<DataSetDefinition> getDataSetDefinitions(
+           @RequestParam(value="studyName", required=false) String studyName) 
     {
-        List<DataSetDefinition> dataSetDefinitions = 
-            new ArrayList<DataSetDefinition>();
-        Iterator iter = dataSetDefinitionRepository.findAll().iterator();
-        CollectionUtils.addAll(dataSetDefinitions, iter);
-        
-        return dataSetDefinitions;         
+        if (studyName != null) {
+            return 
+                dataSetDefinitionRepository.findDataSetsForStudyName(studyName);
+        } else {
+            List<DataSetDefinition> dataSetDefinitions = 
+                new ArrayList<DataSetDefinition>();            
+            Iterator iter = dataSetDefinitionRepository.findAll().iterator();
+            CollectionUtils.addAll(dataSetDefinitions, iter);            
+            return dataSetDefinitions;
+        }         
 	}
     
     @RequestMapping(value = "/datasets", method = RequestMethod.POST)
@@ -50,7 +59,7 @@ public class DataSetDefinitionController extends BaseController
            @RequestBody DataSetDefinition dataSet) 
     {
         try {
-            dataSetDefinitionRepository.save(dataSet);
+            registryService.saveDataSetDefinition(dataSet);
         } catch (DataIntegrityViolationException e) {
             log.warn("DataIntegrityViolationException: " + e);
             throw new ConflictException(e.getMostSpecificCause());
@@ -101,7 +110,7 @@ public class DataSetDefinitionController extends BaseController
         }
         // ok, good to go
         try {
-            dataSetDefinitionRepository.save(dataSet);
+            registryService.saveDataSetDefinition(dataSet);
         } catch (DataIntegrityViolationException e) {
             log.warn("DataIntegrityViolationException: " + e);
             throw new ConflictException(e.getMostSpecificCause());

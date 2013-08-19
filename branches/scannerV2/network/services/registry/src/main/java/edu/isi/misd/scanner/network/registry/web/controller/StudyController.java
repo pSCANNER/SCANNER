@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -34,14 +35,23 @@ public class StudyController extends BaseController
     private StudyRepository studyRepository;   
     
 	@RequestMapping(value = "/studies", method = RequestMethod.GET)
-	public @ResponseBody List<Study> getStudies() 
+	public @ResponseBody List<Study> getStudies(
+           @RequestParam(value="studyName", required=false) String studyName)
     {
         List<Study> studies = new ArrayList<Study>();
-        Iterator iter = studyRepository.findAll().iterator();
-        CollectionUtils.addAll(studies, iter);
         
-        return studies;         
-	}
+        if (studyName != null) {
+            Study study = studyRepository.findByStudyName(studyName);
+            if (study == null) {
+                throw new ResourceNotFoundException(studyName);
+            }
+            studies.add(study);
+        } else {
+            Iterator iter = studyRepository.findAll().iterator();
+            CollectionUtils.addAll(studies, iter);      
+        }
+        return studies;   
+    }
     
     @RequestMapping(value = "/studies", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)

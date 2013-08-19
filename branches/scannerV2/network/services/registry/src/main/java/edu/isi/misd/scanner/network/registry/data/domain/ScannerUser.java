@@ -30,8 +30,8 @@ public class ScannerUser implements Serializable
     @Column(name = "user_id")
     private Integer userId;
     @Basic(optional = false)
-    @Column(name = "username")
-    private String username;
+    @Column(name = "user_name")
+    private String userName;
     @Basic(optional = false)
     @Column(name = "email")
     private String email;
@@ -58,7 +58,8 @@ public class ScannerUser implements Serializable
     @Basic(optional = false)
     @Column(name = "is_superuser")
     private boolean isSuperuser;
-    @ManyToMany(mappedBy = "scannerUsers", fetch=FetchType.EAGER)
+    @JsonIgnore
+    @ManyToMany(mappedBy = "scannerUsers")
     private List<ScannerRole> scannerRoles;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "investigator")
@@ -89,9 +90,9 @@ public class ScannerUser implements Serializable
         this.userId = userId;
     }
 
-    public ScannerUser(Integer userId, String username, String email, String phone, boolean active, String firstName, String lastName, boolean isSuperuser) {
+    public ScannerUser(Integer userId, String userName, String email, String phone, boolean active, String firstName, String lastName, boolean isSuperuser) {
         this.userId = userId;
-        this.username = username;
+        this.userName = userName;
         this.email = email;
         this.phone = phone;
         this.active = active;
@@ -108,12 +109,12 @@ public class ScannerUser implements Serializable
         this.userId = userId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsername(String userName) {
+        this.userName = userName;
     }
 
     public String getEmail() {

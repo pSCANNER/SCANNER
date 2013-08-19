@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -34,13 +35,22 @@ public class ScannerUserController extends BaseController
     private ScannerUserRepository scannerUserRepository;   
     
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
-	public @ResponseBody List<ScannerUser> getScannerUsers() 
+	public @ResponseBody List<ScannerUser> getScannerUsers(
+           @RequestParam(value="userName", required=false) String userName)
     {
         List<ScannerUser> users = new ArrayList<ScannerUser>();
-        Iterator iter = scannerUserRepository.findAll().iterator();
-        CollectionUtils.addAll(users, iter);
         
-        return users;         
+        if (userName != null) {
+            ScannerUser user = scannerUserRepository.findByUserName(userName);
+            if (user == null) {
+                throw new ResourceNotFoundException(userName);
+            }
+            users.add(user);
+        } else {
+            Iterator iter = scannerUserRepository.findAll().iterator();
+            CollectionUtils.addAll(users, iter);      
+        }
+        return users;           
 	}
     
     @RequestMapping(value = "/users", method = RequestMethod.POST)
