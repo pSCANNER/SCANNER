@@ -22,12 +22,17 @@ INSERT INTO study (study_name,IRB_ID, Protocol, Principal_Investigator_UID, Star
 INSERT INTO study_role (study_id,role_within_study) VALUES
 (1,'Principle Investigator'),
 (1,'Site Administrator'),
-(1,'Investigator');
+(1,'Investigator'),
+(2,'Principle Investigator'),
+(2,'Site Administrator'),
+(2,'Investigator');
 
 INSERT INTO user_role(user_id, role_id) VALUES
 (1, 1),
-(2, 1),
-(3, 1);
+(2, 3),
+(3, 3),
+(1, 4),
+(2, 6);
 
 INSERT INTO tool_library (library_name, version, description) VALUES
 ('GLORE', '1', 'Executes Virtually Pooled Analysis Across Multiple Sites'),

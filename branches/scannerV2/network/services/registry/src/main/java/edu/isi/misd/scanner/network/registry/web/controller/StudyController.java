@@ -36,7 +36,9 @@ public class StudyController extends BaseController
     
 	@RequestMapping(value = "/studies", method = RequestMethod.GET)
 	public @ResponseBody List<Study> getStudies(
-           @RequestParam(value="studyName", required=false) String studyName)
+           @RequestParam(value="studyName", required=false) String studyName,
+           @RequestParam(value="userId", required=false) Integer userId,
+           @RequestParam(value="userName", required=false) String userName)
     {
         List<Study> studies = new ArrayList<Study>();
         
@@ -46,6 +48,12 @@ public class StudyController extends BaseController
                 throw new ResourceNotFoundException(studyName);
             }
             studies.add(study);
+        } else if (userId != null) {
+            return 
+                studyRepository.findStudiesForUserId(userId);
+        } else if (userName != null) {
+            return 
+                studyRepository.findStudiesForUserName(userName);
         } else {
             Iterator iter = studyRepository.findAll().iterator();
             CollectionUtils.addAll(studies, iter);      

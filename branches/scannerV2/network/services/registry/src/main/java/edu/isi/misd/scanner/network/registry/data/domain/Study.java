@@ -2,10 +2,13 @@ package edu.isi.misd.scanner.network.registry.data.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -48,6 +52,9 @@ public class Study implements Serializable
     private Integer clinicalTrialsId;
     @Column(name = "analysis_plan")
     private String analysisPlan;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
+    private List<StudyRole> studyRoles;      
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "study_status_type_id", referencedColumnName = "study_status_type_id")
@@ -151,7 +158,15 @@ public class Study implements Serializable
     public void setPrincipalInvestigatorUid(ScannerUser principalInvestigator) {
         this.principalInvestigator = principalInvestigator;
     }
+    
+    public List<StudyRole> getStudyRoles() {
+        return studyRoles;
+    }
 
+    public void setStudyRoles(List<StudyRole> studyRoles) {
+        this.studyRoles = studyRoles;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

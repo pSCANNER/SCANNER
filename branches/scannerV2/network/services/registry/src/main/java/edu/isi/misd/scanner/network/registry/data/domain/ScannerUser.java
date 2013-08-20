@@ -1,12 +1,17 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -50,7 +55,24 @@ public class ScannerUser implements Serializable
     @Basic(optional = false)
     @Column(name = "is_superuser")
     private boolean isSuperuser;
-
+    @JsonIgnore
+    @ManyToMany(mappedBy = "scannerUsers")
+    private List<StudyRole> studyRoles;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<UserRole> userRoles;    
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "principalInvestigator")
+    private List<Study> studies;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
+    private List<DataSetDefinition> dataSetDefinitions;
+//    @JsonIgnore    
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "curator")
+//    private List<DataSetInstance> dataSetInstances;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyOriginator")
+    private List<StudyPolicyStatement> studyPolicyStatements;    
     public ScannerUser() {
     }
 
@@ -162,6 +184,54 @@ public class ScannerUser implements Serializable
 
     public void setIsSuperuser(boolean isSuperuser) {
         this.isSuperuser = isSuperuser;
+    }
+    
+    public List<StudyRole> getStudyRoles() {
+        return studyRoles;
+    }
+
+    public void setStudyRoles(List<StudyRole> studyRoles) {
+        this.studyRoles = studyRoles;
+    }
+
+    public List<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(List<UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
+
+    public List<Study> getStudies() {
+        return studies;
+    }
+
+    public void setStudies(List<Study> studies) {
+        this.studies = studies;
+    }
+
+    public List<DataSetDefinition> getDataSetDefinitions() {
+        return dataSetDefinitions;
+    }
+
+    public void setDataSetDefinitions(List<DataSetDefinition> dataSetDefinitions) {
+        this.dataSetDefinitions = dataSetDefinitions;
+    }
+
+//    public List<DataSetInstance> getDataSetInstances() {
+//        return dataSetInstances;
+//    }
+//
+//    public void setDataSetInstances(List<DataSetInstance> dataSetInstances) {
+//        this.dataSetInstances = dataSetInstances;
+//    }
+
+    public List<StudyPolicyStatement> getAbstractPolicies() {
+        return studyPolicyStatements;
+    }
+
+    public void setAbstractPolicies(List<StudyPolicyStatement> studyPolicyStatements) {
+        this.studyPolicyStatements = studyPolicyStatements;
     }
 
     @Override

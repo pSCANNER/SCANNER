@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS user_role (
   unique (User_ID, role_id)
 );
 
+/*
 create or replace view user_study_view as
   select distinct i.user_id::text || '-' || r.study_id::text as user_study_id,
   u.user_id,
@@ -96,6 +97,7 @@ create or replace view user_study_view as
   from user_role i join scanner_user u on i.user_id = u.user_id
   join study_role r on r.role_id = i.role_id
   join study s on s.study_id = r.role_id;
+*/
 
 create table if not exists tool_library (
   library_id serial not null primary key,

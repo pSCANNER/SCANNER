@@ -1,7 +1,9 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
@@ -13,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -33,17 +37,28 @@ public class StudyRole implements Serializable
     @Basic(optional = false)
     @Column(name = "role_within_study")
     private String roleWithinStudy;
+    @JoinTable(name = "user_role", schema = "scanner_registry", 
+        joinColumns = {
+        @JoinColumn(name = "role_id", referencedColumnName = "role_id")}, inverseJoinColumns = {
+        @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
+    @ManyToMany
+    @JsonBackReference("user-role")    
+    private List<ScannerUser> scannerUsers;     
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
     @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;    
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<SitePolicy> sitePolicies;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<PolicyStatement> policyStatements;
+    @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<UserRole> userRoles;
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<StudyPolicyStatement> studyPolicyStatements;
 
@@ -91,6 +106,14 @@ public class StudyRole implements Serializable
         this.policyStatements = policyStatements;
     }
 
+    public List<ScannerUser> getScannerUsers() {
+        return scannerUsers;
+    }
+
+    public void setScannerUsers(List<ScannerUser> scannerUsers) {
+        this.scannerUsers = scannerUsers;
+    }
+    
     public Study getStudy() {
         return study;
     }
