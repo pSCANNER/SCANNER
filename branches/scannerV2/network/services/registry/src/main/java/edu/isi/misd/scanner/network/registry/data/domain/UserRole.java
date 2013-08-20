@@ -15,42 +15,34 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "site_policy", schema = "scanner_registry")
-public class SitePolicy implements Serializable {
+@Table(name = "user_role", schema = "scanner_registry")
+public class UserRole implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "site_policy_id")
-    private Integer sitePolicyId;
-    @JoinColumn(name = "site_id", referencedColumnName = "site_id")
-    @ManyToOne(optional = false)
-    private Site site;
+    @Column(name = "user_role_id")
+    private Integer userRoleId;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole role;
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @ManyToOne(optional = false)
+    private ScannerUser user;
 
-    public SitePolicy() {
+    public UserRole() {
     }
 
-    public SitePolicy(Integer sitePolicyId) {
-        this.sitePolicyId = sitePolicyId;
+    public UserRole(Integer userRoleId) {
+        this.userRoleId = userRoleId;
     }
 
-    public Integer getSitePolicyId() {
-        return sitePolicyId;
+    public Integer getUserRoleId() {
+        return userRoleId;
     }
 
-    public void setSitePolicyId(Integer sitePolicyId) {
-        this.sitePolicyId = sitePolicyId;
-    }
-
-    public Site getSite() {
-        return site;
-    }
-
-    public void setSite(Site site) {
-        this.site = site;
+    public void setUserRoleId(Integer userRoleId) {
+        this.userRoleId = userRoleId;
     }
 
     public StudyRole getRole() {
@@ -61,21 +53,29 @@ public class SitePolicy implements Serializable {
         this.role = role;
     }
 
+    public ScannerUser getUser() {
+        return user;
+    }
+
+    public void setUser(ScannerUser user) {
+        this.user = user;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (sitePolicyId != null ? sitePolicyId.hashCode() : 0);
+        hash += (userRoleId != null ? userRoleId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof SitePolicy)) {
+        if (!(object instanceof UserRole)) {
             return false;
         }
-        SitePolicy other = (SitePolicy) object;
-        if ((this.sitePolicyId == null && other.sitePolicyId != null) || (this.sitePolicyId != null && !this.sitePolicyId.equals(other.sitePolicyId))) {
+        UserRole other = (UserRole) object;
+        if ((this.userRoleId == null && other.userRoleId != null) || (this.userRoleId != null && !this.userRoleId.equals(other.userRoleId))) {
             return false;
         }
         return true;
@@ -83,7 +83,7 @@ public class SitePolicy implements Serializable {
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.SitePolicy[ sitePolicyId=" + sitePolicyId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.UserRole[ userRoleId=" + userRoleId + " ]";
     }
     
 }

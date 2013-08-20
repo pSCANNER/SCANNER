@@ -34,7 +34,7 @@ public class PolicyStatusType implements Serializable
     private List<PolicyStatement> policyStatements;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyStatus")
-    private List<AbstractPolicy> abstractPolicies;
+    private List<StudyPolicyStatement> studyPolicyStatements;
 
     public PolicyStatusType() {
     }
@@ -81,12 +81,12 @@ public class PolicyStatusType implements Serializable
         this.policyStatements = policyStatements;
     }
 
-    public List<AbstractPolicy> getAbstractPolicies() {
-        return abstractPolicies;
+    public List<StudyPolicyStatement> getStudyPolicyStatement() {
+        return studyPolicyStatements;
     }
 
-    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
-        this.abstractPolicies = abstractPolicies;
+    public void setStudyPolicyStatement(List<StudyPolicyStatement> studyPolicyStatements) {
+        this.studyPolicyStatements = studyPolicyStatements;
     }
 
     @Override
@@ -113,5 +113,5 @@ public class PolicyStatusType implements Serializable
     public String toString() {
         return "edu.isi.misd.scanner.network.registry.data.domain.PolicyStatusType[ policyStatusTypeId=" + policyStatusTypeId + " ]";
     }
-    
+
 }

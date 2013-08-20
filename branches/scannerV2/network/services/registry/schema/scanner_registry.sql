@@ -1,13 +1,5 @@
 set search_path = scanner_registry;
 
-create table if not exists tool_library (
-  library_id serial not null primary key,
-  library_name text not null,
-  version text not null,
-  description text,
-  unique(library_name, version)
-);
-
 CREATE TABLE IF NOT EXISTS scanner_user (
   user_id serial NOT NULL primary key,
   user_name text not null unique,
@@ -23,6 +15,20 @@ CREATE TABLE IF NOT EXISTS scanner_user (
   is_superuser boolean not null default false
 );
 
+CREATE TABLE IF NOT EXISTS study (
+  study_id serial NOT NULL primary key,
+  study_name text NOT NULL unique,
+  irb_id integer NOT NULL,
+  protocol text,
+  principal_investigator_uid integer NOT NULL references scanner_user(user_id),
+  start_date date,
+  end_date date,
+  clinical_trials_id integer,
+  analysis_plan text,
+  study_status_type_id integer not null references study_status_type(study_status_type_id)
+);
+
+/*
 CREATE TABLE IF NOT EXISTS dua (
   dua_id serial not null primary key,
   dua_detail text
@@ -36,19 +42,6 @@ CREATE TABLE IF NOT EXISTS scanner_grant (
 );
 
 COMMENT ON table scanner_grant is 'Placeholder grant table.';
-
-CREATE TABLE IF NOT EXISTS study (
-  study_id serial NOT NULL primary key,
-  study_name text NOT NULL unique,
-  irb_id integer NOT NULL,
-  protocol text,
-  principal_investigator_uid integer NOT NULL references scanner_user(user_id),
-  start_date date,
-  end_date date,
-  clinical_trials_id integer,
-  analysis_plan text,
-  study_status_type_id integer not null references study_status_type(study_status_type_id)
-);
 
 create table study_grant (
   study_id integer not null references study(study_id),
@@ -76,6 +69,7 @@ CREATE TABLE IF NOT EXISTS study_data_warehouse (
 );
 
 COMMENT ON table study_data_warehouse is 'Placeholder study/warehouse xref table.';
+*/
 
 create table if not exists study_role (
   role_id serial not null primary key,
@@ -102,6 +96,14 @@ create or replace view user_study_view as
   from user_role i join scanner_user u on i.user_id = u.user_id
   join study_role r on r.role_id = i.role_id
   join study s on s.study_id = r.role_id;
+
+create table if not exists tool_library (
+  library_id serial not null primary key,
+  library_name text not null,
+  version text not null,
+  description text,
+  unique(library_name, version)
+);
 
 CREATE TABLE IF NOT EXISTS analysis_tool (
   tool_id serial NOT NULL primary key,
@@ -166,11 +168,9 @@ CREATE TABLE IF NOT EXISTS data_set_instance (
   data_set_instance_id serial NOT NULL primary key,
   data_set_definition_id integer NOT NULL references data_set_definition(data_set_definition_id),
   node_id integer not null references node(node_id),
-  data_set_instance_location text NOT NULL,
+  data_source text NOT NULL,
   curator_uid integer NOT NULL references scanner_user(user_id),
-  study_id integer NOT NULL references study(study_id),
-  source_data_warehouse_id integer references source_data_warehouse (source_data_warehouse_id),
-  data_slice_id integer DEFAULT NULL
+  study_id integer NOT NULL references study(study_id)
 );
 
 create table if not exists policy_statement (
@@ -197,7 +197,7 @@ create table if not exists site_policy (
 );
 
 --- More Mike-owned tables
-
+/*
 CREATE TABLE IF NOT EXISTS analysis_instance (
   analysis_instance_id serial NOT NULL primary key,
   -- I don't think study_policy_statement_id belongs here, but if it does, it should be a foreign key to the study_policy_statement table - LP
@@ -222,4 +222,4 @@ CREATE TABLE IF NOT EXISTS result_instance (
   result_location integer NOT NULL,
   result_instance_url text NOT NULL
 );
-
+*/

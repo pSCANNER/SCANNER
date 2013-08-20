@@ -18,29 +18,28 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "abstract_policy", schema = "scanner_registry")
-public class AbstractPolicy implements Serializable 
+@Table(name = "study_policy_statement", schema = "scanner_registry")
+public class StudyPolicyStatement implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "abstract_policy_id")
-    private Integer abstractPolicyId;
-    @Basic(optional = false)
+    @Column(name = "study_policy_statement_id")
+    private Integer studyPolicyStatementId;
     @Column(name = "attestation")
     private String attestation;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentAbstractPolicy")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentStudyPolicyStatement")
     private List<PolicyStatement> policyStatements;
+    @JoinColumn(name = "role_id", referencedColumnName = "role_id")
+    @ManyToOne(optional = false)
+    private StudyRole role;
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;
     @JoinColumn(name = "policy_originator", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser policyOriginator;
-    @JoinColumn(name = "role_id", referencedColumnName = "role_id")
-    @ManyToOne(optional = false)
-    private ScannerRole role;
     @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatus;
@@ -57,24 +56,19 @@ public class AbstractPolicy implements Serializable
     @ManyToOne(optional = false)
     private AccessMode accessMode;
 
-    public AbstractPolicy() {
+    public StudyPolicyStatement() {
     }
 
-    public AbstractPolicy(Integer abstractPolicyId) {
-        this.abstractPolicyId = abstractPolicyId;
+    public StudyPolicyStatement(Integer studyPolicyStatementId) {
+        this.studyPolicyStatementId = studyPolicyStatementId;
     }
 
-    public AbstractPolicy(Integer abstractPolicyId, String attestation) {
-        this.abstractPolicyId = abstractPolicyId;
-        this.attestation = attestation;
+    public Integer getStudyPolicyStatementId() {
+        return studyPolicyStatementId;
     }
 
-    public Integer getAbstractPolicyId() {
-        return abstractPolicyId;
-    }
-
-    public void setAbstractPolicyId(Integer abstractPolicyId) {
-        this.abstractPolicyId = abstractPolicyId;
+    public void setStudyPolicyStatementId(Integer studyPolicyStatementId) {
+        this.studyPolicyStatementId = studyPolicyStatementId;
     }
 
     public String getAttestation() {
@@ -93,6 +87,14 @@ public class AbstractPolicy implements Serializable
         this.policyStatements = policyStatements;
     }
 
+    public StudyRole getRole() {
+        return role;
+    }
+
+    public void setRole(StudyRole role) {
+        this.role = role;
+    }
+
     public Study getStudy() {
         return study;
     }
@@ -109,19 +111,11 @@ public class AbstractPolicy implements Serializable
         this.policyOriginator = policyOriginator;
     }
 
-    public ScannerRole getRole() {
-        return role;
-    }
-
-    public void setRole(ScannerRole role) {
-        this.role = role;
-    }
-
     public PolicyStatusType getPolicyStatus() {
         return policyStatus;
     }
 
-    public void setPolicyStatusId(PolicyStatusType policyStatus) {
+    public void setPolicyStatus(PolicyStatusType policyStatus) {
         this.policyStatus = policyStatus;
     }
 
@@ -137,7 +131,7 @@ public class AbstractPolicy implements Serializable
         return dataSetDefinition;
     }
 
-    public void setDataSetDefinitionId(DataSetDefinition dataSetDefinition) {
+    public void setDataSetDefinition(DataSetDefinition dataSetDefinition) {
         this.dataSetDefinition = dataSetDefinition;
     }
 
@@ -145,7 +139,7 @@ public class AbstractPolicy implements Serializable
         return analysisTool;
     }
 
-    public void setAnalysisToolId(AnalysisTool analysisTool) {
+    public void setAnalysisTool(AnalysisTool analysisTool) {
         this.analysisTool = analysisTool;
     }
 
@@ -160,18 +154,18 @@ public class AbstractPolicy implements Serializable
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (abstractPolicyId != null ? abstractPolicyId.hashCode() : 0);
+        hash += (studyPolicyStatementId != null ? studyPolicyStatementId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof AbstractPolicy)) {
+        if (!(object instanceof StudyPolicyStatement)) {
             return false;
         }
-        AbstractPolicy other = (AbstractPolicy) object;
-        if ((this.abstractPolicyId == null && other.abstractPolicyId != null) || (this.abstractPolicyId != null && !this.abstractPolicyId.equals(other.abstractPolicyId))) {
+        StudyPolicyStatement other = (StudyPolicyStatement) object;
+        if ((this.studyPolicyStatementId == null && other.studyPolicyStatementId != null) || (this.studyPolicyStatementId != null && !this.studyPolicyStatementId.equals(other.studyPolicyStatementId))) {
             return false;
         }
         return true;
@@ -179,7 +173,7 @@ public class AbstractPolicy implements Serializable
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.AbstractPolicy[ abstractPolicyId=" + abstractPolicyId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.StudyPolicyStatement[ studyPolicyStatementId=" + studyPolicyStatementId + " ]";
     }
     
 }

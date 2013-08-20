@@ -26,7 +26,7 @@ public class PolicyStatement implements Serializable
     private Integer policyStatementId;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
-    private ScannerRole role;
+    private StudyRole role;
     @JoinColumn(name = "policy_status_type_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatusType;
@@ -39,9 +39,9 @@ public class PolicyStatement implements Serializable
     @JoinColumn(name = "access_mode_id", referencedColumnName = "access_mode_id")
     @ManyToOne(optional = false)
     private AccessMode accessMode;
-    @JoinColumn(name = "parent_abstract_policy_id", referencedColumnName = "abstract_policy_id")
+    @JoinColumn(name = "parent_study_policy_statement_id", referencedColumnName = "study_policy_statement_id")
     @ManyToOne(optional = false)
-    private AbstractPolicy parentAbstractPolicy;
+    private StudyPolicyStatement parentStudyPolicyStatement;
 
     public PolicyStatement() {
     }
@@ -58,11 +58,11 @@ public class PolicyStatement implements Serializable
         this.policyStatementId = policyStatementId;
     }
 
-    public ScannerRole getRole() {
+    public StudyRole getRole() {
         return role;
     }
 
-    public void setRole(ScannerRole role) {
+    public void setRole(StudyRole role) {
         this.role = role;
     }
 
@@ -98,14 +98,14 @@ public class PolicyStatement implements Serializable
         this.accessMode = accessMode;
     }
 
-    public AbstractPolicy getParentAbstractPolicy() {
-        return parentAbstractPolicy;
+    public StudyPolicyStatement getParentStudyPolicyStatement() {
+        return parentStudyPolicyStatement;
     }
 
-    public void setParentAbstractPolicy(AbstractPolicy parentAbstractPolicy) {
-        this.parentAbstractPolicy = parentAbstractPolicy;
+    public void setParentStudyPolicyStatementId(StudyPolicyStatement parentStudyPolicyStatement) {
+        this.parentStudyPolicyStatement = parentStudyPolicyStatement;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;

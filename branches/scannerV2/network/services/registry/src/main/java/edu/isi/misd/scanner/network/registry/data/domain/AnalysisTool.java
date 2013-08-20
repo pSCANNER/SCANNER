@@ -32,7 +32,6 @@ public class AnalysisTool implements Serializable
     @Basic(optional = false)
     @Column(name = "tool_name")
     private String toolName;
-    @Basic(optional = false)
     @Column(name = "tool_description")
     private String toolDescription;
     @Basic(optional = false)
@@ -41,9 +40,6 @@ public class AnalysisTool implements Serializable
     @Basic(optional = false)
     @Column(name = "output_format_specifications")
     private String outputFormatSpecifications;
-    @Basic(optional = false)
-    @Column(name = "curator_uid")
-    private int curatorUid;
     @Basic(optional = false)
     @Column(name = "information_email")
     private String informationEmail;
@@ -55,8 +51,8 @@ public class AnalysisTool implements Serializable
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
     private List<PolicyStatement> policyStatements;
     @JsonIgnore       
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")    
-    private List<AbstractPolicy> abstractPolicies;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
+    private List<StudyPolicyStatement> studyPolicyStatements;
 
     public AnalysisTool() {
     }
@@ -71,7 +67,6 @@ public class AnalysisTool implements Serializable
         this.toolDescription = toolDescription;
         this.inputFormatSpecifications = inputFormatSpecifications;
         this.outputFormatSpecifications = outputFormatSpecifications;
-        this.curatorUid = curatorUid;
         this.informationEmail = informationEmail;
     }
 
@@ -115,14 +110,6 @@ public class AnalysisTool implements Serializable
         this.outputFormatSpecifications = outputFormatSpecifications;
     }
 
-    public int getCuratorUid() {
-        return curatorUid;
-    }
-
-    public void setCuratorUid(int curatorUid) {
-        this.curatorUid = curatorUid;
-    }
-
     public String getInformationEmail() {
         return informationEmail;
     }
@@ -146,15 +133,15 @@ public class AnalysisTool implements Serializable
     public void setPolicyStatements(List<PolicyStatement> policyStatements) {
         this.policyStatements = policyStatements;
     }
-
-    public List<AbstractPolicy> getAbstractPolicies() {
-        return abstractPolicies;
+    
+    public List<StudyPolicyStatement> getStudyPolicyStatements() {
+        return studyPolicyStatements;
     }
 
-    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
-        this.abstractPolicies = abstractPolicies;
+    public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
+        this.studyPolicyStatements = studyPolicyStatements;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;

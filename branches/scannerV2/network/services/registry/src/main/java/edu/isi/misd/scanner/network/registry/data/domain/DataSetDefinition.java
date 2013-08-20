@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -36,10 +37,8 @@ public class DataSetDefinition implements Serializable
     @Basic(optional = false)
     @Column(name = "data_description_xml")
     private String dataDescriptionXml;
-    @Basic(optional = false)
     @Column(name = "data_processing_xml")
     private String dataProcessingXml;
-    @Basic(optional = false)
     @Column(name = "data_processing_program")
     private String dataProcessingProgram;
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
@@ -50,7 +49,7 @@ public class DataSetDefinition implements Serializable
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
     @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "author_uid", referencedColumnName = "user_id")
-    @ManyToOne(optional = false)
+    @ManyToOne
     private ScannerUser author;
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
     @JsonIdentityReference(alwaysAsId=true)       
@@ -62,7 +61,7 @@ public class DataSetDefinition implements Serializable
     private Set<DataSetInstance> dataSetInstances;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition")
-    private Set<AbstractPolicy> abstractPolicies;
+    private List<StudyPolicyStatement> studyPolicyStatements;
 
     public DataSetDefinition() {
     }
@@ -142,12 +141,12 @@ public class DataSetDefinition implements Serializable
         this.dataSetInstances = dataSetInstances;
     }
 
-    public Set<AbstractPolicy> getAbstractPolicies() {
-        return abstractPolicies;
+    public List<StudyPolicyStatement> getStudyPolicyStatements() {
+        return studyPolicyStatements;
     }
 
-    public void setAbstractPolicies(Set<AbstractPolicy> abstractPolicies) {
-        this.abstractPolicies = abstractPolicies;
+    public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
+        this.studyPolicyStatements = studyPolicyStatements;
     }
 
     @Override

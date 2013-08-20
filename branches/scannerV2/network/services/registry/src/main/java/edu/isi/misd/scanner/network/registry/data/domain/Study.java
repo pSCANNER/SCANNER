@@ -2,24 +2,17 @@ package edu.isi.misd.scanner.network.registry.data.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -39,56 +32,32 @@ public class Study implements Serializable
     private Integer studyId;
     @Basic(optional = false)
     @Column(name = "study_name")
-    private String studyName;    
+    private String studyName;
     @Basic(optional = false)
     @Column(name = "irb_id")
     private int irbId;
-    @Basic(optional = false)
     @Column(name = "protocol")
     private String protocol;
-    @Basic(optional = false)
     @Column(name = "start_date")
     @Temporal(TemporalType.DATE)
     private Date startDate;
-    @Basic(optional = false)
     @Column(name = "end_date")
     @Temporal(TemporalType.DATE)
     private Date endDate;
-    @Basic(optional = false)
     @Column(name = "clinical_trials_id")
-    private int clinicalTrialsId;
-    @Basic(optional = false)
+    private Integer clinicalTrialsId;
     @Column(name = "analysis_plan")
     private String analysisPlan;
-    @JsonIgnore
-    @ManyToMany(mappedBy = "studies")
-    private List<SourceDataWarehouse> sourceDataWarehouses;
-    @JsonIgnore    
-    @ManyToMany(mappedBy = "studies")
-    private List<ScannerGrant> scannerGrants;   
-    //@JsonManagedReference("study-role")
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
-    private List<ScannerRole> scannerRoles;    
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "study_status_type_id", referencedColumnName = "study_status_type_id")
     @ManyToOne(optional = false)
-    private StudyStatusType studyStatusType;  
+    private StudyStatusType studyStatusType;
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser principalInvestigator;
-    @JsonIgnore    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudy")
-    private List<DataSetDefinition> dataSetDefinitions;
-    @JsonIgnore    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
-    private List<DataSetInstance> dataSetInstances;
-    @JsonIgnore    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
-    private List<AbstractPolicy> abstractPolicies;
 
     public Study() {
     }
@@ -97,14 +66,10 @@ public class Study implements Serializable
         this.studyId = studyId;
     }
 
-    public Study(Integer studyId, int irbId, String protocol, Date startDate, Date endDate, int clinicalTrialsId, String analysisPlan) {
+    public Study(Integer studyId, String studyName, int irbId) {
         this.studyId = studyId;
+        this.studyName = studyName;
         this.irbId = irbId;
-        this.protocol = protocol;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.clinicalTrialsId = clinicalTrialsId;
-        this.analysisPlan = analysisPlan;
     }
 
     public Integer getStudyId() {
@@ -122,7 +87,7 @@ public class Study implements Serializable
     public void setStudyName(String studyName) {
         this.studyName = studyName;
     }
-    
+
     public int getIrbId() {
         return irbId;
     }
@@ -155,11 +120,11 @@ public class Study implements Serializable
         this.endDate = endDate;
     }
 
-    public int getClinicalTrialsId() {
+    public Integer getClinicalTrialsId() {
         return clinicalTrialsId;
     }
 
-    public void setClinicalTrialsId(int clinicalTrialsId) {
+    public void setClinicalTrialsId(Integer clinicalTrialsId) {
         this.clinicalTrialsId = clinicalTrialsId;
     }
 
@@ -171,35 +136,11 @@ public class Study implements Serializable
         this.analysisPlan = analysisPlan;
     }
 
-    public List<SourceDataWarehouse> getSourceDataWarehouses() {
-        return sourceDataWarehouses;
-    }
-
-    public void setSourceDataWarehouses(List<SourceDataWarehouse> sourceDataWarehouses) {
-        this.sourceDataWarehouses = sourceDataWarehouses;
-    }
-
-    public List<ScannerGrant> getScannerGrants() {
-        return scannerGrants;
-    }
-
-    public void setScannerGrants(List<ScannerGrant> scannerGrants) {
-        this.scannerGrants = scannerGrants;
-    }
-
-    public List<ScannerRole> getScannerRoles() {
-        return scannerRoles;
-    }
-
-    public void setScannerRoles(List<ScannerRole> scannerRoles) {
-        this.scannerRoles = scannerRoles;
-    }
-
     public StudyStatusType getStudyStatusType() {
         return studyStatusType;
     }
 
-    public void setStudyStatusType(StudyStatusType studyStatusType) {
+    public void setStudyStatusTypeId(StudyStatusType studyStatusType) {
         this.studyStatusType = studyStatusType;
     }
 
@@ -209,30 +150,6 @@ public class Study implements Serializable
 
     public void setPrincipalInvestigatorUid(ScannerUser principalInvestigator) {
         this.principalInvestigator = principalInvestigator;
-    }
-
-    public List<DataSetDefinition> getDataSetDefinitions() {
-        return dataSetDefinitions;
-    }
-
-    public void setDataSetDefinition(List<DataSetDefinition> dataSetDefinitions) {
-        this.dataSetDefinitions = dataSetDefinitions;
-    }
-
-    public List<DataSetInstance> getDataSetInstances() {
-        return dataSetInstances;
-    }
-
-    public void setDataSetInstances(List<DataSetInstance> dataSetInstances) {
-        this.dataSetInstances = dataSetInstances;
-    }
-
-    public List<AbstractPolicy> getAbstractPolicies() {
-        return abstractPolicies;
-    }
-
-    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
-        this.abstractPolicies = abstractPolicies;
     }
 
     @Override

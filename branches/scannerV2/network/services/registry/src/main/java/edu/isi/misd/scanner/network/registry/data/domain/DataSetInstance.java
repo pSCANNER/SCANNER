@@ -33,10 +33,8 @@ public class DataSetInstance implements Serializable
     @Column(name = "data_set_instance_id")
     private Integer dataSetInstanceId;
     @Basic(optional = false)
-    @Column(name = "data_set_instance_location")
-    private String dataSetInstanceLocation;
-    @Column(name = "data_slice_id")
-    private Integer dataSliceId;
+    @Column(name = "data_source")
+    private String dataSource;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetInstance")
     private Set<PolicyStatement> policyStatements;
@@ -45,14 +43,11 @@ public class DataSetInstance implements Serializable
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;
-    @JoinColumn(name = "source_data_warehouse_id", referencedColumnName = "source_data_warehouse_id")
-    @ManyToOne
-    private SourceDataWarehouse sourceDataWarehouse;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
-    @JsonIdentityReference(alwaysAsId=true)      
-    @JoinColumn(name = "curator_uid", referencedColumnName = "user_id")
-    @ManyToOne(optional = false)
-    private ScannerUser curator;
+//    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
+//    @JsonIdentityReference(alwaysAsId=true)      
+//    @JoinColumn(name = "curator_uid", referencedColumnName = "user_id")
+//    @ManyToOne(optional = false)
+//    private ScannerUser curator;
     @JoinColumn(name = "node_id", referencedColumnName = "node_id")
     @ManyToOne(optional = false)
     private Node node;
@@ -68,9 +63,9 @@ public class DataSetInstance implements Serializable
         this.dataSetInstanceId = dataSetInstanceId;
     }
 
-    public DataSetInstance(Integer dataSetInstanceId, String dataSetInstanceLocation) {
+    public DataSetInstance(Integer dataSetInstanceId, String dataSource) {
         this.dataSetInstanceId = dataSetInstanceId;
-        this.dataSetInstanceLocation = dataSetInstanceLocation;
+        this.dataSource = dataSource;
     }
 
     public Integer getDataSetInstanceId() {
@@ -81,27 +76,19 @@ public class DataSetInstance implements Serializable
         this.dataSetInstanceId = dataSetInstanceId;
     }
 
-    public String getDataSetInstanceLocation() {
-        return dataSetInstanceLocation;
+    public String getDataSource() {
+        return dataSource;
     }
 
-    public void setDataSetInstanceLocation(String dataSetInstanceLocation) {
-        this.dataSetInstanceLocation = dataSetInstanceLocation;
-    }
-
-    public Integer getDataSliceId() {
-        return dataSliceId;
-    }
-
-    public void setDataSliceId(Integer dataSliceId) {
-        this.dataSliceId = dataSliceId;
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
 
     public Set<PolicyStatement> getPolicyStatements() {
         return policyStatements;
     }
 
-    public void setPolicyStatementList(Set<PolicyStatement> policyStatements) {
+    public void setPolicyStatements(Set<PolicyStatement> policyStatements) {
         this.policyStatements = policyStatements;
     }
 
@@ -113,21 +100,13 @@ public class DataSetInstance implements Serializable
         this.study = study;
     }
 
-    public SourceDataWarehouse getSourceDataWarehouse() {
-        return sourceDataWarehouse;
-    }
-
-    public void setSourceDataWarehouse(SourceDataWarehouse sourceDataWarehouse) {
-        this.sourceDataWarehouse = sourceDataWarehouse;
-    }
-
-    public ScannerUser getCurator() {
-        return curator;
-    }
-
-    public void setCurator(ScannerUser curator) {
-        this.curator = curator;
-    }
+//    public ScannerUser getCurator() {
+//        return curator;
+//    }
+//
+//    public void setCurator(ScannerUser curator) {
+//        this.curator = curator;
+//    }
 
     public Node getNode() {
         return node;

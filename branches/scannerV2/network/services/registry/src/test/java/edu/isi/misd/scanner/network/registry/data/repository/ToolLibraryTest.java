@@ -56,7 +56,6 @@ public class ToolLibraryTest
       
         tool.setToolName(TOOL_NAME);
         tool.setToolDescription(TOOL_DESC);
-        tool.setCuratorUid(TOOL_CURATOR_ID);
         tool.setInformationEmail(TOOL_INFORMATION_EMAIL);
         tool.setInputFormatSpecifications(TOOL_INPUT_FORMAT_SPEC);
         tool.setOutputFormatSpecifications(TOOL_OUTPUT_FORMAT_SPEC);
@@ -87,8 +86,6 @@ public class ToolLibraryTest
                      savedToolLibrary.getAnalysisTools().get(0).getToolName());   
 		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolDescription(),
                      savedToolLibrary.getAnalysisTools().get(0).getToolDescription());  
-		assertEquals(toolLibrary.getAnalysisTools().get(0).getCuratorUid(),
-                     savedToolLibrary.getAnalysisTools().get(0).getCuratorUid());  
 		assertEquals(toolLibrary.getAnalysisTools().get(0).getInformationEmail(),
                      savedToolLibrary.getAnalysisTools().get(0).getInformationEmail());    
 		assertEquals(toolLibrary.getAnalysisTools().get(0).getInputFormatSpecifications(),

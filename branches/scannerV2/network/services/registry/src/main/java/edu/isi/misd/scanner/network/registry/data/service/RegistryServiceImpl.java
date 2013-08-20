@@ -19,19 +19,7 @@ public class RegistryServiceImpl implements RegistryService
 {
 
     @Autowired
-    private ScannerUserRepository scannerUserRepository;
-    @Autowired
-    private StudyRepository studyRepository;
-    @Autowired
     private DataSetDefinitionRepository dataSetDefinitionRepository;
-    @Autowired
-    private DataSetInstanceRepository dataSetInstanceRepository;
-    @Autowired
-    private DuaRepository duaStudyRepository;
-    @Autowired
-    private PolicyStatusTypeRepository policyRegistryRepository;
-    @Autowired
-    private AnalysisToolRepository analysisToolRepository;   
     @Autowired
     private ToolLibraryRepository toolLibraryRepository;   
 

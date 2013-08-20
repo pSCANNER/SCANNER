@@ -2,9 +2,12 @@ package edu.isi.misd.scanner.network.registry.data.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -46,6 +50,9 @@ public class Node implements Serializable
     @JoinColumn(name = "site_id", referencedColumnName = "site_id")
     @ManyToOne(optional = false)
     private Site site;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "node")
+    private List<DataSetInstance> dataSetInstances;    
 
     public Node() {
     }
@@ -117,6 +124,14 @@ public class Node implements Serializable
         this.site = site;
     }
 
+    public List<DataSetInstance> getDataSetInstances() {
+        return dataSetInstances;
+    }
+
+    public void setDataSetInstanceList(List<DataSetInstance> dataSetInstances) {
+        this.dataSetInstances = dataSetInstances;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

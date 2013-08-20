@@ -29,9 +29,6 @@ public class ConfidentialityLevel implements Serializable
     @Basic(optional = false)
     @Column(name = "description")
     private String description;
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataWarehouseConfidentialityLevel")
-    private List<SourceDataWarehouse> sourceDataWarehouses;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetConfidentialityLevel")
     private List<DataSetDefinition> dataSetDefinitions;
@@ -71,14 +68,6 @@ public class ConfidentialityLevel implements Serializable
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<SourceDataWarehouse> getSourceDataWarehouses() {
-        return sourceDataWarehouses;
-    }
-
-    public void setSourceDataWarehouse(List<SourceDataWarehouse> sourceDataWarehouses) {
-        this.sourceDataWarehouses = sourceDataWarehouses;
     }
 
     public List<DataSetDefinition> getDataSetDefinitions() {

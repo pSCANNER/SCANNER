@@ -1,9 +1,7 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
@@ -15,8 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -25,8 +21,8 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "scanner_role", schema = "scanner_registry")
-public class ScannerRole implements Serializable 
+@Table(name = "study_role", schema = "scanner_registry")
+public class StudyRole implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
@@ -37,44 +33,33 @@ public class ScannerRole implements Serializable
     @Basic(optional = false)
     @Column(name = "role_within_study")
     private String roleWithinStudy;
-    @JoinTable(name = "investigator_role", schema = "scanner_registry", 
-        joinColumns = {
-        @JoinColumn(name = "role_id", referencedColumnName = "role_id")}, inverseJoinColumns = {
-        @JoinColumn(name = "investigator_id", referencedColumnName = "user_id")})
-    @ManyToMany
-    @JsonBackReference("user-role")    
-    private List<ScannerUser> scannerUsers; 
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
-    @JsonIdentityReference(alwaysAsId=true)  
+    @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
-    private Study study;
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
-    private List<InvestigatorRole> investigatorRoles;    
-    @JsonIgnore
+    private Study study;    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<SitePolicy> sitePolicies;
-    @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<PolicyStatement> policyStatements;
-    @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
-    private List<AbstractPolicy> abstractPolicies;
+    private List<UserRole> userRoles;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    private List<StudyPolicyStatement> studyPolicyStatements;
 
-    public ScannerRole() {
+    public StudyRole() {
     }
 
-    public ScannerRole(Integer roleId) {
+    public StudyRole(Integer roleId) {
         this.roleId = roleId;
     }
 
-    public ScannerRole(Integer roleId, String roleWithinStudy) {
+    public StudyRole(Integer roleId, String roleWithinStudy) {
         this.roleId = roleId;
         this.roleWithinStudy = roleWithinStudy;
     }
 
-    public Integer getRoleId() {
+    public Integer getRole() {
         return roleId;
     }
 
@@ -90,22 +75,6 @@ public class ScannerRole implements Serializable
         this.roleWithinStudy = roleWithinStudy;
     }
 
-    public List<ScannerUser> getScannerUsers() {
-        return scannerUsers;
-    }
-
-    public void setScannerUsers(List<ScannerUser> scannerUsers) {
-        this.scannerUsers = scannerUsers;
-    }
-
-    public Study getStudy() {
-        return study;
-    }
-
-    public void setStudy(Study study) {
-        this.study = study;
-    }
-
     public List<SitePolicy> getSitePolicies() {
         return sitePolicies;
     }
@@ -114,30 +83,38 @@ public class ScannerRole implements Serializable
         this.sitePolicies = sitePolicies;
     }
 
-    public List<PolicyStatement> getPolicyStatements() {
+    public List<PolicyStatement> getPolicyStatement() {
         return policyStatements;
     }
 
-    public void setPolicyStatements(List<PolicyStatement> policyStatements) {
+    public void setPolicyStatement(List<PolicyStatement> policyStatements) {
         this.policyStatements = policyStatements;
     }
 
-    public List<AbstractPolicy> getAbstractPolicies() {
-        return abstractPolicies;
+    public Study getStudy() {
+        return study;
     }
 
-    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
-        this.abstractPolicies = abstractPolicies;
+    public void setStudyId(Study study) {
+        this.study = study;
     }
 
-    public List<InvestigatorRole> getInvestigatorRoles() {
-        return investigatorRoles;
+    public List<UserRole> getUserRoles() {
+        return userRoles;
     }
 
-    public void setInvestigatorRoles(List<InvestigatorRole> investigatorRoles) {
-        this.investigatorRoles = investigatorRoles;
+    public void setUserRoles(List<UserRole> userRoles) {
+        this.userRoles = userRoles;
     }
-    
+
+    public List<StudyPolicyStatement> getStudyPolicyStatements() {
+        return studyPolicyStatements;
+    }
+
+    public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
+        this.studyPolicyStatements = studyPolicyStatements;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -148,10 +125,10 @@ public class ScannerRole implements Serializable
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof ScannerRole)) {
+        if (!(object instanceof StudyRole)) {
             return false;
         }
-        ScannerRole other = (ScannerRole) object;
+        StudyRole other = (StudyRole) object;
         if ((this.roleId == null && other.roleId != null) || (this.roleId != null && !this.roleId.equals(other.roleId))) {
             return false;
         }
@@ -160,7 +137,7 @@ public class ScannerRole implements Serializable
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.ScannerRole[ roleId=" + roleId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.StudyRole[ roleId=" + roleId + " ]";
     }
     
 }

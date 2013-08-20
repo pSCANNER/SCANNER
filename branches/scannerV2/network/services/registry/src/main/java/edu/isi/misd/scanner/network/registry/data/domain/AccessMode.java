@@ -34,7 +34,7 @@ public class AccessMode implements Serializable
     private List<PolicyStatement> policyStatements;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "accessMode")
-    private List<AbstractPolicy> abstractPolicies;
+    private List<StudyPolicyStatement> studyPolicyStatements;
 
     public AccessMode() {
     }
@@ -81,12 +81,12 @@ public class AccessMode implements Serializable
         this.policyStatements = policyStatements;
     }
 
-    public List<AbstractPolicy> getAbstractPolicies() {
-        return abstractPolicies;
+    public List<StudyPolicyStatement> getStudyPolicyStatements() {
+        return studyPolicyStatements;
     }
 
-    public void setAbstractPolicies(List<AbstractPolicy> abstractPolicies) {
-        this.abstractPolicies = abstractPolicies;
+    public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
+        this.studyPolicyStatements = studyPolicyStatements;
     }
 
     @Override
