@@ -73,6 +73,7 @@ public class ScannerUser implements Serializable
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyOriginator")
     private List<StudyPolicyStatement> studyPolicyStatements;    
+    
     public ScannerUser() {
     }
 
@@ -226,11 +227,11 @@ public class ScannerUser implements Serializable
 //        this.dataSetInstances = dataSetInstances;
 //    }
 
-    public List<StudyPolicyStatement> getAbstractPolicies() {
+    public List<StudyPolicyStatement> getStudyPolicyStatements() {
         return studyPolicyStatements;
     }
 
-    public void setAbstractPolicies(List<StudyPolicyStatement> studyPolicyStatements) {
+    public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
         this.studyPolicyStatements = studyPolicyStatements;
     }
 
