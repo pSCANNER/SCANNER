@@ -38,19 +38,27 @@ INSERT INTO tool_library (library_name, version, description) VALUES
 ('GLORE', '1', 'Executes Virtually Pooled Analysis Across Multiple Sites'),
 ('OCEANS', '1', 'Executes meta-regression across multple sites');
 
-INSERT INTO analysis_tool (tool_name, Tool_Parent_Library_ID, Tool_Description, Input_Format_Specifications, Output_Format_Specifications, Information_Email) VALUES
-('lr', 1, 'Virtually pooled logistic regression ', '', '', 'x1jiang@ucsd.edu'),
-('lr', 2, 'Meta-regression with logit', '', '', 'michael.matheny@vanderbilt.edu');
+INSERT INTO analysis_tool (tool_name, tool_path, Tool_Parent_Library_ID, Tool_Description, Input_Format_Specifications, Output_Format_Specifications, Information_Email) VALUES
+('Logistic Regression', '/oceans/lr', 1, 'Meta-regression with logit', '', '', 'michael.matheny@vanderbilt.edu'),
+('Logistic Regression', '/glore/lr', 2, 'Virtually pooled logistic regression ', '', '', 'x1jiang@ucsd.edu');
 
-INSERT INTO data_set_definition (Data_Description_XML, Data_Processing_XML, Data_Processing_Program, Author_UID, Originating_Study_ID, Data_Set_Confidentiality_Level) VALUES
-('placeholder value', null, null, 1, 1, 100),
-('placeholder value', null, null, 2, 2, 100);
+INSERT INTO data_set_definition (data_set_name, Data_Description_XML, Data_Processing_XML, Data_Processing_Program, Author_UID, Originating_Study_ID, Data_Set_Confidentiality_Level) VALUES
+('MTM Sample Dataset','placeholder value', null, null, 1, 1, 100),
+('BEARI Sample Dataset','placeholder value', null, null, 2, 2, 100);
+
+INSERT INTO data_set_instance (Data_Set_Definition_ID, node_id, data_source) VALUES
+(1, 2, 'MTM_SIMULATED_ALTAMED.csv'),
+(1, 3, 'MTM_SIMULATED_RAND.csv'),
+(1, 4, 'MTM_SIMULATED_UCSD.csv');
 
 INSERT INTO study_policy_statement (study_id, data_set_definition_id, policy_authority, policy_originator, attestation, role_id, analysis_tool_id, access_mode, policy_status_id) VALUES
-(1, 1, 400, 1, ' Data Set Instance X of DataSetDefinition 1 will be analyzed with with GLORE logistic regression in a mode with approval before transfer of aggregate/patient-level data at node X.  ', 1, 1, 0, 1),
-(1, 1, 400, 1, ' Data Set Instance X of DataSetDefinition 1 will be analyzed with with GLORE logistic regression in a mode without approval before transfer of aggregate/patient-level data at node X.  ', 1, 1, 0, 1);
+(1, 1, 400, 1, ' DataSetDefinition 1 will be analyzed with with OCEANS logistic regression in a mode with approval before transfer of aggregate/patient-level data at node X.  ', 1, 2, 0, 1),
+(1, 1, 400, 1, ' DataSetDefinition 1 will be analyzed with with OCEANS logistic regression in a mode without approval before transfer of aggregate/patient-level data at node X.  ', 1, 2, 0, 1);
 
-INSERT INTO data_set_instance (Data_Set_Definition_ID, node_id, data_source, Curator_UID, Study_ID) VALUES
-(1, 2, 'MTM_SIMULATED_ALTAMED.csv', 1, 1),
-(1, 3, 'MTM_SIMULATED_RAND.csv', 3, 1),
-(1, 4, 'MTM_SIMULATED_UCSD.csv', 2, 1);
+INSERT INTO policy_statement (data_set_instance_id, role_id, analysis_tool_id, access_mode_id, policy_status_type_id, parent_study_policy_statement_id) VALUES
+(1,1,1,1,0,1),
+(2,1,1,1,0,1),
+(3,1,1,1,0,1),
+(1,1,2,1,0,2),
+(2,1,2,1,0,2),
+(3,1,2,1,0,2);

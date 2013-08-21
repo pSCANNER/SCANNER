@@ -34,7 +34,7 @@ public class ToolLibraryTest
     private static final String LIBRARY_VERSION = "1";
     private static final String TOOL_NAME = "Test Tool";
     private static final String TOOL_DESC = "Unit test tool instance";
-    private static final Integer TOOL_CURATOR_ID = 1;
+    private static final String TOOL_PATH = "/tool/path";
     private static final String TOOL_INFORMATION_EMAIL = "nobody@localhost";
     private static final String TOOL_INPUT_FORMAT_SPEC = 
         "Unit test input specifications";
@@ -56,6 +56,7 @@ public class ToolLibraryTest
       
         tool.setToolName(TOOL_NAME);
         tool.setToolDescription(TOOL_DESC);
+        tool.setToolPath(TOOL_PATH);
         tool.setInformationEmail(TOOL_INFORMATION_EMAIL);
         tool.setInputFormatSpecifications(TOOL_INPUT_FORMAT_SPEC);
         tool.setOutputFormatSpecifications(TOOL_OUTPUT_FORMAT_SPEC);
@@ -86,7 +87,9 @@ public class ToolLibraryTest
                      savedToolLibrary.getAnalysisTools().get(0).getToolName());   
 		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolDescription(),
                      savedToolLibrary.getAnalysisTools().get(0).getToolDescription());  
-		assertEquals(toolLibrary.getAnalysisTools().get(0).getInformationEmail(),
+		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolPath(),
+                     savedToolLibrary.getAnalysisTools().get(0).getToolPath());
+        assertEquals(toolLibrary.getAnalysisTools().get(0).getInformationEmail(),
                      savedToolLibrary.getAnalysisTools().get(0).getInformationEmail());    
 		assertEquals(toolLibrary.getAnalysisTools().get(0).getInputFormatSpecifications(),
                      savedToolLibrary.getAnalysisTools().get(0).getInputFormatSpecifications());           

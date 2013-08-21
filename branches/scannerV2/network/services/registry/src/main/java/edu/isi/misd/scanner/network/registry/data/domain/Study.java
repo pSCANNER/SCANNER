@@ -65,6 +65,12 @@ public class Study implements Serializable
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser principalInvestigator;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudy")
+    private List<DataSetDefinition> dataSetDefinitions;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
+    private List<StudyPolicyStatement> studyPolicyStatements;
 
     public Study() {
     }
@@ -147,7 +153,7 @@ public class Study implements Serializable
         return studyStatusType;
     }
 
-    public void setStudyStatusTypeId(StudyStatusType studyStatusType) {
+    public void setStudyStatusType(StudyStatusType studyStatusType) {
         this.studyStatusType = studyStatusType;
     }
 
@@ -155,7 +161,7 @@ public class Study implements Serializable
         return principalInvestigator;
     }
 
-    public void setPrincipalInvestigatorUid(ScannerUser principalInvestigator) {
+    public void setPrincipalInvestigator(ScannerUser principalInvestigator) {
         this.principalInvestigator = principalInvestigator;
     }
     
@@ -165,6 +171,22 @@ public class Study implements Serializable
 
     public void setStudyRoles(List<StudyRole> studyRoles) {
         this.studyRoles = studyRoles;
+    }
+
+    public List<DataSetDefinition> getDataSetDefinitions() {
+        return dataSetDefinitions;
+    }
+
+    public void setDataSetDefinition(List<DataSetDefinition> dataSetDefinitions) {
+        this.dataSetDefinitions = dataSetDefinitions;
+    }
+
+    public List<StudyPolicyStatement> getStudyPolicyStatements() {
+        return studyPolicyStatements;
+    }
+
+    public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
+        this.studyPolicyStatements = studyPolicyStatements;
     }
     
     @Override

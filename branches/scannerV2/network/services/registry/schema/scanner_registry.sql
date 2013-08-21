@@ -87,18 +87,6 @@ CREATE TABLE IF NOT EXISTS user_role (
   unique (User_ID, role_id)
 );
 
-/*
-create or replace view user_study_view as
-  select distinct i.user_id::text || '-' || r.study_id::text as user_study_id,
-  u.user_id,
-  u.user_name,
-  s.study_id,
-  s.study_name
-  from user_role i join scanner_user u on i.user_id = u.user_id
-  join study_role r on r.role_id = i.role_id
-  join study s on s.study_id = r.role_id;
-*/
-
 create table if not exists tool_library (
   library_id serial not null primary key,
   library_name text not null,
@@ -110,6 +98,7 @@ create table if not exists tool_library (
 CREATE TABLE IF NOT EXISTS analysis_tool (
   tool_id serial NOT NULL primary key,
   tool_name text not null,
+  tool_path text not null,
   tool_parent_library_id integer NOT NULL references tool_library(library_id),
   tool_description text NOT NULL,
   input_format_specifications text NOT NULL,
@@ -120,6 +109,7 @@ CREATE TABLE IF NOT EXISTS analysis_tool (
 
 CREATE TABLE IF NOT EXISTS data_set_definition (
   data_set_definition_id serial NOT NULL primary key,
+  data_set_name text not null unique,
   data_description_xml text not null,
   data_processing_xml text,
   data_processing_program text,
@@ -170,9 +160,7 @@ CREATE TABLE IF NOT EXISTS data_set_instance (
   data_set_instance_id serial NOT NULL primary key,
   data_set_definition_id integer NOT NULL references data_set_definition(data_set_definition_id),
   node_id integer not null references node(node_id),
-  data_source text NOT NULL,
-  curator_uid integer NOT NULL references scanner_user(user_id),
-  study_id integer NOT NULL references study(study_id)
+  data_source text NOT NULL
 );
 
 create table if not exists policy_statement (

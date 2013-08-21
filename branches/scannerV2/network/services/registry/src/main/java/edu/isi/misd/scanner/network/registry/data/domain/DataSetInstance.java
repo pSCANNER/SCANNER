@@ -38,16 +38,6 @@ public class DataSetInstance implements Serializable
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetInstance")
     private Set<PolicyStatement> policyStatements;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
-    @JsonIdentityReference(alwaysAsId=true)      
-    @JoinColumn(name = "study_id", referencedColumnName = "study_id")
-    @ManyToOne(optional = false)
-    private Study study;
-//    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
-//    @JsonIdentityReference(alwaysAsId=true)      
-//    @JoinColumn(name = "curator_uid", referencedColumnName = "user_id")
-//    @ManyToOne(optional = false)
-//    private ScannerUser curator;
     @JoinColumn(name = "node_id", referencedColumnName = "node_id")
     @ManyToOne(optional = false)
     private Node node;
@@ -91,22 +81,6 @@ public class DataSetInstance implements Serializable
     public void setPolicyStatements(Set<PolicyStatement> policyStatements) {
         this.policyStatements = policyStatements;
     }
-
-    public Study getStudy() {
-        return study;
-    }
-
-    public void setStudy(Study study) {
-        this.study = study;
-    }
-
-//    public ScannerUser getCurator() {
-//        return curator;
-//    }
-//
-//    public void setCurator(ScannerUser curator) {
-//        this.curator = curator;
-//    }
 
     public Node getNode() {
         return node;

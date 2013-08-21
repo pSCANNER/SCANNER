@@ -32,6 +32,9 @@ public class AnalysisTool implements Serializable
     @Basic(optional = false)
     @Column(name = "tool_name")
     private String toolName;
+    @Basic(optional = false)
+    @Column(name = "tool_path")
+    private String toolPath;    
     @Column(name = "tool_description")
     private String toolDescription;
     @Basic(optional = false)
@@ -85,7 +88,15 @@ public class AnalysisTool implements Serializable
     public void setToolName(String toolName) {
         this.toolName = toolName;
     }
+    
+    public String getToolPath() {
+        return toolPath;
+    }
 
+    public void setToolPath(String toolPath) {
+        this.toolPath = toolPath;
+    }
+    
     public String getToolDescription() {
         return toolDescription;
     }

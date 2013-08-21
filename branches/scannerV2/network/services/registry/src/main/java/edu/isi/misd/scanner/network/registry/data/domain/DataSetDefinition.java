@@ -35,6 +35,9 @@ public class DataSetDefinition implements Serializable
     @Column(name = "data_set_definition_id")
     private Integer dataSetDefinitionId;
     @Basic(optional = false)
+    @Column(name = "data_set_name")
+    private String dataSetName; 
+    @Basic(optional = false)
     @Column(name = "data_description_xml")
     private String dataDescriptionXml;
     @Column(name = "data_processing_xml")
@@ -85,6 +88,14 @@ public class DataSetDefinition implements Serializable
         this.dataSetDefinitionId = dataSetDefinitionId;
     }
 
+    public String getDataSetName() {
+        return dataSetName;
+    }
+
+    public void setDataSetName(String dataSetName) {
+        this.dataSetName = dataSetName;
+    }
+    
     public String getDataDescriptionXml() {
         return dataDescriptionXml;
     }

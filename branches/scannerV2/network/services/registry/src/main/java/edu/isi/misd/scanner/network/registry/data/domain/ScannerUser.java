@@ -67,9 +67,6 @@ public class ScannerUser implements Serializable
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
     private List<DataSetDefinition> dataSetDefinitions;
-//    @JsonIgnore    
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "curator")
-//    private List<DataSetInstance> dataSetInstances;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyOriginator")
     private List<StudyPolicyStatement> studyPolicyStatements;    
@@ -218,14 +215,6 @@ public class ScannerUser implements Serializable
     public void setDataSetDefinitions(List<DataSetDefinition> dataSetDefinitions) {
         this.dataSetDefinitions = dataSetDefinitions;
     }
-
-//    public List<DataSetInstance> getDataSetInstances() {
-//        return dataSetInstances;
-//    }
-//
-//    public void setDataSetInstances(List<DataSetInstance> dataSetInstances) {
-//        this.dataSetInstances = dataSetInstances;
-//    }
 
     public List<StudyPolicyStatement> getStudyPolicyStatements() {
         return studyPolicyStatements;
