@@ -254,7 +254,7 @@
 				<artifactId>maven-jetty-plugin</artifactId>
 				<version>6.1.26</version>
 				<configuration>
-                    <contextPath>/scanner</contextPath>
+                    <contextPath>/scannerV2</contextPath>
                     <connectors>
                       <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
                         <port>8088</port>
