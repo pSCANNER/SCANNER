@@ -71,7 +71,8 @@
           <groupId>com.fasterxml.jackson.datatype</groupId>
           <artifactId>jackson-datatype-hibernate4</artifactId>
           <version>${jackson.version}</version>
-        </dependency>                                  
+        </dependency>   
+                                       
         <!-- Spring -->     
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -216,15 +217,18 @@
           <artifactId>base-common</artifactId>
           <version>${project.version}</version>
         </dependency>
-	 <dependency>
-	  <groupId>javax.annotation</groupId>
-	  <artifactId>jsr250-api</artifactId>
-	  <version>1.0</version>
-	  <scope>provided</scope>
-	 </dependency>
+        
+        <dependency>
+         <groupId>javax.annotation</groupId>
+         <artifactId>jsr250-api</artifactId>
+         <version>1.0</version>
+         <scope>provided</scope>
+        </dependency>
+        
 	</dependencies>
 
 	<build>
+        <defaultGoal>install</defaultGoal>        
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
