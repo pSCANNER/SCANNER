@@ -35,12 +35,12 @@ INSERT INTO user_role(user_id, role_id) VALUES
 (2, 6);
 
 INSERT INTO tool_library (library_name, version, description) VALUES
-('GLORE', '1', 'Executes Virtually Pooled Analysis Across Multiple Sites'),
-('OCEANS', '1', 'Executes meta-regression across multple sites');
+('OCEANS', '1', 'Executes meta-regression across multple sites'),
+('GLORE', '1', 'Executes Virtually Pooled Analysis Across Multiple Sites');
 
 INSERT INTO analysis_tool (tool_name, tool_path, Tool_Parent_Library_ID, Tool_Description, Input_Format_Specifications, Output_Format_Specifications, Information_Email) VALUES
-('Logistic Regression', '/glore/lr', 1, 'Meta-regression with logit', '', '', 'michael.matheny@vanderbilt.edu'),
-('Logistic Regression', '/oceans/lr', 2, 'Virtually pooled logistic regression ', '', '', 'x1jiang@ucsd.edu');
+('Logistic Regression', '/oceans/lr', 1, 'Meta-regression with logit', '', '', 'michael.matheny@vanderbilt.edu'),
+('Logistic Regression', '/glore/lr', 2, 'Virtually pooled logistic regression ', '', '', 'x1jiang@ucsd.edu');
 
 INSERT INTO data_set_definition (data_set_name, Data_Description_XML, Data_Processing_XML, Data_Processing_Program, Author_UID, Originating_Study_ID, Data_Set_Confidentiality_Level) VALUES
 ('MTM Sample Dataset','placeholder value', null, null, 1, 1, 100),
