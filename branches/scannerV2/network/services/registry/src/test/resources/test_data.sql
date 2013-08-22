@@ -5,7 +5,7 @@ INSERT into site (site_name) VALUES
 ('ISI');
  
 INSERT INTO node (site_id,host_url, host_port, base_path, description, is_master) VALUES
-(1, 'https://scanner.misd.isi.edu', 8888, '/scanner/query/', 'SCANNER MASTER', true),
+(1, 'https://scanner.misd.isi.edu', 9998, '/scanner/query/', 'SCANNER MASTER', true),
 (1, 'https://scanner-node1.misd.isi.edu', 8888, '/scanner/dataset/','ALTAMED SIM', false),
 (1, 'https://scanner-node2.misd.isi.edu', 8888, '/scanner/dataset/', 'RAND SIM', false),
 (1, 'https://scanner-node3.misd.isi.edu', 8888, '/scanner/dataset/', 'UCSD SIM', false);
@@ -39,8 +39,8 @@ INSERT INTO tool_library (library_name, version, description) VALUES
 ('OCEANS', '1', 'Executes meta-regression across multple sites');
 
 INSERT INTO analysis_tool (tool_name, tool_path, Tool_Parent_Library_ID, Tool_Description, Input_Format_Specifications, Output_Format_Specifications, Information_Email) VALUES
-('Logistic Regression', '/oceans/lr', 1, 'Meta-regression with logit', '', '', 'michael.matheny@vanderbilt.edu'),
-('Logistic Regression', '/glore/lr', 2, 'Virtually pooled logistic regression ', '', '', 'x1jiang@ucsd.edu');
+('Logistic Regression', '/glore/lr', 1, 'Meta-regression with logit', '', '', 'michael.matheny@vanderbilt.edu'),
+('Logistic Regression', '/oceans/lr', 2, 'Virtually pooled logistic regression ', '', '', 'x1jiang@ucsd.edu');
 
 INSERT INTO data_set_definition (data_set_name, Data_Description_XML, Data_Processing_XML, Data_Processing_Program, Author_UID, Originating_Study_ID, Data_Set_Confidentiality_Level) VALUES
 ('MTM Sample Dataset','placeholder value', null, null, 1, 1, 100),
@@ -48,8 +48,8 @@ INSERT INTO data_set_definition (data_set_name, Data_Description_XML, Data_Proce
 
 INSERT INTO data_set_instance (Data_Set_Definition_ID, node_id, data_source) VALUES
 (1, 2, 'MTM_SIMULATED_ALTAMED.csv'),
-(1, 3, 'MTM_SIMULATED_RAND.csv'),
-(1, 4, 'MTM_SIMULATED_UCSD.csv');
+(1, 3, 'MTM_SIMULATED_UCSD.csv'),
+(1, 4, 'MTM_SIMULATED_RAND.csv');
 
 INSERT INTO study_policy_statement (study_id, data_set_definition_id, policy_authority, policy_originator, attestation, role_id, analysis_tool_id, access_mode, policy_status_id) VALUES
 (1, 1, 400, 1, ' DataSetDefinition 1 will be analyzed with with OCEANS logistic regression in a mode with approval before transfer of aggregate/patient-level data at node X.  ', 1, 2, 0, 1),
