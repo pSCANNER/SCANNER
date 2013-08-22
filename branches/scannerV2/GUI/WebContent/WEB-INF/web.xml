@@ -89,7 +89,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>Query</servlet-name>
-    <servlet-class>edu.isi.misd.scanner.servlets.Query</servlet-class>
+    <servlet-class>edu.isi.misd.scanner.servlets.Analyze</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>Query</servlet-name>
