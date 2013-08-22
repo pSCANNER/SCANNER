@@ -1,5 +1,7 @@
 package edu.isi.misd.scanner.client;
 
+import java.util.List;
+
 import org.json.JSONObject;
 
 /* 
@@ -125,7 +127,7 @@ public interface RegistryClientResponse {
      * <br/>}
      * 
      */
-    public String toSites();
+    public String toSites(String dataset);
     
     /**
      * Returns a string representing a JSONObject for the parameters.
@@ -675,7 +677,7 @@ public interface RegistryClientResponse {
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;"cname":"Logistic Regression"
      * <br/>}
      */
-    public String toMethodString();
+    public String toMethodString(String func, String lib);
     
     /**
      * Returns a string representing a JSONObject for the library.
@@ -714,7 +716,7 @@ public interface RegistryClientResponse {
      * <br/>&nbsp;&nbsp;&nbsp;&nbsp;}
      * <br/>]
      */
-    public String toSiteString();
+    public String toSiteString(List<String> sites, String dataset);
     
 
     /**

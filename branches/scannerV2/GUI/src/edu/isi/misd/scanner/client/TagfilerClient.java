@@ -1845,7 +1845,7 @@ public class TagfilerClient implements RegistryClient {
 					sites.add(obj.getString("site"));
 				}
 			}
-			clientResponse = this.getSiteObject(sites);
+			clientResponse = this.getSiteObject(sites, study);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (JSONException e) {
@@ -2196,7 +2196,7 @@ public class TagfilerClient implements RegistryClient {
      * @return The client response.
      */
 	@Override
-	public RegistryClientResponse getSiteObject(List<String> sites) {
+	public RegistryClientResponse getSiteObject(List<String> sites, String study) {
 		RegistryClientResponse clientResponse = null;
 		try {
 			client.setCookieValue(cookie);

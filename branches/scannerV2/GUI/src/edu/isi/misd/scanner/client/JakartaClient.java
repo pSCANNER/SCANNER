@@ -368,7 +368,9 @@ public class JakartaClient {
      * @return the HTTP Response
      */
     private ClientURLResponse execute(HttpUriRequest request, String cookie) {
-    	setCookie(cookie, request);
+    	if (cookie != null) {
+        	setCookie(cookie, request);
+    	}
     	request.setHeader("X-Machine-Generated", "true");
     	ClientURLResponse response = null;
     	int count = 0;
@@ -377,10 +379,12 @@ public class JakartaClient {
     	while (true) {
     		try {
     			response = new ClientURLResponse(httpclient.execute(request));
-				setCookieValue(response.getCookieValue());
-				if (getCookieValue() != null) {
-	        		System.out.println("Response cookie: "+ getCookieValue());
-				}
+    			if (cookie != null) {
+    				setCookieValue(response.getCookieValue());
+    				if (getCookieValue() != null) {
+    	        		System.out.println("Response cookie: "+ getCookieValue());
+    				}
+    			}
     			break;
     		} catch (ConnectException e) {
     			// Can not connect and send the request

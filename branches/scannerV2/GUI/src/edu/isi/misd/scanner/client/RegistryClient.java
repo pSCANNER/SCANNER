@@ -664,7 +664,7 @@ public interface RegistryClient {
      *            the name of the sites; if null or empty then get all the sites.
      * @return The client response.
      */
-	public RegistryClientResponse getSiteObject(List<String> sites);
+	public RegistryClientResponse getSiteObject(List<String> sites, String study);
 	
     /**
      * Gets the contacts of the SCANNER, studies and sites.

@@ -198,7 +198,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
      * 
      */
 	@Override
-	public String toSites() {
+	public String toSites(String dataset) {
 		String result = null;
 		try {
 			String res = response.getEntityString();
@@ -836,7 +836,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
      * <br/>}
      */
 	@Override
-	public String toMethodString() {
+	public String toMethodString(String func, String lib) {
 		return toResource();
 	}
 	
@@ -905,7 +905,7 @@ public class TagfilerClientResponse implements RegistryClientResponse {
      * <br/>]
      */
 	@Override
-	public String toSiteString() {
+	public String toSiteString(List<String> sites, String dataset) {
 		return response.getEntityString();
 	}
 	

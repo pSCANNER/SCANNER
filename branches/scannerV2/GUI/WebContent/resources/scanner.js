@@ -1855,7 +1855,7 @@ function loginRegistry() {
 function postLoginRegistry(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
-		setContacts(res['contacts']);
+		//setContacts(res['contacts']);
 		renderAvailableStudies();
 		renderSitesStatus();
 	} else {
@@ -2988,8 +2988,9 @@ function manageSites() {
 
 function getSiteName(siteName, url) {
 	url = url.split('//');
+	var protocol = url[0] + '//';
 	url = url[1].split('/');
-	var value = sitesMap[url[0]];
+	var value = sitesMap[protocol + url[0]];
 	if (value != null) {
 		siteName = value;
 	}

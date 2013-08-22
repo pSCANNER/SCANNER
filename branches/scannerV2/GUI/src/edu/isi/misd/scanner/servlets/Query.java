@@ -174,7 +174,7 @@ public class Query extends HttpServlet {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset);
-			String ret = clientResponse.toSites();
+			String ret = clientResponse.toSites(dataset);
 			clientResponse.release();
 			System.out.println("Get Sites:\n"+ret);
 			PrintWriter out = response.getWriter();
@@ -266,7 +266,7 @@ public class Query extends HttpServlet {
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("rURL");
 					clientResponse = registryClient.getMethodObject(func, lib);
-					res = clientResponse.toMethodString();
+					res = clientResponse.toMethodString(func, lib);
 					clientResponse.release();
 					System.out.println("method string: " + res);
 					temp = new JSONObject(res);
@@ -287,8 +287,8 @@ public class Query extends HttpServlet {
 							}
 						}
 					}
-					clientResponse = registryClient.getSiteObject(values);
-					res = clientResponse.toSiteString();
+					clientResponse = registryClient.getSiteObject(values, study);
+					res = clientResponse.toSiteString(values, dataset);
 					clientResponse.release();
 					System.out.println("site string: " + res);
 					HashMap<String, String> sitesMap = new HashMap<String, String>();
@@ -411,7 +411,7 @@ public class Query extends HttpServlet {
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("rURL");
 					clientResponse = registryClient.getMethodObject(func, lib);
-					res = clientResponse.toMethodString();
+					res = clientResponse.toMethodString(func, lib);
 					clientResponse.release();
 					System.out.println("method string: " + res);
 					temp = new JSONObject(res);
@@ -432,8 +432,8 @@ public class Query extends HttpServlet {
 							}
 						}
 					}
-					clientResponse = registryClient.getSiteObject(values);
-					res = clientResponse.toSiteString();
+					clientResponse = registryClient.getSiteObject(values, study);
+					res = clientResponse.toSiteString(values, dataset);
 					clientResponse.release();
 					System.out.println("site string: " + res);
 					HashMap<String, String> sitesMap = new HashMap<String, String>();
