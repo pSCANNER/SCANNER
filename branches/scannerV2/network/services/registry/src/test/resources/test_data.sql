@@ -13,7 +13,8 @@ INSERT INTO node (site_id,host_url, host_port, base_path, description, is_master
 INSERT INTO scanner_user (user_name, email, HSPC_documents, Phone, Reports_To, Active, First_Name, Middle_Initial, Last_Name, PubMed_Author_ID, is_superuser) VALUES
 ('dmeeker', 'dmeeker@rand.org', null, '2139262658', 0, true, 'Daniella', 'EP', 'Meeker', NULL, true),
 ('laura', 'laura@isi.edu', null, null, 0, true, 'Laura', NULL, 'Pearlman', NULL, true),
-('mdarcy', 'mdarcy@isi.edu', null, null, 0, true, 'Mike', NULL, 'D''Arcy', NULL, true);
+('mdarcy', 'mdarcy@isi.edu', null, null, 0, true, 'Mike', NULL, 'D''Arcy', NULL, true),
+('serban', 'serban@isi.edu', null, null, 0, true, 'Serban', NULL, 'Voinea', NULL, true);
 
 INSERT INTO study (study_name,IRB_ID, Protocol, Principal_Investigator_UID, Start_Date, End_Date, Clinical_Trials_ID, Analysis_Plan, study_status_type_id) VALUES
 ('MTM', 1, 'Analyze MTM data on multiple sites with both OCEANS and GLORE', 1, '2013-08-15', '2013-08-15', 0, 'Very Important Analysis on Multiple Sites',1),
@@ -32,7 +33,9 @@ INSERT INTO user_role(user_id, role_id) VALUES
 (2, 3),
 (3, 3),
 (1, 4),
-(2, 6);
+(2, 6),
+(4, 1),
+(4, 4);
 
 INSERT INTO tool_library (library_name, version, description) VALUES
 ('OCEANS', '1', 'Executes meta-regression across multple sites'),
