@@ -22,4 +22,14 @@ public interface DataSetInstanceRepository
     List<DataSetInstance> findDataSetInstancesForDataSetIdAndUserName(
         @Param("dataSetId")Integer dataSetId,
         @Param("userName")String userName); 
+
+    @Query("SELECT DISTINCT i from DataSetInstance i " +  
+           "JOIN i.dataSetDefinition d JOIN i.policyStatements p " + 
+           "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
+           "WHERE d.dataSetName = :dataSetName " + 
+           "AND u.userName = :userName " +
+           "AND p.policyStatusType.policyStatusTypeName = 'active'")
+    List<DataSetInstance> findDataSetInstancesForDataSetNameAndUserName(
+        @Param("dataSetName")String dataSetName,
+        @Param("userName")String userName); 
 }
