@@ -48,8 +48,8 @@ INSERT INTO data_set_definition (data_set_name, Data_Description_XML, Data_Proce
 
 INSERT INTO data_set_instance (Data_Set_Definition_ID, node_id, data_source) VALUES
 (1, 2, 'MTM_SIMULATED_ALTAMED.csv'),
-(1, 3, 'MTM_SIMULATED_UCSD.csv'),
-(1, 4, 'MTM_SIMULATED_RAND.csv');
+(1, 3, 'MTM_SIMULATED_RAND.csv'),
+(1, 4, 'MTM_SIMULATED_UCSD.csv');
 
 INSERT INTO study_policy_statement (study_id, data_set_definition_id, policy_authority, policy_originator, attestation, role_id, analysis_tool_id, access_mode, policy_status_id) VALUES
 (1, 1, 400, 1, ' DataSetDefinition 1 will be analyzed with with OCEANS logistic regression in a mode with approval before transfer of aggregate/patient-level data at node X.  ', 1, 2, 0, 1),
