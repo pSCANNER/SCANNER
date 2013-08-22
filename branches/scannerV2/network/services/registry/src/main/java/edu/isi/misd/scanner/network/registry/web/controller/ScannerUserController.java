@@ -2,11 +2,13 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.ScannerUser;
 import edu.isi.misd.scanner.network.registry.data.repository.ScannerUserRepository;
+import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,15 +33,25 @@ public class ScannerUserController extends BaseController
     private static final Log log = 
         LogFactory.getLog(ScannerUserController.class.getName());
     
+    public static final String REQUEST_PARAM_USER_NAME = "userName";
+    
     @Autowired
     private ScannerUserRepository scannerUserRepository;   
     
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	public @ResponseBody List<ScannerUser> getScannerUsers(
-           @RequestParam(value="userName", required=false) String userName)
+           @RequestParam Map<String, String> paramMap) 
     {
-        List<ScannerUser> users = new ArrayList<ScannerUser>();
+        String userName = null;
+        if (!paramMap.isEmpty()) 
+        {
+            userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
+            if (!paramMap.isEmpty()) {
+                throw new BadRequestException(paramMap.keySet());
+            }            
+        }
         
+        List<ScannerUser> users = new ArrayList<ScannerUser>();        
         if (userName != null) {
             ScannerUser user = scannerUserRepository.findByUserName(userName);
             if (user == null) {

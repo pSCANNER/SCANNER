@@ -59,8 +59,8 @@ public class DataSetDefinition implements Serializable
     @JoinColumn(name = "data_set_confidentiality_level", referencedColumnName = "level_id")
     @ManyToOne(optional = false)
     private ConfidentialityLevel dataSetConfidentialityLevel;
-    @JsonManagedReference("DataSetDefinition-DataSetInstance")
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition", fetch=FetchType.EAGER)
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition")
     private Set<DataSetInstance> dataSetInstances;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition")

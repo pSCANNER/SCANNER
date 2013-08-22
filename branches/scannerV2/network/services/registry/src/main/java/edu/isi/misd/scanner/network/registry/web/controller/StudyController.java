@@ -2,11 +2,13 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import edu.isi.misd.scanner.network.registry.data.repository.StudyRepository;
+import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,17 +33,31 @@ public class StudyController extends BaseController
     private static final Log log = 
         LogFactory.getLog(StudyController.class.getName());
     
+    public static final String REQUEST_PARAM_STUDY_NAME = "studyName";
+    public static final String REQUEST_PARAM_USER_NAME = "userName";
+    public static final String REQUEST_PARAM_USER_ID = "userId";    
+    
     @Autowired
     private StudyRepository studyRepository;   
     
 	@RequestMapping(value = "/studies", method = RequestMethod.GET)
 	public @ResponseBody List<Study> getStudies(
-           @RequestParam(value="studyName", required=false) String studyName,
-           @RequestParam(value="userId", required=false) Integer userId,
-           @RequestParam(value="userName", required=false) String userName)
+           @RequestParam Map<String, String> paramMap) 
     {
-        List<Study> studies = new ArrayList<Study>();
+        String studyName = null;
+        String userName = null;
+        String userId = null;
+        if (!paramMap.isEmpty()) 
+        {
+            studyName = paramMap.remove(REQUEST_PARAM_STUDY_NAME);            
+            userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
+            userId = paramMap.remove(REQUEST_PARAM_USER_ID);            
+            if (!paramMap.isEmpty()) {
+                throw new BadRequestException(paramMap.keySet());
+            }            
+        }
         
+        List<Study> studies = new ArrayList<Study>();        
         if (studyName != null) {
             Study study = studyRepository.findByStudyName(studyName);
             if (study == null) {
@@ -49,11 +65,15 @@ public class StudyController extends BaseController
             }
             studies.add(study);
         } else if (userId != null) {
-            return 
-                studyRepository.findStudiesForUserId(userId);
+            Integer id;
+            try {
+                id = Integer.parseInt(userId);
+            } catch (NumberFormatException nfe) {
+                throw new BadRequestException(nfe.toString());
+            }
+            return studyRepository.findStudiesForUserId(id);
         } else if (userName != null) {
-            return 
-                studyRepository.findStudiesForUserName(userName);
+            return studyRepository.findStudiesForUserName(userName);
         } else {
             Iterator iter = studyRepository.findAll().iterator();
             CollectionUtils.addAll(studies, iter);      

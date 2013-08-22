@@ -3,11 +3,13 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
 import edu.isi.misd.scanner.network.registry.data.repository.DataSetDefinitionRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +34,9 @@ public class DataSetDefinitionController extends BaseController
     private static final Log log = 
         LogFactory.getLog(DataSetDefinitionController.class.getName());
 
+    public static final String REQUEST_PARAM_STUDY_NAME = "studyName";
+    public static final String REQUEST_PARAM_USER_NAME = "userName";
+    
     @Autowired    
     private RegistryService registryService;    
     @Autowired
@@ -39,18 +44,37 @@ public class DataSetDefinitionController extends BaseController
     
 	@RequestMapping(value = "/datasets", method = RequestMethod.GET)
 	public @ResponseBody List<DataSetDefinition> getDataSetDefinitions(
-           @RequestParam(value="studyName", required=false) String studyName) 
+           @RequestParam Map<String, String> paramMap)        
     {
-        if (studyName != null) {
-            return 
-                dataSetDefinitionRepository.findDataSetsForStudyName(studyName);
-        } else {
-            List<DataSetDefinition> dataSetDefinitions = 
-                new ArrayList<DataSetDefinition>();            
-            Iterator iter = dataSetDefinitionRepository.findAll().iterator();
-            CollectionUtils.addAll(dataSetDefinitions, iter);            
-            return dataSetDefinitions;
-        }         
+        if (!paramMap.isEmpty()) 
+        {
+            String studyName = paramMap.remove(REQUEST_PARAM_STUDY_NAME);
+            String userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
+            if (!paramMap.isEmpty()) {
+                throw new BadRequestException(paramMap.keySet());
+            }
+            if ((studyName != null) && (userName != null)) {
+                return
+                    dataSetDefinitionRepository.
+                        findDataSetsForStudyNameAndUserName(
+                            studyName, userName);
+            }
+            if (studyName != null) {
+                return 
+                    dataSetDefinitionRepository.
+                        findDataSetsForStudyName(studyName);
+            }
+            if (studyName == null) {
+                throw new BadRequestException(
+                    "Required parameter missing: " + REQUEST_PARAM_STUDY_NAME);                
+            }
+        }
+
+        List<DataSetDefinition> dataSetDefinitions = 
+            new ArrayList<DataSetDefinition>();            
+        Iterator iter = dataSetDefinitionRepository.findAll().iterator();
+        CollectionUtils.addAll(dataSetDefinitions, iter);            
+        return dataSetDefinitions;                     
 	}
     
     @RequestMapping(value = "/datasets", method = RequestMethod.POST)

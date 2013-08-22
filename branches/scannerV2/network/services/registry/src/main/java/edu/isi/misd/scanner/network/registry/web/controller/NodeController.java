@@ -2,11 +2,13 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.Node;
 import edu.isi.misd.scanner.network.registry.data.repository.NodeRepository;
+import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,13 +33,24 @@ public class NodeController extends BaseController
     private static final Log log = 
         LogFactory.getLog(NodeController.class.getName());
     
+    public static final String REQUEST_PARAM_NODE_TYPE = "nodeType";
+    
     @Autowired
     private NodeRepository nodeRepository;   
     
 	@RequestMapping(value = "/nodes", method = RequestMethod.GET)
 	public @ResponseBody List<Node> getNodes(
-           @RequestParam(value="nodeType", required=false) String nodeType) 
+           @RequestParam Map<String, String> paramMap) 
     {
+        String nodeType = null;
+        if (!paramMap.isEmpty()) 
+        {
+            nodeType = paramMap.remove(REQUEST_PARAM_NODE_TYPE);
+            if (!paramMap.isEmpty()) {
+                throw new BadRequestException(paramMap.keySet());
+            }            
+        }
+        
         Iterator iter;
         List<Node> nodes = new ArrayList<Node>();
         

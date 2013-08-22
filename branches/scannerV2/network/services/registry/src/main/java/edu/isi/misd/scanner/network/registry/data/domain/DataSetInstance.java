@@ -41,7 +41,7 @@ public class DataSetInstance implements Serializable
     @JoinColumn(name = "node_id", referencedColumnName = "node_id")
     @ManyToOne(optional = false)
     private Node node;
-    @JsonBackReference("DataSetDefinition-DataSetInstance")    
+    @JsonIgnore    
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)
     private DataSetDefinition dataSetDefinition;
