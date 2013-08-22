@@ -46,8 +46,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String getEntityString() {
-		// TODO Auto-generated method stub
-		return null;
+		return response.getEntityString();
 	}
 
 	/* (non-Javadoc)
@@ -169,15 +168,8 @@ public class ERDClientResponse implements RegistryClientResponse {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject datasetObj = arr.getJSONObject(i);
-				if (datasetObj.get("dataSetName").equals(dataset)) {
-					JSONArray dataSetInstances = datasetObj.getJSONArray("dataSetInstances");
-					for (int j=0; j < dataSetInstances.length(); j++) {
-						JSONObject dataSetInstancesObj = dataSetInstances.getJSONObject(j);
-						JSONObject node = dataSetInstancesObj.getJSONObject("node");
-						ret.put(node.getString("site") + ":" + node.getInt("nodeId"), node.getString("nodeId"));
-					}
-					break;
-				}
+				JSONObject node = datasetObj.getJSONObject("node");
+				ret.put(node.getString("site") + ":" + node.getInt("nodeId"), node.getString("nodeId"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -352,17 +344,11 @@ public class ERDClientResponse implements RegistryClientResponse {
 			JSONArray nodes = new JSONArray();
 			JSONArray datasets = new JSONArray(res);
 			for (int i=0; i < datasets.length(); i++) {
-				JSONObject obj = datasets.getJSONObject(i);
-				if (obj.get("dataSetName").equals(dataset)) {
-					JSONArray instances = obj.getJSONArray("dataSetInstances");
-					for (int j=0; j < instances.length(); j++) {
-						JSONObject instance = instances.getJSONObject(j);
-						JSONObject node = instance.getJSONObject("node");
-						String site = node.getString("site") + ":" + node.getInt("nodeId");
-						if (sites.contains(site)) {
-							nodes.put(instance);
-						}
-					}
+				JSONObject instance = datasets.getJSONObject(i);
+				JSONObject node = instance.getJSONObject("node");
+				String site = node.getString("site") + ":" + node.getInt("nodeId");
+				if (sites.contains(site)) {
+					nodes.put(instance);
 				}
 			}
 			result = nodes.toString();

@@ -213,7 +213,7 @@ public class Analyze extends HttpServlet {
 							}
 						}
 					}
-					clientResponse = registryClient.getSiteObject(values, study);
+					clientResponse = registryClient.getSites(study, dataset);
 					res = clientResponse.toSiteString(values, dataset);
 					clientResponse.release();
 					System.out.println("site string: " + res);

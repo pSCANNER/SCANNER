@@ -283,7 +283,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse getStudies() {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "studies" + getUserPredicate();
+		String url = erdURL + "studies" + getUserPredicate("?");
+		System.out.println("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -296,7 +297,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getDatasets(String study) {
 		RegistryClientResponse ret = null;
 		try {
-			String url = erdURL + "datasets?studyName=" + Utils.urlEncode(study) + getUserPredicate();
+			String url = erdURL + "datasets?studyName=" + Utils.urlEncode(study) + getUserPredicate("&");
+			System.out.println("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -312,7 +314,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getLibraries(String study, String dataset,
 			String func, String sites) {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "libraries" + getUserPredicate();
+		String url = erdURL + "libraries";
+		System.out.println("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -325,7 +328,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getMethods(String study, String dataset,
 			String lib) {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "libraries" + getUserPredicate();
+		String url = erdURL + "libraries";
+		System.out.println("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -359,10 +363,30 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getSites(String study, String dataset) {
 		RegistryClientResponse ret = null;
 		try {
-			String url = erdURL + "datasets?studyName=" + Utils.urlEncode(study) + getUserPredicate();
+			String url = erdURL + "datasets?studyName=" + Utils.urlEncode(study) + getUserPredicate("&");
+			System.out.println("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null);
 			ret = new ERDClientResponse(rsp);
+			String res = ret.getEntityString();
+			JSONArray arr = new JSONArray(res);
+			String dataSetId = null;
+			for (int i=0; i < arr.length(); i++) {
+				JSONObject obj = arr.getJSONObject(i);
+				if (obj.getString("dataSetName").equals(dataset)) {
+					dataSetId = obj.getString("dataSetDefinitionId");
+					break;
+				}
+			}
+			ret.release();
+			
+			url = erdURL + "instances?dataSetId=" + dataSetId + getUserPredicate("&");
+			System.out.println("GET: " + url);
+			rsp = get(url, (String) null);
+			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -429,7 +453,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse getMethodObject(String name, String lib) {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "libraries" + getUserPredicate();
+		String url = erdURL + "libraries";
+		System.out.println("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -450,7 +475,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse getMasterObject() {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "nodes?nodeType=master" + getUserPredicate();
+		String url = erdURL + "nodes?nodeType=master";
+		System.out.println("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -490,15 +516,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 */
 	@Override
 	public RegistryClientResponse getSiteObject(List<String> sites, String study) {
-		RegistryClientResponse ret = null;
-		try {
-			String url = erdURL + "datasets?studyName=" + Utils.urlEncode(study) + getUserPredicate();
-			ClientURLResponse rsp = get(url, (String) null);
-			ret = new ERDClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return ret;
+		return null;
 	}
 
 	/* (non-Javadoc)
@@ -534,7 +552,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	@Override
 	public RegistryClientResponse getSitesMap() {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "nodes" + getUserPredicate();
+		String url = erdURL + "nodes";
+		System.out.println("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -549,8 +568,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		return null;
 	}
 
-	protected String getUserPredicate() {
-		String ret = "";
+	protected String getUserPredicate(String prefix) {
+		String ret = prefix + "userName=" + user;
 		return ret;
 	}
 	
