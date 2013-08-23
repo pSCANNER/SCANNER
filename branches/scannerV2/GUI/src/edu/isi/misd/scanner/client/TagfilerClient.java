@@ -1735,18 +1735,16 @@ public class TagfilerClient implements RegistryClient {
      * @return The client response.
      */
 	@Override
-	public RegistryClientResponse getParameters(String func, String lib, String jsonFile) {
+	public RegistryClientResponse getParameters(String dataset, String jsonFile) {
 		RegistryClientResponse clientResponse = null;
-		try {
-			client.setCookieValue(cookie);
-			String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;parentParameter;cname;minOccurs;maxOccurs;position;parameterType;description;selected;linkedParameter;quickHelp;arrayParameter)?limit=none";
-			//ClientURLResponse rsp = client.get(url, cookie);
-			//clientResponse = new TagfilerClientResponse(rsp);
-			JSONArray jsonRsp = readParameterFile(jsonFile, lib);
-			clientResponse = new TagfilerClientResponse(jsonRsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		client.setCookieValue(cookie);
+		//String url = tagfilerURL + "/query/rtype=parameter;method=" + Utils.urlEncode(func) + ";library=" + Utils.urlEncode(lib) + "(id;parentParameter;cname;minOccurs;maxOccurs;position;parameterType;description;selected;linkedParameter;quickHelp;arrayParameter)?limit=none";
+		String url = "";
+		//ClientURLResponse rsp = client.get(url, cookie);
+		//clientResponse = new TagfilerClientResponse(rsp);
+		//JSONArray jsonRsp = readParameterFile(jsonFile, lib);
+		JSONArray jsonRsp = readParameterFile(jsonFile, dataset);
+		clientResponse = new TagfilerClientResponse(jsonRsp);
 		return clientResponse;
 	}
 

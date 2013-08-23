@@ -339,11 +339,39 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getParameters(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse getParameters(String func, String lib,
-			String jsonFile) {
+	public RegistryClientResponse getParameters(String dataset, String jsonFile) {
 		RegistryClientResponse clientResponse = null;
-		JSONArray jsonRsp = readParameterFile(jsonFile, lib);
-		clientResponse = new ERDClientResponse(jsonRsp);
+		try {
+			JSONArray jsonRsp = readParameterFile(jsonFile);
+			String url = erdURL + "variables?dataSetName=" + Utils.urlEncode(dataset);
+			System.out.println("GET: " + url);
+			ClientURLResponse rsp = get(url, (String) null);
+			RegistryClientResponse ret = new ERDClientResponse(rsp);
+			String res = ret.getEntityString();
+			JSONArray parents = new JSONArray();
+			parents.put("dependentVariableName");
+			parents.put("independentVariableName");
+			JSONArray arr = new JSONArray(res);
+			for (int i=0; i < arr.length(); i++) {
+				JSONObject obj = arr.getJSONObject(i);
+				JSONObject variable = new JSONObject();
+				variable.put("cname", obj.get("variableName"));
+				variable.put("text", obj.get("variableName"));
+				variable.put("minOccurs", 0);
+				variable.put("maxOccurs", 1);
+				variable.put("parameterType", "enum");
+				variable.put("parentParameter", parents);
+				variable.put("description", obj.get("variableDescription"));
+				variable.put("variableType", obj.get("variableType"));
+				jsonRsp.put(variable);
+			}
+			ret.release();
+			clientResponse = new ERDClientResponse(jsonRsp);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 		return clientResponse;
 	}
 
@@ -363,30 +391,11 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getSites(String study, String dataset) {
 		RegistryClientResponse ret = null;
 		try {
-			String url = erdURL + "datasets?studyName=" + Utils.urlEncode(study) + getUserPredicate("&");
+			String url = erdURL + "instances?dataSetName=" + Utils.urlEncode(dataset) + getUserPredicate("&");
 			System.out.println("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null);
 			ret = new ERDClientResponse(rsp);
-			String res = ret.getEntityString();
-			JSONArray arr = new JSONArray(res);
-			String dataSetId = null;
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject obj = arr.getJSONObject(i);
-				if (obj.getString("dataSetName").equals(dataset)) {
-					dataSetId = obj.getString("dataSetDefinitionId");
-					break;
-				}
-			}
-			ret.release();
-			
-			url = erdURL + "instances?dataSetId=" + dataSetId + getUserPredicate("&");
-			System.out.println("GET: " + url);
-			rsp = get(url, (String) null);
-			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -573,7 +582,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		return ret;
 	}
 	
-	public static JSONArray readParameterFile(String file, String lib) {
+	public static JSONArray readParameterFile(String file) {
 		JSONArray ret = null;
 		try {
 			File jsonFile = new File(file);
@@ -585,28 +594,11 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			}
 			input.close();
 			ret = new JSONArray(buff.toString());
-			for (int i=ret.length()-1; i >= 0; i--) {
-				JSONObject param = ret.getJSONObject(i);
-				JSONArray libs = param.getJSONArray("library");
-				boolean hasLib = false;
-				for (int j=0; j < libs.length(); j++) {
-					if (libs.getString(j).equals(lib)) {
-						hasLib = true;
-						break;
-					}
-				}
-				if (!hasLib) {
-					ret.remove(i);
-				}
-			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;

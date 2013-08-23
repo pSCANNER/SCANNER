@@ -124,6 +124,7 @@ var parametersDescription = null;
 var parametersBody = null;
 
 var postResult = null;
+var scrollbarWidth;
 
 /**
  * Method "contains" for the Array object
@@ -187,6 +188,7 @@ function initScanner() {
 			}
 		}
 	});
+	scrollbarWidth = getScrollbarWidth();
 	submitLogin();
 }
 
@@ -610,7 +612,7 @@ function renderAvailableParameters() {
 	if (lib != '' && lib.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && lib != emptyValue) {
 		$('#libraryHelp').html(availableLibraries[lib]);
 		var url = HOME + '/query?action=getParameters&method=' + encodeSafeURIComponent(func) + 
-			'&library=' + encodeSafeURIComponent(lib);
+			'&library=' + encodeSafeURIComponent(lib) + '&dataset=' + encodeSafeURIComponent(dataset);
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -671,6 +673,11 @@ function disableLinkedVariableName(id, linkedParameter) {
 		$('input:checkbox', $('#table_' + makeId(linkedParameter))).removeAttr('disabled');
 		$('#param_' + makeId(linkedParameter) + '_' + makeId(val)).removeAttr('checked');
 		$('#param_' + makeId(linkedParameter) + '_' + makeId(val)).attr('disabled', 'disabled');
+		if (val == '') {
+			$('#submitQueryButton').attr('disabled', 'disabled');
+		} else {
+			$('#submitQueryButton').removeAttr('disabled');
+		}
 	}
 }
 
@@ -708,11 +715,14 @@ function renderParam(div, param, index, table, select) {
 			if (select != null) {
 				var option = $('<option>');
 				option.text(metadata['cname']);
-				option.attr('value', metadata['cname']);
+				option.attr('value', metadata['text']);
 				if (metadata['selected'] != null) {
 					option.attr('selected', 'selected');
 				}
 				select.append(option);
+				option.hover(
+						function(event) {DisplaySelectTipBox(event, 'Variable Type: ' + metadata['variableType']);}, 
+						function(){HideSelectTipBox();});
 			} else {
 				var trNo = $('tr', table).length;
 				var tr = null;
@@ -2597,6 +2607,29 @@ function HideTipBox() {
 	tipBox.css('display', 'none');
 }
 
+/**
+ * Display a flyover message
+ * 
+ * @param e
+ * 	the event that triggered the flyover
+ * @param content
+ * 	the content to be displayed
+ */
+function DisplaySelectTipBox(e, content) {
+	tipBox.html(content);
+	var left = ($(e.currentTarget).position().left + $(e.currentTarget).parent().width() + scrollbarWidth) + 'px';
+	tipBox.css('left', left);
+	tipBox.css('top', String(parseInt(e.pageY - tipBox.height() - 50) + 'px'));
+	tipBox.css('display', 'block');
+}
+
+/**
+ * Hide a flyover message
+ */
+function HideSelectTipBox() {
+	tipBox.css('display', 'none');
+}
+
 function disableIndependentVariableName() {
 	var val = $('#param_dependentVariableName').val();
 	if (val != null) {
@@ -3531,3 +3564,13 @@ function cancelInstance() {
 	$('#add_instance_div').hide();
 }
 
+function getScrollbarWidth() {
+    var div = $('<div style="width:50px;height:50px;overflow:hidden;position:absolute;top:-200px;left:-200px;"><div style="height:100px;"></div>');
+    // Append our div, do our calculation and then remove it
+    $('body').append(div);
+    var w1 = $('div', div).innerWidth();
+    div.css('overflow-y', 'scroll');
+    var w2 = $('div', div).innerWidth();
+    $(div).remove();
+    return Math.ceil((w1 - w2) * 3 / 2);
+}

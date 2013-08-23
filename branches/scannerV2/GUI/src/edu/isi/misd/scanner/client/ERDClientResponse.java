@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -80,7 +81,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				ret.put(obj.getString("studyName"), obj.getString("analysisPlan"));
+				ret.put(obj.getString("studyName"), obj.getString("description"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -101,7 +102,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
-				ret.put(obj.getString("dataSetName"), obj.getString("dataSetName"));
+				ret.put(obj.getString("dataSetName"), obj.getString("description"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -476,3 +477,21 @@ public class ERDClientResponse implements RegistryClientResponse {
 	}
 
 }
+
+class JSONComparator implements Comparator<JSONObject>
+{
+
+    public int compare(JSONObject a, JSONObject b)
+    {
+		try {
+			String valA = a.getString("text");
+		    String valB = b.getString("text");
+	        return valA.compareToIgnoreCase(valB);    
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return 0;
+ 
+    }
+}
+

@@ -164,7 +164,8 @@ public class Query extends HttpServlet {
 		} else if (action.equals("getParameters")) {
 			String func = request.getParameter("method");
 			String lib = request.getParameter("library");
-			RegistryClientResponse clientResponse = registryClient.getParameters(func, lib, webContentPath + "etc/parameterTypes/LogisticRegression.json");
+			String dataset = request.getParameter("dataset");
+			RegistryClientResponse clientResponse = registryClient.getParameters(dataset, webContentPath + "etc/parameterTypes/LogisticRegression.json");
 			String ret = clientResponse.toParameters();
 			clientResponse.release();
 			System.out.println("Get Parameters:\n"+ret);

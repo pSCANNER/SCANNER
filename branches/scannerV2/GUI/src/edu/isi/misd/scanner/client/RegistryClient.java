@@ -501,7 +501,7 @@ public interface RegistryClient {
      *            the name of the library.
      * @return The client response.
      */
-	public RegistryClientResponse getParameters(String func, String lib, String jsonFile);
+	public RegistryClientResponse getParameters(String dataset, String jsonFile);
 	
     /**
      * Gets the variables of a dataset. 

@@ -1018,20 +1018,3 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 
 }
 
-class JSONComparator implements Comparator<JSONObject>
-{
-
-    public int compare(JSONObject a, JSONObject b)
-    {
-		try {
-			String valA = a.getString("cname");
-		    String valB = b.getString("cname");
-	        return valA.compareToIgnoreCase(valB);    
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return 0;
- 
-    }
-}
-
