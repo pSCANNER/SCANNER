@@ -227,7 +227,7 @@ public class Analyze extends HttpServlet {
 						String dataSource = temp.getString("dataSource");
 						JSONObject node = temp.getJSONObject("node");
 						buff.append(node.getString("hostUrl")).append(":").append(node.getString("hostPort")).append(node.getString("basePath")).append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
-						if ((node.getString("hostUrl") + ":" + node.getString("hostPort")).equals("https://scanner-node1.misd.isi.edu:8888")) {
+						if ((node.getString("hostUrl") + ":" + node.getString("hostPort")).equals("https://scanner-node1.misd.isi.edu:8888") && lib.equals("OCEANS")) {
 							buff.append("&resultsReleaseAuthReq=true");
 						}
 					}

@@ -942,6 +942,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	if (obj != null) {
 		obj['trxId'] = data['trxId'];
 		obj['complete'] = checkComplete(data['data']);
+		obj['hasError'] = checkError(data['data']);
 		index = analyzeDataStore.items.length + 1;
 		pushAnalyze(obj);
 		queryResult = dict;
@@ -2443,6 +2444,9 @@ function pushAnalyze(obj) {
 		if (obj['complete']) {
 			item.status = 'Complete';
 			item.options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
+		} else if (obj['hasError']) {
+			item.status = 'Error';
+			item.options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
 		} else {
 			item.status = 'In Progress';
 			item.options = '<a href="javascript:refreshQueryStatus(' + index + ')" >Refresh</a>';
@@ -3025,6 +3029,25 @@ function checkComplete(data) {
 		}
 	});
 	return complete;
+	
+}
+
+function checkError(data) {
+	var error = false;
+	var serviceResponse = data['ServiceResponses']['ServiceResponse'];
+	if (!$.isArray(serviceResponse)) {
+		serviceResponse = [];
+		serviceResponse.push(data['ServiceResponses']['ServiceResponse']);
+	}
+	$.each(serviceResponse, function(i, elem) {
+		var serviceResponseMetadata = elem['ServiceResponseMetadata'];
+		if (serviceResponseMetadata != null) {
+			if (serviceResponseMetadata['RequestState'] == 'Error') {
+				error = true;
+			}
+		}
+	});
+	return error;
 	
 }
 
