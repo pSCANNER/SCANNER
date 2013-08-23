@@ -1,10 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -32,6 +28,11 @@ public class DataSetInstance implements Serializable
     @Basic(optional = false)
     @Column(name = "data_set_instance_id")
     private Integer dataSetInstanceId;
+    @Basic(optional = false)
+    @Column(name = "data_set_instance_name")
+    private String dataSetInstanceName;
+    @Column(name = "description")
+    private String description;    
     @Basic(optional = false)
     @Column(name = "data_source")
     private String dataSource;
@@ -66,6 +67,22 @@ public class DataSetInstance implements Serializable
         this.dataSetInstanceId = dataSetInstanceId;
     }
 
+    public String getDataSetInstanceName() {
+        return dataSetInstanceName;
+    }
+
+    public void setDataSetInstanceName(String dataSetInstanceName) {
+        this.dataSetInstanceName = dataSetInstanceName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
     public String getDataSource() {
         return dataSource;
     }

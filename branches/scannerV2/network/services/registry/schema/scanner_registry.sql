@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS scanner_user (
 CREATE TABLE IF NOT EXISTS study (
   study_id serial NOT NULL primary key,
   study_name text NOT NULL unique,
+  description text,
   irb_id integer NOT NULL,
   protocol text,
   principal_investigator_uid integer NOT NULL references scanner_user(user_id),
@@ -27,6 +28,130 @@ CREATE TABLE IF NOT EXISTS study (
   analysis_plan text,
   study_status_type_id integer not null references study_status_type(study_status_type_id)
 );
+
+create table if not exists study_role (
+  role_id serial not null primary key,
+  study_id integer not null references study(study_id),
+  role_within_study text not null,
+  unique(study_id, role_within_study)
+);
+
+COMMENT on column study_role.role_within_study is 'PI, CO-I, PM, etc.';
+
+CREATE TABLE IF NOT EXISTS user_role (
+  user_role_id serial not null primary key,
+  user_id integer NOT NULL references scanner_user(user_id),
+  role_id integer NOT NULL references study_role(role_id),
+  unique (User_ID, role_id)
+);
+
+create table if not exists tool_library (
+  library_id serial not null primary key,
+  library_name text not null,
+  version text not null,
+  description text,
+  unique(library_name, version)
+);
+
+CREATE TABLE IF NOT EXISTS analysis_tool (
+  tool_id serial NOT NULL primary key,
+  tool_name text not null,
+  tool_path text not null,
+  tool_parent_library_id integer NOT NULL references tool_library(library_id),
+  tool_description text NOT NULL,
+  input_format_specifications text NOT NULL,
+  output_format_specifications text NOT NULL,
+  information_email text not null,
+  unique (tool_name, tool_parent_library_id)
+);
+
+CREATE TABLE IF NOT EXISTS data_set_definition (
+  data_set_definition_id serial NOT NULL primary key,
+  data_set_name text not null unique,
+  description text,
+  data_processing_xml text,
+  data_processing_program text,
+  author_uid integer references scanner_user(user_id),
+  originating_study_id integer references study(study_id),
+  data_set_confidentiality_level integer NOT NULL references confidentiality_level(level_id)
+);
+
+COMMENT on column data_set_definition.data_processing_xml is 'Daniella: Path to XML for data processing specifications';
+COMMENT on column data_set_definition.data_processing_program is 'Daniella: Path to SQL or other data processing program';
+COMMENT on column data_set_definition.author_uid is 'Daniella: UID of author';
+COMMENT on column data_set_definition.originating_study_id is 'Daniella: ID of study using this data set';
+COMMENT on column data_set_definition.data_set_confidentiality_level is 'Daniella: This is a key to the type of legal regulations this data set is subject to (safe harbor, limited data set, identified data)';
+
+create table study_policy_statement (
+  study_policy_statement_id serial not null primary key,
+  study_id integer not null references study(study_id),
+  data_set_definition_id integer not null references data_set_definition(data_set_definition_id),
+  policy_authority integer not null references data_set_policy_authority(data_set_policy_authority_id),
+  policy_originator integer not null references scanner_user(user_id),
+  attestation text,
+  role_id integer not null references study_role(role_id),
+  analysis_tool_id integer not null references analysis_tool(tool_id),
+  access_mode integer not null references access_mode(access_mode_id),
+  policy_status_id integer not null references policy_status_type(policy_status_type_id)
+);
+
+create table if not exists site (
+  site_id serial NOT NULL primary key,
+  site_name text not null unique,
+  description text
+);
+
+CREATE TABLE IF NOT EXISTS node (
+  node_id serial NOT NULL primary key,
+  site_id integer not null references site(site_id),
+  host_url text NOT NULL,
+  host_port integer NOT NULL,
+  base_path text NOT NULL,
+  description text,
+  is_master boolean NOT NULL default false
+);
+
+CREATE TABLE IF NOT EXISTS data_set_instance (
+  data_set_instance_id serial NOT NULL primary key,
+  data_set_definition_id integer NOT NULL references data_set_definition(data_set_definition_id),
+  data_set_instance_name text NOT NULL unique,
+  description text,
+  node_id integer not null references node(node_id),
+  data_source text NOT NULL
+);
+
+create table if not exists policy_statement (
+  policy_statement_id serial not null primary key,
+  data_set_instance_id integer not null references data_set_instance(data_set_instance_id),
+  role_id integer not null references study_role(role_id),
+  analysis_tool_id integer not null references analysis_tool(tool_id),
+  access_mode_id integer not null references access_mode(access_mode_id),
+  policy_status_type_id integer not null references policy_status_type(policy_status_type_id),
+  parent_study_policy_statement_id integer not null references study_policy_statement(study_policy_statement_id)
+);
+
+COMMENT on table policy_statement is 'Users in role <role_id> may run toll <tool_id> on data set instance <data_set_instance_id> in mode <access_mode> if status is active';
+
+create table if not exists site_policy (
+  site_policy_id serial not null primary key,
+  site_id integer not null references site(site_id),
+  role_id integer not null references study_role(role_id)
+);
+
+CREATE TABLE IF NOT EXISTS data_set_variable_metadata
+(
+  data_set_variable_metadata_id serial NOT NULL primary key,
+  data_set_definition integer NOT NULL references data_set_definition(data_set_definition_id),
+  variable_name text NOT NULL, 
+  variable_type text NOT NULL,
+  variable_description text, 
+  variable_options text,
+  unique (data_set_definition, variable_name)
+);
+COMMENT ON TABLE data_set_variable_metadata
+  IS 'this is information about the data set variables that can be shared across multiple studies and analysis instances';
+COMMENT ON COLUMN data_set_variable_metadata.variable_name IS 'variable name is unique wihtin data set';
+COMMENT ON COLUMN data_set_variable_metadata.variable_description IS 'this is the tooltip and description of the variable';
 
 /*
 CREATE TABLE IF NOT EXISTS dua (
@@ -70,121 +195,6 @@ CREATE TABLE IF NOT EXISTS study_data_warehouse (
 
 COMMENT ON table study_data_warehouse is 'Placeholder study/warehouse xref table.';
 */
-
-create table if not exists study_role (
-  role_id serial not null primary key,
-  study_id integer not null references study(study_id),
-  role_within_study text not null,
-  unique(study_id, role_within_study)
-);
-
-COMMENT on column study_role.role_within_study is 'PI, CO-I, PM, etc.';
-
-CREATE TABLE IF NOT EXISTS user_role (
-  user_role_id serial not null primary key,
-  user_id integer NOT NULL references scanner_user(user_id),
-  role_id integer NOT NULL references study_role(role_id),
-  unique (User_ID, role_id)
-);
-
-create table if not exists tool_library (
-  library_id serial not null primary key,
-  library_name text not null,
-  version text not null,
-  description text,
-  unique(library_name, version)
-);
-
-CREATE TABLE IF NOT EXISTS analysis_tool (
-  tool_id serial NOT NULL primary key,
-  tool_name text not null,
-  tool_path text not null,
-  tool_parent_library_id integer NOT NULL references tool_library(library_id),
-  tool_description text NOT NULL,
-  input_format_specifications text NOT NULL,
-  output_format_specifications text NOT NULL,
-  information_email text not null,
-  unique (tool_name, tool_parent_library_id)
-);
-
-CREATE TABLE IF NOT EXISTS data_set_definition (
-  data_set_definition_id serial NOT NULL primary key,
-  data_set_name text not null unique,
-  data_description_xml text not null,
-  data_processing_xml text,
-  data_processing_program text,
-  author_uid integer references scanner_user(user_id),
-  originating_study_id integer references study(study_id),
-  data_set_confidentiality_level integer NOT NULL references confidentiality_level(level_id)
-);
-
-COMMENT on column data_set_definition.data_description_xml is 'Daniella: Path to XML describing data';
-COMMENT on column data_set_definition.data_processing_xml is 'Daniella: Path to XML for data processing specifications';
-COMMENT on column data_set_definition.data_processing_program is 'Daniella: Path to SQL or other data processing program';
-COMMENT on column data_set_definition.author_uid is 'Daniella: UID of author';
-COMMENT on column data_set_definition.originating_study_id is 'Daniella: ID of study using this data set';
-COMMENT on column data_set_definition.data_set_confidentiality_level is 'Daniella: This is a key to the type of legal regulations this data set is subject to (safe harbor, limited data set, identified data)';
-
-create table study_policy_statement (
-  study_policy_statement_id serial not null primary key,
-  study_id integer not null references study(study_id),
-  data_set_definition_id integer not null references data_set_definition(data_set_definition_id),
-  policy_authority integer not null references data_set_policy_authority(data_set_policy_authority_id),
-  policy_originator integer not null references scanner_user(user_id),
-  attestation text,
-  role_id integer not null references study_role(role_id),
-  analysis_tool_id integer not null references analysis_tool(tool_id),
-  access_mode integer not null references access_mode(access_mode_id),
-  policy_status_id integer not null references policy_status_type(policy_status_type_id)
-);
-
-create table if not exists site (
-  site_id serial NOT NULL primary key,
-  site_name text not null unique
-);
-
--- The node table must have node_id and site_id, but Mike should feel free to change anything else
-
-CREATE TABLE IF NOT EXISTS node (
-  node_id serial NOT NULL primary key,
-  site_id integer not null references site(site_id),
-  host_url text NOT NULL,
-  host_port integer NOT NULL,
-  base_path text NOT NULL,
-  description text,
-  is_master boolean NOT NULL default false
-);
-
-
-CREATE TABLE IF NOT EXISTS data_set_instance (
-  data_set_instance_id serial NOT NULL primary key,
-  data_set_definition_id integer NOT NULL references data_set_definition(data_set_definition_id),
-  node_id integer not null references node(node_id),
-  data_source text NOT NULL
-);
-
-create table if not exists policy_statement (
-  policy_statement_id serial not null primary key,
-  data_set_instance_id integer not null references data_set_instance(data_set_instance_id),
-  role_id integer not null references study_role(role_id),
-  analysis_tool_id integer not null references analysis_tool(tool_id),
-  access_mode_id integer not null references access_mode(access_mode_id),
-  policy_status_type_id integer not null references policy_status_type(policy_status_type_id),
-  parent_study_policy_statement_id integer not null references study_policy_statement(study_policy_statement_id)
-);
-
-COMMENT on table policy_statement is 'Users in role <role_id> may run toll <tool_id> on data set instance <data_set_instance_id> in mode <access_mode> if status is active';
-
-create or replace view active_policy as
-  select s.* from policy_statement s join policy_status_type t on s.policy_status_type_id = t.policy_status_type_id
-    where t.policy_status_type_name = 'active';
-
- 
-create table if not exists site_policy (
-  site_policy_id serial not null primary key,
-  site_id integer not null references site(site_id),
-  role_id integer not null references study_role(role_id)
-);
 
 --- More Mike-owned tables
 /*

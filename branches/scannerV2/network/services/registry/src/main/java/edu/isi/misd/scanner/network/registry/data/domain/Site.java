@@ -18,7 +18,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "site", schema = "scanner_registry")
-public class Site implements Serializable {
+public class Site implements Serializable 
+{
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +29,8 @@ public class Site implements Serializable {
     @Basic(optional = false)
     @Column(name = "site_name")
     private String siteName;
+    @Column(name = "description")
+    private String description;    
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "site")
     private List<SitePolicy> sitePolicies;
@@ -63,6 +66,14 @@ public class Site implements Serializable {
         this.siteName = siteName;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
     public List<SitePolicy> getSitePolicies() {
         return sitePolicies;
     }

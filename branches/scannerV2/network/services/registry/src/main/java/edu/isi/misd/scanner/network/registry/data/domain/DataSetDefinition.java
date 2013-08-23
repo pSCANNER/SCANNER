@@ -3,7 +3,6 @@ package edu.isi.misd.scanner.network.registry.data.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
@@ -12,7 +11,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,11 +35,8 @@ public class DataSetDefinition implements Serializable
     @Basic(optional = false)
     @Column(name = "data_set_name")
     private String dataSetName; 
-    @Basic(optional = false)
-    @Column(name = "data_description_xml")
-    private String dataDescriptionXml;
-    @Column(name = "data_processing_xml")
-    private String dataProcessingXml;
+    @Column(name = "description")
+    private String description;
     @Column(name = "data_processing_program")
     private String dataProcessingProgram;
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
@@ -65,6 +60,9 @@ public class DataSetDefinition implements Serializable
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition")
     private List<StudyPolicyStatement> studyPolicyStatements;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition")
+    private List<DataSetVariableMetadata> dataSetVariableMetadata;    
 
     public DataSetDefinition() {
     }
@@ -73,11 +71,9 @@ public class DataSetDefinition implements Serializable
         this.dataSetDefinitionId = dataSetDefinitionId;
     }
 
-    public DataSetDefinition(Integer dataSetDefinitionId, String dataDescriptionXml, String dataProcessingXml, String dataProcessingProgram) {
+    public DataSetDefinition(Integer dataSetDefinitionId, String dataSetName) {
         this.dataSetDefinitionId = dataSetDefinitionId;
-        this.dataDescriptionXml = dataDescriptionXml;
-        this.dataProcessingXml = dataProcessingXml;
-        this.dataProcessingProgram = dataProcessingProgram;
+        this.dataSetName = dataSetName;
     }
 
     public Integer getDataSetDefinitionId() {
@@ -96,22 +92,14 @@ public class DataSetDefinition implements Serializable
         this.dataSetName = dataSetName;
     }
     
-    public String getDataDescriptionXml() {
-        return dataDescriptionXml;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDataDescriptionXml(String dataDescriptionXml) {
-        this.dataDescriptionXml = dataDescriptionXml;
+    public void setDescription(String description) {
+        this.description = description;
     }
-
-    public String getDataProcessingXml() {
-        return dataProcessingXml;
-    }
-
-    public void setDataProcessingXml(String dataProcessingXml) {
-        this.dataProcessingXml = dataProcessingXml;
-    }
-
+    
     public String getDataProcessingProgram() {
         return dataProcessingProgram;
     }
@@ -160,6 +148,14 @@ public class DataSetDefinition implements Serializable
         this.studyPolicyStatements = studyPolicyStatements;
     }
 
+    public List<DataSetVariableMetadata> getDataSetVariableMetadata() {
+        return dataSetVariableMetadata;
+    }
+
+    public void setDataSetVariableMetadataList(List<DataSetVariableMetadata> dataSetVariableMetadata) {
+        this.dataSetVariableMetadata = dataSetVariableMetadata;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

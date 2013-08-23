@@ -37,9 +37,11 @@ public class Study implements Serializable
     @Basic(optional = false)
     @Column(name = "study_name")
     private String studyName;
+    @Column(name = "description")
+    private String description;    
     @Basic(optional = false)
     @Column(name = "irb_id")
-    private int irbId;
+    private Integer irbId;
     @Column(name = "protocol")
     private String protocol;
     @Column(name = "start_date")
@@ -79,7 +81,7 @@ public class Study implements Serializable
         this.studyId = studyId;
     }
 
-    public Study(Integer studyId, String studyName, int irbId) {
+    public Study(Integer studyId, String studyName, Integer irbId) {
         this.studyId = studyId;
         this.studyName = studyName;
         this.irbId = irbId;
@@ -101,11 +103,19 @@ public class Study implements Serializable
         this.studyName = studyName;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
     public int getIrbId() {
         return irbId;
     }
 
-    public void setIrbId(int irbId) {
+    public void setIrbId(Integer irbId) {
         this.irbId = irbId;
     }
 
