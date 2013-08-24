@@ -1,8 +1,7 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
-import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
-import edu.isi.misd.scanner.network.registry.data.repository.ToolLibraryRepository;
-import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
+import edu.isi.misd.scanner.network.registry.data.repository.AnalysisToolRepository;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
@@ -29,23 +28,22 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * 
  */
 @Controller
-public class ToolLibraryController extends BaseController
+public class AnalysisToolController extends BaseController
 {
     private static final Log log = 
-        LogFactory.getLog(ToolLibraryController.class.getName());
+        LogFactory.getLog(AnalysisToolController.class.getName());
     
-    public static final String REQUEST_PARAM_USER_NAME = "userName";
-    public static final String REQUEST_PARAM_STUDY_NAME = "studyName";       
+    public static final String REQUEST_PARAM_USER_NAME = "userName";  
+    public static final String REQUEST_PARAM_STUDY_NAME = "studyName";      
     public static final String REQUEST_PARAM_DATASET_NAME = "dataSetName"; 
+    public static final String REQUEST_PARAM_LIBRARY_ID = "libraryId";     
     
-    @Autowired    
-    private RegistryService registryService;
     @Autowired
-    private ToolLibraryRepository toolLibraryRepository;   
+    private AnalysisToolRepository analysisToolRepository;   
     
-	@RequestMapping(value = "/libraries", method = RequestMethod.GET)
-	public @ResponseBody List<ToolLibrary> getToolLibraries(
-           @RequestParam Map<String, String> paramMap)
+	@RequestMapping(value = "/tools", method = RequestMethod.GET)
+	public @ResponseBody List<AnalysisTool> getAnalysisTools(
+           @RequestParam Map<String, String> paramMap) 
     {
         if (!paramMap.isEmpty()) 
         {
@@ -53,49 +51,64 @@ public class ToolLibraryController extends BaseController
             String userName = paramMap.remove(REQUEST_PARAM_USER_NAME);  
             if (userName == null) {
                 missingParams.add(REQUEST_PARAM_USER_NAME);
-            }
+            }   
             String studyName = paramMap.remove(REQUEST_PARAM_STUDY_NAME);
             if (studyName == null) {
                 missingParams.add(REQUEST_PARAM_STUDY_NAME);
-            }            
+            }                  
             String dataSetName = paramMap.remove(REQUEST_PARAM_DATASET_NAME);
             if (dataSetName == null) {
                 missingParams.add(REQUEST_PARAM_DATASET_NAME);
-            }            
+            }
+            String libraryId = paramMap.remove(REQUEST_PARAM_LIBRARY_ID);
+            if (libraryId == null) {
+                missingParams.add(REQUEST_PARAM_LIBRARY_ID);
+            }               
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
             }
-            if ((studyName != null) && 
-                (userName != null) && 
-                (dataSetName != null)) 
+            if ((userName != null) && 
+                (studyName != null) &&                 
+                (dataSetName != null) &&
+                (libraryId != null)) 
             {
+                Integer libId;
+                try {
+                    libId = Integer.parseInt(libraryId);
+                } catch (NumberFormatException nfe) {
+                    throw new BadRequestException(
+                        "Invalid parameter format for " + 
+                        REQUEST_PARAM_LIBRARY_ID + " - " + nfe.toString());
+                }                 
                 return
-                    toolLibraryRepository.
-                        findToolLibraryByStudyPolicyStatement(
-                            userName, studyName, dataSetName);
+                    analysisToolRepository.
+                        findAnalysisToolByPolicyStatement(
+                            userName, studyName, dataSetName, libId);
             }
-            if ((studyName == null) || 
-                (userName == null) || 
-                (dataSetName == null)) 
+            if ((userName == null) || 
+                (studyName == null) ||                
+                (dataSetName == null) ||
+                (libraryId == null)) 
             {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
             }
-        }        
-        List<ToolLibrary> toolLibraries = new ArrayList<ToolLibrary>();
-        Iterator iter = toolLibraryRepository.findAll().iterator();
+        }
+        
+        List<AnalysisTool> toolLibraries = new ArrayList<AnalysisTool>();
+        Iterator iter = analysisToolRepository.findAll().iterator();
         CollectionUtils.addAll(toolLibraries, iter);
         
         return toolLibraries;         
 	}
     
-    @RequestMapping(value = "/libraries", method = RequestMethod.POST)
+    @RequestMapping(value = "/tools", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody ToolLibrary createToolLibrary(
-           @RequestBody ToolLibrary library) 
+    public @ResponseBody AnalysisTool createAnalysisTool(
+           @RequestBody AnalysisTool tool) 
     {
         try {
-            registryService.saveToolLibrary(library);
+            analysisToolRepository.save(tool);
         } catch (DataIntegrityViolationException e) {
             log.warn("DataIntegrityViolationException: " + e);
             // throwing nested MostSpecificCause should probably be replaced
@@ -103,14 +116,14 @@ public class ToolLibraryController extends BaseController
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
-        return toolLibraryRepository.findOne(library.getLibraryId());
+        return analysisToolRepository.findOne(tool.getToolId());
     }  
     
-    @RequestMapping(value = "/libraries/{id}", method = RequestMethod.GET)
-    public @ResponseBody ToolLibrary getToolLibrary(
+    @RequestMapping(value = "/tools/{id}", method = RequestMethod.GET)
+    public @ResponseBody AnalysisTool getAnalysisTool(
            @PathVariable("id") Integer id) 
     {
-        ToolLibrary toolLib = toolLibraryRepository.findOne(id);
+        AnalysisTool toolLib = analysisToolRepository.findOne(id);
 
         if (toolLib == null) {
             throw new ResourceNotFoundException(id);
@@ -118,12 +131,12 @@ public class ToolLibraryController extends BaseController
         return toolLib;
     }  
     
-    @RequestMapping(value = "/libraries/{id}", method = RequestMethod.PUT)
-    public @ResponseBody ToolLibrary updateToolLibrary(
-           @PathVariable("id") Integer id, @RequestBody ToolLibrary library) 
+    @RequestMapping(value = "/tools/{id}", method = RequestMethod.PUT)
+    public @ResponseBody AnalysisTool updateAnalysisTool(
+           @PathVariable("id") Integer id, @RequestBody AnalysisTool tool) 
     {
         // find the requested resource
-        ToolLibrary toolLib = toolLibraryRepository.findOne(id);
+        AnalysisTool toolLib = analysisToolRepository.findOne(id);
         // if the ID is not found then throw a ResourceNotFoundException (404)
         if (toolLib == null) {
             throw new ResourceNotFoundException(id);            
@@ -131,35 +144,35 @@ public class ToolLibraryController extends BaseController
         // if the ID in the request body is null, use the ID parsed from the URL
         // if the ID is found in the request body but does not match the ID in 
         // the current data, then throw a ConflictException (409)
-        Integer updateID = library.getLibraryId();
+        Integer updateID = tool.getToolId();
         if (updateID == null) {
-            library.setLibraryId(id);
-        } else if (!library.getLibraryId().equals(toolLib.getLibraryId())) {
+            tool.setToolId(id);
+        } else if (!tool.getToolId().equals(toolLib.getToolId())) {
             throw new ConflictException(
                 "Update failed: specified object ID (" + 
-                library.getLibraryId() + 
+                tool.getToolId() + 
                 ") does not match referenced ID (" + 
-                toolLib.getLibraryId() + ")"); 
+                toolLib.getToolId() + ")"); 
         }
         // ok, good to go
         try {
-            registryService.saveToolLibrary(library);
+            analysisToolRepository.save(tool);
         } catch (DataIntegrityViolationException e) {
             log.warn("DataIntegrityViolationException: " + e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
-        return toolLibraryRepository.findOne(library.getLibraryId());
+        return analysisToolRepository.findOne(tool.getToolId());
     }     
     
-    @RequestMapping(value = "/libraries/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = "/tools/{id}", method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeToolLibrary(@PathVariable("id") Integer id) 
+    public void removeAnalysisTool(@PathVariable("id") Integer id) 
     {
-        if (!toolLibraryRepository.exists(id)) {
+        if (!analysisToolRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }
-        toolLibraryRepository.delete(id);
+        analysisToolRepository.delete(id);
     } 
   
 }

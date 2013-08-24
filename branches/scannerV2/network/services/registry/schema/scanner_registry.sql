@@ -126,7 +126,7 @@ create table if not exists policy_statement (
   role_id integer not null references study_role(role_id),
   analysis_tool_id integer not null references analysis_tool(tool_id),
   access_mode_id integer not null references access_mode(access_mode_id),
-  policy_status_type_id integer not null references policy_status_type(policy_status_type_id),
+  policy_status_id integer not null references policy_status_type(policy_status_type_id),
   parent_study_policy_statement_id integer not null references study_policy_statement(study_policy_statement_id)
 );
 

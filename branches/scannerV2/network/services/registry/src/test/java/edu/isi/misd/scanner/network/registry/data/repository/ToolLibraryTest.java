@@ -83,18 +83,18 @@ public class ToolLibraryTest
 		assertEquals(toolLibrary.getLibraryName(), savedToolLibrary.getLibraryName());   
 		assertEquals(toolLibrary.getVersion(), savedToolLibrary.getVersion());   
 		assertEquals(toolLibrary.getDescription(), savedToolLibrary.getDescription());   
-		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolName(),
-                     savedToolLibrary.getAnalysisTools().get(0).getToolName());   
-		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolDescription(),
-                     savedToolLibrary.getAnalysisTools().get(0).getToolDescription());  
-		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolPath(),
-                     savedToolLibrary.getAnalysisTools().get(0).getToolPath());
-        assertEquals(toolLibrary.getAnalysisTools().get(0).getInformationEmail(),
-                     savedToolLibrary.getAnalysisTools().get(0).getInformationEmail());    
-		assertEquals(toolLibrary.getAnalysisTools().get(0).getInputFormatSpecifications(),
-                     savedToolLibrary.getAnalysisTools().get(0).getInputFormatSpecifications());           
-		assertEquals(toolLibrary.getAnalysisTools().get(0).getOutputFormatSpecifications(),
-                     savedToolLibrary.getAnalysisTools().get(0).getOutputFormatSpecifications());           
+//		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolName(),
+//                     savedToolLibrary.getAnalysisTools().get(0).getToolName());   
+//		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolDescription(),
+//                     savedToolLibrary.getAnalysisTools().get(0).getToolDescription());  
+//		assertEquals(toolLibrary.getAnalysisTools().get(0).getToolPath(),
+//                     savedToolLibrary.getAnalysisTools().get(0).getToolPath());
+//        assertEquals(toolLibrary.getAnalysisTools().get(0).getInformationEmail(),
+//                     savedToolLibrary.getAnalysisTools().get(0).getInformationEmail());    
+//		assertEquals(toolLibrary.getAnalysisTools().get(0).getInputFormatSpecifications(),
+//                     savedToolLibrary.getAnalysisTools().get(0).getInputFormatSpecifications());           
+//		assertEquals(toolLibrary.getAnalysisTools().get(0).getOutputFormatSpecifications(),
+//                     savedToolLibrary.getAnalysisTools().get(0).getOutputFormatSpecifications());           
 	}
     
 }

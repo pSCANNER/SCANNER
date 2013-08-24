@@ -13,22 +13,22 @@ import org.springframework.data.repository.query.Param;
 public interface DataSetInstanceRepository 
     extends CrudRepository<DataSetInstance, Integer> 
 {    
-    @Query("SELECT DISTINCT i from DataSetInstance i " +  
+    @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
            "JOIN i.dataSetDefinition d JOIN i.policyStatements p " + 
            "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE d.dataSetDefinitionId = :dataSetId " + 
            "AND u.userName = :userName " +
-           "AND p.policyStatusType.policyStatusTypeName = 'active'")
+           "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
     List<DataSetInstance> findDataSetInstancesForDataSetIdAndUserName(
         @Param("dataSetId")Integer dataSetId,
         @Param("userName")String userName); 
 
-    @Query("SELECT DISTINCT i from DataSetInstance i " +  
+    @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
            "JOIN i.dataSetDefinition d JOIN i.policyStatements p " + 
            "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE d.dataSetName = :dataSetName " + 
            "AND u.userName = :userName " +
-           "AND p.policyStatusType.policyStatusTypeName = 'active'")
+           "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
     List<DataSetInstance> findDataSetInstancesForDataSetNameAndUserName(
         @Param("dataSetName")String dataSetName,
         @Param("userName")String userName); 

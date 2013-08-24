@@ -29,7 +29,7 @@ public class PolicyStatement implements Serializable
     private StudyRole role;
     @JoinColumn(name = "policy_status_type_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
-    private PolicyStatusType policyStatusType;
+    private PolicyStatusType policyStatus;
     @JoinColumn(name = "data_set_instance_id", referencedColumnName = "data_set_instance_id")
     @ManyToOne(optional = false)
     private DataSetInstance dataSetInstance;
@@ -66,12 +66,12 @@ public class PolicyStatement implements Serializable
         this.role = role;
     }
 
-    public PolicyStatusType getPolicyStatusType() {
-        return policyStatusType;
+    public PolicyStatusType getPolicyStatus() {
+        return policyStatus;
     }
 
-    public void setPolicyStatusType(PolicyStatusType policyStatusType) {
-        this.policyStatusType = policyStatusType;
+    public void setPolicyStatus(PolicyStatusType policyStatus) {
+        this.policyStatus = policyStatus;
     }
 
     public DataSetInstance getDataSetInstance() {

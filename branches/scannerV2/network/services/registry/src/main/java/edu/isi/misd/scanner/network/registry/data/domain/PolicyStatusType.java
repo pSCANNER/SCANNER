@@ -30,7 +30,7 @@ public class PolicyStatusType implements Serializable
     @Column(name = "description")
     private String description;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyStatusType")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyStatus")
     private List<PolicyStatement> policyStatements;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyStatus")
