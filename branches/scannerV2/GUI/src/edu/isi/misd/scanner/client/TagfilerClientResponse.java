@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -1014,6 +1013,12 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 			e.printStackTrace();
 		}
 		return ret;
+	}
+
+	@Override
+	public JSONArray getEntityResponse() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

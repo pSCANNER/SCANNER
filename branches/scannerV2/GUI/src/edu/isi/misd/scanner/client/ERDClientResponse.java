@@ -23,14 +23,21 @@ import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 public class ERDClientResponse implements RegistryClientResponse {
 
 	protected ClientURLResponse response;
-	protected JSONArray jsonResponse;
+	protected JSONArray entityResponse;
 
 	public ERDClientResponse(ClientURLResponse rsp) {
-		response = rsp;
+		try {
+			response = rsp;
+			String res = response.getEntityString();
+			entityResponse = new JSONArray(res);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public ERDClientResponse(JSONArray rsp) {
-		jsonResponse = rsp;
+		entityResponse = rsp;
 	}
 	
 	/* (non-Javadoc)
@@ -76,11 +83,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public String toStudies() {
 		String result = null;
 		try {
-			String res = response.getEntityString();
-			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject obj = arr.getJSONObject(i);
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject obj = entityResponse.getJSONObject(i);
 				ret.put(obj.getString("studyName"), obj.getString("description"));
 			}
 			result = ret.toString();
@@ -97,11 +102,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public String toDatasets() {
 		String result = null;
 		try {
-			String res = response.getEntityString();
-			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject obj = arr.getJSONObject(i);
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject obj = entityResponse.getJSONObject(i);
 				ret.put(obj.getString("dataSetName"), obj.getString("description"));
 			}
 			result = ret.toString();
@@ -118,11 +121,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public String toLibraries() {
 		String result = null;
 		try {
-			String res = response.getEntityString();
-			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject library = arr.getJSONObject(i);
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject library = entityResponse.getJSONObject(i);
 				ret.put(library.getString("libraryName"), library.getString("description"));
 			}
 			result = ret.toString();
@@ -139,11 +140,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public String toMethods() {
 		String result = null;
 		try {
-			String res = response.getEntityString();
-			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject library = arr.getJSONObject(i);
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject library = entityResponse.getJSONObject(i);
 				JSONArray analysisTools = library.getJSONArray("analysisTools");
 				for (int j=0; j < analysisTools.length(); j++) {
 					JSONObject tool = analysisTools.getJSONObject(j);
@@ -164,11 +163,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public String toSites(String dataset) {
 		String result = null;
 		try {
-			String res = response.getEntityString();
-			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject datasetObj = arr.getJSONObject(i);
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject datasetObj = entityResponse.getJSONObject(i);
 				JSONObject node = datasetObj.getJSONObject("node");
 				ret.put(node.getString("site") + ":" + node.getInt("nodeId"), node.getString("nodeId"));
 			}
@@ -184,7 +181,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String toParameters() {
-		JSONArray params = buildParameters(jsonResponse, null);
+		JSONArray params = buildParameters(entityResponse, null);
 		String result = params.toString();
 		return result;
 	}
@@ -286,7 +283,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public String toMasterString() {
 		String ret = null;
 		try {
-			JSONObject obj = (new JSONArray(response.getEntityString())).getJSONObject(0);
+			JSONObject obj = entityResponse.getJSONObject(0);
 			ret = obj.toString();
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -301,11 +298,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public String toMethodString(String func, String lib) {
 		String result = null;
 		try {
-			String res = response.getEntityString();
-			JSONArray arr = new JSONArray(res);
 			JSONObject ret = new JSONObject();
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject library = arr.getJSONObject(i);
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject library = entityResponse.getJSONObject(i);
 				if (library.get("libraryName").equals(lib)) {
 					JSONArray analysisTools = library.getJSONArray("analysisTools");
 					for (int j=0; j < analysisTools.length(); j++) {
@@ -341,11 +336,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public String toSiteString(List<String> sites, String dataset) {
 		String result = null;
 		try {
-			String res = response.getEntityString();
 			JSONArray nodes = new JSONArray();
-			JSONArray datasets = new JSONArray(res);
-			for (int i=0; i < datasets.length(); i++) {
-				JSONObject instance = datasets.getJSONObject(i);
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject instance = entityResponse.getJSONObject(i);
 				JSONObject node = instance.getJSONObject("node");
 				String site = node.getString("site") + ":" + node.getInt("nodeId");
 				if (sites.contains(site)) {
@@ -379,10 +372,8 @@ public class ERDClientResponse implements RegistryClientResponse {
 		try {
 			ret.put("map", map);
 			ret.put("targets", targets);
-			String res = response.getEntityString();
-			JSONArray arr = new JSONArray(res);
-			for (int i=0; i < arr.length(); i++) {
-				JSONObject obj = arr.getJSONObject(i);
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject obj = entityResponse.getJSONObject(i);
 				if (!obj.getBoolean("isMaster")) {
 					String key = obj.getString("hostUrl") + ":" + obj.getInt("hostPort");
 					String rURL = key + obj.getString("basePath");
@@ -474,6 +465,11 @@ public class ERDClientResponse implements RegistryClientResponse {
 			e.printStackTrace();
 		}
 		return ret;
+	}
+
+	@Override
+	public JSONArray getEntityResponse() {
+		return entityResponse;
 	}
 
 }

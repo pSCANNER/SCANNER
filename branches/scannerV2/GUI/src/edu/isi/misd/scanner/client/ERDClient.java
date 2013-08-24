@@ -347,11 +347,10 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			System.out.println("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null);
 			RegistryClientResponse ret = new ERDClientResponse(rsp);
-			String res = ret.getEntityString();
 			JSONArray parents = new JSONArray();
 			parents.put("dependentVariableName");
 			parents.put("independentVariableName");
-			JSONArray arr = new JSONArray(res);
+			JSONArray arr = ret.getEntityResponse();
 			for (int i=0; i < arr.length(); i++) {
 				JSONObject obj = arr.getJSONObject(i);
 				JSONObject variable = new JSONObject();

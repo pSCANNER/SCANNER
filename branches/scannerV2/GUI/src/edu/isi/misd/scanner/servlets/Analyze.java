@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -21,11 +20,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.isi.misd.scanner.client.ERDClient;
-import edu.isi.misd.scanner.client.JakartaClient;
+import edu.isi.misd.scanner.client.ERDClientResponse;
 import edu.isi.misd.scanner.client.RegistryClient;
 import edu.isi.misd.scanner.client.RegistryClientResponse;
 import edu.isi.misd.scanner.client.ScannerClient;
-import edu.isi.misd.scanner.client.TagfilerClient;
 import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 import edu.isi.misd.scanner.utils.Utils;
 
@@ -46,6 +44,10 @@ public class Analyze extends HttpServlet {
        
 	private String erdURL;
 	private String webContentPath;
+	private JSONArray retrievedStudies;
+	private JSONArray retrievedDatasets;
+	private JSONArray retrievedLibraries;
+	private JSONArray retrievedDatasetInstances;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -94,6 +96,7 @@ public class Analyze extends HttpServlet {
 		}
 		if (action.equals("getStudies")) {
 			RegistryClientResponse clientResponse = registryClient.getStudies();
+			retrievedStudies = clientResponse.getEntityResponse();
 			String ret = clientResponse.toStudies();
 			clientResponse.release();
 			System.out.println("Analyze Get Studies:\n"+ret);
@@ -102,6 +105,7 @@ public class Analyze extends HttpServlet {
 		} else if (action.equals("getDatasets")) {
 			String study = request.getParameter("study");
 			RegistryClientResponse clientResponse = registryClient.getDatasets(study);
+			retrievedDatasets = clientResponse.getEntityResponse();
 			String ret = clientResponse.toDatasets();
 			clientResponse.release();
 			System.out.println("Analyze Get Datasets: "+ret);
@@ -113,6 +117,7 @@ public class Analyze extends HttpServlet {
 			String sites = request.getParameter("site");
 			String func = request.getParameter("method");
 			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset, func, sites);
+			retrievedLibraries = clientResponse.getEntityResponse();
 			String ret = clientResponse.toLibraries();
 			clientResponse.release();
 			System.out.println("Analyze Get Libraries: "+ret);
@@ -129,8 +134,6 @@ public class Analyze extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getParameters")) {
-			String func = request.getParameter("method");
-			String lib = request.getParameter("library");
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getParameters(dataset, webContentPath + "etc/parameterTypes/LogisticRegressionBase.json");
 			String ret = clientResponse.toParameters();
@@ -142,6 +145,7 @@ public class Analyze extends HttpServlet {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset);
+			retrievedDatasetInstances = clientResponse.getEntityResponse();
 			String ret = clientResponse.toSites(dataset);
 			clientResponse.release();
 			System.out.println("Analyze Get Sites:\n"+ret);
@@ -190,15 +194,15 @@ public class Analyze extends HttpServlet {
 					String sites = request.getParameter("sites");
 					String lib = request.getParameter("library");
 					String func = request.getParameter("method");
-					String study = request.getParameter("study");
 					String dataset = request.getParameter("dataset");
+					String study = request.getParameter("study");
 					RegistryClientResponse clientResponse = registryClient.getMasterObject();
 					String res = clientResponse.toMasterString();
 					clientResponse.release();
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("hostUrl") + ":" + temp.getString("hostPort") + temp.getString("basePath");
-					clientResponse = registryClient.getMethodObject(func, lib);
+					clientResponse = new ERDClientResponse(retrievedLibraries);
 					res = clientResponse.toMethodString(func, lib);
 					clientResponse.release();
 					System.out.println("method string: " + res);
@@ -214,7 +218,7 @@ public class Analyze extends HttpServlet {
 							}
 						}
 					}
-					clientResponse = registryClient.getSites(study, dataset);
+					clientResponse = new ERDClientResponse(retrievedDatasetInstances);
 					res = clientResponse.toSiteString(values, dataset);
 					clientResponse.release();
 					System.out.println("site string: " + res);
@@ -240,6 +244,11 @@ public class Analyze extends HttpServlet {
 					ClientURLResponse rsp = null;
 					String rspId = null;
 					obj = new JSONObject();
+					System.out.println("Study Id: " + getStudyId(study));
+					System.out.println("Dataset Id: " + getDatasetId(dataset));
+					System.out.println("Library Id: " + getLibraryId(lib));
+					System.out.println("Method Id: " + getMethodId(lib, func));
+					System.out.println("Dataset Instances Ids: " + getDatasetInstancesIds(values));
 					if (trxId != null) {
 						// check that the user authorization for this trxId
 						boolean isAuthorized = false;
@@ -273,7 +282,6 @@ public class Analyze extends HttpServlet {
 							}
 							temp = targets.getJSONObject(i);
 							temp = targets.getJSONObject(i);
-							String dataSource = temp.getString("dataSource");
 							JSONObject node = temp.getJSONObject("node");
 							buff.append(node.getString("hostUrl")).append(":").append(node.getString("hostPort")).append(node.getString("basePath")).append(funcPath);
 						}
@@ -341,6 +349,96 @@ public class Analyze extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		String text = obj.toString();
 		out.print(text);
+	}
+	
+	int getStudyId(String studyName) {
+		int ret = -1;
+		try {
+			for (int i=0; i < retrievedStudies.length(); i++) {
+				JSONObject obj = retrievedStudies.getJSONObject(i);
+				if (obj.getString("studyName").equals(studyName)) {
+					ret = obj.getInt("studyId");
+					break;
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	int getDatasetId(String dataSetName) {
+		int ret = -1;
+		try {
+			for (int i=0; i < retrievedDatasets.length(); i++) {
+				JSONObject obj = retrievedDatasets.getJSONObject(i);
+				if (obj.getString("dataSetName").equals(dataSetName)) {
+					ret = obj.getInt("dataSetDefinitionId");
+					break;
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	int getLibraryId(String libraryName) {
+		int ret = -1;
+		try {
+			for (int i=0; i < retrievedLibraries.length(); i++) {
+				JSONObject obj = retrievedLibraries.getJSONObject(i);
+				if (obj.getString("libraryName").equals(libraryName)) {
+					ret = obj.getInt("libraryId");
+					break;
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	int getMethodId(String libraryName, String toolName) {
+		int ret = -1;
+		try {
+			JSONObject lib = null;
+			for (int i=0; i < retrievedLibraries.length(); i++) {
+				JSONObject obj = retrievedLibraries.getJSONObject(i);
+				if (obj.getString("libraryName").equals(libraryName)) {
+					lib = obj;
+					break;
+				}
+			}
+			JSONArray analysisTools = lib.getJSONArray("analysisTools");
+			for (int i=0; i < analysisTools.length(); i++) {
+				JSONObject obj = analysisTools.getJSONObject(i);
+				if (obj.getString("toolName").equals(toolName)) {
+					ret = obj.getInt("toolId");
+					break;
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	JSONArray getDatasetInstancesIds(ArrayList<String> values) {
+		JSONArray ret = new JSONArray();
+		try {
+			for (int i=0; i < retrievedDatasetInstances.length(); i++) {
+				JSONObject instance = retrievedDatasetInstances.getJSONObject(i);
+				JSONObject node = instance.getJSONObject("node");
+				String site = node.getString("site") + ":" + node.getInt("nodeId");
+				if (values.contains(site)) {
+					ret.put(instance.getInt("dataSetInstanceId"));
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 }

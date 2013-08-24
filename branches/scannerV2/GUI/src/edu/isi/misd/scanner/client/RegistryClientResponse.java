@@ -2,6 +2,7 @@ package edu.isi.misd.scanner.client;
 
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /* 
@@ -745,5 +746,7 @@ public interface RegistryClientResponse {
      * <br/>}
      */
     public JSONObject toSitesMap();
+    
+    public JSONArray getEntityResponse();
 
 }
