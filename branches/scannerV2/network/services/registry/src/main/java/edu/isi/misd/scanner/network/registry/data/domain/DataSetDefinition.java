@@ -152,7 +152,7 @@ public class DataSetDefinition implements Serializable
         return dataSetVariableMetadata;
     }
 
-    public void setDataSetVariableMetadataList(List<DataSetVariableMetadata> dataSetVariableMetadata) {
+    public void setDataSetVariableMetadata(List<DataSetVariableMetadata> dataSetVariableMetadata) {
         this.dataSetVariableMetadata = dataSetVariableMetadata;
     }
     

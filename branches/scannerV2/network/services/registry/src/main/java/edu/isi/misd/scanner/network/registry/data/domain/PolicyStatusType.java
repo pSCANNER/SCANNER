@@ -73,19 +73,19 @@ public class PolicyStatusType implements Serializable
         this.description = description;
     }
 
-    public List<PolicyStatement> getPolicyStatement() {
+    public List<PolicyStatement> getPolicyStatements() {
         return policyStatements;
     }
 
-    public void setPolicyStatement(List<PolicyStatement> policyStatements) {
+    public void setPolicyStatements(List<PolicyStatement> policyStatements) {
         this.policyStatements = policyStatements;
     }
 
-    public List<StudyPolicyStatement> getStudyPolicyStatement() {
+    public List<StudyPolicyStatement> getStudyPolicyStatements() {
         return studyPolicyStatements;
     }
 
-    public void setStudyPolicyStatement(List<StudyPolicyStatement> studyPolicyStatements) {
+    public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
         this.studyPolicyStatements = studyPolicyStatements;
     }
 

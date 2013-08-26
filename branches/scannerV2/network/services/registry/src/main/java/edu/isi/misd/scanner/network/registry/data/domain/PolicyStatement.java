@@ -27,7 +27,7 @@ public class PolicyStatement implements Serializable
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole role;
-    @JoinColumn(name = "policy_status_type_id", referencedColumnName = "policy_status_type_id")
+    @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatus;
     @JoinColumn(name = "data_set_instance_id", referencedColumnName = "data_set_instance_id")
@@ -102,7 +102,7 @@ public class PolicyStatement implements Serializable
         return parentStudyPolicyStatement;
     }
 
-    public void setParentStudyPolicyStatementId(StudyPolicyStatement parentStudyPolicyStatement) {
+    public void setParentStudyPolicyStatement(StudyPolicyStatement parentStudyPolicyStatement) {
         this.parentStudyPolicyStatement = parentStudyPolicyStatement;
     }
     

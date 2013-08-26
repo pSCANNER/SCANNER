@@ -118,7 +118,7 @@ public class StudyRole implements Serializable
         return study;
     }
 
-    public void setStudyId(Study study) {
+    public void setStudy(Study study) {
         this.study = study;
     }
 

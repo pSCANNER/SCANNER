@@ -128,7 +128,7 @@ public class Node implements Serializable
         return dataSetInstances;
     }
 
-    public void setDataSetInstanceList(List<DataSetInstance> dataSetInstances) {
+    public void setDataSetInstances(List<DataSetInstance> dataSetInstances) {
         this.dataSetInstances = dataSetInstances;
     }
     

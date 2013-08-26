@@ -83,7 +83,7 @@ public class StudyPolicyStatement implements Serializable
         return policyStatements;
     }
 
-    public void setPolicyStatementList(List<PolicyStatement> policyStatements) {
+    public void setPolicyStatements(List<PolicyStatement> policyStatements) {
         this.policyStatements = policyStatements;
     }
 
