@@ -22,7 +22,7 @@ public interface AnalysisToolRepository
            "AND p.dataSetDefinition.dataSetName = :dataSetName " +
            "AND t.toolParentLibrary.libraryId = :libraryId " +        
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
-    List<AnalysisTool> findAnalysisToolByPolicyStatement(
+    List<AnalysisTool> findAnalysisToolByStudyPolicyStatement(
         @Param("userName") String userName,
         @Param("studyName") String studyName,
         @Param("dataSetName") String dataSetName,

@@ -82,7 +82,7 @@ public class AnalysisToolController extends BaseController
                 }                 
                 return
                     analysisToolRepository.
-                        findAnalysisToolByPolicyStatement(
+                        findAnalysisToolByStudyPolicyStatement(
                             userName, studyName, dataSetName, libId);
             }
             if ((userName == null) || 

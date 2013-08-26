@@ -30,7 +30,7 @@ public class StudyPolicyStatement implements Serializable
     @Column(name = "attestation")
     private String attestation;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentStudyPolicyStatement")
-    private List<PolicyStatement> policyStatements;
+    private List<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole role;
@@ -79,12 +79,12 @@ public class StudyPolicyStatement implements Serializable
         this.attestation = attestation;
     }
 
-    public List<PolicyStatement> getPolicyStatements() {
-        return policyStatements;
+    public List<DataSetInstancePolicyStatement> getDataSetInstancePolicyStatements() {
+        return dataSetInstancePolicyStatements;
     }
 
-    public void setPolicyStatements(List<PolicyStatement> policyStatements) {
-        this.policyStatements = policyStatements;
+    public void setDataSetInstancePolicyStatements(List<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements) {
+        this.dataSetInstancePolicyStatements = dataSetInstancePolicyStatements;
     }
 
     public StudyRole getRole() {

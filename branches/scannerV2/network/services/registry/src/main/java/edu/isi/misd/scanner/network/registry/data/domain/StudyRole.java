@@ -54,7 +54,7 @@ public class StudyRole implements Serializable
     private List<SitePolicy> sitePolicies;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
-    private List<PolicyStatement> policyStatements;
+    private List<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
     private List<UserRole> userRoles;
@@ -98,12 +98,12 @@ public class StudyRole implements Serializable
         this.sitePolicies = sitePolicies;
     }
 
-    public List<PolicyStatement> getPolicyStatement() {
-        return policyStatements;
+    public List<DataSetInstancePolicyStatement> getDataSetInstancePolicyStatement() {
+        return dataSetInstancePolicyStatements;
     }
 
-    public void setPolicyStatement(List<PolicyStatement> policyStatements) {
-        this.policyStatements = policyStatements;
+    public void setDataSetInstancePolicyStatement(List<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements) {
+        this.dataSetInstancePolicyStatements = dataSetInstancePolicyStatements;
     }
 
     public List<ScannerUser> getScannerUsers() {

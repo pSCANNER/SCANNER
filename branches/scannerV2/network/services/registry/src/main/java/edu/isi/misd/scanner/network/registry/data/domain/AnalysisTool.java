@@ -1,6 +1,5 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -56,7 +55,7 @@ public class AnalysisTool implements Serializable
     private ToolLibrary toolParentLibrary;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
-    private List<PolicyStatement> policyStatements;
+    private List<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements;
     @JsonIgnore       
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
     private List<StudyPolicyStatement> studyPolicyStatements;
@@ -141,12 +140,12 @@ public class AnalysisTool implements Serializable
         this.toolParentLibrary = toolParentLibrary;
     }
 
-    public List<PolicyStatement> getPolicyStatements() {
-        return policyStatements;
+    public List<DataSetInstancePolicyStatement> getDataSetInstancePolicyStatements() {
+        return dataSetInstancePolicyStatements;
     }
 
-    public void setPolicyStatements(List<PolicyStatement> policyStatements) {
-        this.policyStatements = policyStatements;
+    public void setDataSetInstancePolicyStatements(List<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements) {
+        this.dataSetInstancePolicyStatements = dataSetInstancePolicyStatements;
     }
     
     public List<StudyPolicyStatement> getStudyPolicyStatements() {

@@ -15,14 +15,14 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "policy_statement", schema = "scanner_registry")
-public class PolicyStatement implements Serializable 
+@Table(name = "data_set_instance_policy_statement", schema = "scanner_registry")
+public class DataSetInstancePolicyStatement implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "policy_statement_id")
+    @Column(name = "data_set_instance_policy_statement_id")
     private Integer policyStatementId;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
@@ -43,10 +43,10 @@ public class PolicyStatement implements Serializable
     @ManyToOne(optional = false)
     private StudyPolicyStatement parentStudyPolicyStatement;
 
-    public PolicyStatement() {
+    public DataSetInstancePolicyStatement() {
     }
 
-    public PolicyStatement(Integer policyStatementId) {
+    public DataSetInstancePolicyStatement(Integer policyStatementId) {
         this.policyStatementId = policyStatementId;
     }
 
@@ -116,10 +116,10 @@ public class PolicyStatement implements Serializable
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof PolicyStatement)) {
+        if (!(object instanceof DataSetInstancePolicyStatement)) {
             return false;
         }
-        PolicyStatement other = (PolicyStatement) object;
+        DataSetInstancePolicyStatement other = (DataSetInstancePolicyStatement) object;
         if ((this.policyStatementId == null && other.policyStatementId != null) || (this.policyStatementId != null && !this.policyStatementId.equals(other.policyStatementId))) {
             return false;
         }

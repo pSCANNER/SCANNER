@@ -14,7 +14,8 @@ public interface DataSetInstanceRepository
     extends CrudRepository<DataSetInstance, Integer> 
 {    
     @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
-           "JOIN i.dataSetDefinition d JOIN i.policyStatements p " + 
+           "JOIN i.dataSetDefinition d " + 
+           "JOIN i.dataSetInstancePolicyStatements p " + 
            "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE d.dataSetDefinitionId = :dataSetId " + 
            "AND u.userName = :userName " +
@@ -24,7 +25,8 @@ public interface DataSetInstanceRepository
         @Param("userName")String userName); 
 
     @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
-           "JOIN i.dataSetDefinition d JOIN i.policyStatements p " + 
+           "JOIN i.dataSetDefinition d " + 
+           "JOIN i.dataSetInstancePolicyStatements p " + 
            "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE d.dataSetName = :dataSetName " + 
            "AND u.userName = :userName " +

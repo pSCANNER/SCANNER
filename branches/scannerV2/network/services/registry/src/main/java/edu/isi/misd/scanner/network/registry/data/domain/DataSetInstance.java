@@ -38,7 +38,7 @@ public class DataSetInstance implements Serializable
     private String dataSource;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetInstance")
-    private Set<PolicyStatement> policyStatements;
+    private Set<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements;
     @JoinColumn(name = "node_id", referencedColumnName = "node_id")
     @ManyToOne(optional = false)
     private Node node;
@@ -91,12 +91,12 @@ public class DataSetInstance implements Serializable
         this.dataSource = dataSource;
     }
 
-    public Set<PolicyStatement> getPolicyStatements() {
-        return policyStatements;
+    public Set<DataSetInstancePolicyStatement> getDataSetInstancePolicyStatements() {
+        return dataSetInstancePolicyStatements;
     }
 
-    public void setPolicyStatements(Set<PolicyStatement> policyStatements) {
-        this.policyStatements = policyStatements;
+    public void setDataSetInstancePolicyStatements(Set<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements) {
+        this.dataSetInstancePolicyStatements = dataSetInstancePolicyStatements;
     }
 
     public Node getNode() {
