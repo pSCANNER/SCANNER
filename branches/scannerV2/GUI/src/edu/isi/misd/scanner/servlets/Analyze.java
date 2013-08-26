@@ -47,6 +47,7 @@ public class Analyze extends HttpServlet {
 	private JSONArray retrievedStudies;
 	private JSONArray retrievedDatasets;
 	private JSONArray retrievedLibraries;
+	private JSONArray retrievedTools;
 	private JSONArray retrievedDatasetInstances;
        
     /**
@@ -115,8 +116,7 @@ public class Analyze extends HttpServlet {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
 			String sites = request.getParameter("site");
-			String func = request.getParameter("method");
-			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset, func, sites);
+			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset, sites);
 			retrievedLibraries = clientResponse.getEntityResponse();
 			String ret = clientResponse.toLibraries();
 			clientResponse.release();
@@ -126,8 +126,9 @@ public class Analyze extends HttpServlet {
 		} else if (action.equals("getMethods")) {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
-			String sites = request.getParameter("site");
-			RegistryClientResponse clientResponse = registryClient.getMethods(study, dataset, sites);
+			String lib = request.getParameter("library");
+			RegistryClientResponse clientResponse = registryClient.getMethods(study, dataset, "" + getLibraryId(lib));
+			retrievedTools = clientResponse.getEntityResponse();
 			String ret = clientResponse.toMethods();
 			clientResponse.release();
 			System.out.println("Analyze Get Methods: "+ret);
@@ -202,8 +203,8 @@ public class Analyze extends HttpServlet {
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("hostUrl") + ":" + temp.getString("hostPort") + temp.getString("basePath");
-					clientResponse = new ERDClientResponse(retrievedLibraries);
-					res = clientResponse.toMethodString(func, lib);
+					clientResponse = new ERDClientResponse(retrievedTools);
+					res = clientResponse.toMethodString(func, "" + getLibraryId(lib));
 					clientResponse.release();
 					System.out.println("method string: " + res);
 					temp = new JSONObject(res);

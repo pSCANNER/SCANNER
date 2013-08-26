@@ -145,7 +145,7 @@ public class Query extends HttpServlet {
 			String dataset = request.getParameter("dataset");
 			String sites = request.getParameter("site");
 			String func = request.getParameter("method");
-			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset, func, sites);
+			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset, sites);
 			String ret = clientResponse.toLibraries();
 			clientResponse.release();
 			System.out.println("Get Libraries: "+ret);

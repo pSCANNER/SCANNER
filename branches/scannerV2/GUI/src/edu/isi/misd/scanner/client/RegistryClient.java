@@ -477,7 +477,7 @@ public interface RegistryClient {
      *            the name of the dataset the library belongs to.
      * @return The client response.
      */
-	public RegistryClientResponse getLibraries(String study, String dataset, String func, String sites);
+	public RegistryClientResponse getLibraries(String study, String dataset, String sites);
 	
     /**
      * Gets the methods of a library. 

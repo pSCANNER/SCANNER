@@ -511,23 +511,11 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
  */
 function renderAvailableLibraries() {
 	// send the request
-	var method = getSelectedMethodName();
-	if (method != null && method.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && method != emptyValue) {
-		$('#methodHelp').html(availableMethods[getSelectedMethodName()]);
-		var sites = getSelectedSitesNames();
-		var sitesURL = '';
-		if (sites.length > 0) {
-			sitesURL = '&site=';
-			var encodedSites = [];
-			$.each(sites, function(i, site) {
-				encodedSites.push(encodeSafeURIComponent(site));
-			});
-			sitesURL += valueToString(encodedSites);
-		}
-		var url = HOME + '/query?action=getLibraries' + sitesURL +
-		'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
-		'&method=' + encodeSafeURIComponent(getSelectedMethodName()) +
-		'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
+	var dataset = getSelectedDatasetName();
+	if (dataset != null && dataset.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && dataset != emptyValue) {
+		var url = HOME + '/query?action=getLibraries' +
+			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
 		scanner.GET(url, true, postRenderAvailableLibraries, null, null, 0);
 	}
 }
@@ -561,20 +549,15 @@ function postRenderAvailableLibraries(data, textStatus, jqXHR, param) {
  * Send the request to get the available methods
  */
 function renderAvailableMethods() {
-	var sites = getSelectedSitesNames();
-	var sitesURL = '';
-	if (sites.length > 0) {
-		sitesURL = '&site=';
-		var encodedSites = [];
-		$.each(sites, function(i, site) {
-			encodedSites.push(encodeSafeURIComponent(site));
-		});
-		sitesURL += valueToString(encodedSites);
+	var lib = getSelectedLibraryName();
+	if (lib != '' && lib.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && lib != emptyValue) {
+		$('#libraryHelp').html(availableLibraries[lib]);
+		var url = HOME + '/query?action=getMethods' +
+			'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
+			'&library=' + encodeSafeURIComponent(getSelectedLibraryName()) +
+			'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
+		scanner.GET(url, true, postRenderAvailableMethods, null, null, 0);
 	}
-	var url = HOME + '/query?action=getMethods' + sitesURL +
-		'&study=' + encodeSafeURIComponent(getSelectedStudyName()) +
-		'&dataset=' + encodeSafeURIComponent(getSelectedDatasetName());
-	scanner.GET(url, true, postRenderAvailableMethods, null, null, 0);
 }
 
 /**
@@ -606,13 +589,11 @@ function postRenderAvailableMethods(data, textStatus, jqXHR, param) {
  */
 function renderAvailableParameters() {
 	// send the request
-	var func = getSelectedMethodName();
-	var lib = getSelectedLibraryName();
+	var method = getSelectedMethodName();
 	var dataset = getSelectedDatasetName();
-	if (lib != '' && lib.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && lib != emptyValue) {
-		$('#libraryHelp').html(availableLibraries[lib]);
-		var url = HOME + '/query?action=getParameters&method=' + encodeSafeURIComponent(func) + 
-			'&library=' + encodeSafeURIComponent(lib) + '&dataset=' + encodeSafeURIComponent(dataset);
+	if (method != null && method.replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && method != emptyValue) {
+		$('#methodHelp').html(availableMethods[getSelectedMethodName()]);
+		var url = HOME + '/query?action=getParameters&dataset=' + encodeSafeURIComponent(dataset);
 		scanner.GET(url, true, postRenderAvailableParameters, null, null, 0);
 	}
 }
@@ -2273,6 +2254,7 @@ function loadLibraries(values) {
 			});
 			librariesMultiSelect = new MultiSelect({ name: 'selectLibraries', value: '' }, selLibraries);
 			librariesMultiSelect.watch('value', function () {
+				loadMethods(emptyValue);
 				$('#libraryHelp').html('');
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
@@ -2281,7 +2263,7 @@ function loadLibraries(values) {
 				var selValues = librariesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
-						renderAvailableParameters();
+						renderAvailableMethods();
 					} else if (selValues.length > 1) {
 						librariesMultiSelect.set('value', '');
 					}
@@ -2313,7 +2295,6 @@ function loadMethods(values) {
 			});
 			methodsMultiSelect = new MultiSelect({ name: 'selectMethods', value: '' }, selMethods);
 			methodsMultiSelect.watch('value', function () {
-				loadLibraries(emptyValue, false);
 				var selValues = methodsMultiSelect.get('value');
 				$('#methodHelp').html('');
 				$('#paramsTitle').css('display', 'none');
@@ -2322,7 +2303,7 @@ function loadMethods(values) {
 				$('#queryDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
-						renderAvailableLibraries();
+						renderAvailableParameters();
 					} else if (selValues.length > 1) {
 						methodsMultiSelect.set('value', '');
 					}
@@ -2354,8 +2335,8 @@ function loadSites(values, selectAll) {
 			});
 			sitesMultiSelect = new MultiSelect({ name: 'selectSites'}, selSites);
 			sitesMultiSelect.watch('value', function () {
-				loadMethods(emptyValue, false);
-				loadLibraries(emptyValue, false);
+				loadMethods(emptyValue);
+				loadLibraries(emptyValue);
 				var selValues = sitesMultiSelect.get('value');
 				$('#paramsTitle').css('display', 'none');
 				$('#paramsDiv').css('display', 'none');
@@ -2363,7 +2344,7 @@ function loadSites(values, selectAll) {
 				$('#queryDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length >= 1) {
-						renderAvailableMethods();
+						renderAvailableLibraries();
 					}
 				} 
 			});

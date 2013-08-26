@@ -142,12 +142,8 @@ public class ERDClientResponse implements RegistryClientResponse {
 		try {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < entityResponse.length(); i++) {
-				JSONObject library = entityResponse.getJSONObject(i);
-				JSONArray analysisTools = library.getJSONArray("analysisTools");
-				for (int j=0; j < analysisTools.length(); j++) {
-					JSONObject tool = analysisTools.getJSONObject(j);
-					ret.put(tool.getString("toolName"), tool.getString("toolDescription"));
-				}
+				JSONObject tool = entityResponse.getJSONObject(i);
+				ret.put(tool.getString("toolName"), tool.getString("toolDescription"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -300,16 +296,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 		try {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < entityResponse.length(); i++) {
-				JSONObject library = entityResponse.getJSONObject(i);
-				if (library.get("libraryName").equals(lib)) {
-					JSONArray analysisTools = library.getJSONArray("analysisTools");
-					for (int j=0; j < analysisTools.length(); j++) {
-						JSONObject tool = analysisTools.getJSONObject(j);
-						if (tool.getString("toolName").equals(func)) {
-							ret = tool;
-							break;
-						}
-					}
+				JSONObject tool = entityResponse.getJSONObject(i);
+				if (tool.getString("toolName").equals(func) && tool.getString("toolParentLibrary").equals(lib)) {
+					ret = tool;
 					break;
 				}
 			}

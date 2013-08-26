@@ -1585,8 +1585,9 @@ public class TagfilerClient implements RegistryClient {
      * @return The client response.
      */
 	@Override
-	public RegistryClientResponse getLibraries(String study, String dataset, String method, String sites) {
+	public RegistryClientResponse getLibraries(String study, String dataset, String sites) {
 		RegistryClientResponse clientResponse = null;
+		String method = "";
 		ArrayList<String> sitesList = new ArrayList<String>();
 		client.setCookieValue(cookie);
 		try {
