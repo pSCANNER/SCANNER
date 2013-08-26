@@ -120,8 +120,8 @@ CREATE TABLE IF NOT EXISTS data_set_instance (
   data_source text NOT NULL
 );
 
-create table if not exists data_set_instance_policy_statement (
-  data_set_instance_policy_statement_id serial not null primary key,
+create table if not exists analysis_policy_statement (
+  analysis_policy_statement_id serial not null primary key,
   data_set_instance_id integer not null references data_set_instance(data_set_instance_id),
   role_id integer not null references study_role(role_id),
   analysis_tool_id integer not null references analysis_tool(tool_id),
@@ -130,7 +130,7 @@ create table if not exists data_set_instance_policy_statement (
   parent_study_policy_statement_id integer not null references study_policy_statement(study_policy_statement_id)
 );
 
-COMMENT on table data_set_instance_policy_statement is 'Users in role <role_id> may run tool <tool_id> on data set instance <data_set_instance_id> in mode <access_mode> if status is active';
+COMMENT on table analysis_policy_statement is 'Users in role <role_id> may run tool <tool_id> on data set instance <data_set_instance_id> in mode <access_mode> if status is active';
 
 create table if not exists site_policy (
   site_policy_id serial not null primary key,

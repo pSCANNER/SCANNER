@@ -59,7 +59,7 @@ INSERT INTO study_policy_statement (study_id, data_set_definition_id, policy_aut
 (1, 1, 400, 1, ' DataSetDefinition 1 will be analyzed with with OCEANS Logistic Regression in a mode with approval before transfer of aggregate/patient-level data at node X.  ', 1, 1, 1, 0),
 (1, 1, 400, 1, ' DataSetDefinition 1 will be analyzed with with OCEANS Logistic Regression in a mode without approval before transfer of aggregate/patient-level data at node X.  ', 1, 1, 0, 0);
 
-INSERT INTO data_set_instance_policy_statement (data_set_instance_id, role_id, analysis_tool_id, access_mode_id, policy_status_id, parent_study_policy_statement_id) VALUES
+INSERT INTO analysis_policy_statement (data_set_instance_id, role_id, analysis_tool_id, access_mode_id, policy_status_id, parent_study_policy_statement_id) VALUES
 (1,1,1,1,0,1),
 (2,1,1,1,0,1),
 (3,1,1,1,0,1),

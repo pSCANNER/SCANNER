@@ -55,7 +55,7 @@ public class AnalysisTool implements Serializable
     private ToolLibrary toolParentLibrary;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
-    private List<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements;
+    private List<AnalysisPolicyStatement> analysisPolicyStatements;
     @JsonIgnore       
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
     private List<StudyPolicyStatement> studyPolicyStatements;
@@ -140,12 +140,12 @@ public class AnalysisTool implements Serializable
         this.toolParentLibrary = toolParentLibrary;
     }
 
-    public List<DataSetInstancePolicyStatement> getDataSetInstancePolicyStatements() {
-        return dataSetInstancePolicyStatements;
+    public List<AnalysisPolicyStatement> getAnalysisPolicyStatements() {
+        return analysisPolicyStatements;
     }
 
-    public void setDataSetInstancePolicyStatements(List<DataSetInstancePolicyStatement> dataSetInstancePolicyStatements) {
-        this.dataSetInstancePolicyStatements = dataSetInstancePolicyStatements;
+    public void setAnalysisPolicyStatements(List<AnalysisPolicyStatement> analysisPolicyStatements) {
+        this.analysisPolicyStatements = analysisPolicyStatements;
     }
     
     public List<StudyPolicyStatement> getStudyPolicyStatements() {

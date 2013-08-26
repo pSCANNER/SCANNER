@@ -15,15 +15,15 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@Table(name = "data_set_instance_policy_statement", schema = "scanner_registry")
-public class DataSetInstancePolicyStatement implements Serializable 
+@Table(name = "analysis_policy_statement", schema = "scanner_registry")
+public class AnalysisPolicyStatement implements Serializable 
 {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @Column(name = "data_set_instance_policy_statement_id")
-    private Integer policyStatementId;
+    @Column(name = "analysis_policy_statement_id")
+    private Integer analysisPolicyStatementId;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole role;
@@ -43,19 +43,19 @@ public class DataSetInstancePolicyStatement implements Serializable
     @ManyToOne(optional = false)
     private StudyPolicyStatement parentStudyPolicyStatement;
 
-    public DataSetInstancePolicyStatement() {
+    public AnalysisPolicyStatement() {
     }
 
-    public DataSetInstancePolicyStatement(Integer policyStatementId) {
-        this.policyStatementId = policyStatementId;
+    public AnalysisPolicyStatement(Integer analysisPolicyStatementId) {
+        this.analysisPolicyStatementId = analysisPolicyStatementId;
     }
 
     public Integer getPolicyStatementId() {
-        return policyStatementId;
+        return analysisPolicyStatementId;
     }
 
-    public void setPolicyStatementId(Integer policyStatementId) {
-        this.policyStatementId = policyStatementId;
+    public void setPolicyStatementId(Integer analysisPolicyStatementId) {
+        this.analysisPolicyStatementId = analysisPolicyStatementId;
     }
 
     public StudyRole getRole() {
@@ -109,18 +109,18 @@ public class DataSetInstancePolicyStatement implements Serializable
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (policyStatementId != null ? policyStatementId.hashCode() : 0);
+        hash += (analysisPolicyStatementId != null ? analysisPolicyStatementId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof DataSetInstancePolicyStatement)) {
+        if (!(object instanceof AnalysisPolicyStatement)) {
             return false;
         }
-        DataSetInstancePolicyStatement other = (DataSetInstancePolicyStatement) object;
-        if ((this.policyStatementId == null && other.policyStatementId != null) || (this.policyStatementId != null && !this.policyStatementId.equals(other.policyStatementId))) {
+        AnalysisPolicyStatement other = (AnalysisPolicyStatement) object;
+        if ((this.analysisPolicyStatementId == null && other.analysisPolicyStatementId != null) || (this.analysisPolicyStatementId != null && !this.analysisPolicyStatementId.equals(other.analysisPolicyStatementId))) {
             return false;
         }
         return true;
@@ -128,7 +128,7 @@ public class DataSetInstancePolicyStatement implements Serializable
 
     @Override
     public String toString() {
-        return "edu.isi.misd.scanner.network.registry.data.domain.PolicyStatement[ policyStatementId=" + policyStatementId + " ]";
+        return "edu.isi.misd.scanner.network.registry.data.domain.PolicyStatement[ analysisPolicyStatementId=" + analysisPolicyStatementId + " ]";
     }
     
 }
