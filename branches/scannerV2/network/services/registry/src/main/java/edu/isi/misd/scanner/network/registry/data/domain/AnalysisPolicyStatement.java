@@ -1,5 +1,8 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -24,21 +27,33 @@ public class AnalysisPolicyStatement implements Serializable
     @Basic(optional = false)
     @Column(name = "analysis_policy_statement_id")
     private Integer analysisPolicyStatementId;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleWithinStudy")
+    @JsonIdentityReference(alwaysAsId=true)            
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole role;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatus;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetInstanceName")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "data_set_instance_id", referencedColumnName = "data_set_instance_id")
     @ManyToOne(optional = false)
     private DataSetInstance dataSetInstance;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="toolName")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
     private AnalysisTool analysisTool;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "access_mode_id", referencedColumnName = "access_mode_id")
     @ManyToOne(optional = false)
     private AccessMode accessMode;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyPolicyStatementId")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "parent_study_policy_statement_id", referencedColumnName = "study_policy_statement_id")
     @ManyToOne(optional = false)
     private StudyPolicyStatement parentStudyPolicyStatement;
@@ -50,11 +65,11 @@ public class AnalysisPolicyStatement implements Serializable
         this.analysisPolicyStatementId = analysisPolicyStatementId;
     }
 
-    public Integer getPolicyStatementId() {
+    public Integer getAnalysisPolicyStatementId() {
         return analysisPolicyStatementId;
     }
 
-    public void setPolicyStatementId(Integer analysisPolicyStatementId) {
+    public void setAnalysisPolicyStatementId(Integer analysisPolicyStatementId) {
         this.analysisPolicyStatementId = analysisPolicyStatementId;
     }
 

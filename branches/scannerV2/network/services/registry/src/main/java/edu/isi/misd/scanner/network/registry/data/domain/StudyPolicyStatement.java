@@ -1,5 +1,9 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -29,33 +33,50 @@ public class StudyPolicyStatement implements Serializable
     private Integer studyPolicyStatementId;
     @Column(name = "attestation")
     private String attestation;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentStudyPolicyStatement")
-    private List<AnalysisPolicyStatement> analysisPolicyStatements;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleWithinStudy")
+    @JsonIdentityReference(alwaysAsId=true)            
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole role;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
+    @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "policy_originator", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser policyOriginator;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
+    @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatus;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
+    @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "policy_authority", referencedColumnName = "data_set_policy_authority_id")
     @ManyToOne(optional = false)
     private DataSetPolicyAuthority policyAuthority;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetName")
+    @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)
     private DataSetDefinition dataSetDefinition;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="toolName")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
     private AnalysisTool analysisTool;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
+    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "access_mode", referencedColumnName = "access_mode_id")
     @ManyToOne(optional = false)
     private AccessMode accessMode;
-
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parentStudyPolicyStatement")
+    private List<AnalysisPolicyStatement> analysisPolicyStatements;
+    
     public StudyPolicyStatement() {
     }
 

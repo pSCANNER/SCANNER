@@ -74,7 +74,7 @@ public class StudyRole implements Serializable
         this.roleWithinStudy = roleWithinStudy;
     }
 
-    public Integer getRole() {
+    public Integer getRoleId() {
         return roleId;
     }
 
