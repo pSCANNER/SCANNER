@@ -31,11 +31,10 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import edu.isi.misd.scanner.client.ERDClient;
 import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.client.RegistryClient;
 import edu.isi.misd.scanner.client.RegistryClientResponse;
-import edu.isi.misd.scanner.client.TagfilerClient;
-import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 import edu.isi.misd.scanner.utils.Utils;
 
 /**
@@ -47,9 +46,7 @@ import edu.isi.misd.scanner.utils.Utils;
 public class Registry extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ServletConfig servletConfig;
-	private String tagfilerURL;
-	private String tagfilerUser;
-	private String tagfilerPassword;
+	private String erdURL;
        
     /**
      * Default constructor. 
@@ -67,9 +64,7 @@ public class Registry extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		servletConfig = config;
-		tagfilerURL = servletConfig.getServletContext().getInitParameter("tagfilerURL");
-		tagfilerUser = servletConfig.getServletContext().getInitParameter("tagfilerUser");
-		tagfilerPassword = servletConfig.getServletContext().getInitParameter("tagfilerPassword");
+		erdURL = servletConfig.getServletContext().getInitParameter("registryURL");
 	}
 
 	/**
@@ -209,24 +204,15 @@ public class Registry extends HttpServlet {
 			}  
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
-			boolean valid = username != null && password != null && username.equals(tagfilerUser) && password.equals(tagfilerPassword);
+			boolean valid = username != null && password != null;
 			if (valid) {
 				session.setAttribute("user", username);
 				JakartaClient client = new JakartaClient(4, 8192, 120000);
 				session.setAttribute("httpClient", client);
-				ClientURLResponse rsp = client.login(tagfilerURL + "/session", tagfilerUser, tagfilerPassword);
-				if (rsp != null) {
-					//rsp.debug();
-					session.setAttribute("tagfilerCookie", client.getCookieValue());
-					//RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue(), request);
-					RegistryClient registryClient = new TagfilerClient(client, tagfilerURL, client.getCookieValue());
-					session.setAttribute("registryClient", registryClient);
-					PrintWriter out = response.getWriter();
-					out.print(client.getCookieValue() + "\n");
-				} else {
-					PrintWriter out = response.getWriter();
-					out.print("Can not access registry service.\n");
-				}
+				RegistryClient registryClient = new ERDClient(erdURL, (String) session.getAttribute("user"));
+				session.setAttribute("registryClient", registryClient);
+				PrintWriter out = response.getWriter();
+				out.print(client.getCookieValue() + "\n");
 			} else {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password.");
 			}

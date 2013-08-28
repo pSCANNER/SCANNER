@@ -79,7 +79,7 @@ public class Analyze extends HttpServlet {
 		keyStoreResource = path + keyStoreResource;
 		System.out.println("trustStoreResource: " + trustStoreResource);
 		System.out.println("keyStoreResource: " + keyStoreResource);
-		erdURL = "http://aspc.isi.edu:8088/scannerV2/registry/";
+		erdURL = servletConfig.getServletContext().getInitParameter("registryURL");
 	}
 
 	/**
@@ -395,7 +395,6 @@ public class Analyze extends HttpServlet {
 					throw(new ServletException(e));
 				}
 			} else if (action.equals("displaySitesStatus")) {
-				// keep Tagfiler's session alive
 				obj = (JSONObject) servletConfig.getServletContext().getAttribute("echo");
 				if (obj == null) {
 					obj = new JSONObject();

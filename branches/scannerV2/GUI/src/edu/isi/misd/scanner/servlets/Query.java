@@ -38,10 +38,10 @@ import org.json.JSONArray;
 
 import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
+import edu.isi.misd.scanner.client.ERDClient;
 import edu.isi.misd.scanner.client.RegistryClient;
 import edu.isi.misd.scanner.client.RegistryClientResponse;
 import edu.isi.misd.scanner.client.ScannerClient;
-import edu.isi.misd.scanner.client.TagfilerClient;
 import edu.isi.misd.scanner.utils.Utils;
 
 
@@ -50,13 +50,10 @@ import edu.isi.misd.scanner.utils.Utils;
  * 
  * @author Serban Voinea
  */
-@WebServlet(description = "Query Tagfiler and SCANNER", urlPatterns = { "/query" })
+@WebServlet(description = "Query Registry and SCANNER", urlPatterns = { "/query" })
 public class Query extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ServletConfig servletConfig;
-	private String tagfilerURL;
-	private String tagfilerUser;
-	private String tagfilerPassword;
 	
 	private String trustStoreType;
 	private String trustStorePassword;
@@ -67,6 +64,7 @@ public class Query extends HttpServlet {
 	private String keyManagerPassword;
        
 	private String webContentPath;
+	private String erdURL;
 
 	/**
      * Default constructor. 
@@ -84,9 +82,6 @@ public class Query extends HttpServlet {
 	public void init(ServletConfig config)  throws ServletException {
 		super.init(config);
 		servletConfig = config;
-		tagfilerURL = servletConfig.getServletContext().getInitParameter("tagfilerURL");
-		tagfilerUser = servletConfig.getServletContext().getInitParameter("tagfilerUser");
-		tagfilerPassword = servletConfig.getServletContext().getInitParameter("tagfilerPassword");
 		trustStoreType = servletConfig.getServletContext().getInitParameter("trustStoreType");
 		trustStorePassword = servletConfig.getServletContext().getInitParameter("trustStorePassword");
 		trustStoreResource = servletConfig.getServletContext().getInitParameter("trustStoreResource");
@@ -102,6 +97,7 @@ public class Query extends HttpServlet {
 		keyStoreResource = path + keyStoreResource;
 		System.out.println("trustStoreResource: " + trustStoreResource);
 		System.out.println("keyStoreResource: " + keyStoreResource);
+		erdURL = servletConfig.getServletContext().getInitParameter("registryURL");
 	}
 
 	/**
@@ -116,9 +112,6 @@ public class Query extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
 		HttpSession session = request.getSession(false);
-		JakartaClient httpClient = (JakartaClient) session.getAttribute("httpClient");
-		String cookie = (String) session.getAttribute("tagfilerCookie");
-		httpClient.setCookieValue(cookie);
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		if (!registryClient.hasRoles()) {
 			PrintWriter out = response.getWriter();
@@ -144,7 +137,6 @@ public class Query extends HttpServlet {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
 			String sites = request.getParameter("site");
-			String func = request.getParameter("method");
 			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset, sites);
 			String ret = clientResponse.toLibraries();
 			clientResponse.release();
@@ -162,8 +154,6 @@ public class Query extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getParameters")) {
-			String func = request.getParameter("method");
-			String lib = request.getParameter("library");
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getParameters(dataset, webContentPath + "etc/parameterTypes/LogisticRegression.json");
 			String ret = clientResponse.toParameters();
@@ -198,55 +188,25 @@ public class Query extends HttpServlet {
 		try {
 			String action = request.getParameter("action");
 			HttpSession session = request.getSession(false);
-			JakartaClient httpClient = (JakartaClient) session.getAttribute("httpClient");
 			ScannerClient scannerClient = (ScannerClient) session.getAttribute("scannerClient");
 			if (action.equals("loginRegistry")) {
 				obj.put("status", "login error");
-				ClientURLResponse rsp = httpClient.login(tagfilerURL + "/session", tagfilerUser, tagfilerPassword);
-				if (rsp != null) {
-					//rsp.debug();
-					session.setAttribute("tagfilerCookie", httpClient.getCookieValue());
-					RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue(), request);
-					//RegistryClient registryClient = new TagfilerClient(httpClient, tagfilerURL, httpClient.getCookieValue());
-					session.setAttribute("registryClient", registryClient);
-					RegistryClientResponse clientResponse = registryClient.getContacts();
-					String ret = clientResponse.toContacts();
-					clientResponse.release();
-					JSONArray arr = new JSONArray(ret);
-					obj.put("contacts", arr);
-					System.out.println("Get Contacts:\n"+ret);
-				} else {
-					// to handle this case
-					System.out.println("Response is null");
-				}
+				RegistryClient registryClient = new ERDClient(erdURL, (String) session.getAttribute("user"));
+				session.setAttribute("registryClient", registryClient);
+				RegistryClientResponse clientResponse = registryClient.getContacts();
+				String ret = clientResponse.toContacts();
+				clientResponse.release();
+				JSONArray arr = new JSONArray(ret);
+				obj.put("contacts", arr);
+				System.out.println("Get Contacts:\n"+ret);
 				scannerClient = new ScannerClient(4, 8192, 300000,
 						trustStoreType, trustStorePassword, trustStoreResource,
 						keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
 				session.setAttribute("scannerClient", scannerClient);
 				obj.put("status", "success");
-			} else if (action.equals("file")) {
-				obj.put("status", "download error");
-				String cookie = (String) session.getAttribute("tagfilerCookie");
-				httpClient.setCookieValue(cookie);
-				ClientURLResponse rsp = httpClient.downloadFile(tagfilerURL + "/file/name=OceanTypes", cookie);
-				if (rsp != null) {
-					if (httpClient.getCookieValue() != null) {
-						session.setAttribute("tagfilerCookie", httpClient.getCookieValue());
-					}
-					String res = rsp.getEntityString();
-					System.out.println("The file content is:\n"+res);
-					obj.put("status", "success");
-				}
 			} else if (action.equals("logout")) {
-				obj.put("status", "logout error");
-				String cookie = (String) session.getAttribute("tagfilerCookie");
-				httpClient.setCookieValue(cookie);
-				ClientURLResponse rsp = httpClient.delete(tagfilerURL + "/session", cookie);
-				if (rsp != null) {
-					session.setAttribute("tagfilerCookie", null);
-					System.out.println("Logout successfully");
-					obj.put("status", "success");
-				}
+				System.out.println("Logout successfully");
+				obj.put("status", "success");
 			} else if (action.equals("getResults")) {
 				try {
 					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
@@ -555,7 +515,6 @@ public class Query extends HttpServlet {
 					throw(new ServletException(e));
 				}
 			} else if (action.equals("displaySitesStatus")) {
-				// keep Tagfiler's session alive
 				RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 				RegistryClientResponse clientResponse = registryClient.getSitesMap();
 				clientResponse.release();

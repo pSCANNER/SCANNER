@@ -36,9 +36,6 @@ public class Echo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ServletContext servletContext;
 	private ServletConfig servletConfig;
-	private String tagfilerURL;
-	private String tagfilerUser;
-	private String tagfilerPassword;
 	
 	private String trustStoreType;
 	private String trustStorePassword;
@@ -75,9 +72,6 @@ public class Echo extends HttpServlet {
 		super.init(config);
 		System.out.println("Echo is initialized");
 		servletConfig = config;
-		tagfilerURL = servletConfig.getServletContext().getInitParameter("tagfilerURL");
-		tagfilerUser = servletConfig.getServletContext().getInitParameter("tagfilerUser");
-		tagfilerPassword = servletConfig.getServletContext().getInitParameter("tagfilerPassword");
 		trustStoreType = servletConfig.getServletContext().getInitParameter("trustStoreType");
 		trustStorePassword = servletConfig.getServletContext().getInitParameter("trustStorePassword");
 		trustStoreResource = servletConfig.getServletContext().getInitParameter("trustStoreResource");
