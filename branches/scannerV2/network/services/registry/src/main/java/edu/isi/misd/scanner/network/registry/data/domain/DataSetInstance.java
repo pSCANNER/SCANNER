@@ -1,6 +1,9 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Set;
 import javax.persistence.Basic;
@@ -36,16 +39,17 @@ public class DataSetInstance implements Serializable
     @Basic(optional = false)
     @Column(name = "data_source")
     private String dataSource;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetDefinitionId")
+    @JsonIdentityReference(alwaysAsId=true)    
+    @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
+    @ManyToOne(optional = false)
+    private DataSetDefinition dataSetDefinition;    
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetInstance")
     private Set<AnalysisPolicyStatement> analysisPolicyStatements;
     @JoinColumn(name = "node_id", referencedColumnName = "node_id")
     @ManyToOne(optional = false)
     private Node node;
-    @JsonIgnore    
-    @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
-    @ManyToOne(optional = false)
-    private DataSetDefinition dataSetDefinition;
 
     public DataSetInstance() {
     }
