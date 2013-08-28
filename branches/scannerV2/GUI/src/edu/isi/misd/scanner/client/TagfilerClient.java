@@ -2334,4 +2334,17 @@ public class TagfilerClient implements RegistryClient {
 		return null;
 	}
 
+	@Override
+	public RegistryClientResponse getUser(String user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RegistryClientResponse getAnalysisPolicies(int userId,
+			int toolId, int datasetInstanceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

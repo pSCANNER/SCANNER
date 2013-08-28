@@ -698,4 +698,6 @@ public interface RegistryClient {
 	public RegistryClientResponse getTools();
 	public RegistryClientResponse getDatasetInstances();
 	public RegistryClientResponse getDatasetDefinitions();
+	public RegistryClientResponse getUser(String user);
+	public RegistryClientResponse getAnalysisPolicies(int userId, int toolId, int datasetInstanceId);
 }

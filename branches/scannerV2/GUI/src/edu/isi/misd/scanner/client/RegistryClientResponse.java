@@ -747,6 +747,7 @@ public interface RegistryClientResponse {
      */
     public JSONObject toSitesMap();
     
+    public JSONObject getEntity();
     public JSONArray getEntityResponse();
 
     public JSONArray toUsers();

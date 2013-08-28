@@ -22,15 +22,20 @@ public class ERDClientResponse implements RegistryClientResponse {
 
 	protected ClientURLResponse response;
 	protected JSONArray entityResponse;
+	protected JSONObject entityObject;
 
 	public ERDClientResponse(ClientURLResponse rsp) {
+		response = rsp;
+		String res = response.getEntityString();
 		try {
-			response = rsp;
-			String res = response.getEntityString();
 			entityResponse = new JSONArray(res);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			try {
+				entityObject = new JSONObject(res);
+			} catch (JSONException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 	
@@ -494,6 +499,11 @@ public class ERDClientResponse implements RegistryClientResponse {
 	@Override
 	public JSONArray toDatasetDefinitions() {
 		return getEntityResponse();
+	}
+
+	@Override
+	public JSONObject getEntity() {
+		return entityObject;
 	}
 
 }

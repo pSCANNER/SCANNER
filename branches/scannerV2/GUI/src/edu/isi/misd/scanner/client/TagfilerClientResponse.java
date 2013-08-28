@@ -1051,5 +1051,11 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 		return null;
 	}
 
+	@Override
+	public JSONObject getEntity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
 
