@@ -153,6 +153,82 @@ COMMENT ON TABLE data_set_variable_metadata
 COMMENT ON COLUMN data_set_variable_metadata.variable_name IS 'variable name is unique wihtin data set';
 COMMENT ON COLUMN data_set_variable_metadata.variable_description IS 'this is the tooltip and description of the variable';
 
+create table drugs_code_set (
+    concept_id integer not null primary key,
+    concept_name text not null,
+    valid_start_date date not null,
+    valid_end_date date default '31-dec-2099'  not null,
+-- The rest of these probably won't be used in the initial version of prep-to-research
+    concept_level integer not null,
+    concept_class text not null,
+    vocabulary_id integer not null,
+    concept_code text not null
+);
+
+create index drugs_code_set_concept_name_idx on drugs_code_set(concept_name);
+create index drugs_code_set_date_idx on drugs_code_set(valid_start_date, valid_end_date);
+
+COMMENT ON TABLE drugs_code_set IS 'code sets for drugs, for use in prep-to-research';
+COMMENT ON COLUMN drugs_code_set.concept_id IS 'OMOP concept ID';
+COMMENT ON COLUMN drugs_code_set.concept_name IS 'OMOP concept name. This will be searched on in prep-to-research';
+COMMENT ON COLUMN drugs_code_set.valid_start_date IS 'Date when this code starts being valid. Most queries should check that now() >= valid_start_date';
+COMMENT ON COLUMN drugs_code_set.valid_end_date IS 'Date when this code starts being valid. Most queries should check that now() <= valid_end_date';
+COMMENT ON COLUMN drugs_code_set.concept_level IS 'Currently, always 2 in the *_code tables.';
+COMMENT ON COLUMN drugs_code_set.concept_class IS 'Always "Ingredient" in the drugs_code_set table.';
+COMMENT ON COLUMN drugs_code_set.vocabulary_id IS 'Always 8 (RxNorm) in the drugs_code_set table.';
+COMMENT ON COLUMN drugs_code_set.concept_code IS 'Code from original vocabulary (i.e., RxNorm code).';
+
+
+create table conditions_code_set (
+    concept_id integer not null primary key,
+    concept_name text not null,
+    valid_start_date date not null,
+    valid_end_date date default '31-dec-2099'  not null,
+-- The rest of these probably won't be used in the initial version of prep-to-research
+    concept_level integer not null,
+    concept_class text not null,
+    vocabulary_id integer not null,
+    concept_code text not null
+);
+
+create index conditions_code_set_concept_name_idx on conditions_code_set(concept_name);
+create index conditions_code_set_date_idx on conditions_code_set(valid_start_date, valid_end_date);
+
+COMMENT ON TABLE conditions_code_set IS 'code sets for conditions, for use in prep-to-research';
+COMMENT ON COLUMN conditions_code_set.concept_id IS 'OMOP concept ID';
+COMMENT ON COLUMN conditions_code_set.concept_name IS 'OMOP concept name. This will be searched on in prep-to-research';
+COMMENT ON COLUMN conditions_code_set.valid_start_date IS 'Date when this code starts being valid. Most queries should check that now() >= valid_start_date';
+COMMENT ON COLUMN conditions_code_set.valid_end_date IS 'Date when this code starts being valid. Most queries should check that now() <= valid_end_date';
+COMMENT ON COLUMN conditions_code_set.concept_level IS 'Currently, always 2 in the *_code tables.';
+COMMENT ON COLUMN conditions_code_set.concept_class IS 'Always "Clinical finding" in the conditions_code_set table.';
+COMMENT ON COLUMN conditions_code_set.vocabulary_id IS 'Always 1 (SnoMed) in the conditions_code_set table.';
+COMMENT ON COLUMN conditions_code_set.concept_code IS 'Code from original vocabulary (i.e., SnoMed code).';
+
+create table favorites_code_set (
+    concept_id integer not null primary key,
+    concept_name text not null,
+    valid_start_date date not null,
+    valid_end_date date default '31-dec-2099'  not null,
+-- The rest of these probably won't be used in the initial version of prep-to-research
+    concept_level integer not null,
+    concept_class text not null,
+    vocabulary_id integer not null,
+    concept_code text not null
+);
+
+create index favorites_code_set_concept_name_idx on favorites_code_set(concept_name);
+create index favorites_code_set_date_idx on favorites_code_set(valid_start_date, valid_end_date);
+
+COMMENT ON TABLE favorites_code_set IS 'some code sets for use in prep-to-research';
+COMMENT ON COLUMN favorites_code_set.concept_id IS 'OMOP concept ID';
+COMMENT ON COLUMN favorites_code_set.concept_name IS 'OMOP concept name. This will be searched on in prep-to-research';
+COMMENT ON COLUMN favorites_code_set.valid_start_date IS 'Date when this code starts being valid. Most queries should check that now() >= valid_start_date';
+COMMENT ON COLUMN favorites_code_set.valid_end_date IS 'Date when this code starts being valid. Most queries should check that now() <= valid_end_date';
+COMMENT ON COLUMN favorites_code_set.concept_class IS 'Currently, always 2 in the *_code tables.';
+COMMENT ON COLUMN favorites_code_set.concept_class IS 'Always "Ingredient" in the favorites_code_set table.';
+COMMENT ON COLUMN favorites_code_set.vocabulary_id IS 'Initially, always the HQMF vocabulary ID in the favorites_code_set table.';
+COMMENT ON COLUMN favorites_code_set.concept_code IS 'Code from original vocabulary (i.e., HQMF OID).';
+
 /*
 CREATE TABLE IF NOT EXISTS dua (
   dua_id serial not null primary key,

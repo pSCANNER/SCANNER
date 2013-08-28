@@ -1,0 +1,5 @@
+Test data for vocabulary tables is in sample_codeset_data.sql. It's a set of insert statements instead of a data file
+because that's easier for Mike's tests to load. This one was generated from an extended OMOP vocabulary database with:
+
+psql -f populate_codeset_tables.sql
+pg_dump -O -a -t '*_code_set' --column-inserts > sample_codeset_data.sql
