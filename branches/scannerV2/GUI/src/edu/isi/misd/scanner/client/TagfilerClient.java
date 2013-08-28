@@ -2304,4 +2304,34 @@ public class TagfilerClient implements RegistryClient {
 		return clientResponse;
 	}
 
+	@Override
+	public RegistryClientResponse getUsers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RegistryClientResponse getNodes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RegistryClientResponse getTools() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RegistryClientResponse getDatasetInstances() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RegistryClientResponse getDatasetDefinitions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

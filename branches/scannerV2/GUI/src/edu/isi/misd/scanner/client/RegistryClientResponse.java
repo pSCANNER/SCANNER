@@ -749,4 +749,9 @@ public interface RegistryClientResponse {
     
     public JSONArray getEntityResponse();
 
+    public JSONArray toUsers();
+    public JSONArray toNodes();
+    public JSONArray toTools();
+    public JSONArray toDatasetInstances();
+    public JSONArray toDatasetDefinitions();
 }

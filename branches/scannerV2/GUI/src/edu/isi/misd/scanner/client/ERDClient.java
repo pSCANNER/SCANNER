@@ -16,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 import edu.isi.misd.scanner.utils.Utils;
 
 /**
@@ -608,6 +607,51 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getUsers() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "users";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getNodes() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "nodes";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getTools() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "tools";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getDatasetInstances() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "instances";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getDatasetDefinitions() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "datasets";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
 	

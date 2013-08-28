@@ -1021,5 +1021,35 @@ public class TagfilerClientResponse implements RegistryClientResponse {
 		return null;
 	}
 
+	@Override
+	public JSONArray toUsers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JSONArray toNodes() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JSONArray toTools() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JSONArray toDatasetInstances() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public JSONArray toDatasetDefinitions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
 

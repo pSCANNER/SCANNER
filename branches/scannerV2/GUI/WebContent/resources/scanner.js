@@ -73,30 +73,6 @@ var analyzeLayout = [[
                       {'name': 'Options', 'field': 'options', 'width': '15%'}
                       ]];
 
-var slicesLayout = [[
-                     {'name': '#', 'field': 'no', 'width': '5%'},
-                     {'name': 'Study', 'field': 'study', 'width': '15%'},
-                     {'name': 'Dataset', 'field': 'dataset', 'width': '15%'},
-                     {'name': 'Library', 'field': 'library','width': '10%'},
-                     {'name': 'Method', 'field': 'method', 'width': '15%'},
-                     {'name': 'Site', 'field': 'site', 'width': '10%'},
-                     {'name': 'Datasource', 'field': 'datasource', 'width': '15%'},
-                     {'name': 'Users', 'field': 'users', 'width': '15%'}
-                     ]];
-
-var projectsLayoutOld = [[
-                       {'name': 'Project Title', 'field': 'title', 'width': '20%'},
-                       {'name': 'Principal Investigator', 'field': 'principal', 'width': '30%'},
-                       {'name': 'Project Description', 'field': 'description', 'width': '50%'}
-                       ]];
-
-var projectsLayout = [[
-                       {'name': 'Project Title', 'field': 'title', 'width': '20%'},
-                       {'name': 'Principal Status', 'field': 'status', 'width': '20%'},
-                       {'name': 'Principal Investigator', 'field': 'principal', 'width': '20%'},
-                       {'name': 'Project Description', 'field': 'description', 'width': '40%'}
-                       ]];
-
 var analyzeDataStore = {
 		identifier: "id",
 		items: []
@@ -1850,6 +1826,7 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 		//setContacts(res['contacts']);
 		renderAvailableStudies();
 		renderSitesStatus();
+		initUsers();
 	} else {
 		alert(res['status']);
 	}
@@ -1918,6 +1895,8 @@ function valueToString(val) {
 		var valType = $.type(val);
 		if (valType == 'string') {
 			return '"' + escapeDoubleQuotes(val) + '"';
+		} else if (valType == 'boolean') {
+			return val;
 		} else if (valType == 'object') {
 			return '"Object"';
 		} else {
@@ -2766,10 +2745,10 @@ function manageStudy() {
 	option.text('Enter Letters of Name.');
 	option.attr('value', '');
 	select.append(option);
-	$.each(investigatorsList, function(i, name) {
+	$.each(scannerUsersList, function(i, user) {
 		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
+		option.text(user['firstName'] + ' ' + user['lastName']);
+		option.attr('value', user['userId']);
 		select.append(option);
 	});
 	var select = $('#staffRoles');
@@ -2789,13 +2768,14 @@ function manageStudy() {
 	select.html('');
 	select.change(function(event) {checkAddStaffButton();});
 	var option = $('<option>');
-	option.text('...add site');
+	option.text('...add node');
 	option.attr('value', '');
 	select.append(option);
-	$.each(siteNames, function(i, name) {
+	$.each(datasetInstancesList, function(i, datasetInstance) {
+		var node = datasetInstance['node'];
 		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
+		option.text(node['site'] + ':' + node['nodeId']);
+		option.attr('value', datasetInstance['dataSetInstanceId']);
 		select.append(option);
 	});
 	
@@ -2806,36 +2786,23 @@ function manageStudy() {
 	option.text('Estimate model...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(modelNames, function(i, name) {
+	$.each(toolList, function(i, tool) {
 		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
-		select.append(option);
-	});
-	var select = $('#siteNames');
-	select.html('');
-	select.change(function(event) {checkAddProtocolButton();});
-	var option = $('<option>');
-	option.text('for site...');
-	option.attr('value', '');
-	select.append(option);
-	$.each(siteNames, function(i, name) {
-		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
+		option.text(tool['toolDescription']);
+		option.attr('value', tool['toolId']);
 		select.append(option);
 	});
 	var select = $('#datasetNames');
 	select.html('');
-	select.change(function(event) {checkAddProtocolButton();});
+	select.change(function(event) {displayAddNewInstanceOption();});
 	var option = $('<option>');
 	option.text('using data set...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(datasetNames, function(i, name) {
+	$.each(datasetDefinitionList, function(i, dataset) {
 		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
+		option.text(dataset['dataSetName']);
+		option.attr('value', dataset['dataSetDefinitionId']);
 		select.append(option);
 	});
 	var select = $('#datasetInstances');
@@ -2845,12 +2812,18 @@ function manageStudy() {
 	option.text('and data set instance...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(datasetInstances, function(i, name) {
+	$.each(datasetInstancesList, function(i, datasetInstance) {
 		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
+		option.text(datasetInstance['dataSetInstanceName']);
+		option.attr('value', datasetInstance['dataSetInstanceId']);
 		select.append(option);
 	});
+	option = $('<option>');
+	option.text('Add new...');
+	option.attr('value', 'Add new...');
+	option.attr('id', 'add_new_dataset_instance_option');
+	select.append(option);
+
 	var select = $('#studySendOptions');
 	select.html('');
 	select.change(function(event) {checkAddProtocolButton();});
@@ -2884,17 +2857,19 @@ function manageStudy() {
 	option.text('for node...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(siteNodes, function(i, name) {
+	$.each(datasetInstancesList, function(i, datasetInstance) {
+		var node = datasetInstance['node'];
 		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
+		option.text(node['site'] + ':' + node['nodeId']);
+		option.attr('value', datasetInstance['dataSetInstanceId']);
 		select.append(option);
 	});
 	$('#instanceName').keyup(function(event) {checkAddInstanceButton();});
-	$('#instanceURL').keyup(function(event) {checkAddInstanceButton();});
+	$('#instanceDataSource').keyup(function(event) {checkAddInstanceButton();});
 	$('#addInstanceButton').attr('disabled', 'disabled');
 	$('#add_protocol_div').show();
 	$('#add_instance_div').hide();
+	displayAddNewInstanceOption();
 }
 
 function checkCreateStudyButton() {
@@ -2903,6 +2878,15 @@ function checkCreateStudyButton() {
 	} else {
 		$('#createStudyButton').attr('disabled', 'disabled');
 	}
+}
+
+function displayAddNewInstanceOption() {
+	if ($('#datasetNames').val() != '') {
+		$('#add_new_dataset_instance_option').show();
+	} else {
+		$('#add_new_dataset_instance_option').hide();
+	}
+	checkAddProtocolButton();
 }
 
 function checkAddStaffButton() {
@@ -2917,11 +2901,11 @@ function checkAddProtocolButton() {
 	if ($('#datasetInstances').val() == 'Add new...') {
 		$('#instanceName').val('');
 		$('#nodeNames').val('');
-		$('#instanceURL').val('');
+		$('#instanceDataSource').val('');
 		$('#instanceDescription').val('');
 		$('#add_protocol_div').hide();
 		$('#add_instance_div').show();
-	} else if ($('#modelNames').val() != '' && $('#siteNames').val() != '' && $('#datasetNames').val() != '' && 
+	} else if ($('#modelNames').val() != '' && $('#datasetNames').val() != '' && 
 			$('#datasetInstances').val() != '' && $('#studySendOptions').val() != '') {
 		$('#addProtocolButton').removeAttr('disabled');
 	} else {
@@ -2931,7 +2915,7 @@ function checkAddProtocolButton() {
 
 function checkAddInstanceButton() {
 	if ($('#instanceName').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && $('#nodeNames').val() != '' && 
-			$('#instanceURL').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
+			$('#instanceDataSource').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
 		$('#addInstanceButton').removeAttr('disabled');
 	} else {
 		$('#addInstanceButton').attr('disabled', 'disabled');
@@ -2940,9 +2924,9 @@ function checkAddInstanceButton() {
 
 function addStaff() {
 	var obj = {};
-	obj['name'] = $('#staffNames').val();
+	obj['userId'] = $('#staffNames').val();
 	obj['role'] = $('#staffRoles').val();
-	obj['site'] = $('#studySites').val();
+	obj['datasetInstance'] = $('#studySites').val();
 	activeStudy['staff'].push(obj);
 	addStaffRow(obj);
 	updateBasicInfo(activeStudy);
@@ -2958,15 +2942,17 @@ function addStaffRow(obj) {
 	td.html(obj['role']);
 	td = $('<td>');
 	tr.append(td);
-	td.html(obj['name']);
+	td.html(scannerUsersDict[obj['userId']]['firstName'] + ' ' + scannerUsersDict[obj['userId']]['lastName']);
+	td.attr('userId', obj['userId']);
 	td = $('<td>');
 	tr.append(td);
-	td.html(obj['site']);
+	var node = datasetInstancesDict[obj['datasetInstance']]['node'];
+	td.html(node['site'] + ':' + node['nodeId']);
 	td = $('<td>');
 	tr.append(td);
 	var a = $('<a>');
-	a.attr('href', 'mailto:' + investigatorsMails[obj['name']] + '@' + obj['site'].toLowerCase());
-	a.html(investigatorsMails[obj['name']] + '@' + obj['site'].toLowerCase());
+	a.attr('href', 'mailto:' + scannerUsersDict[obj['userId']]['email']);
+	a.html(scannerUsersDict[obj['userId']]['email']);
 	td.append(a);
 	td = $('<td>');
 	tr.append(td);
@@ -2983,7 +2969,7 @@ function addStaffRow(obj) {
 function removeStaff(button, obj) {
 	var staffValues = activeStudy['staff'];
 	$.each(staffValues, function(i, elem) {
-		if (elem['name'] == obj['name'] && elem['role'] == obj['role'] && elem['site'] == obj['site']) {
+		if (elem['userId'] == obj['userId'] && elem['role'] == obj['role'] && elem['site'] == obj['site']) {
 			staffValues.splice(i, 1);
 			return false;
 		}
@@ -3072,26 +3058,8 @@ function checkError(data) {
  * 	the array with the datasets names
  * 	the id of the tree
  */
-var investigatorsList = ['Chris Anderson',
-                         'Jordan Harris',
-                         'Bill Johnston',
-                         'Jose Martinez',
-                         'Joe Miller',
-                         'John Smith',
-                         'Mark Thomas',
-                         'Mary Williams'
-                         ];
-
-var investigatorsMails = {'Chris Anderson': 'canderson',
-                         'Jordan Harris': 'jharris',
-                         'Bill Johnston': 'bjohnston',
-                         'Jose Martinez': 'jmartinez',
-                         'Joe Miller': 'jmiller',
-                         'John Smith': 'jsmith',
-                         'Mark Thomas': 'mthomas',
-                         'Mary Williams': 'mwilliams'
-};
-
+var scannerUsersDict = null;
+var scannerUsersList = null;
 var investigatorsRoles = ['Site PI',
                           'Co Investigator',
                           'Co PI',
@@ -3100,66 +3068,38 @@ var investigatorsRoles = ['Site PI',
                           'Delegate'
                           ];
 
-var siteNames = ['UCSD',
-                 'Lahey',
-                 'RAND',
-                 'USC'
-                          ];
+var datasetInstancesDict = null;
+var datasetInstancesList = null;
 
-var modelNames = ['GLORE - Cox PH',
-                  'GLORE - Logit',
-                  'OCEANS - Logit',
-                  'OCEANS - PH'
-                  ];
+var toolsDict = null;
+var toolList = null;
 
-var datasetNames = ['BEARI SN Diagnostic',
-                    'Med Surveillance',
-                    'Med Surveillance V1',
-                    'MTM Simulated',
-                    'MTM DS V1.2',
-                    'MTM DS V2.1'
-                    ];
-
-var datasetInstances = ['MTM 1',
-                        'MTM 2',
-                        'MTM 3',
-                        'MTM V1.0 NODE17 SITE2',
-	                    'MTM V1.3 NODE17 SITE2',
-	                    'MTM V1.4',
-	                    'Add new...'
-	                    ];
-
-var datasetInstancesMap = {	'MTM 1': {'url': 'https://scanner-node3.misd.isi.edu:8888/scanner', 'node': 'RAND'},
-							'MTM 2': {'url': 'https://scanner-node2.misd.isi.edu:8888/scanner', 'node': 'UCSD'},
-							'MTM 3': {'url': 'https://scanner-node1.misd.isi.edu:8888/scanner', 'node': 'USC'},
-							'MTM V1.0 NODE17 SITE2': {'url': 'https://a.b.com/n12s2v1.0', 'node': 'ISI1'},
-		                    'MTM V1.3 NODE17 SITE2': {'url': 'https://a.b.com/n12s2v1.3', 'node': 'ISI2'},
-		                    'MTM V1.4': {'url': 'https://a.b.com/mtmv1.0', 'node': 'USC1'}
-							};
+var datasetDefinitionList = null;
+var datasetDefinitionDict = null;
 
 var releaseResultsPolicy = ['instantly',
 		                    'manually'
 		                    ];
 
-var siteNodes = siteNames;
-
 var studyCounter = 200;
 
-var myStudies = [ {"staff":[{"name":"Bill Johnston","role":"Project Manager","site":"UCSD"},
-                            {"name":"Mark Thomas","role":"Site PI","site":"USC"}],
-                   "protocol":[{"method":"OCEANS - Logit","site":"UCSD","dataset":"MTM Simulated","url":"https://scanner-node3.misd.isi.edu:8888/scanner","node":"RAND","releasePolicy":"instantly"},
-                               {"method":"OCEANS - Logit","site":"RAND","dataset":"MTM Simulated","url":"https://scanner-node2.misd.isi.edu:8888/scanner","node":"UCSD","releasePolicy":"instantly"},
-                               {"method":"OCEANS - Logit","site":"USC","dataset":"MTM Simulated","url":"https://scanner-node1.misd.isi.edu:8888/scanner","node":"USC","releasePolicy":"manually"},
-                               {"method":"GLORE - Logit","site":"UCSD","dataset":"MTM Simulated","url":"https://scanner-node3.misd.isi.edu:8888/scanner","node":"RAND","releasePolicy":"instantly"},
-                               {"method":"GLORE - Logit","site":"RAND","dataset":"MTM Simulated","url":"https://scanner-node2.misd.isi.edu:8888/scanner","node":"UCSD","releasePolicy":"instantly"},
-                               {"method":"GLORE - Logit","site":"USC","dataset":"MTM Simulated","url":"https://scanner-node1.misd.isi.edu:8888/scanner","node":"USC","releasePolicy":"instantly"}],
-                   "id":200,
+var myStudies = [ {"staff":[{"userId":1,"role":"Project Manager","datasetInstance":1},
+                            {"userId":2,"role":"Site PI","datasetInstance":2}],
+                   "protocol":[{"tool":1,"datasetInstance":1,"dataset":1,"releasePolicy":"instantly"},
+                               {"tool":1,"datasetInstance":2,"dataset":1,"releasePolicy":"instantly"},
+                               {"tool":1,"datasetInstance":3,"dataset":1,"releasePolicy":"manually"},
+                               {"tool":2,"datasetInstance":1,"dataset":1,"releasePolicy":"instantly"},
+                               {"tool":2,"datasetInstance":2,"dataset":1,"releasePolicy":"instantly"},
+                               {"tool":2,"datasetInstance":3,"dataset":1,"releasePolicy":"instantly"}],
+                   "id":1,
                    "title":"MTM",
-                   "description":"Test",
-                   "startDate":"2013-08-14",
-                   "endDate":"2013-09-14"
+                   "description":"Medication Therapy Management",
+                   "startDate":"2013-08-15",
+                   "endDate":"2013-08-15"
                    }
                  ];
+
+var instanceIdCounter = 0;
 
 var activeStudy = null;
 
@@ -3202,11 +3142,9 @@ function updateStudy() {
 
 function addProtocol() {
 	var obj = {};
-	obj['method'] = $('#modelNames').val();
-	obj['site'] = $('#siteNames').val();
+	obj['tool'] = $('#modelNames').val();
 	obj['dataset'] = $('#datasetNames').val();
-	obj['url'] = datasetInstancesMap[$('#datasetInstances').val()]['url'];
-	obj['node'] = datasetInstancesMap[$('#datasetInstances').val()]['node'];
+	obj['datasetInstance'] = $('#datasetInstances').val();
 	obj['releasePolicy'] = $('#studySendOptions').val();
 	activeStudy['protocol'].push(obj);
 	addProtocolRow(obj);
@@ -3220,27 +3158,28 @@ function addProtocolRow(obj) {
 	var td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html('Estimate ' + obj['method']);
+	td.html(toolsDict[obj['tool']]['toolDescription']);
 	td = $('<td>');
 	td.addClass('protocol_border');
 	tr.append(td);
-	td.html('for ' + obj['site']);
+	var node = datasetInstancesDict[obj['datasetInstance']]['node'];
+	td.html(node['site']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html('using ' + obj['dataset']);
+	td.html(datasetDefinitionDict[obj['dataset']]['dataSetName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['url']);
+	td.html(node['hostUrl']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['node']);
+	td.html(node['site'] + ':' + node['nodeId']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html('release results ' + obj['releasePolicy']);
+	td.html(obj['releasePolicy']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3268,7 +3207,6 @@ function addProtocolRow(obj) {
 	td.append(button);
 	$('.wizard_content_protocol', div).width(div.width());
 	$('#modelNames').val('');
-	$('#siteNames').val('');
 	$('#datasetNames').val('');
 	$('#datasetInstances').val('');
 	$('#studySendOptions').val('');
@@ -3521,20 +3459,24 @@ function appendStudyContent(study) {
 }
 
 function addInstance() {
-	addDatasetInstance($('#instanceName').val(), $('#instanceURL').val(), $('#nodeNames').val(), $('#instanceDescription').val());
+	addDatasetInstance($('#instanceName').val(), $('#instanceDataSource').val(), $('#nodeNames').val(), $('#instanceDescription').val());
 }
-function addDatasetInstance(name, url, node, description) {
-	datasetInstances.unshift(name);
+
+function addDatasetInstance(name, datasource, datasetInstance, description) {
 	var obj = {};
-	obj['url'] = url;
-	obj['node'] = node;
-	datasetInstancesMap[name] = obj;
+	obj['dataSetInstanceId'] = ++instanceIdCounter;
+	obj['dataSetInstanceName'] = name;
+	obj['description'] = description;
+	obj['dataSource'] = datasource;
+	obj['node'] = datasetInstancesDict[datasetInstance]['node'];
+	datasetInstancesList.unshift(obj);
+	datasetInstancesDict[instanceIdCounter] = obj;
 	var firstOption = $($('option', $('#datasetInstances'))[0]);
 	var option = $('<option>');
 	option.text(name);
-	option.attr('value', name);
+	option.attr('value', instanceIdCounter);
 	option.insertAfter(firstOption);
-	$('#datasetInstances').val(name);
+	$('#datasetInstances').val(instanceIdCounter);
 	$('#add_protocol_div').show();
 	$('#add_instance_div').hide();
 }
@@ -3555,3 +3497,100 @@ function getScrollbarWidth() {
     $(div).remove();
     return Math.ceil((w1 - w2) * 3 / 2);
 }
+
+function initUsers() {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getUsers';
+	scanner.RETRIEVE(url, obj, true, postInitUsers, null, null, 0);
+}
+
+function postInitUsers(data, textStatus, jqXHR, param) {
+	scannerUsersList = data;
+	scannerUsersDict = {};
+	$.each(data, function(i, user) {
+		scannerUsersDict[user['userId']] = user;
+	});
+	scannerUsersList.sort(compareUsers);
+	initDatasetInstances();
+}
+
+function initDatasetInstances() {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getDatasetInstances';
+	scanner.RETRIEVE(url, obj, true, postInitDatasetInstances, null, null, 0);
+}
+
+function postInitDatasetInstances(data, textStatus, jqXHR, param) {
+	datasetInstancesList = data;
+	datasetInstancesDict = {};
+	$.each(data, function(i, datasetInstance) {
+		if (datasetInstance['dataSetInstanceId'] > instanceIdCounter) {
+			instanceIdCounter = datasetInstance['dataSetInstanceId'];
+		}
+		datasetInstancesDict[datasetInstance['dataSetInstanceId']] = datasetInstance;
+	});
+	datasetInstancesList.sort(compareNodes);
+	initTools();
+}
+
+function initTools() {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getTools';
+	scanner.RETRIEVE(url, obj, true, postInitTools, null, null, 0);
+}
+
+function postInitTools(data, textStatus, jqXHR, param) {
+	toolList = data;
+	toolsDict = {};
+	$.each(data, function(i, tool) {
+		toolsDict[tool['toolId']] = tool;
+	});
+	toolList.sort(compareTools);
+	initDatasets();
+}
+
+function initDatasets() {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getDatasetDefinitions';
+	scanner.RETRIEVE(url, obj, true, postInitDatasets, null, null, 0);
+}
+
+function postInitDatasets(data, textStatus, jqXHR, param) {
+	datasetDefinitionList = data;
+	datasetDefinitionDict = {};
+	$.each(data, function(i, dataset) {
+		datasetDefinitionDict[dataset['dataSetDefinitionId']] = dataset;
+	});
+	datasetDefinitionList.sort(compareDatasetDefinitions);
+}
+
+function compareUsers(user1, user2) {
+	var val1 = user1['lastName'] + ' ' + user1['firstName'];
+	var val2 = user2['lastName'] + ' ' + user2['firstName'];
+	return compareIgnoreCase(val1, val2);
+}
+
+function compareNodes(datasetInstance1, datasetInstance2) {
+	var node1 = datasetInstance1['node'];
+	var node2 = datasetInstance2['node'];
+	var val1 = node1['site'] + ':' + node1['nodeId'];
+	var val2 = node2['site'] + ':' + node2['nodeId'];
+	return compareIgnoreCase(val1, val2);
+}
+
+function compareTools(tool1, tool2) {
+	var val1 = tool1['toolDescription'];
+	var val2 = tool2['toolDescription'];
+	return compareIgnoreCase(val1, val2);
+}
+
+function compareDatasetDefinitions(dataset1, dataset2) {
+	var val1 = dataset1['dataSetName'];
+	var val2 = dataset2['dataSetName'];
+	return compareIgnoreCase(val1, val2);
+}
+

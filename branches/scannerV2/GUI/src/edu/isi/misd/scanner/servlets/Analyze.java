@@ -152,6 +152,41 @@ public class Analyze extends HttpServlet {
 			System.out.println("Analyze Get Sites:\n"+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
+		} else if (action.equals("getUsers")) {
+			RegistryClientResponse clientResponse = registryClient.getUsers();
+			JSONArray ret = clientResponse.toUsers();
+			clientResponse.release();
+			System.out.println("Analyze Get Users:\n"+ret);
+			PrintWriter out = response.getWriter();
+			out.print(ret.toString());
+		} else if (action.equals("getNodes")) {
+			RegistryClientResponse clientResponse = registryClient.getNodes();
+			JSONArray ret = clientResponse.toNodes();
+			clientResponse.release();
+			System.out.println("Analyze Get Nodes:\n"+ret);
+			PrintWriter out = response.getWriter();
+			out.print(ret.toString());
+		} else if (action.equals("getTools")) {
+			RegistryClientResponse clientResponse = registryClient.getTools();
+			String ret = clientResponse.toTools().toString();
+			clientResponse.release();
+			System.out.println("Analyze Get Tools: "+ret);
+			PrintWriter out = response.getWriter();
+			out.print(ret);
+		} else if (action.equals("getDatasetInstances")) {
+			RegistryClientResponse clientResponse = registryClient.getDatasetInstances();
+			String ret = clientResponse.toDatasetInstances().toString();
+			clientResponse.release();
+			System.out.println("Analyze Get Tools: "+ret);
+			PrintWriter out = response.getWriter();
+			out.print(ret);
+		} else if (action.equals("getDatasetDefinitions")) {
+			RegistryClientResponse clientResponse = registryClient.getDatasetDefinitions();
+			String ret = clientResponse.toDatasetDefinitions().toString();
+			clientResponse.release();
+			System.out.println("Analyze Get Tools: "+ret);
+			PrintWriter out = response.getWriter();
+			out.print(ret);
 		}
 	}
 

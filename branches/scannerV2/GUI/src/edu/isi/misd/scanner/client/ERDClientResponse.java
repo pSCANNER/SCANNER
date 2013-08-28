@@ -3,8 +3,6 @@
  */
 package edu.isi.misd.scanner.client;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -459,6 +457,43 @@ public class ERDClientResponse implements RegistryClientResponse {
 	@Override
 	public JSONArray getEntityResponse() {
 		return entityResponse;
+	}
+
+	@Override
+	public JSONArray toUsers() {
+		return getEntityResponse();
+	}
+
+	@Override
+	public JSONArray toNodes() {
+		// TODO Auto-generated method stub
+		JSONArray ret = new JSONArray();
+		try {
+			for (int i=0; i < entityResponse.length(); i++) {
+				JSONObject node = entityResponse.getJSONObject(i);
+				if (!node.getBoolean("isMaster")) {
+					ret.put(node);
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	@Override
+	public JSONArray toTools() {
+		return getEntityResponse();
+	}
+
+	@Override
+	public JSONArray toDatasetInstances() {
+		return getEntityResponse();
+	}
+
+	@Override
+	public JSONArray toDatasetDefinitions() {
+		return getEntityResponse();
 	}
 
 }

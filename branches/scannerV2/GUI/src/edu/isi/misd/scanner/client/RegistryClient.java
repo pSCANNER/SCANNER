@@ -693,4 +693,9 @@ public interface RegistryClient {
 	public RegistryClientResponse getSitesMap();
 
 	public RegistryClientResponse getPI();
+	public RegistryClientResponse getUsers();
+	public RegistryClientResponse getNodes();
+	public RegistryClientResponse getTools();
+	public RegistryClientResponse getDatasetInstances();
+	public RegistryClientResponse getDatasetDefinitions();
 }
