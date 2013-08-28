@@ -44,11 +44,17 @@ public class FavoritesCodeSetController extends BaseController
         }
                
         if (searchTerm != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Search query issued using term: " + searchTerm);
+            }
             return 
                 favoritesCodeSetRepository.
                     findByConceptNameIgnoreCaseContainingOrderByConceptNameAsc(
                         searchTerm); 
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Find all query issued");
+            }             
             return
                 favoritesCodeSetRepository.findAllOrderByConceptNameAsc();
         }          

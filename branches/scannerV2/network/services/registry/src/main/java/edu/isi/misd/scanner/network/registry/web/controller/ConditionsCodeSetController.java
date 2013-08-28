@@ -44,11 +44,17 @@ public class ConditionsCodeSetController extends BaseController
         }
               
         if (searchTerm != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Search query issued using term: " + searchTerm);
+            }            
             return 
                 conditionsCodeSetRepository.
                     findByConceptNameIgnoreCaseContainingOrderByConceptNameAsc(
                         searchTerm); 
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Find all query issued");
+            }                 
             return 
                 conditionsCodeSetRepository.findAllOrderByConceptNameAsc();
         }           

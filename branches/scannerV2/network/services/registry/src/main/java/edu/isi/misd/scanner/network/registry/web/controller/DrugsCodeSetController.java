@@ -44,11 +44,17 @@ public class DrugsCodeSetController extends BaseController
         }
                
         if (searchTerm != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Search query issued using term: " + searchTerm);
+            }            
             return 
                 drugsCodeSetRepository.
                     findByConceptNameIgnoreCaseContainingOrderByConceptNameAsc(
                         searchTerm); 
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Find all query issued");
+            }             
             return 
                 drugsCodeSetRepository.findAllOrderByConceptNameAsc();
         }          
