@@ -35,11 +35,28 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#createStudy(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse createStudy(String name, String description,
-			String title, String email, String phone, String website,
-			String address, String contact, String approvals) {
-		// TODO Auto-generated method stub
-		return null;
+	public RegistryClientResponse createStudy(String studyName, String irbId, String principalInvestigator, String studyStatusType) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studies";
+		try {
+			JSONObject body = new JSONObject();
+			body.put("studyName", studyName);
+			body.put("irbId", irbId != null ? Integer.parseInt(irbId) : 0);
+			JSONObject investigator = new JSONObject();
+			investigator.put("userId", Integer.parseInt(principalInvestigator));
+			body.put("principalInvestigator", investigator);
+			JSONObject status = new JSONObject();
+			status.put("studyStatusTypeId", Integer.parseInt(studyStatusType));
+			body.put("studyStatusType", status);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			ClientURLResponse rsp = postRegistry(url, body.toString());
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 	/* (non-Javadoc)

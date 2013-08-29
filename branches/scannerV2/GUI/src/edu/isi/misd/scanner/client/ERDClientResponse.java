@@ -30,7 +30,6 @@ public class ERDClientResponse implements RegistryClientResponse {
 		try {
 			entityResponse = new JSONArray(res);
 		} catch (JSONException e) {
-			e.printStackTrace();
 			try {
 				entityObject = new JSONObject(res);
 			} catch (JSONException e1) {

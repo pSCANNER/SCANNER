@@ -225,9 +225,15 @@ public class Registry extends HttpServlet {
 			return;
 		}
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
+		String studyName = request.getParameter("studyName");
+		String irbId = request.getParameter("irbId");
+		String principalInvestigator = request.getParameter("principalInvestigator");
+		String studyStatusType = request.getParameter("studyStatusType");
+		
+		
+		String study = request.getParameter("study");
 		String id = request.getParameter("id");
 		String name = request.getParameter("cname");
-		String study = request.getParameter("study");
 		String rpath = request.getParameter("rpath");
 		String lib = request.getParameter("library");
 		String rURL = request.getParameter("rURL");
@@ -259,10 +265,10 @@ public class Registry extends HttpServlet {
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
 		if (action.equals("createStudy")) {
-			clientResponse = registryClient.createStudy(name, description, title,
-					email, phone, website, address, contact, approvals);
+			clientResponse = registryClient.createStudy(studyName, irbId, principalInvestigator, studyStatusType);
 			if (clientResponse != null) {
-				responseBody = Utils.extractId(clientResponse.getEntityString());
+				responseBody = clientResponse.getEntity().toString();
+				System.out.println("responseBody: " + responseBody);
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create study.");
 				return;

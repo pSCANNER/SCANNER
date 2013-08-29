@@ -123,9 +123,39 @@
 								<div id="newProjectDiv" class="wizard_layer">
 									<div id="createStudyDiv">
 										<h1>New Study</h1>
-										<h4>To Get Started, Enter the Title of Your New Study: </h4>
-										<input type="text" id="studyTitleInput">
-										<input type="button" id="createStudyButton" value="Create Study" onclick="createStudy()" disabled="disabled">
+										<div class="wizard_content">
+											<table>
+												<tr>
+													<td>
+														<table class="update_study">
+															<tbody>
+																<tr>
+																	<td class="tag">Title:</td>
+																	<td><input type="text" id="studyTitleInput"></td>
+																	<td class="tag">IRB:</td>
+																	<td><input type="text" id="createStudyIRBInput"></td>
+																</tr>
+																<tr>
+																	<td class="tag">Principal Investigator:</td>
+																	<td><select id="createStudyPrincipalInvestigator"></select></td>
+																	<td class="tag">Study Status Type:</td>
+																	<td>
+																		<select id="createStudyStatusType">
+																			<option value="1">defined</option>
+																		</select>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+													</td>
+												</tr>
+												<tr>
+													<td class="tag">
+														<input type="button" id="createStudyButton" value="Create Study" onclick="createStudy()" disabled="disabled">
+													</td>
+												</tr>
+											</table>
+										</div>
 									</div>
 								</div>
 								<div id="manageStudiesDiv" class="wizard_layer">

@@ -157,6 +157,23 @@ function initScanner() {
 				$('#createStudyButton').attr('disabled', 'disabled');
 				$('#studyTitleInput').unbind('keyup');
 				$('#studyTitleInput').keyup(function(event) {checkCreateStudyButton();});
+				
+				$('#createStudyIRBInput').val('');
+				$('#createStudyPrincipalInvestigator').val('');
+				$('#createStudyPrincipalInvestigator').unbind('change');
+				var select = $('#createStudyPrincipalInvestigator');
+				select.html('');
+				var option = $('<option>');
+				option.text('Enter Letters of Name...');
+				option.attr('value', '');
+				select.append(option);
+				$.each(scannerUsersList, function(i, user) {
+					option = $('<option>');
+					option.text(user['firstName'] + ' ' + user['lastName']);
+					option.attr('value', user['userId']);
+					select.append(option);
+				});
+				select.change(function(event) {checkCreateStudyButton();});
 			} else if (divId == 'manageStudiesDiv') {
 				manageStudy();
 			} else if (divId == 'myStudiesDiv') {
@@ -2873,7 +2890,7 @@ function manageStudy() {
 }
 
 function checkCreateStudyButton() {
-	if ($('#studyTitleInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
+	if ($('#studyTitleInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && $('#createStudyPrincipalInvestigator').val() != '') {
 		$('#createStudyButton').removeAttr('disabled');
 	} else {
 		$('#createStudyButton').attr('disabled', 'disabled');
@@ -3104,18 +3121,40 @@ var instanceIdCounter = 0;
 var activeStudy = null;
 
 function createStudy() {
+	obj = {};
+	obj['action'] = 'createStudy';
+	obj['studyName'] = $('#studyTitleInput').val();
+	var irb = $('#createStudyIRBInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	if (irb.length > 0) {
+		if (!isNaN(parseInt(irb)) && irb.length == ("" + parseInt(irb)).length) {
+			obj['irbId'] = parseInt(irb);
+		} else {
+			alert('Invalid integer value for IRB: "' + $('#createStudyIRBInput').val() + '"');
+			return;
+		}
+	}
+	obj['principalInvestigator'] = $('#createStudyPrincipalInvestigator').val();
+	obj['studyStatusType'] = $('#createStudyStatusType').val();
+	var url =  HOME + '/registry';
+	scanner.POST(url, obj, true, postCreateStudy, null, null, 0);
+}
+
+function postCreateStudy(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	if (data['studyId'] == null) {
+		alert('Error Status Code: ' + data['errorStatusCode'] + '\nError Message: ' + data['errorMessage'] + '\nError Detail: ' + data['errorDetail']);
+		return;
+	}
 	activeStudy = {};
 	myStudies.push(activeStudy);
 	activeStudy['staff'] = [];
 	activeStudy['protocol'] = [];
-	activeStudy['id'] = ++studyCounter;
+	activeStudy['id'] = data['studyId'];
 	activeStudy['title'] = $('#studyTitleInput').val();
 	$('#projectTitle').val($('#studyTitleInput').val());
 	appendStudy(activeStudy);
 	setActive(activeStudy['id']);
 	$('#manageStudiesDivLink').click();
-	//sendStudy(obj);
-	
 }
 
 function updateStudy() {

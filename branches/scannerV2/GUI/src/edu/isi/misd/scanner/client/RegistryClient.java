@@ -49,8 +49,7 @@ public interface RegistryClient {
      *            the website for the study approvals.
      * @return The client response.
      */
-	public RegistryClientResponse createStudy(String name, String description, String title,
-			String email, String phone, String website, String address, String contact, String approvals);
+	public RegistryClientResponse createStudy(String studyName, String irbId, String principalInvestigator, String studyStatusType);
 	
     /**
      * Creates an entry of "dataset" type in the registry.
