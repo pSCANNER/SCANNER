@@ -1,8 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -58,12 +56,11 @@ public class ScannerUser implements Serializable
     @Basic(optional = false)
     @Column(name = "is_superuser")
     private boolean isSuperuser;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch=FetchType.EAGER)
+    private List<UserRole> userRoles;      
     @JsonIgnore
     @ManyToMany(mappedBy = "scannerUsers")
-    private List<StudyRole> studyRoles; 
-    @JsonManagedReference("ScannerUser-UserRole")
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch=FetchType.EAGER)
-    private List<UserRole> userRoles;    
+    private List<StudyRole> studyRoles;   
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "principalInvestigator")
     private List<Study> studies;
