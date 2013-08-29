@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -22,12 +23,14 @@ public class DataSetPolicyAuthority implements Serializable
     @Basic(optional = false)
     @Column(name = "data_set_policy_authority_id")
     private Integer dataSetPolicyAuthorityId;
+    @JsonIgnore
     @Basic(optional = false)
     @Column(name = "data_set_policy_authority_name")
     private String dataSetPolicyAuthorityName;
     @Basic(optional = false)
     @Column(name = "description")
     private String description;
+    @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyAuthority")
     private List<StudyPolicyStatement> studyPolicyStatements;
 

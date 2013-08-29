@@ -16,7 +16,7 @@ public interface DataSetInstanceRepository
     @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
            "JOIN i.dataSetDefinition d " + 
            "JOIN i.analysisPolicyStatements p " + 
-           "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
+           "JOIN p.studyRole r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE d.dataSetDefinitionId = :dataSetId " + 
            "AND u.userName = :userName " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
@@ -27,7 +27,7 @@ public interface DataSetInstanceRepository
     @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
            "JOIN i.dataSetDefinition d " + 
            "JOIN i.analysisPolicyStatements p " + 
-           "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
+           "JOIN p.studyRole r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE d.dataSetName = :dataSetName " + 
            "AND u.userName = :userName " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)

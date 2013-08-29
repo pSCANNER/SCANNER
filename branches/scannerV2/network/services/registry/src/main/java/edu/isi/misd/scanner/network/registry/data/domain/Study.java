@@ -11,6 +11,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,10 +54,7 @@ public class Study implements Serializable
     @Column(name = "clinical_trials_id")
     private Integer clinicalTrialsId;
     @Column(name = "analysis_plan")
-    private String analysisPlan;
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
-    private List<StudyRole> studyRoles;      
+    private String analysisPlan;   
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "study_status_type_id", referencedColumnName = "study_status_type_id")
@@ -67,6 +65,8 @@ public class Study implements Serializable
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser principalInvestigator;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study", fetch=FetchType.EAGER)
+    private List<StudyRole> studyRoles;       
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudy")
     private List<DataSetDefinition> dataSetDefinitions;

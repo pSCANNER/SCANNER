@@ -23,7 +23,7 @@ public interface DataSetDefinitionRepository
  
     @Query("SELECT DISTINCT d FROM DataSetDefinition d " +  
            "JOIN d.studyPolicyStatements p JOIN p.study s " + 
-           "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
+           "JOIN p.studyRole r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE s.studyName = :studyName AND u.userName = :userName " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
     List<DataSetDefinition> findDataSetsForStudyNameAndUserName(

@@ -14,7 +14,7 @@ public interface AnalysisPolicyStatementRepository
     extends CrudRepository<AnalysisPolicyStatement, Integer> 
 {               
     @Query("SELECT p FROM AnalysisPolicyStatement p " +
-           "JOIN p.role r JOIN r.userRoles ur JOIN ur.user u " +
+           "JOIN p.studyRole r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE u.userId = :userId " + 
            "AND p.dataSetInstance.dataSetInstanceId = :instanceId " +
            "AND p.analysisTool.toolId = :toolId " + 

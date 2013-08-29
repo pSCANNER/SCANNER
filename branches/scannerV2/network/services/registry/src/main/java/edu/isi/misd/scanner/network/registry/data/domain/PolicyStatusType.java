@@ -23,6 +23,7 @@ public class PolicyStatusType implements Serializable
     @Basic(optional = false)
     @Column(name = "policy_status_type_id")
     private Integer policyStatusTypeId;
+    @JsonIgnore
     @Basic(optional = false)
     @Column(name = "policy_status_type_name")
     private String policyStatusTypeName;

@@ -1,6 +1,5 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,30 +35,30 @@ public class StudyRole implements Serializable
     private Integer roleId;
     @Basic(optional = false)
     @Column(name = "role_within_study")
-    private String roleWithinStudy;
+    private String roleWithinStudy;       
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityReference(alwaysAsId=true)      
+    @JoinColumn(name = "study_id", referencedColumnName = "study_id")
+    @ManyToOne(optional = false)
+    private Study study;       
     @JoinTable(name = "user_role", schema = "scanner_registry", 
         joinColumns = {
         @JoinColumn(name = "role_id", referencedColumnName = "role_id")}, inverseJoinColumns = {
         @JoinColumn(name = "user_id", referencedColumnName = "user_id")})
     @ManyToMany
-    @JsonBackReference("user-role")    
-    private List<ScannerUser> scannerUsers;     
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
-    @JsonIdentityReference(alwaysAsId=true)      
-    @JoinColumn(name = "study_id", referencedColumnName = "study_id")
-    @ManyToOne(optional = false)
-    private Study study;    
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    private List<ScannerUser> scannerUsers; 
+    @JsonIgnore     
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyRole")
+    private List<UserRole> userRoles;    
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyRole")
     private List<SitePolicy> sitePolicies;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyRole")
     private List<AnalysisPolicyStatement> analysisPolicyStatements;
-    @JsonIgnore    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
-    private List<UserRole> userRoles;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "role")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyRole")
     private List<StudyPolicyStatement> studyPolicyStatements;
 
     public StudyRole() {
@@ -98,11 +97,11 @@ public class StudyRole implements Serializable
         this.sitePolicies = sitePolicies;
     }
 
-    public List<AnalysisPolicyStatement> getAnalysisPolicyStatement() {
+    public List<AnalysisPolicyStatement> getAnalysisPolicyStatements() {
         return analysisPolicyStatements;
     }
 
-    public void setAnalysisPolicyStatement(List<AnalysisPolicyStatement> analysisPolicyStatements) {
+    public void setAnalysisPolicyStatements(List<AnalysisPolicyStatement> analysisPolicyStatements) {
         this.analysisPolicyStatements = analysisPolicyStatements;
     }
 

@@ -23,6 +23,7 @@ public class StudyStatusType implements Serializable
     @Basic(optional = false)
     @Column(name = "study_status_type_id")
     private Integer studyStatusTypeId;
+    @JsonIgnore
     @Basic(optional = false)
     @Column(name = "study_status_type_name")
     private String studyStatusTypeName;

@@ -23,6 +23,7 @@ public class AccessMode implements Serializable
     @Basic(optional = false)
     @Column(name = "access_mode_id")
     private Integer accessModeId;
+    @JsonIgnore    
     @Basic(optional = false)
     @Column(name = "access_mode_name")
     private String accessModeName;

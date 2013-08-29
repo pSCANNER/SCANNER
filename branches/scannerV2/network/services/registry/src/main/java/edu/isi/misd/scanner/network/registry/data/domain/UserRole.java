@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -25,7 +26,8 @@ public class UserRole implements Serializable {
     private Integer userRoleId;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
-    private StudyRole role;
+    private StudyRole studyRole;
+    @JsonBackReference("ScannerUser-UserRole")
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser user;
@@ -45,12 +47,12 @@ public class UserRole implements Serializable {
         this.userRoleId = userRoleId;
     }
 
-    public StudyRole getRole() {
-        return role;
+    public StudyRole getStudyRole() {
+        return studyRole;
     }
 
-    public void setRole(StudyRole role) {
-        this.role = role;
+    public void setStudyRole(StudyRole studyRole) {
+        this.studyRole = studyRole;
     }
 
     public ScannerUser getUser() {

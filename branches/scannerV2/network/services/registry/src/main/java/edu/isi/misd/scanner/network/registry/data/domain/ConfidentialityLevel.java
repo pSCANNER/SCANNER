@@ -23,6 +23,7 @@ public class ConfidentialityLevel implements Serializable
     @Basic(optional = false)
     @Column(name = "level_id")
     private Integer levelId;
+    @JsonIgnore    
     @Basic(optional = false)
     @Column(name = "level_name")
     private String levelName;

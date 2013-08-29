@@ -37,7 +37,7 @@ public class StudyPolicyStatement implements Serializable
     @JsonIdentityReference(alwaysAsId=true)            
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
-    private StudyRole role;
+    private StudyRole studyRole;
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
     @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
@@ -108,12 +108,12 @@ public class StudyPolicyStatement implements Serializable
         this.analysisPolicyStatements = analysisPolicyStatements;
     }
 
-    public StudyRole getRole() {
-        return role;
+    public StudyRole getStudyRole() {
+        return studyRole;
     }
 
-    public void setRole(StudyRole role) {
-        this.role = role;
+    public void setStudyRole(StudyRole studyRole) {
+        this.studyRole = studyRole;
     }
 
     public Study getStudy() {

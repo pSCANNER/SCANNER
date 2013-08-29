@@ -15,7 +15,7 @@ public interface ToolLibraryRepository
 {   
     @Query("SELECT DISTINCT l FROM ToolLibrary l " + 
            "JOIN l.analysisTools a JOIN a.studyPolicyStatements p " +
-           "JOIN p.role r JOIN r.userRoles ur " +
+           "JOIN p.studyRole r JOIN r.userRoles ur " +
            "WHERE ur.user.userName = :userName " +
            "AND p.study.studyName = :studyName " +
            "AND p.dataSetDefinition.dataSetName = :dataSetName " +

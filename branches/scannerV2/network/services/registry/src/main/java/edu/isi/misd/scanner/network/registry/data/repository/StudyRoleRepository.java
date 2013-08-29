@@ -9,9 +9,10 @@ import org.springframework.data.repository.CrudRepository;
 /**
  *
  */
-
 public interface StudyRoleRepository 
     extends CrudRepository<StudyRole, Integer> 
 {
-    
+   List<StudyRole> findByScannerUsersUserId(Integer userId);
+   List<StudyRole> findByScannerUsersUserName(String userName);   
+   List<StudyRole> findByStudyStudyName(String studyName);   
 }

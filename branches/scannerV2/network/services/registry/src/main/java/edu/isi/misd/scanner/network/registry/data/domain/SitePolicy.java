@@ -28,7 +28,7 @@ public class SitePolicy implements Serializable {
     private Site site;
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
-    private StudyRole role;
+    private StudyRole studyRole;
 
     public SitePolicy() {
     }
@@ -53,12 +53,12 @@ public class SitePolicy implements Serializable {
         this.site = site;
     }
 
-    public StudyRole getRole() {
-        return role;
+    public StudyRole getStudyRole() {
+        return studyRole;
     }
 
-    public void setRole(StudyRole role) {
-        this.role = role;
+    public void setStudyRole(StudyRole studyRole) {
+        this.studyRole = studyRole;
     }
 
     @Override

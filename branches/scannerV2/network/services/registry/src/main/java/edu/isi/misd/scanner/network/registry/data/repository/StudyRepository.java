@@ -17,13 +17,13 @@ public interface StudyRepository
     Study findByStudyName(String studyName);
    
     @Query("SELECT DISTINCT s FROM UserRole ur " + 
-           "JOIN ur.role r JOIN r.study s " +
+           "JOIN ur.studyRole r JOIN r.study s " +
            "WHERE ur.user.userId = :userId " +
            "ORDER BY s.studyId")
     List<Study> findStudiesForUserId( @Param("userId")Integer userId);
        
     @Query("SELECT DISTINCT s FROM UserRole ur " + 
-           "JOIN ur.role r JOIN r.study s " +
+           "JOIN ur.studyRole r JOIN r.study s " +
            "WHERE ur.user.userName = :userName " +
            "ORDER BY s.studyId")
     List<Study> findStudiesForUserName( @Param("userName")String userName);   

@@ -16,7 +16,7 @@ public interface AnalysisToolRepository
 {
     @Query("SELECT DISTINCT t FROM AnalysisTool t " + 
            "JOIN t.studyPolicyStatements p " +
-           "JOIN p.role r JOIN r.userRoles ur " +
+           "JOIN p.studyRole r JOIN r.userRoles ur " +
            "WHERE ur.user.userName = :userName " +
            "AND p.study.studyName = :studyName " +
            "AND p.dataSetDefinition.dataSetName = :dataSetName " +

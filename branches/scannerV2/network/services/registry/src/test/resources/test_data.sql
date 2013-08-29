@@ -18,13 +18,13 @@ INSERT INTO scanner_user (user_name, email, HSPC_documents, Phone, Reports_To, A
 
 INSERT INTO study (study_name, description, IRB_ID, Protocol, Principal_Investigator_UID, Start_Date, End_Date, Clinical_Trials_ID, Analysis_Plan, study_status_type_id) VALUES
 ('MTM', 'Medication Therapy Management', 1, 'Analyze MTM data on multiple sites with both OCEANS and GLORE', 1, '2013-08-15', '2013-08-15', 0, 'Very Important Analysis on Multiple Sites',1),
-('BEARI', 'Behavioral Economics for Acute Respitory Infections', 2, 'Analyze BEARI data on multiple ISI VMs with both OCEANS and GLORE', 1, '2013-08-15', '2013-08-15', 0, 'Determine if perfomrance is contingent on principal diagnosis',1);
+('BEARI', 'Behavioral Economics for Acute Respitory Infections', 2, 'Analyze BEARI data on multiple ISI VMs with both OCEANS and GLORE', 1, '2013-08-15', '2013-08-15', 0, 'Determine if performance is contingent on principal diagnosis',1);
 
 INSERT INTO study_role (study_id,role_within_study) VALUES
-(1,'Principle Investigator'),
+(1,'Principal Investigator'),
 (1,'Site Administrator'),
 (1,'Investigator'),
-(2,'Principle Investigator'),
+(2,'Principal Investigator'),
 (2,'Site Administrator'),
 (2,'Investigator');
 
