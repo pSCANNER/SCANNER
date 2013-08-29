@@ -2724,7 +2724,7 @@ function manageStudy() {
 		$('#updateStudyDiv').hide();
 		return;
 	}
-	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['id'] + ': ' + activeStudy['title']);
+	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['studyId'] + ': ' + activeStudy['studyName']);
 	if (activeStudy['description'] != null) {
 		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + activeStudy['description']);
 	}
@@ -2742,18 +2742,52 @@ function manageStudy() {
 		showHour: false,
 		showMinute: false
 	});
-	$('#projectTitle').val(activeStudy['title']);
+	
+	$('#projectTitle').unbind('keyup');
+	$('#projectTitle').keyup(function(event) {checkUpdateStudyButton();});
+	$('#updateStudyPrincipalInvestigator').unbind('change');
+	var select = $('#updateStudyPrincipalInvestigator');
+	select.html('');
+	var option = $('<option>');
+	option.text('Enter Letters of Name...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(scannerUsersList, function(i, user) {
+		option = $('<option>');
+		option.text(user['firstName'] + ' ' + user['lastName']);
+		option.attr('value', user['userId']);
+		select.append(option);
+	});
+	select.change(function(event) {checkUpdateStudyButton();});
+	
+	$('#projectTitle').val(activeStudy['studyName']);
+	$('#updateStudyIRBInput').val(activeStudy['irbId']);
+	$('#updateStudyPrincipalInvestigator').val(activeStudy['principalInvestigator']);
+	$('#updateStudyStatusType').val(activeStudy['studyStatusType']);
 	$('#projectDescription').val('');
+	$('#projectProtocol').val('');
 	$('#projectStartDate').val('');
 	$('#projectEndDate').val('');
+	$('#projectClinicalTrialsId').val('');
+	$('#projectAnalysisPlan').val('');
+	
 	if (activeStudy['description'] != null) {
 		$('#projectDescription').val(activeStudy['description']);
+	}
+	if (activeStudy['protocol'] != null) {
+		$('#projectProtocol').val(activeStudy['protocol']);
 	}
 	if (activeStudy['startDate'] != null) {
 		$('#projectStartDate').val(activeStudy['startDate']);
 	}
 	if (activeStudy['endDate'] != null) {
 		$('#projectEndDate').val(activeStudy['endDate']);
+	}
+	if (activeStudy['clinicalTrialsId'] != null) {
+		$('#projectClinicalTrialsId').val(activeStudy['clinicalTrialsId']);
+	}
+	if (activeStudy['analysisPlan'] != null) {
+		$('#projectAnalysisPlan').val(activeStudy['analysisPlan']);
 	}
 	var select = $('#staffNames');
 	select.html('');
@@ -2864,7 +2898,7 @@ function manageStudy() {
 		addStaffRow(staff);
 	});
 	$('#manageStudyProtocolsTbody').html('');
-	$.each(activeStudy['protocol'], function(i, protocol) {
+	$.each(activeStudy['protocols'], function(i, protocol) {
 		addProtocolRow(protocol);
 	});
 	var select = $('#nodeNames');
@@ -2887,6 +2921,7 @@ function manageStudy() {
 	$('#add_protocol_div').show();
 	$('#add_instance_div').hide();
 	displayAddNewInstanceOption();
+	checkUpdateStudyButton();
 }
 
 function checkCreateStudyButton() {
@@ -2894,6 +2929,14 @@ function checkCreateStudyButton() {
 		$('#createStudyButton').removeAttr('disabled');
 	} else {
 		$('#createStudyButton').attr('disabled', 'disabled');
+	}
+}
+
+function checkUpdateStudyButton() {
+	if ($('#projectTitle').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && $('#updateStudyPrincipalInvestigator').val() != '') {
+		$('#updateStudyButton').removeAttr('disabled');
+	} else {
+		$('#updateStudyButton').attr('disabled', 'disabled');
 	}
 }
 
@@ -3102,17 +3145,23 @@ var studyCounter = 200;
 
 var myStudies = [ {"staff":[{"userId":1,"role":"Project Manager","datasetInstance":1},
                             {"userId":2,"role":"Site PI","datasetInstance":2}],
-                   "protocol":[{"tool":1,"datasetInstance":1,"dataset":1,"releasePolicy":"instantly"},
+                   "protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"releasePolicy":"instantly"},
                                {"tool":1,"datasetInstance":2,"dataset":1,"releasePolicy":"instantly"},
                                {"tool":1,"datasetInstance":3,"dataset":1,"releasePolicy":"manually"},
                                {"tool":2,"datasetInstance":1,"dataset":1,"releasePolicy":"instantly"},
                                {"tool":2,"datasetInstance":2,"dataset":1,"releasePolicy":"instantly"},
                                {"tool":2,"datasetInstance":3,"dataset":1,"releasePolicy":"instantly"}],
-                   "id":1,
-                   "title":"MTM",
+                   "studyId":1,
+                   "studyName":"MTM",
+                   "irbId":1,
+                   "principalInvestigator":1,
+                   "studyStatusType":"defined",
                    "description":"Medication Therapy Management",
+                   "protocol":"Analyze MTM data on multiple sites with both OCEANS and GLORE",
                    "startDate":"2013-08-15",
-                   "endDate":"2013-08-15"
+                   "endDate":"2013-08-15",
+                   "clinicalTrialsId":0,
+                   "analysisPlan":"Very Important Analysis on Multiple Sites"
                    }
                  ];
 
@@ -3148,35 +3197,80 @@ function postCreateStudy(data, textStatus, jqXHR, param) {
 	activeStudy = {};
 	myStudies.push(activeStudy);
 	activeStudy['staff'] = [];
-	activeStudy['protocol'] = [];
-	activeStudy['id'] = data['studyId'];
-	activeStudy['title'] = $('#studyTitleInput').val();
+	activeStudy['protocols'] = [];
+	activeStudy['studyId'] = data['studyId'];
+	activeStudy['studyName'] = data['studyName'];
+	activeStudy['irbId'] = data['irbId'];
+	activeStudy['principalInvestigator'] = $('#createStudyPrincipalInvestigator').val();
 	$('#projectTitle').val($('#studyTitleInput').val());
 	appendStudy(activeStudy);
-	setActive(activeStudy['id']);
+	setActive(activeStudy['studyId']);
 	$('#manageStudiesDivLink').click();
 }
 
 function updateStudy() {
-	if ($('#projectTitle').val().replace(/^\s*/, "").replace(/\s*$/, "").length == 0) {
-		alert('The study "Title" can not be empty.');
-		return;
+	obj = {};
+	obj['action'] = 'updateStudy';
+	obj['studyName'] = $('#projectTitle').val();
+	obj['studyId'] = activeStudy['studyId'];
+
+	var irb = $('#updateStudyIRBInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	if (irb.length > 0) {
+		if (!isNaN(parseInt(irb)) && irb.length == ("" + parseInt(irb)).length) {
+			obj['irbId'] = parseInt(irb);
+		} else {
+			alert('Invalid integer value for IRB: "' + $('#updateStudyIRBInput').val() + '"');
+			return;
+		}
 	}
-	activeStudy['title'] = $('#projectTitle').val();
-	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['id'] + ': ' + activeStudy['title']);
-	if ($('#projectDescription').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
-		activeStudy['description'] = $('#projectDescription').val();
+
+	var clinicalTrialsId = $('#projectClinicalTrialsId').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	if (clinicalTrialsId.length > 0) {
+		if (isNaN(parseInt(clinicalTrialsId)) || clinicalTrialsId.length != ("" + parseInt(clinicalTrialsId)).length) {
+			alert('Invalid integer value for the Clinical Trials Id: "' + $('#projectClinicalTrialsId').val() + '"');
+			return;
+		} else {
+			obj['clinicalTrialsId'] = parseInt(clinicalTrialsId);
+		}
+	} else {
+		obj['clinicalTrialsId'] = '';
+	}
+	obj['principalInvestigator'] = $('#updateStudyPrincipalInvestigator').val();
+	obj['studyStatusType'] = $('#updateStudyStatusType').val();
+	obj['description'] = $('#projectDescription').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['protocol'] = $('#projectProtocol').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['startDate'] = $('#projectStartDate').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['endDate'] = $('#projectEndDate').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['analysisPlan'] = $('#projectAnalysisPlan').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	
+	var url =  HOME + '/registry';
+	scanner.POST(url, obj, true, postUpdateStudy, obj, null, 0);
+}
+
+function postUpdateStudy(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	if (data['studyId'] == null) {
+		alert('Error Status Code: ' + data['errorStatusCode'] + '\nError Message: ' + data['errorMessage'] + '\nError Detail: ' + data['errorDetail']);
+		return;
+	} else {
+		alert('The study was successfully updated.');
+	}
+	activeStudy['studyName'] = data['studyName'];
+	activeStudy['irbId'] = data['irbId'];
+	activeStudy['principalInvestigator'] = param['principalInvestigator'];
+	activeStudy['studyStatusType'] = data['studyStatusType'];
+	activeStudy['description'] = data['description'];
+	activeStudy['protocol'] = data['protocol'];
+	activeStudy['startDate'] = data['startDate'];
+	activeStudy['endDate'] = data['endDate'];
+	activeStudy['clinicalTrialsId'] = data['clinicalTrialsId'];
+	activeStudy['analysisPlan'] = data['analysisPlan'];
+	
+	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['studyId'] + ': ' + activeStudy['studyName']);
+	if (param['description'].length > 0) {
 		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + activeStudy['description']);
 	}
-	if ($('#projectStartDate').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
-		activeStudy['startDate'] = $('#projectStartDate').val();
-	}
-	if ($('#projectEndDate').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
-		activeStudy['endDate'] = $('#projectEndDate').val();
-	}
 	updateBasicInfo(activeStudy);
-	//sendStudy(obj);
-	
 }
 
 function addProtocol() {
@@ -3185,7 +3279,7 @@ function addProtocol() {
 	obj['dataset'] = $('#datasetNames').val();
 	obj['datasetInstance'] = $('#datasetInstances').val();
 	obj['releasePolicy'] = $('#studySendOptions').val();
-	activeStudy['protocol'].push(obj);
+	activeStudy['protocols'].push(obj);
 	addProtocolRow(obj);
 	updateBasicInfo(activeStudy);
 }
@@ -3254,7 +3348,7 @@ function addProtocolRow(obj) {
 }
 
 function removeProtocol(button, obj) {
-	var protocolValues = activeStudy['protocol'];
+	var protocolValues = activeStudy['protocols'];
 	$.each(protocolValues, function(i, elem) {
 		if (elem['method'] == obj['method'] && elem['dataset'] == obj['dataset'] && elem['site'] == obj['site'] && 
 				elem['url'] == obj['url'] && elem['node'] == obj['node'] && elem['releasePolicy'] == obj['releasePolicy']) {
@@ -3271,8 +3365,8 @@ function removeProtocol(button, obj) {
 
 function setActive(id) {
 	$.each(myStudies, function(i, study) {
-		if (study['id'] == id) {
-			setActiveStudy(study['title']);
+		if (study['studyId'] == id) {
+			setActiveStudy(study['studyName']);
 			return false;
 		}
 	});
@@ -3296,8 +3390,8 @@ function appendStudy(study) {
 	var p = $('<p>');
 	div.append(p);
 	p.addClass('wizard_heading');
-	p.attr('id', 'Study_p_' + study['id']);
-	var value = 'Study ' + study['id'] + ': ' + study['title'];
+	p.attr('id', 'Study_p_' + study['studyId']);
+	var value = 'Study ' + study['studyId'] + ': ' + study['studyName'];
 	if (study['description'] != null) {
 		value += ' - ' + study['description'];
 	}
@@ -3307,15 +3401,15 @@ function appendStudy(study) {
 	var span = $('<span>');
 	p.append(span);
 	span.addClass('active');
-	span.attr({	'id': 'Study_span_' + study['id'],
-				'study_id': study['id']
+	span.attr({	'id': 'Study_span_' + study['studyId'],
+				'study_id': study['studyId']
 	});
 	var a = $('<a>');
 	span.append(a);
-	a.attr('href', 'javascript:setActive(' + study['id'] + ');');
+	a.attr('href', 'javascript:setActive(' + study['studyId'] + ');');
 	a.html('Set Active');
 	var contentDiv = $('<div>');
-	contentDiv.attr('id', 'Study_div_' + study['id']);
+	contentDiv.attr('id', 'Study_div_' + study['studyId']);
 	div.append(contentDiv);
 	contentDiv.addClass('wizard_content');
 	p.click(function() {
@@ -3325,8 +3419,8 @@ function appendStudy(study) {
 }
 
 function updateBasicInfo(study) {
-	var label = $('label', $('#Study_p_' + study['id']));
-	var value = 'Study ' + study['id'] + ': ' + study['title'];
+	var label = $('label', $('#Study_p_' + study['studyId']));
+	var value = 'Study ' + study['studyId'] + ': ' + study['studyName'];
 	if (study['description'] != null) {
 		value += ' - ' + study['description'];
 	}
@@ -3344,12 +3438,12 @@ function setActiveStudy(name) {
 		a.html('Set Active');
 	});
 	$.each(myStudies, function(i, study) {
-		if (study['title'] == name) {
+		if (study['studyName'] == name) {
 			activeStudy = study;
 			return false;
 		}
 	});
-	var span = $('#Study_span_' + activeStudy['id']);
+	var span = $('#Study_span_' + activeStudy['studyId']);
 	span.html('');
 	var b = $('<b>');
 	span.append(b);
@@ -3359,7 +3453,7 @@ function setActiveStudy(name) {
 }
 
 function appendStudyContent(study) {
-	var contentDiv = $('#Study_div_' + study['id']);
+	var contentDiv = $('#Study_div_' + study['studyId']);
 	contentDiv.html('');	
 	var h2 = $('<h2>');
 	contentDiv.append(h2);
@@ -3375,7 +3469,7 @@ function appendStudyContent(study) {
 	b.html('Title: ');
 	var label = $('<label>');
 	li.append(label);
-	label.html(study['title']);
+	label.html(study['studyName']);
 	
 	if (study['description'] != null) {
 		var li = $('<li>');
@@ -3427,14 +3521,14 @@ function appendStudyContent(study) {
 			label.html(staff['name']);
 		});
 	}
-	if (study['protocol'] != null && study['protocol'].length > 0) {
+	if (study['protocols'] != null && study['protocols'].length > 0) {
 		var h2 = $('<h2>');
 		contentDiv.append(h2);
 		h2.html('Protocol');
 		var datasets = [];
 		var models = [];
 		var sites = [];
-		$.each(study['protocol'], function (i, protocol) {
+		$.each(study['protocols'], function (i, protocol) {
 			var model = protocol['method'];
 			if (!models.contains(model)) {
 				models.push(model);

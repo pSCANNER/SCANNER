@@ -211,11 +211,35 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#updateStudy(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse updateStudy(String id, String name,
-			String description, String title, String email, String phone,
-			String website, String address, String contact, String approvals) {
-		// TODO Auto-generated method stub
-		return null;
+	public RegistryClientResponse updateStudy(String studyId, String studyName, String irbId, String principalInvestigator, 
+			String studyStatusType, String description, String protocol, String startDate, String endDate, 
+			String clinicalTrialsId, String analysisPlan) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studies/" + studyId;
+		try {
+			JSONObject body = new JSONObject();
+			body.put("studyName", studyName);
+			body.put("irbId", irbId != null ? Integer.parseInt(irbId) : 0);
+			JSONObject investigator = new JSONObject();
+			investigator.put("userId", Integer.parseInt(principalInvestigator));
+			body.put("principalInvestigator", investigator);
+			JSONObject status = new JSONObject();
+			status.put("studyStatusTypeId", Integer.parseInt(studyStatusType));
+			body.put("studyStatusType", status);
+			body.put("description", description.length() == 0 ? JSONObject.NULL : description);
+			body.put("protocol", protocol.length() == 0 ? JSONObject.NULL : protocol);
+			body.put("startDate", startDate.length() == 0 ? JSONObject.NULL : startDate);
+			body.put("endDate", endDate.length() == 0 ? JSONObject.NULL : endDate);
+			body.put("clinicalTrialsId", clinicalTrialsId.length() == 0 ? JSONObject.NULL : Integer.parseInt(clinicalTrialsId));
+			body.put("analysisPlan", analysisPlan.length() == 0 ? JSONObject.NULL : analysisPlan);
+			System.out.println("PUT: " + url);
+			System.out.println("PUT Body:\n" + body.toString(2));
+			ClientURLResponse rsp = putRegistry(url, body.toString());
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 	/* (non-Javadoc)

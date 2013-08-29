@@ -229,6 +229,13 @@ public class Registry extends HttpServlet {
 		String irbId = request.getParameter("irbId");
 		String principalInvestigator = request.getParameter("principalInvestigator");
 		String studyStatusType = request.getParameter("studyStatusType");
+		String studyId = request.getParameter("studyId");
+		String clinicalTrialsId = request.getParameter("clinicalTrialsId");
+		String description = request.getParameter("description"); 
+		String protocol = request.getParameter("protocol"); 
+		String startDate = request.getParameter("startDate"); 
+		String endDate = request.getParameter("endDate"); 
+		String analysisPlan = request.getParameter("analysisPlan"); 
 		
 		
 		String study = request.getParameter("study");
@@ -242,7 +249,6 @@ public class Registry extends HttpServlet {
 		String func = request.getParameter("method");
 		String site = request.getParameter("site");
 		String resourceValues = request.getParameter("values"); 
-		String description = request.getParameter("description"); 
 		String title = request.getParameter("title"); 
 		String email = request.getParameter("email"); 
 		String phone = request.getParameter("phone"); 
@@ -464,11 +470,11 @@ public class Registry extends HttpServlet {
 				return;
 			}
 		} else if (action.equals("updateStudy")) {
-			clientResponse = registryClient.updateStudy(id, name,
-					description, title, email, phone,
-					website, address, contact, approvals);
+			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, principalInvestigator, studyStatusType,
+					description, protocol, startDate, endDate, clinicalTrialsId, analysisPlan);
 			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
+				responseBody = clientResponse.getEntity().toString();
+				System.out.println("responseBody: " + responseBody);
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update study.");
 				return;

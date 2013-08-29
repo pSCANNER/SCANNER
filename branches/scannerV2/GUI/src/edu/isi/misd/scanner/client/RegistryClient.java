@@ -299,8 +299,9 @@ public interface RegistryClient {
      *            the new website for the study approvals.
      * @return The client response.
      */
-	public RegistryClientResponse updateStudy(String id, String name, String description, String title,
-			String email, String phone, String website, String address, String contact, String approvals);
+	public RegistryClientResponse updateStudy(String studyId, String studyName, String irbId, String principalInvestigator, 
+			String studyStatusType, String description, String protocol, String startDate, String endDate, 
+			String clinicalTrialsId, String analysisPlan);
 	
     /**
      * Updates a dataset. 

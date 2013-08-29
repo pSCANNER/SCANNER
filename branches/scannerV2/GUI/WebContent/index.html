@@ -130,7 +130,7 @@
 														<table class="update_study">
 															<tbody>
 																<tr>
-																	<td class="tag">Title:</td>
+																	<td class="tag">Study Name:</td>
 																	<td><input type="text" id="studyTitleInput"></td>
 																	<td class="tag">IRB:</td>
 																	<td><input type="text" id="createStudyIRBInput"></td>
@@ -169,16 +169,38 @@
 														<table class="update_study">
 															<tbody>
 																<tr>
-																	<td class="tag">Title:</td>
+																	<td class="tag">Study Name:</td>
 																	<td><input type="text" id="projectTitle"></td>
-																	<td class="tag">Start Date:</td>
-																	<td><input type="text" id="projectStartDate" class="datepicker"></td>
+																	<td class="tag">IRB:</td>
+																	<td><input type="text" id="updateStudyIRBInput"></td>
+																</tr>
+																<tr>
+																	<td class="tag">Principal Investigator:</td>
+																	<td><select id="updateStudyPrincipalInvestigator"></select></td>
+																	<td class="tag">Study Status Type:</td>
+																	<td>
+																		<select id="updateStudyStatusType">
+																			<option value="1">defined</option>
+																		</select>
+																	</td>
 																</tr>
 																<tr>
 																	<td class="tag">Description:</td>
-																	<td><input type="text" id="projectDescription" size="50"></td>
+																	<td><input type="text" id="projectDescription" size="30"></td>
+																	<td class="tag">Protocol:</td>
+																	<td><input type="text" id="projectProtocol" size="50"></td>
+																</tr>
+																<tr>
+																	<td class="tag">Start Date:</td>
+																	<td><input type="text" id="projectStartDate" class="datepicker"></td>
 																	<td class="tag">End Date:</td>
 																	<td><input type="text" id="projectEndDate" class="datepicker"></td>
+																</tr>
+																<tr>
+																	<td class="tag">Clinical Trials Id:</td>
+																	<td><input type="text" id="projectClinicalTrialsId"></td>
+																	<td class="tag">Analysis Plan:</td>
+																	<td><input type="text" id="projectAnalysisPlan" size="50"></td>
 																</tr>
 															</tbody>
 														</table>
@@ -186,7 +208,7 @@
 												</tr>
 												<tr>
 													<td class="tag">
-														<input type="button" value="Update Study" onclick="updateStudy()">
+														<input type="button" id="updateStudyButton" value="Update Study" onclick="updateStudy()">
 													</td>
 												</tr>
 											</table>

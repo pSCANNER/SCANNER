@@ -321,6 +321,33 @@ public class JakartaClient {
     }
     
     /**
+     * Execute a Registry request.
+     * 
+     * @param url
+     *            the query URL.
+     * @param body
+     *            the request body.
+     * @return The HTTP response.
+     */
+    public ClientURLResponse putRegistry(String url, String body) {
+        HttpPut httpput = new HttpPut(url);
+        httpput.setHeader("Accept", "application/json");
+        httpput.setHeader("Content-Type", "application/json; charset=UTF-8");
+        if (body != null) {
+			try {
+				StringEntity entity = new StringEntity(body, "UTF-8");
+				httpput.setEntity(entity);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+        }
+        retries = 0;
+        ClientURLResponse rsp = execute(httpput, null);
+        retries = 10;
+		return rsp;
+    }
+    
+    /**
      * Execute a SCANNER network request.
      * 
      * @param url
