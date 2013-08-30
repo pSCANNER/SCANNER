@@ -2883,10 +2883,10 @@ function manageStudy() {
 	option.text('and release results...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(releaseResultsPolicy, function(i, name) {
+	$.each(accessModeList, function(i, accessMode) {
 		option = $('<option>');
-		option.text(name);
-		option.attr('value', name);
+		option.text(accessMode['description']);
+		option.attr('value', accessMode['accessModeId']);
 		select.append(option);
 	});
 	$('#addStaffButton').attr('disabled', 'disabled');
@@ -3139,20 +3139,19 @@ var userRolesList = null;
 
 var studyPoliciesList = null;
 
-var releaseResultsPolicy = ['instantly',
-		                    'manually'
-		                    ];
+var accessModeList = null;
+var accessModeDict = null;
 
 var studyCounter = 200;
 
 var myStudies = [ {"staff":[{"userId":1,"role":"Principal Investigator","datasetInstance":1},
                             {"userId":2,"role":"Investigator","datasetInstance":2}],
-                   "protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"releasePolicy":"instantly"},
-                               {"tool":1,"datasetInstance":2,"dataset":1,"releasePolicy":"instantly"},
-                               {"tool":1,"datasetInstance":3,"dataset":1,"releasePolicy":"manually"},
-                               {"tool":2,"datasetInstance":1,"dataset":1,"releasePolicy":"instantly"},
-                               {"tool":2,"datasetInstance":2,"dataset":1,"releasePolicy":"instantly"},
-                               {"tool":2,"datasetInstance":3,"dataset":1,"releasePolicy":"instantly"}],
+                   "protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"accessMode":0},
+                               {"tool":1,"datasetInstance":2,"dataset":1,"accessMode":0},
+                               {"tool":1,"datasetInstance":3,"dataset":1,"accessMode":1},
+                               {"tool":2,"datasetInstance":1,"dataset":1,"accessMode":0},
+                               {"tool":2,"datasetInstance":2,"dataset":1,"accessMode":0},
+                               {"tool":2,"datasetInstance":3,"dataset":1,"accessMode":0}],
                    "studyId":1,
                    "studyName":"MTM",
                    "irbId":1,
@@ -3280,7 +3279,7 @@ function addProtocol() {
 	obj['tool'] = $('#modelNames').val();
 	obj['dataset'] = $('#datasetNames').val();
 	obj['datasetInstance'] = $('#datasetInstances').val();
-	obj['releasePolicy'] = $('#studySendOptions').val();
+	obj['accessMode'] = $('#studySendOptions').val();
 	activeStudy['protocols'].push(obj);
 	addProtocolRow(obj);
 	updateBasicInfo(activeStudy);
@@ -3315,7 +3314,8 @@ function addProtocolRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['releasePolicy']);
+	var accessMode = accessModeDict[obj['accessMode']];
+	td.html(accessMode['description']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3329,7 +3329,7 @@ function addProtocolRow(obj) {
 	var statusDiv = $('<div>');
 	div.append(statusDiv);
 	statusDiv.addClass('wizard_content_protocol');
-	statusDiv.html(obj['releasePolicy'] == 'instantly' ? 'Approved' : 'Waiting for approval');
+	statusDiv.html(accessMode['description'] == 'sync' ? 'Approved' : 'Waiting for approval');
 	$('.wizard_content_protocol', div).hide();
 	$('.wizard_heading_protocol', div).click(function() {
 		$(this).next(".wizard_content_protocol").toggle();
@@ -3354,7 +3354,7 @@ function removeProtocol(button, obj) {
 	var protocolValues = activeStudy['protocols'];
 	$.each(protocolValues, function(i, elem) {
 		if (elem['method'] == obj['method'] && elem['dataset'] == obj['dataset'] && elem['site'] == obj['site'] && 
-				elem['url'] == obj['url'] && elem['node'] == obj['node'] && elem['releasePolicy'] == obj['releasePolicy']) {
+				elem['url'] == obj['url'] && elem['node'] == obj['node'] && elem['accessMode'] == obj['accessMode']) {
 			protocolValues.splice(i, 1);
 			return false;
 		}
@@ -3748,6 +3748,19 @@ function initStudyPolicies() {
 
 function postInitStudyPolicies(data, textStatus, jqXHR, param) {
 	studyPoliciesList = data;
+	var ids = [];
+	accessModeList = [];
+	accessModeDict = {};
+	$.each(data, function(i, policy) {
+		var accessMode = policy['accessMode'];
+		var id = accessMode['accessModeId'];
+		if (!ids.contains(id)) {
+			ids.push(id);
+			accessModeList.push(accessMode);
+			accessModeDict[id] = accessMode;
+		}
+	});
+	accessModeList.sort(compareAccessMode);
 	initStudyRoles();
 }
 
@@ -3808,6 +3821,12 @@ function compareRoles(role1, role2) {
 		}
 	}
 	return ret;
+}
+
+function compareAccessMode(accessMode1, accessMode2) {
+	var val1 = accessMode1['description'];
+	var val2 = accessMode2['description'];
+	return compareIgnoreCase(val1, val2);
 }
 
 function compareNumbers(val1, val2) {
