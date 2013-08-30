@@ -2824,8 +2824,9 @@ function manageStudy() {
 	select.append(option);
 	$.each(datasetInstancesList, function(i, datasetInstance) {
 		var node = datasetInstance['node'];
+		var site = node['site'];
 		option = $('<option>');
-		option.text(node['site'] + ':' + node['nodeId']);
+		option.text(site['siteName'] + ':' + node['nodeId']);
 		option.attr('value', datasetInstance['dataSetInstanceId']);
 		select.append(option);
 	});
@@ -2910,8 +2911,9 @@ function manageStudy() {
 	select.append(option);
 	$.each(datasetInstancesList, function(i, datasetInstance) {
 		var node = datasetInstance['node'];
+		var site = node['site'];
 		option = $('<option>');
-		option.text(node['site'] + ':' + node['nodeId']);
+		option.text(site['siteName'] + ':' + node['nodeId']);
 		option.attr('value', datasetInstance['dataSetInstanceId']);
 		select.append(option);
 	});
@@ -3007,7 +3009,8 @@ function addStaffRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	var node = datasetInstancesDict[obj['datasetInstance']]['node'];
-	td.html(node['site'] + ':' + node['nodeId']);
+	var site = node['site'];
+	td.html(site['siteName'] + ':' + node['nodeId']);
 	td = $('<td>');
 	tr.append(td);
 	var a = $('<a>');
@@ -3137,14 +3140,17 @@ var toolList = null;
 var datasetDefinitionList = null;
 var datasetDefinitionDict = null;
 
+var userRolesDict = null;
+var userRolesList = null;
+
 var releaseResultsPolicy = ['instantly',
 		                    'manually'
 		                    ];
 
 var studyCounter = 200;
 
-var myStudies = [ {"staff":[{"userId":1,"role":"Project Manager","datasetInstance":1},
-                            {"userId":2,"role":"Site PI","datasetInstance":2}],
+var myStudies = [ {"staff":[{"userId":1,"role":"Principal Investigator","datasetInstance":1},
+                            {"userId":2,"role":"Investigator","datasetInstance":2}],
                    "protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"releasePolicy":"instantly"},
                                {"tool":1,"datasetInstance":2,"dataset":1,"releasePolicy":"instantly"},
                                {"tool":1,"datasetInstance":3,"dataset":1,"releasePolicy":"manually"},
@@ -3296,7 +3302,8 @@ function addProtocolRow(obj) {
 	td.addClass('protocol_border');
 	tr.append(td);
 	var node = datasetInstancesDict[obj['datasetInstance']]['node'];
-	td.html(node['site']);
+	var site = node['site'];
+	td.html(site['siteName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
@@ -3308,7 +3315,7 @@ function addProtocolRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(node['site'] + ':' + node['nodeId']);
+	td.html(site['siteName'] + ':' + node['nodeId']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
@@ -3503,91 +3510,92 @@ function appendStudyContent(study) {
 		li.append(label);
 		label.html(study['endDate']);
 	}
-	if (study['staff'] != null && study['staff'].length > 0) {
-		var h2 = $('<h2>');
-		contentDiv.append(h2);
-		h2.html('Investigators');
-		var ol = $('<ol>');
-		contentDiv.append(ol);
-		ol.addClass('blank');
-		$.each(study['staff'], function (i, staff) {
+	
+	var h2 = $('<h2>');
+	contentDiv.append(h2);
+	h2.html('Investigators');
+	var ol = $('<ol>');
+	contentDiv.append(ol);
+	ol.addClass('blank');
+	$.each(userRolesList, function(i, userRole) {
+		var studyRole = userRole['studyRole'];
+		if (studyRole['study'] == study['studyId']) {
 			var li = $('<li>');
 			ol.append(li);
 			var b = $('<b>');
 			li.append(b);
-			b.html(staff['role'] + ': ');
+			b.html(studyRole['roleWithinStudy'] + ': ');
 			var label = $('<label>');
 			li.append(label);
-			label.html(staff['name']);
-		});
-	}
-	if (study['protocols'] != null && study['protocols'].length > 0) {
-		var h2 = $('<h2>');
-		contentDiv.append(h2);
-		h2.html('Protocol');
-		var datasets = [];
-		var models = [];
-		var sites = [];
-		$.each(study['protocols'], function (i, protocol) {
-			var model = protocol['method'];
-			if (!models.contains(model)) {
-				models.push(model);
-			}
-			var site = protocol['site'];
-			if (!sites.contains(site)) {
-				sites.push(site);
-			}
-			var dataset = protocol['dataset'];
-			if (!datasets.contains(dataset)) {
-				datasets.push(dataset);
-			}
-		});
-		var ol = $('<ol>');
-		contentDiv.append(ol);
-		ol.addClass('blank');
-		
-		var li = $('<li>');
-		ol.append(li);
-		var b = $('<b>');
-		li.append(b);
-		b.html('Data Sets:');
-		var ol1 = $('<ol>');
-		li.append(ol1);
-		ol1.addClass('blank');
-		$.each(datasets, function (i, dataset) {
-			var li1 = $('<li>');
-			ol1.append(li1);
-			li1.html(dataset);
-		});
-		
-		var li = $('<li>');
-		ol.append(li);
-		var b = $('<b>');
-		li.append(b);
-		b.html('Models:');
-		var ol1 = $('<ol>');
-		li.append(ol1);
-		ol1.addClass('blank');
-		$.each(models, function (i, model) {
-			var li1 = $('<li>');
-			ol1.append(li1);
-			li1.html(model);
-		});
-		
-		var li = $('<li>');
-		ol.append(li);
-		var b = $('<b>');
-		li.append(b);
-		b.html('Participating Sites:');
-		var ol1 = $('<ol>');
-		li.append(ol1);
-		ol1.addClass('blank');
-		$.each(sites, function (i, site) {
-			var li1 = $('<li>');
-			ol1.append(li1);
-			li1.html(site);
-		});
-	}
+			var user = scannerUsersDict[userRole['user']];
+			label.html(user['firstName'] + ' ' + user['lastName']);
+		}
+	});
+	
+	var h2 = $('<h2>');
+	contentDiv.append(h2);
+	h2.html('Protocol');
+	var datasets = [];
+	var models = [];
+	var sites = [];
+	$.each(datasetDefinitionList, function(i, dataset) {
+		if (dataset['originatingStudy'] == study['studyId']) {
+			datasets.push(dataset['dataSetName']);
+		}
+	});
+	$.each(toolList, function(i, tool) {
+		models.push(tool['toolName'] + ' - ' + tool['toolDescription']);
+	});
+	$.each(datasetInstancesList, function(i, instance) {
+		var node = instance['node'];
+		var site = node['site'];
+		sites.push(site['siteName'] + ':' + node['nodeId']);
+	});
+	var ol = $('<ol>');
+	contentDiv.append(ol);
+	ol.addClass('blank');
+	
+	var li = $('<li>');
+	ol.append(li);
+	var b = $('<b>');
+	li.append(b);
+	b.html('Data Sets:');
+	var ol1 = $('<ol>');
+	li.append(ol1);
+	ol1.addClass('blank');
+	$.each(datasets, function (i, dataset) {
+		var li1 = $('<li>');
+		ol1.append(li1);
+		li1.html(dataset);
+	});
+	
+	var li = $('<li>');
+	ol.append(li);
+	var b = $('<b>');
+	li.append(b);
+	b.html('Models:');
+	var ol1 = $('<ol>');
+	li.append(ol1);
+	ol1.addClass('blank');
+	$.each(models, function (i, model) {
+		var li1 = $('<li>');
+		ol1.append(li1);
+		li1.html(model);
+	});
+	
+	var li = $('<li>');
+	ol.append(li);
+	var b = $('<b>');
+	li.append(b);
+	b.html('Participating Sites:');
+	var ol1 = $('<ol>');
+	li.append(ol1);
+	ol1.addClass('blank');
+	$.each(sites, function (i, site) {
+		var li1 = $('<li>');
+		ol1.append(li1);
+		li1.html(site);
+	});
 	contentDiv.hide();
 }
 
@@ -3699,6 +3707,23 @@ function postInitDatasets(data, textStatus, jqXHR, param) {
 		datasetDefinitionDict[dataset['dataSetDefinitionId']] = dataset;
 	});
 	datasetDefinitionList.sort(compareDatasetDefinitions);
+	initUserRoles();
+}
+
+function initUserRoles() {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getUserRoles';
+	scanner.RETRIEVE(url, obj, true, postInitUserRoles, null, null, 0);
+}
+
+function postInitUserRoles(data, textStatus, jqXHR, param) {
+	userRolesList = data;
+	userRolesDict = {};
+	$.each(data, function(i, userRole) {
+		userRolesDict[userRole['userRoleId']] = userRole;
+	});
+	userRolesList.sort(compareRoles);
 }
 
 function compareUsers(user1, user2) {
@@ -3716,8 +3741,8 @@ function compareNodes(datasetInstance1, datasetInstance2) {
 }
 
 function compareTools(tool1, tool2) {
-	var val1 = tool1['toolDescription'];
-	var val2 = tool2['toolDescription'];
+	var val1 = tool1['toolName'] + tool1['toolDescription'];
+	var val2 = tool1['toolName'] + tool2['toolDescription'];
 	return compareIgnoreCase(val1, val2);
 }
 
@@ -3727,3 +3752,27 @@ function compareDatasetDefinitions(dataset1, dataset2) {
 	return compareIgnoreCase(val1, val2);
 }
 
+function compareRoles(role1, role2) {
+	var studyRole1 = role1['studyRole'];
+	var studyRole2 = role2['studyRole'];
+	var ret = compareNumbers(studyRole1['study'], studyRole2['study']);
+	if (ret == 0) {
+		ret = compareNumbers(studyRole1['roleId'], studyRole2['roleId']);
+		if (ret == 0) {
+			var user1 = scannerUsersDict[role1['user']];
+			var user2 = scannerUsersDict[role2['user']];
+			ret = compareUsers(user1, user2);
+		}
+	}
+	return ret;
+}
+
+function compareNumbers(val1, val2) {
+	var ret = 0;
+	if (val1 < val2) {
+		ret = -1;
+	} else if (val1 > val2) {
+		ret = 1;
+	}
+	return ret;
+}

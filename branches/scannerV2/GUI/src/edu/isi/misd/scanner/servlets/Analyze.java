@@ -186,6 +186,13 @@ public class Analyze extends HttpServlet {
 			System.out.println("Analyze Get Tools: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
+		} else if (action.equals("getUserRoles")) {
+			RegistryClientResponse clientResponse = registryClient.getUserRoles();
+			String ret = clientResponse.toUserRoles().toString();
+			clientResponse.release();
+			System.out.println("Analyze Get user roles: "+ret);
+			PrintWriter out = response.getWriter();
+			out.print(ret);
 		}
 	}
 
@@ -284,7 +291,7 @@ public class Analyze extends HttpServlet {
 						String dataSource = temp.getString("dataSource");
 						JSONObject node = temp.getJSONObject("node");
 						buff.append(node.getString("hostUrl")).append(":").append(node.getString("hostPort")).append(node.getString("basePath")).append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
-						if (policy.getJSONObject(0).getString("accessMode").equals("async")) {
+						if (policy.getJSONObject(0).getJSONObject("accessMode").getString("description").equals("async")) {
 							buff.append("&resultsReleaseAuthReq=true");
 						}
 					}

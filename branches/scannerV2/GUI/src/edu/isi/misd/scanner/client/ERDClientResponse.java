@@ -165,7 +165,8 @@ public class ERDClientResponse implements RegistryClientResponse {
 			for (int i=0; i < entityResponse.length(); i++) {
 				JSONObject datasetObj = entityResponse.getJSONObject(i);
 				JSONObject node = datasetObj.getJSONObject("node");
-				ret.put(node.getString("site") + ":" + node.getInt("nodeId"), node.getString("nodeId"));
+				JSONObject siteObj = node.getJSONObject("site");
+				ret.put(siteObj.getString("siteName") + ":" + node.getInt("nodeId"), node.getInt("nodeId"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -331,7 +332,8 @@ public class ERDClientResponse implements RegistryClientResponse {
 			for (int i=0; i < entityResponse.length(); i++) {
 				JSONObject instance = entityResponse.getJSONObject(i);
 				JSONObject node = instance.getJSONObject("node");
-				String site = node.getString("site") + ":" + node.getInt("nodeId");
+				JSONObject siteObj = node.getJSONObject("site");
+				String site = siteObj.getString("siteName") + ":" + node.getInt("nodeId");
 				if (sites.contains(site)) {
 					nodes.put(instance);
 				}
@@ -368,7 +370,8 @@ public class ERDClientResponse implements RegistryClientResponse {
 				if (!obj.getBoolean("isMaster")) {
 					String key = obj.getString("hostUrl") + ":" + obj.getInt("hostPort");
 					String rURL = key + obj.getString("basePath");
-					String cname = obj.getString("site") + ":" + obj.getInt("nodeId");
+					JSONObject site = obj.getJSONObject("site");
+					String cname = site.getString("siteName") + ":" + obj.getInt("nodeId");
 					map.put(key, cname);
 					targets.put(rURL, cname);
 				}
@@ -503,6 +506,11 @@ public class ERDClientResponse implements RegistryClientResponse {
 	@Override
 	public JSONObject getEntity() {
 		return entityObject;
+	}
+
+	@Override
+	public JSONArray toUserRoles() {
+		return getEntityResponse();
 	}
 
 }

@@ -755,4 +755,5 @@ public interface RegistryClientResponse {
     public JSONArray toTools();
     public JSONArray toDatasetInstances();
     public JSONArray toDatasetDefinitions();
+    public JSONArray toUserRoles();
 }
