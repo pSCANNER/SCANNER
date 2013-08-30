@@ -44,9 +44,7 @@ public class Node implements Serializable
     private String description;
     @Basic(optional = false)
     @Column(name = "is_master")
-    private boolean isMaster;    
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="siteName")
-    @JsonIdentityReference(alwaysAsId=true)       
+    private boolean isMaster;     
     @JoinColumn(name = "site_id", referencedColumnName = "site_id")
     @ManyToOne(optional = false)
     private Site site;

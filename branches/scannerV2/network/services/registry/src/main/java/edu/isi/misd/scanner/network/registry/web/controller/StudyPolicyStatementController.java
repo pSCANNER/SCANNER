@@ -62,46 +62,23 @@ public class StudyPolicyStatementController extends BaseController
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
             }
-            if ((studyId != null) && 
-                (dataSetId != null) &&                 
-                (toolId != null)) 
-            {
-                Integer sId;
-                try {
-                    sId = Integer.parseInt(studyId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(
-                        String.format("Invalid parameter format for %s - %s",
-                            REQUEST_PARAM_STUDY_ID, nfe.toString()));
-                } 
-                Integer dId;
-                try {
-                    dId = Integer.parseInt(dataSetId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(
-                        String.format("Invalid parameter format for %s - %s",
-                            REQUEST_PARAM_DATASET_ID, nfe.toString()));
-                }                 
-                Integer tId;
-                try {
-                    tId = Integer.parseInt(toolId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(
-                        String.format("Invalid parameter format for %s - %s",
-                            REQUEST_PARAM_ANALYSIS_TOOL_ID, nfe.toString()));
-                }                 
-                return
-                    studyPolicyStatementRepository.
-                        findStudyPolicyStatementByStudyIdAndDataSetIdAndToolId(
-                            sId, dId, tId);
-            }
             if ((studyId == null) || 
                 (dataSetId == null) ||                
                 (toolId == null)) 
             {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
-            }
+            }            
+               
+            return
+                studyPolicyStatementRepository.
+                    findStudyPolicyStatementByStudyIdAndDataSetIdAndToolId(
+                        validateIntegerParameter(
+                            REQUEST_PARAM_STUDY_ID, studyId),
+                        validateIntegerParameter(
+                            REQUEST_PARAM_DATASET_ID, dataSetId),
+                        validateIntegerParameter(
+                            REQUEST_PARAM_ANALYSIS_TOOL_ID, toolId));                      
         }
         
         List<StudyPolicyStatement> studyPolicyStatements = 

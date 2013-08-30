@@ -82,5 +82,17 @@ public class BaseController
             HttpStatus.METHOD_NOT_ALLOWED.value(),
             HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(),                    
             e.getLocalizedMessage());
-    }     
+    }
+    
+    public static Integer validateIntegerParameter(String param, String value)
+        throws BadRequestException
+    {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException nfe) {
+            throw new BadRequestException(
+                String.format("Invalid format for parameter [%s] %s", 
+                    param, nfe.toString()));
+        }        
+    }
 }

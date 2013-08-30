@@ -52,17 +52,13 @@ public class DataSetInstanceController extends BaseController
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
             }
-            if ((dataSetId != null) && (userName != null)) {
-                Integer id;
-                try {
-                    id = Integer.parseInt(dataSetId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(nfe.toString());
-                }                
+            if ((dataSetId != null) && (userName != null)) {              
                 return
                     dataSetInstanceRepository.
                         findDataSetInstancesForDataSetIdAndUserName(
-                            id, userName);
+                            validateIntegerParameter(
+                                REQUEST_PARAM_DATASET_ID, dataSetId),
+                            userName);
             }
             if ((dataSetName!= null) && (userName != null)) {            
                 return

@@ -54,18 +54,17 @@ public class Study implements Serializable
     @Column(name = "clinical_trials_id")
     private Integer clinicalTrialsId;
     @Column(name = "analysis_plan")
-    private String analysisPlan;   
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
-    @JsonIdentityReference(alwaysAsId=true)        
+    private String analysisPlan;      
     @JoinColumn(name = "study_status_type_id", referencedColumnName = "study_status_type_id")
     @ManyToOne(optional = false)
     private StudyStatusType studyStatusType;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser principalInvestigator;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study", fetch=FetchType.EAGER)
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
     private List<StudyRole> studyRoles;       
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudy")

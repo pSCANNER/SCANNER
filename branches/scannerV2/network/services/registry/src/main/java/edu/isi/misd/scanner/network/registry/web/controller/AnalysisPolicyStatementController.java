@@ -51,57 +51,35 @@ public class AnalysisPolicyStatementController extends BaseController
             if (userId == null) {
                 missingParams.add(REQUEST_PARAM_USER_ID);
             }              
-            String dataSetId = paramMap.remove(REQUEST_PARAM_INSTANCE_ID);
-            if (dataSetId == null) {
+            String instanceId = paramMap.remove(REQUEST_PARAM_INSTANCE_ID);
+            if (instanceId == null) {
                 missingParams.add(REQUEST_PARAM_INSTANCE_ID);
             }
             String toolId = paramMap.remove(REQUEST_PARAM_ANALYSIS_TOOL_ID);
             if (toolId == null) {
                 missingParams.add(REQUEST_PARAM_ANALYSIS_TOOL_ID);
-            }               
+            }             
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
-            }
-            if ((userId != null) && 
-                (dataSetId != null) &&                 
-                (toolId != null)) 
-            {
-                Integer uId;
-                try {
-                    uId = Integer.parseInt(userId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(
-                        String.format("Invalid parameter format for %s - %s", 
-                            REQUEST_PARAM_USER_ID, nfe.toString()));
-                } 
-                Integer dId;
-                try {
-                    dId = Integer.parseInt(dataSetId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(
-                        String.format("Invalid parameter format for %s - %s", 
-                            REQUEST_PARAM_INSTANCE_ID, nfe.toString()));
-                }                 
-                Integer tId;
-                try {
-                    tId = Integer.parseInt(toolId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(
-                        String.format("Invalid parameter format for %s - %s", 
-                            REQUEST_PARAM_ANALYSIS_TOOL_ID, nfe.toString()));
-                }                 
-                return
-                    analysisPolicyStatementRepository.
-                        findAnalysisPolicyStatementByUserIdAndInstanceIdAndToolId(
-                            uId, dId, tId);
-            }
+            }          
             if ((userId == null) || 
-                (dataSetId == null) ||                
+                (instanceId == null) ||                
                 (toolId == null)) 
             {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
-            }
+            } 
+            
+            return
+                analysisPolicyStatementRepository.
+                    findAnalysisPolicyStatementByUserIdAndInstanceIdAndToolId(
+                        validateIntegerParameter(
+                            REQUEST_PARAM_USER_ID, userId),
+                        validateIntegerParameter(
+                            REQUEST_PARAM_INSTANCE_ID, instanceId),
+                        validateIntegerParameter(
+                            REQUEST_PARAM_ANALYSIS_TOOL_ID, toolId)
+                );
         }
         
         List<AnalysisPolicyStatement> analysisPolicyStatements = 

@@ -65,15 +65,13 @@ public class StudyController extends BaseController
             }
             studies.add(study);
         } else if (userId != null) {
-            Integer id;
-            try {
-                id = Integer.parseInt(userId);
-            } catch (NumberFormatException nfe) {
-                throw new BadRequestException(nfe.toString());
-            }
-            return studyRepository.findStudiesForUserId(id);
+            return 
+                studyRepository.findStudiesForUserId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_USER_ID, userId));
         } else if (userName != null) {
-            return studyRepository.findStudiesForUserName(userName);
+            return 
+                studyRepository.findStudiesForUserName(userName);
         } else {
             Iterator iter = studyRepository.findAll().iterator();
             CollectionUtils.addAll(studies, iter);      

@@ -33,43 +33,37 @@ public class StudyPolicyStatement implements Serializable
     private Integer studyPolicyStatementId;
     @Column(name = "attestation")
     private String attestation;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleWithinStudy")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleId")
     @JsonIdentityReference(alwaysAsId=true)            
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole studyRole;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyId")
     @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
     @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "policy_originator", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private ScannerUser policyOriginator;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
-    @JsonIdentityReference(alwaysAsId=true)          
+    private ScannerUser policyOriginator;       
     @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatus;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
-    @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "policy_authority", referencedColumnName = "data_set_policy_authority_id")
     @ManyToOne(optional = false)
     private DataSetPolicyAuthority policyAuthority;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetDefinitionId")
     @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)
     private DataSetDefinition dataSetDefinition;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="toolName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="toolId")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
     private AnalysisTool analysisTool;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
-    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "access_mode", referencedColumnName = "access_mode_id")
     @ManyToOne(optional = false)
     private AccessMode accessMode;

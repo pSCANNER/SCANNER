@@ -27,28 +27,24 @@ public class AnalysisPolicyStatement implements Serializable
     @Basic(optional = false)
     @Column(name = "analysis_policy_statement_id")
     private Integer analysisPolicyStatementId;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleWithinStudy")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleId")
     @JsonIdentityReference(alwaysAsId=true)            
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole studyRole;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
-    @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatus;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetInstanceName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetInstanceId")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "data_set_instance_id", referencedColumnName = "data_set_instance_id")
     @ManyToOne(optional = false)
     private DataSetInstance dataSetInstance;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="toolName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="toolId")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
-    private AnalysisTool analysisTool;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
-    @JsonIdentityReference(alwaysAsId=true)        
+    private AnalysisTool analysisTool;      
     @JoinColumn(name = "access_mode_id", referencedColumnName = "access_mode_id")
     @ManyToOne(optional = false)
     private AccessMode accessMode;

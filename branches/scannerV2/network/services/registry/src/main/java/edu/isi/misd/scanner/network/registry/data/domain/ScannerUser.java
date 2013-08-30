@@ -56,7 +56,8 @@ public class ScannerUser implements Serializable
     @Basic(optional = false)
     @Column(name = "is_superuser")
     private boolean isSuperuser;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch=FetchType.EAGER)
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<UserRole> userRoles;      
     @JsonIgnore
     @ManyToMany(mappedBy = "scannerUsers")

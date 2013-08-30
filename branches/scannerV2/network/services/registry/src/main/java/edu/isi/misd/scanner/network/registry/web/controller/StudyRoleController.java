@@ -33,47 +33,48 @@ public class StudyRoleController extends BaseController
     private static final Log log = 
         LogFactory.getLog(StudyRoleController.class.getName());
     
-    public static final String REQUEST_PARAM_STUDY_NAME = "studyName";
-    public static final String REQUEST_PARAM_USER_NAME = "userName";
+    public static final String REQUEST_PARAM_STUDY_ID = "studyId";
     public static final String REQUEST_PARAM_USER_ID = "userId";    
     
     @Autowired
     private StudyRoleRepository studyRoleRepository;   
     
 	@RequestMapping(value = "/studyRoles", method = RequestMethod.GET)
-	public @ResponseBody List<StudyRole> getStudies(
+	public @ResponseBody List<StudyRole> getStudyRoles(
            @RequestParam Map<String, String> paramMap) 
     {
-        String studyName = null;
-        String userName = null;
+        String studyId = null;
         String userId = null;
         if (!paramMap.isEmpty()) 
         {
-            studyName = paramMap.remove(REQUEST_PARAM_STUDY_NAME);            
-            userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
+            studyId = paramMap.remove(REQUEST_PARAM_STUDY_ID);            
             userId = paramMap.remove(REQUEST_PARAM_USER_ID);            
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
             }            
-        }
-        
-        List<StudyRole> roles = new ArrayList<StudyRole>();        
-        if (studyName != null) {
+        }        
+    
+        if ((studyId != null) && (userId != null)) 
+        {
+            return 
+                studyRoleRepository.findByStudyStudyIdAndScannerUsersUserId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_STUDY_ID, studyId),
+                    validateIntegerParameter(
+                        REQUEST_PARAM_USER_ID, userId)
+                );            
+        } else if (studyId != null) {
             return
-                studyRoleRepository.findByStudyStudyName(studyName);
+                studyRoleRepository.findByStudyStudyId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_STUDY_ID, studyId));
         } else if (userId != null) {
-            Integer id;
-            try {
-                id = Integer.parseInt(userId);
-            } catch (NumberFormatException nfe) {
-                throw new BadRequestException(nfe.toString());
-            }
             return 
-                studyRoleRepository.findByScannerUsersUserId(id);
-        } else if (userName != null) {
-            return 
-                studyRoleRepository.findByScannerUsersUserName(userName);
+                studyRoleRepository.findByScannerUsersUserId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_USER_ID, userId));
         } else {
+            List<StudyRole> roles = new ArrayList<StudyRole>();                
             Iterator iter = studyRoleRepository.findAll().iterator();
             CollectionUtils.addAll(roles, iter);    
             return roles;

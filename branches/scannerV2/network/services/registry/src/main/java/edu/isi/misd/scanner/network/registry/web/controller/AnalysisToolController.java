@@ -67,24 +67,6 @@ public class AnalysisToolController extends BaseController
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
             }
-            if ((userName != null) && 
-                (studyName != null) &&                 
-                (dataSetName != null) &&
-                (libraryId != null)) 
-            {
-                Integer libId;
-                try {
-                    libId = Integer.parseInt(libraryId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(
-                        "Invalid parameter format for " + 
-                        REQUEST_PARAM_LIBRARY_ID + " - " + nfe.toString());
-                }                 
-                return
-                    analysisToolRepository.
-                        findAnalysisToolByStudyPolicyStatement(
-                            userName, studyName, dataSetName, libId);
-            }
             if ((userName == null) || 
                 (studyName == null) ||                
                 (dataSetName == null) ||
@@ -92,7 +74,15 @@ public class AnalysisToolController extends BaseController
             {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
-            }
+            }            
+              
+            return
+                analysisToolRepository.
+                    findAnalysisToolByStudyPolicyStatement(
+                        userName, studyName, dataSetName,
+                        validateIntegerParameter(
+                            REQUEST_PARAM_LIBRARY_ID, libraryId)
+                );
         }
         
         List<AnalysisTool> toolLibraries = new ArrayList<AnalysisTool>();

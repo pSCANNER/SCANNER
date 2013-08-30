@@ -50,16 +50,12 @@ public class DataSetVariableMetadataController extends BaseController
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
             }
-            if (dataSetId != null) {
-                Integer id;
-                try {
-                    id = Integer.parseInt(dataSetId);
-                } catch (NumberFormatException nfe) {
-                    throw new BadRequestException(nfe.toString());
-                }                
+            if (dataSetId != null) {             
                 return
                     dataSetVariableMetadataRepository.
-                        findByDataSetDefinitionDataSetDefinitionId(id);
+                        findByDataSetDefinitionDataSetDefinitionId(
+                            validateIntegerParameter(
+                                REQUEST_PARAM_DATASET_ID, dataSetId));
             }
             if (dataSetName != null) {            
                 return

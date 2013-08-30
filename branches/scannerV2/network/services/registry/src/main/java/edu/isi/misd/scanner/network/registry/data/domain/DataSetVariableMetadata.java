@@ -28,7 +28,7 @@ public class DataSetVariableMetadata implements Serializable
     @Basic(optional = false)
     @Column(name = "data_set_variable_metadata_id")
     private Integer dataSetVariableMetadataId;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetDefinitionId")
     @JsonIdentityReference(alwaysAsId=true)    
     @JoinColumn(name = "data_set_definition", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)

@@ -33,47 +33,48 @@ public class UserRoleController extends BaseController
     private static final Log log = 
         LogFactory.getLog(UserRoleController.class.getName());
     
-    public static final String REQUEST_PARAM_STUDY_NAME = "studyName";
-    public static final String REQUEST_PARAM_USER_NAME = "userName";
-    public static final String REQUEST_PARAM_USER_ID = "userId";    
+    public static final String REQUEST_PARAM_USER_ID = "userId";      
+    public static final String REQUEST_PARAM_STUDY_ID = "studyId";  
     
     @Autowired
     private UserRoleRepository userRoleRepository;   
     
 	@RequestMapping(value = "/userRoles", method = RequestMethod.GET)
-	public @ResponseBody List<UserRole> getStudies(
+	public @ResponseBody List<UserRole> getUserRoles(
            @RequestParam Map<String, String> paramMap) 
     {
-        String studyName = null;
-        String userName = null;
-        String userId = null;
+        String userId = null;        
+        String studyId = null;
         if (!paramMap.isEmpty()) 
         {
-            studyName = paramMap.remove(REQUEST_PARAM_STUDY_NAME);            
-            userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
             userId = paramMap.remove(REQUEST_PARAM_USER_ID);            
+            studyId = paramMap.remove(REQUEST_PARAM_STUDY_ID);                       
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
             }            
         }
         
-        List<UserRole> roles = new ArrayList<UserRole>();        
-        if (studyName != null) {
-            return
-                userRoleRepository.findByStudyRoleStudyStudyName(studyName);
+        if ((userId != null) && (studyId != null)) 
+        {
+            return 
+                userRoleRepository.findByUserUserIdAndStudyRoleStudyStudyId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_USER_ID, userId), 
+                    validateIntegerParameter(
+                        REQUEST_PARAM_STUDY_ID, studyId)
+                );
         } else if (userId != null) {
-            Integer id;
-            try {
-                id = Integer.parseInt(userId);
-            } catch (NumberFormatException nfe) {
-                throw new BadRequestException(nfe.toString());
-            }
             return 
-                userRoleRepository.findByUserUserId(id);
-        } else if (userName != null) {
-            return 
-                userRoleRepository.findByUserUserName(userName);
+                userRoleRepository.findByUserUserId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_USER_ID, userId));
+        } else if (studyId != null) {         
+            return
+                userRoleRepository.findByStudyRoleStudyStudyId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_STUDY_ID, studyId));
         } else {
+            List<UserRole> roles = new ArrayList<UserRole>();             
             Iterator iter = userRoleRepository.findAll().iterator();
             CollectionUtils.addAll(roles, iter);    
             return roles;
@@ -123,7 +124,8 @@ public class UserRoleController extends BaseController
         Integer updateID = userRole.getUserRoleId();
         if (updateID == null) {
             userRole.setUserRoleId(id);
-        } else if (!userRole.getUserRoleId().equals(foundUserRole.getUserRoleId())) {
+        } else if (!userRole.getUserRoleId().equals(
+                   foundUserRole.getUserRoleId())) {
             throw new ConflictException(
                 "Update failed: specified object ID (" + 
                 userRole.getUserRoleId() + 

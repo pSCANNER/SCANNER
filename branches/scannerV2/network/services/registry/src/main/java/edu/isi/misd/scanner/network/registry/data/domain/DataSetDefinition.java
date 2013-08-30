@@ -39,18 +39,16 @@ public class DataSetDefinition implements Serializable
     private String description;
     @Column(name = "data_processing_program")
     private String dataProcessingProgram;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyId")
     @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "originating_study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study originatingStudy;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
     @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "author_uid", referencedColumnName = "user_id")
     @ManyToOne
     private ScannerUser author;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="description")
-    @JsonIdentityReference(alwaysAsId=true)       
     @JoinColumn(name = "data_set_confidentiality_level", referencedColumnName = "level_id")
     @ManyToOne(optional = false)
     private ConfidentialityLevel dataSetConfidentialityLevel;
