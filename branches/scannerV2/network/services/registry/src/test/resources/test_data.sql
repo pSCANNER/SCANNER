@@ -2,7 +2,10 @@
 set search_path = scanner_registry;
 
 INSERT into site (site_name, description) VALUES
-('ISI', 'USC Information Sciences Institute');
+('ISI', 'USC Information Sciences Institute'),
+('UCSD', 'University of California, San Diego'),
+('RAND', 'RAND Corporation'),
+('LAHEY', 'Lahey Health');
  
 INSERT INTO node (site_id,host_url, host_port, base_path, description, is_master) VALUES
 (1, 'https://scanner.misd.isi.edu', 9998, '/scanner/query/', 'SCANNER MASTER', true),
@@ -32,10 +35,13 @@ INSERT INTO user_role(user_id, role_id) VALUES
 (1, 1),
 (2, 3),
 (3, 3),
+(4, 3),
 (1, 4),
-(2, 6),
-(4, 1),
-(4, 4);
+(2, 6);
+
+INSERT INTO site_policy(site_id, role_id) VALUES
+(1,2),
+(1,5);
 
 INSERT INTO tool_library (library_name, version, description) VALUES
 ('OCEANS', '1', 'Executes Meta-Regression Across Multiple Sites'),
@@ -63,9 +69,21 @@ INSERT INTO analysis_policy_statement (data_set_instance_id, role_id, analysis_t
 (1,1,1,1,0,2),
 (2,1,1,0,0,3),
 (3,1,1,0,0,3),
+(1,2,1,1,0,2),
+(2,2,1,0,0,3),
+(3,2,1,0,0,3),
+(1,3,1,1,0,2),
+(2,3,1,0,0,3),
+(3,3,1,0,0,3),
 (1,1,2,0,0,1),
 (2,1,2,0,0,1),
-(3,1,2,0,0,1);
+(3,1,2,0,0,1),
+(1,2,2,0,0,1),
+(2,2,2,0,0,1),
+(3,2,2,0,0,1),
+(1,3,2,0,0,1),
+(2,3,2,0,0,1),
+(3,3,2,0,0,1);
 
 INSERT INTO data_set_variable_metadata (data_set_definition, variable_name, variable_description, variable_type, variable_options) VALUES
 (1, 'group', 'group', 'binary', NULL),
