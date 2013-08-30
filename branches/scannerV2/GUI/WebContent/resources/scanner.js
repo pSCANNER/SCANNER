@@ -3123,13 +3123,7 @@ function checkError(data) {
  */
 var scannerUsersDict = null;
 var scannerUsersList = null;
-var investigatorsRoles = ['Site PI',
-                          'Co Investigator',
-                          'Co PI',
-                          'Project Manager',
-                          'Research Assistant',
-                          'Delegate'
-                          ];
+var investigatorsRoles = null;
 
 var datasetInstancesDict = null;
 var datasetInstancesList = null;
@@ -3754,6 +3748,25 @@ function initStudyPolicies() {
 
 function postInitStudyPolicies(data, textStatus, jqXHR, param) {
 	studyPoliciesList = data;
+	initStudyRoles();
+}
+
+function initStudyRoles() {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getStudyRoles';
+	scanner.RETRIEVE(url, obj, true, postInitStudyRoles, null, null, 0);
+}
+
+function postInitStudyRoles(data, textStatus, jqXHR, param) {
+	investigatorsRoles = [];
+	$.each(data, function(i, role) {
+		var roleWithinStudy = role['roleWithinStudy'];
+		if (!investigatorsRoles.contains(roleWithinStudy)) {
+			investigatorsRoles.push(roleWithinStudy);
+		}
+	});
+	investigatorsRoles.sort(compareIgnoreCase);
 }
 
 function compareUsers(user1, user2) {

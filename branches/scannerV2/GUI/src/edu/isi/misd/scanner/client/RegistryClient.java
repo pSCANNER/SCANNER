@@ -702,4 +702,5 @@ public interface RegistryClient {
 	public RegistryClientResponse getAnalysisPolicies(int userId, int toolId, int datasetInstanceId);
 	public RegistryClientResponse getUserRoles();
 	public RegistryClientResponse getStudyPolicies();
+	public RegistryClientResponse getStudyRoles();
 }

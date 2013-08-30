@@ -200,6 +200,13 @@ public class Analyze extends HttpServlet {
 			System.out.println("Analyze Get studies policies: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
+		} else if (action.equals("getStudyRoles")) {
+			RegistryClientResponse clientResponse = registryClient.getStudyRoles();
+			String ret = clientResponse.toStudyRoles().toString();
+			clientResponse.release();
+			System.out.println("Analyze Get studies roles: "+ret);
+			PrintWriter out = response.getWriter();
+			out.print(ret);
 		}
 	}
 
