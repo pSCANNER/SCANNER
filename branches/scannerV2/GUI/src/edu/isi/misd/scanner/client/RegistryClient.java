@@ -701,4 +701,5 @@ public interface RegistryClient {
 	public RegistryClientResponse getUser(String user);
 	public RegistryClientResponse getAnalysisPolicies(int userId, int toolId, int datasetInstanceId);
 	public RegistryClientResponse getUserRoles();
+	public RegistryClientResponse getStudyPolicies();
 }

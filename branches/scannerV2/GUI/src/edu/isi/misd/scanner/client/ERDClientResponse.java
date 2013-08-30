@@ -513,6 +513,11 @@ public class ERDClientResponse implements RegistryClientResponse {
 		return getEntityResponse();
 	}
 
+	@Override
+	public JSONArray toStudyPolicies() {
+		return getEntityResponse();
+	}
+
 }
 
 class JSONComparator implements Comparator<JSONObject>

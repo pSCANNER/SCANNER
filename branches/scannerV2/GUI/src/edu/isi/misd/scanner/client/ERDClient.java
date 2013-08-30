@@ -727,5 +727,14 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse getStudyPolicies() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyPolicies";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 	
 }

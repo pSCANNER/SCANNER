@@ -3143,6 +3143,8 @@ var datasetDefinitionDict = null;
 var userRolesDict = null;
 var userRolesList = null;
 
+var studyPoliciesList = null;
+
 var releaseResultsPolicy = ['instantly',
 		                    'manually'
 		                    ];
@@ -3207,8 +3209,8 @@ function postCreateStudy(data, textStatus, jqXHR, param) {
 	activeStudy['studyId'] = data['studyId'];
 	activeStudy['studyName'] = data['studyName'];
 	activeStudy['irbId'] = data['irbId'];
-	activeStudy['principalInvestigator'] = $('#createStudyPrincipalInvestigator').val();
-	$('#projectTitle').val($('#studyTitleInput').val());
+	activeStudy['principalInvestigator'] = data['principalInvestigator'];
+	$('#projectTitle').val(data['studyName']);
 	appendStudy(activeStudy);
 	setActive(activeStudy['studyId']);
 	$('#manageStudiesDivLink').click();
@@ -3250,7 +3252,7 @@ function updateStudy() {
 	obj['analysisPlan'] = $('#projectAnalysisPlan').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	
 	var url =  HOME + '/registry';
-	scanner.POST(url, obj, true, postUpdateStudy, obj, null, 0);
+	scanner.POST(url, obj, true, postUpdateStudy, null, null, 0);
 }
 
 function postUpdateStudy(data, textStatus, jqXHR, param) {
@@ -3263,7 +3265,7 @@ function postUpdateStudy(data, textStatus, jqXHR, param) {
 	}
 	activeStudy['studyName'] = data['studyName'];
 	activeStudy['irbId'] = data['irbId'];
-	activeStudy['principalInvestigator'] = param['principalInvestigator'];
+	activeStudy['principalInvestigator'] = data['principalInvestigator'];
 	activeStudy['studyStatusType'] = data['studyStatusType'];
 	activeStudy['description'] = data['description'];
 	activeStudy['protocol'] = data['protocol'];
@@ -3272,9 +3274,9 @@ function postUpdateStudy(data, textStatus, jqXHR, param) {
 	activeStudy['clinicalTrialsId'] = data['clinicalTrialsId'];
 	activeStudy['analysisPlan'] = data['analysisPlan'];
 	
-	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['studyId'] + ': ' + activeStudy['studyName']);
-	if (param['description'].length > 0) {
-		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + activeStudy['description']);
+	$('#manageStudyH2').html('Manage Research Study ' + data['studyId'] + ': ' + data['studyName']);
+	if (data['description'] != null) {
+		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + data['description']);
 	}
 	updateBasicInfo(activeStudy);
 }
@@ -3538,18 +3540,34 @@ function appendStudyContent(study) {
 	var datasets = [];
 	var models = [];
 	var sites = [];
+	var datasetIds = [];
 	$.each(datasetDefinitionList, function(i, dataset) {
 		if (dataset['originatingStudy'] == study['studyId']) {
 			datasets.push(dataset['dataSetName']);
+			datasetIds.push(dataset['dataSetDefinitionId']);
 		}
 	});
-	$.each(toolList, function(i, tool) {
+	var studyModels = [];
+	var studyModelsIds = [];
+	$.each(studyPoliciesList, function(i, studyPolicy) {
+		if (studyPolicy['study'] == study['studyId']) {
+			var toolId = studyPolicy['analysisTool'];
+			if (!studyModelsIds.contains(toolId)) {
+				studyModelsIds.push(toolId);
+				studyModels.push(toolsDict[toolId]);
+			}
+		}
+	});
+	studyModels.sort(compareTools);
+	$.each(studyModels, function(i, tool) {
 		models.push(tool['toolName'] + ' - ' + tool['toolDescription']);
 	});
 	$.each(datasetInstancesList, function(i, instance) {
-		var node = instance['node'];
-		var site = node['site'];
-		sites.push(site['siteName'] + ':' + node['nodeId']);
+		if (datasetIds.contains(instance['dataSetDefinition'])) {
+			var node = instance['node'];
+			var site = node['site'];
+			sites.push(site['siteName'] + ':' + node['nodeId']);
+		}
 	});
 	var ol = $('<ol>');
 	contentDiv.append(ol);
@@ -3724,6 +3742,18 @@ function postInitUserRoles(data, textStatus, jqXHR, param) {
 		userRolesDict[userRole['userRoleId']] = userRole;
 	});
 	userRolesList.sort(compareRoles);
+	initStudyPolicies();
+}
+
+function initStudyPolicies() {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getStudyPolicies';
+	scanner.RETRIEVE(url, obj, true, postInitStudyPolicies, null, null, 0);
+}
+
+function postInitStudyPolicies(data, textStatus, jqXHR, param) {
+	studyPoliciesList = data;
 }
 
 function compareUsers(user1, user2) {
