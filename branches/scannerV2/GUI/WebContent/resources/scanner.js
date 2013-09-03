@@ -3157,27 +3157,17 @@ var studyCounter = 200;
 
 var lastActiveStudy = null;
 
-var myStudies = [ {"staff":[{"userId":1,"role":"Principal Investigator","datasetInstance":1},
-                            {"userId":2,"role":"Investigator","datasetInstance":2}],
-                   "protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"accessMode":0},
-                               {"tool":1,"datasetInstance":2,"dataset":1,"accessMode":0},
-                               {"tool":1,"datasetInstance":3,"dataset":1,"accessMode":1},
-                               {"tool":2,"datasetInstance":1,"dataset":1,"accessMode":0},
-                               {"tool":2,"datasetInstance":2,"dataset":1,"accessMode":0},
-                               {"tool":2,"datasetInstance":3,"dataset":1,"accessMode":0}],
-                   "studyId":1,
-                   "studyName":"MTM",
-                   "irbId":1,
-                   "principalInvestigator":1,
-                   "studyStatusType":"defined",
-                   "description":"Medication Therapy Management",
-                   "protocol":"Analyze MTM data on multiple sites with both OCEANS and GLORE",
-                   "startDate":"2013-08-15",
-                   "endDate":"2013-08-15",
-                   "clinicalTrialsId":0,
-                   "analysisPlan":"Very Important Analysis on Multiple Sites"
-                   }
-                 ];
+var MTM_staff_protocols = {"staff":[{"userId":1,"role":"Principal Investigator","datasetInstance":1},
+                                    {"userId":2,"role":"Investigator","datasetInstance":2}],
+                            "protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"accessMode":0},
+                                        {"tool":1,"datasetInstance":2,"dataset":1,"accessMode":0},
+                                        {"tool":1,"datasetInstance":3,"dataset":1,"accessMode":1},
+                                        {"tool":2,"datasetInstance":1,"dataset":1,"accessMode":0},
+                                        {"tool":2,"datasetInstance":2,"dataset":1,"accessMode":0},
+                                        {"tool":2,"datasetInstance":3,"dataset":1,"accessMode":0}]
+							};
+
+var myStudies = null;
 
 var instanceIdCounter = 0;
 
@@ -3405,9 +3395,22 @@ function showAvailableStudies() {
 }
 
 function displayMyStudies() {
+	var url = HOME + '/registry?action=getMyStudies';
+	scanner.GET(url, true, postGetMyStudies, null, null, 0);
+}
+
+function postGetMyStudies(data, textStatus, jqXHR, param) {
+	myStudies = data;
 	var div = $('#lisyMyStudiesDiv');
 	div.html('');
 	$.each(myStudies, function(i, study) {
+		study['studyStatusType'] = study['studyStatusType']['description'];
+		study['staff'] = [];
+		study['protocols'] = [];
+		if (study['studyName'] == 'MTM') {
+			study['staff'] = MTM_staff_protocols['staff'];
+			study['protocols'] = MTM_staff_protocols['protocols'];
+		}
 		appendStudy(study);
 	});
 	setActiveStudy(getSelectedStudyName());

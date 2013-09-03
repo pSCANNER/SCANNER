@@ -692,6 +692,14 @@ public interface RegistryClient {
      */
 	public RegistryClientResponse getSitesMap();
 
+    /**
+     * Gets the studies. 
+     * 
+     * @return The client response.
+     */
+	public RegistryClientResponse getMyStudies();
+	
+
 	public RegistryClientResponse getPI();
 	public RegistryClientResponse getUsers();
 	public RegistryClientResponse getNodes();

@@ -97,12 +97,12 @@ public class Registry extends HttpServlet {
 		String func = request.getParameter("method");
 		String site = request.getParameter("site");
 		RegistryClientResponse clientResponse = null;
-		if  (action.equals("getStudy")) {
-			clientResponse = registryClient.getStudy(name);
+		if  (action.equals("getMyStudies")) {
+			clientResponse = registryClient.getMyStudies();
 			if (clientResponse != null) {
-				res = clientResponse.toStudy();
+				res = clientResponse.getEntityResponse().toString();
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get my studies.");
 				return;
 			}
 		} else if (action.equals("getDataset")) {
