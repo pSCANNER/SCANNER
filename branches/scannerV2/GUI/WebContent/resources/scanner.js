@@ -189,7 +189,11 @@ function initScanner() {
  * @return the value of the selected study
  */
 function getSelectedStudyName() {
-	return studiesMultiSelect.get('value')[0];
+	var ret = studiesMultiSelect.get('value')[0];
+	if (activeStudy != null) {
+		ret = activeStudy['studyName'];
+	}
+	return ret;
 }
 
 /**
@@ -496,7 +500,9 @@ function postRenderAvailableDatasets(data, textStatus, jqXHR, param) {
 		datasets.push(dataset);
 	});
 	datasets.sort(compareIgnoreCase);
-	loadDatasets(datasets);
+	if (datasets.length > 0) {
+		loadDatasets(datasets);
+	}
 }
 
 /**
@@ -1855,6 +1861,7 @@ function analyzeStudy() {
 	$('#ui').css('display', '');
 	$('#logoutButton').show();
 	$('#studyName').html('Study: ' + getSelectedStudyName());
+	lastActiveStudy = getSelectedStudyName();
 	displayMyStudies();
 }
 
@@ -2362,6 +2369,10 @@ function showQuery() {
 	$('#replayDivContent').html('');
 	$('#replayDivWrapper').hide();
 	$('#statusReplayWrapperDiv').hide();
+	if (activeStudy != null && lastActiveStudy != activeStudy['studyName']) {
+		lastActiveStudy = activeStudy['studyName'];
+		showAvailableStudies();
+	}
 }
 
 /**
@@ -3144,6 +3155,8 @@ var accessModeDict = null;
 
 var studyCounter = 200;
 
+var lastActiveStudy = null;
+
 var myStudies = [ {"staff":[{"userId":1,"role":"Principal Investigator","datasetInstance":1},
                             {"userId":2,"role":"Investigator","datasetInstance":2}],
                    "protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"accessMode":0},
@@ -3373,6 +3386,22 @@ function setActive(id) {
 			return false;
 		}
 	});
+}
+
+function showAvailableStudies() {
+	loadDatasets(emptyValue);
+	loadLibraries(emptyValue);
+	loadMethods(emptyValue);
+	loadSites(emptyValue, false);
+	$('#datasetHelp').html('');
+	$('#libraryHelp').html('');
+	$('#methodHelp').html('');
+	$('#paramsTitle').css('display', 'none');
+	$('#paramsDiv').css('display', 'none');
+	$('#statusQueryWrapperDiv').css('display', 'none');
+	$('#queryDiv').css('display', 'none');
+	$('#studyName').html('Study: ' + getSelectedStudyName());
+	renderAvailableDatasets();
 }
 
 function displayMyStudies() {
