@@ -3135,6 +3135,7 @@ function checkError(data) {
 var scannerUsersDict = null;
 var scannerUsersList = null;
 var investigatorsRoles = null;
+var analysisPolicies = null;
 
 var datasetInstancesDict = null;
 var datasetInstancesList = null;
@@ -3157,9 +3158,7 @@ var studyCounter = 200;
 
 var lastActiveStudy = null;
 
-var MTM_staff_protocols = {"staff":[{"userId":1,"role":"Principal Investigator","datasetInstance":1},
-                                    {"userId":2,"role":"Investigator","datasetInstance":2}],
-                            "protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"accessMode":0},
+var MTM_staff_protocols = {"protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"accessMode":0},
                                         {"tool":1,"datasetInstance":2,"dataset":1,"accessMode":0},
                                         {"tool":1,"datasetInstance":3,"dataset":1,"accessMode":1},
                                         {"tool":2,"datasetInstance":1,"dataset":1,"accessMode":0},
@@ -3405,10 +3404,9 @@ function postGetMyStudies(data, textStatus, jqXHR, param) {
 	div.html('');
 	$.each(myStudies, function(i, study) {
 		study['studyStatusType'] = study['studyStatusType']['description'];
-		study['staff'] = [];
+		study['staff'] = getStaff(study['studyId']);
 		study['protocols'] = [];
 		if (study['studyName'] == 'MTM') {
-			study['staff'] = MTM_staff_protocols['staff'];
 			study['protocols'] = MTM_staff_protocols['protocols'];
 		}
 		appendStudy(study);
@@ -3812,6 +3810,18 @@ function postInitStudyRoles(data, textStatus, jqXHR, param) {
 		}
 	});
 	investigatorsRoles.sort(compareIgnoreCase);
+	initAnalysisPolicies();
+}
+
+function initAnalysisPolicies() {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getAnalysisPolicies';
+	scanner.RETRIEVE(url, obj, true, postInitAnalysisPolicies, null, null, 0);
+}
+
+function postInitAnalysisPolicies(data, textStatus, jqXHR, param) {
+	analysisPolicies = data;
 }
 
 function compareUsers(user1, user2) {
@@ -3870,3 +3880,36 @@ function compareNumbers(val1, val2) {
 	}
 	return ret;
 }
+
+function getStaff(study) {
+	var ret = [];
+	$.each(userRolesList, function(i, userRole) {
+		var studyRole = userRole['studyRole'];
+		if (studyRole['study'] == study) {
+			var roleId = studyRole['roleId'];
+			var sites = [];
+			$.each(analysisPolicies, function(j, policy) {
+				if (policy['studyRole'] == roleId) {
+					var dataSetInstance = policy['dataSetInstance'];
+					$.each(datasetInstancesList, function(k, instance) {
+						if (dataSetInstance == instance['dataSetInstanceId']) {
+							var node = instance['node'];
+							var site = node['site'];
+							var val = site['siteName'] + ':' + node['nodeId'];
+							if (!sites.contains(val)) {
+								sites.push(val);
+								var obj = {};
+								obj['userId'] = userRole['user'];
+								obj['role'] = studyRole['roleWithinStudy'];
+								obj['datasetInstance'] = dataSetInstance;
+								ret.push(obj);
+							}
+						}
+					});
+				}
+			});
+		}
+	});
+	return ret;
+}
+
