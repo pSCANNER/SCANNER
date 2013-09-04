@@ -3279,6 +3279,7 @@ function postUpdateStudy(data, textStatus, jqXHR, param) {
 	if (data['description'] != null) {
 		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + data['description']);
 	}
+	$('#updateStudyIRBInput').val(activeStudy['irbId']);
 	updateBasicInfo(activeStudy);
 }
 
