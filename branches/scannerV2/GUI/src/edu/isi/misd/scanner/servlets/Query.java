@@ -193,12 +193,6 @@ public class Query extends HttpServlet {
 				obj.put("status", "login error");
 				RegistryClient registryClient = new ERDClient(erdURL, (String) session.getAttribute("user"));
 				session.setAttribute("registryClient", registryClient);
-				RegistryClientResponse clientResponse = registryClient.getContacts();
-				String ret = clientResponse.toContacts();
-				clientResponse.release();
-				JSONArray arr = new JSONArray(ret);
-				obj.put("contacts", arr);
-				System.out.println("Get Contacts:\n"+ret);
 				scannerClient = new ScannerClient(4, 8192, 300000,
 						trustStoreType, trustStorePassword, trustStoreResource,
 						keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);

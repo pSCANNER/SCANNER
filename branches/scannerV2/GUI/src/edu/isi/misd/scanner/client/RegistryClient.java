@@ -700,6 +700,14 @@ public interface RegistryClient {
 	public RegistryClientResponse getMyStudies();
 	
 
+    /**
+     * Gets the studies. 
+     * 
+     * @return The client response.
+     */
+	public RegistryClientResponse getAllStudies();
+	
+
 	public RegistryClientResponse getPI();
 	public RegistryClientResponse getUsers();
 	public RegistryClientResponse getNodes();

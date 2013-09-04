@@ -1684,156 +1684,42 @@ function postSubmitLogin(data, textStatus, jqXHR, param) {
 	}
 }
 
-function setContacts(contacts) {
-	var studies = {};
-	var sites = {};
-	var master = [];
-	$.each(contacts, function(i, contact) {
-		var rtype = contact['rtype'];
-		if (rtype == 'study') {
-			studies[contact['cname']] = contact;
-		} else if (rtype == 'site') {
-			sites[contact['cname']] = contact;
-		} else if (rtype == 'master') {
-			master.push(contact);
-		}
-	});
+function setContacts() {
 	var div = $('#contactsDiv');
+	/*
 	var h4 = $('<h4>');
 	div.append(h4);
-	h4.html('Project contact information');
-	addContact(div, master[0]);
-	h4 = $('<h4>');
-	div.append(h4);
 	h4.html('Participating site contact information');
-	var names = [];
-	$.each(sites, function(name, value) {
-		names.push(name);
-	});
-	names.sort(compareIgnoreCase);
-	$.each(names, function(i, name) {
-		var h6 = $('<h6>');
-		div.append(h6);
-		h6.html('Site ' + name);
-		addContact(div, sites[name]);
-	});
-	h4 = $('<h4>');
+	*/
+	
+	var h4 = $('<h4>');
 	div.append(h4);
 	h4.html('Studies related information');
-	names = [];
-	$.each(studies, function(name, value) {
-		names.push(name);
-	});
-	names.sort(compareIgnoreCase);
-	$.each(names, function(i, name) {
-		var h6 = $('<h6>');
-		div.append(h6);
-		h6.html('Study ' + name);
-		addContact(div, studies[name]);
+	var studyId = 0;
+	$.each(userRolesList, function(i, userRole) {
+		var studyRole = userRole['studyRole'];
+		if (studyId != studyRole['study']) {
+			studyId = studyRole['study'];
+			var h6 = $('<h6>');
+			div.append(h6);
+			var name = allStudiesDict[studyId]['studyName'];
+			h6.html('Study ' + name);
+		}
+		addContact(div, userRole);
 	});
 }
 
-function addContact(div, elem) {
-	var table = $('<table>');
-	table.addClass('contactsTable');
-	div.append(table);
-	var tbody = $('<tbody>');
-	table.append(tbody);
-	var tr = $('<tr>');
-	tbody.append(tr);
-	var td = $('<td>');
-	tr.append(td);
-	var table1 = $('<table>');
-	table1.addClass('contactsTable');
-	td.append(table1);
-	var tbody1 = $('<tbody>');
-	table1.append(tbody1);
-	var tr1 = $('<tr>');
-	tbody1.append(tr1);
-	var td1 = $('<td>');
-	tr1.append(td1);
-	td1.html(elem['title'] + ':');
-	td1 = $('<td>');
-	tr1.append(td1);
-	td1.html(elem['contact']);
-	tr1 = $('<tr>');
-	tbody1.append(tr1);
-	td1 = $('<td>');
-	tr1.append(td1);
-	td1.html('Email:');
-	td1 = $('<td>');
-	tr1.append(td1);
-	td1.html(elem['email']);
-	tr1 = $('<tr>');
-	tbody1.append(tr1);
-	td1 = $('<td>');
-	tr1.append(td1);
-	td1.html('Phone:');
-	td1 = $('<td>');
-	tr1.append(td1);
-	td1.html(elem['phone']);
-	tr1 = $('<tr>');
-	tbody1.append(tr1);
-	td1 = $('<td>');
-	tr1.append(td1);
-	td1.html('Website:');
-	td1 = $('<td>');
-	tr1.append(td1);
-	var a = $('<a>');
-	td1.append(a);
-	a.attr({'href': elem['website'],
-		'target': '_newtab2'
-	});
-	a.html(elem['website']);
-	td = $('<td>');
-	td.attr('valign', 'top');
-	tr.append(td);
-	var table2 = $('<table>');
-	//table2.attr({'cellspacing': '10'});
-	table2.addClass('contactsTable');
-	td.append(table2);
-	var tbody2 = $('<tbody>');
-	table2.append(tbody2);
-	var tr2 = $('<tr>');
-	tbody2.append(tr2);
-	var td2 = $('<td>');
-	tr2.append(td2);
-	td2.attr('valign', 'top');
-	td2.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Address:');
-	td2 = $('<td>');
-	tr2.append(td2);
-	td2.html(elem['address']);
-	if (elem['agreement'] != null) {
-		tr2 = $('<tr>');
-		tbody2.append(tr2);
-		td2 = $('<td>');
-		tr2.append(td2);
-		td2.attr('valign', 'top');
-		td2.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Agreement:');
-		td2 = $('<td>');
-		tr2.append(td2);
-		var a = $('<a>');
-		td2.append(a);
-		a.attr({'href': elem['agreement'],
-			'target': '_newtab2'
-		});
-		a.html(elem['agreement']);
-	} else if (elem['approvals'] != null) {
-		tr2 = $('<tr>');
-		tbody2.append(tr2);
-		td2 = $('<td>');
-		tr2.append(td2);
-		td2.attr('valign', 'top');
-		td2.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Approvals:');
-		td2 = $('<td>');
-		tr2.append(td2);
-		var a = $('<a>');
-		td2.append(a);
-		a.attr({'href': elem['approvals'],
-			'target': '_newtab2'
-		});
-		a.html(elem['approvals']);
+function addContact(div, userRole) {
+	var studyRole = userRole['studyRole'];
+	var span = $('<span>');
+	div.append(span);
+	var user = scannerUsersDict[userRole['user']];
+	span.html(studyRole['roleWithinStudy'] + ': ' + user['firstName'] + ' ' + user['lastName']);
+	span.html(span.html() + ', Email: ' + user['email']);
+	if (user['phone'] != null) {
+		span.html(span.html() + ', Phone: ' + user['phone']);
 	}
+	span.append('<br>');
 }
 
 function loginRegistry() {
@@ -1846,7 +1732,6 @@ function loginRegistry() {
 function postLoginRegistry(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
-		//setContacts(res['contacts']);
 		renderAvailableStudies();
 		renderSitesStatus();
 		initUsers();
@@ -3173,6 +3058,8 @@ var studyCounter = 200;
 var lastActiveStudy = null;
 
 var myStudies = null;
+var allStudies = null;
+var allStudiesDict = null;
 
 var instanceIdCounter = 0;
 
@@ -3787,7 +3674,7 @@ function postInitStudyPolicies(data, textStatus, jqXHR, param) {
 	accessModeList = [];
 	accessModeDict = {};
 	$.each(data, function(i, policy) {
-		studyPoliciesDict['studyPolicyStatementId'] = policy;
+		studyPoliciesDict[policy['studyPolicyStatementId']] = policy;
 		var accessMode = policy['accessMode'];
 		var id = accessMode['accessModeId'];
 		if (!ids.contains(id)) {
@@ -3829,6 +3716,23 @@ function initAnalysisPolicies() {
 function postInitAnalysisPolicies(data, textStatus, jqXHR, param) {
 	analysisPolicies = data;
 	analysisPolicies.sort(compareAnalysisPolicies);
+	initStudies();
+}
+
+function initStudies() {
+	var url = HOME + '/registry';
+	var obj = new Object();
+	obj['action'] = 'getAllStudies';
+	scanner.RETRIEVE(url, obj, true, postInitStudies, null, null, 0);
+}
+
+function postInitStudies(data, textStatus, jqXHR, param) {
+	allStudies = data;
+	allStudiesDict = {};
+	$.each(allStudies, function(i, study) {
+		allStudiesDict[study['studyId']] = study;
+	});
+	setContacts();
 }
 
 function compareUsers(user1, user2) {
@@ -3881,7 +3785,7 @@ function compareAccessMode(accessMode1, accessMode2) {
 function compareAnalysisPolicies(analysisPolicy1, analysisPolicy2) {
 	var studyPolicy1 = studyPoliciesDict[analysisPolicy1['parentStudyPolicyStatement']];
 	var studyPolicy2 = studyPoliciesDict[analysisPolicy2['parentStudyPolicyStatement']];
-	ret = compareNumbers(studyPolicy1['study'], studyPolicy2['study']);
+	var ret = compareNumbers(studyPolicy1['study'], studyPolicy2['study']);
 	if (ret == 0) {
 		ret = compareNumbers(studyPolicy1['dataSetDefinition'], studyPolicy2['dataSetDefinition']);
 		if (ret == 0) {
