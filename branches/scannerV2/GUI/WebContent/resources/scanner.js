@@ -3150,6 +3150,7 @@ var userRolesDict = null;
 var userRolesList = null;
 
 var studyPoliciesList = null;
+var studyPoliciesDict = null;
 
 var accessModeList = null;
 var accessModeDict = null;
@@ -3157,14 +3158,6 @@ var accessModeDict = null;
 var studyCounter = 200;
 
 var lastActiveStudy = null;
-
-var MTM_staff_protocols = {"protocols":[{"tool":1,"datasetInstance":1,"dataset":1,"accessMode":0},
-                                        {"tool":1,"datasetInstance":2,"dataset":1,"accessMode":0},
-                                        {"tool":1,"datasetInstance":3,"dataset":1,"accessMode":1},
-                                        {"tool":2,"datasetInstance":1,"dataset":1,"accessMode":0},
-                                        {"tool":2,"datasetInstance":2,"dataset":1,"accessMode":0},
-                                        {"tool":2,"datasetInstance":3,"dataset":1,"accessMode":0}]
-							};
 
 var myStudies = null;
 
@@ -3405,10 +3398,7 @@ function postGetMyStudies(data, textStatus, jqXHR, param) {
 	$.each(myStudies, function(i, study) {
 		study['studyStatusType'] = study['studyStatusType']['description'];
 		study['staff'] = getStaff(study['studyId']);
-		study['protocols'] = [];
-		if (study['studyName'] == 'MTM') {
-			study['protocols'] = MTM_staff_protocols['protocols'];
-		}
+		study['protocols'] = getPolicies(study['studyId']);
 		appendStudy(study);
 	});
 	setActiveStudy(getSelectedStudyName());
@@ -3778,10 +3768,12 @@ function initStudyPolicies() {
 
 function postInitStudyPolicies(data, textStatus, jqXHR, param) {
 	studyPoliciesList = data;
+	studyPoliciesDict = {};
 	var ids = [];
 	accessModeList = [];
 	accessModeDict = {};
 	$.each(data, function(i, policy) {
+		studyPoliciesDict['studyPolicyStatementId'] = policy;
 		var accessMode = policy['accessMode'];
 		var id = accessMode['accessModeId'];
 		if (!ids.contains(id)) {
@@ -3822,6 +3814,7 @@ function initAnalysisPolicies() {
 
 function postInitAnalysisPolicies(data, textStatus, jqXHR, param) {
 	analysisPolicies = data;
+	analysisPolicies.sort(compareAnalysisPolicies);
 }
 
 function compareUsers(user1, user2) {
@@ -3871,6 +3864,25 @@ function compareAccessMode(accessMode1, accessMode2) {
 	return compareIgnoreCase(val1, val2);
 }
 
+function compareAnalysisPolicies(analysisPolicy1, analysisPolicy2) {
+	var studyPolicy1 = studyPoliciesDict[analysisPolicy1['parentStudyPolicyStatement']];
+	var studyPolicy2 = studyPoliciesDict[analysisPolicy2['parentStudyPolicyStatement']];
+	ret = compareNumbers(studyPolicy1['study'], studyPolicy2['study']);
+	if (ret == 0) {
+		ret = compareNumbers(studyPolicy1['dataSetDefinition'], studyPolicy2['dataSetDefinition']);
+		if (ret == 0) {
+			ret = compareNumbers(analysisPolicy1['analysisTool'], analysisPolicy2['analysisTool']);
+			if (ret == 0) {
+				ret = compareNumbers(analysisPolicy1['dataSetInstance'], analysisPolicy2['dataSetInstance']);
+				if (ret == 0) {
+					ret = compareNumbers(analysisPolicy1['accessMode']['accessModeId'], analysisPolicy2['accessMode']['accessModeId']);
+				}
+			}
+		}
+	}
+	return ret;
+}
+
 function compareNumbers(val1, val2) {
 	var ret = 0;
 	if (val1 < val2) {
@@ -3909,6 +3921,32 @@ function getStaff(study) {
 				}
 			});
 		}
+	});
+	return ret;
+}
+
+function getPolicies(study) {
+	var ret = [];
+	var policyDict = {};
+	$.each(analysisPolicies, function(i, policy) {
+		var parentStudyPolicyStatement = policy['parentStudyPolicyStatement'];
+		$.each(studyPoliciesList, function(j, studyPolicy) {
+			if (studyPolicy['studyPolicyStatementId'] == parentStudyPolicyStatement && studyPolicy['study'] == study) {
+				var obj = {};
+				obj['dataset'] = studyPolicy['dataSetDefinition'];
+				obj['tool'] = policy['analysisTool'];
+				obj['datasetInstance'] = policy['dataSetInstance'];
+				obj['accessMode'] = policy['accessMode']['accessModeId'];
+				if (policyDict[obj['tool']] == null) {
+					policyDict[obj['tool']] = [];
+				}
+				if (!policyDict[obj['tool']].contains(obj['datasetInstance'])) {
+					policyDict[obj['tool']].push(obj['datasetInstance']);
+					ret.push(obj);
+				}
+				return false;
+			}
+		});
 	});
 	return ret;
 }
