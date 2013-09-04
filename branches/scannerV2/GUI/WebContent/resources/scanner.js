@@ -1861,6 +1861,10 @@ function analyzeStudy() {
 	$('#ui').css('display', '');
 	$('#logoutButton').show();
 	$('#studyName').html('Study: ' + getSelectedStudyName());
+	var description = availableStudies[getSelectedStudyName()];
+	$('#studyName').hover(
+			function(event) {DisplayTipBox(event, description);}, 
+			function(){HideTipBox();});
 	lastActiveStudy = getSelectedStudyName();
 	displayMyStudies();
 }
@@ -2369,9 +2373,18 @@ function showQuery() {
 	$('#replayDivContent').html('');
 	$('#replayDivWrapper').hide();
 	$('#statusReplayWrapperDiv').hide();
-	if (activeStudy != null && lastActiveStudy != activeStudy['studyName']) {
-		lastActiveStudy = activeStudy['studyName'];
-		showAvailableStudies();
+	if (activeStudy != null) {
+		if (lastActiveStudy != activeStudy['studyName']) {
+			lastActiveStudy = activeStudy['studyName'];
+			showAvailableStudies();
+		}
+		$('#studyName').unbind();
+		var description = activeStudy['description'];
+		if (description != null) {
+			$('#studyName').hover(
+					function(event) {DisplayTipBox(event, description);}, 
+					function(){HideTipBox();});
+		}
 	}
 }
 
