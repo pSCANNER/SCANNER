@@ -2749,7 +2749,8 @@ function manageStudy() {
 	select.append(option);
 	$.each(toolList, function(i, tool) {
 		option = $('<option>');
-		option.text(tool['toolDescription']);
+		var lib = librariesDict[tool['toolParentLibrary']];
+		option.text(tool['toolName'] + ' - ' + lib['libraryName']);
 		option.attr('value', tool['toolId']);
 		select.append(option);
 	});
@@ -3041,6 +3042,8 @@ var datasetInstancesList = null;
 var toolsDict = null;
 var toolList = null;
 
+var librariesDict = null;
+
 var datasetDefinitionList = null;
 var datasetDefinitionDict = null;
 
@@ -3182,19 +3185,17 @@ function addProtocol() {
 }
 
 function addProtocolRow(obj) {
+	var node = datasetInstancesDict[obj['datasetInstance']]['node'];
+	var site = node['site'];
 	var tbody = $('#manageStudyProtocolsTbody');
 	var tr = $('<tr>');
 	tbody.append(tr);
 	var td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(toolsDict[obj['tool']]['toolDescription']);
-	td = $('<td>');
-	td.addClass('protocol_border');
-	tr.append(td);
-	var node = datasetInstancesDict[obj['datasetInstance']]['node'];
-	var site = node['site'];
-	td.html(site['siteName']);
+	var lib = librariesDict[toolsDict[obj['tool']]['toolParentLibrary']];
+	var method = toolsDict[obj['tool']]['toolName'] + ' - ' + lib['libraryName'];
+	td.html(method);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
@@ -3202,11 +3203,15 @@ function addProtocolRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(node['hostUrl']);
+	td.html(datasetInstancesDict[obj['datasetInstance']]['dataSetInstanceName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(site['siteName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(site['siteName'] + ':' + node['nodeId']);
+	td.html(node['nodeId']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
@@ -3475,7 +3480,8 @@ function appendStudyContent(study) {
 	});
 	studyModels.sort(compareTools);
 	$.each(studyModels, function(i, tool) {
-		models.push(tool['toolName'] + ' - ' + tool['toolDescription']);
+		var lib = librariesDict[tool['toolParentLibrary']];
+		models.push(tool['toolName'] + ' - ' + lib['libraryName']);
 	});
 	$.each(datasetInstancesList, function(i, instance) {
 		if (datasetIds.contains(instance['dataSetDefinition'])) {
@@ -3606,6 +3612,21 @@ function postInitDatasetInstances(data, textStatus, jqXHR, param) {
 		datasetInstancesDict[datasetInstance['dataSetInstanceId']] = datasetInstance;
 	});
 	datasetInstancesList.sort(compareNodes);
+	initLibraries();
+}
+
+function initLibraries() {
+	var url = HOME + '/registry';
+	var obj = new Object();
+	obj['action'] = 'getAllLibraries';
+	scanner.RETRIEVE(url, obj, true, postInitLibraries, null, null, 0);
+}
+
+function postInitLibraries(data, textStatus, jqXHR, param) {
+	librariesDict = {};
+	$.each(data, function(i, lib) {
+		librariesDict[lib['libraryId']] = lib;
+	});
 	initTools();
 }
 
@@ -3750,8 +3771,10 @@ function compareNodes(datasetInstance1, datasetInstance2) {
 }
 
 function compareTools(tool1, tool2) {
-	var val1 = tool1['toolName'] + tool1['toolDescription'];
-	var val2 = tool1['toolName'] + tool2['toolDescription'];
+	var lib1 = librariesDict[tool1['toolParentLibrary']];
+	var lib2 = librariesDict[tool2['toolParentLibrary']];
+	var val1 = tool1['toolName'] + lib1['libraryName'];
+	var val2 = tool1['toolName'] + lib2['libraryName'];
 	return compareIgnoreCase(val1, val2);
 }
 

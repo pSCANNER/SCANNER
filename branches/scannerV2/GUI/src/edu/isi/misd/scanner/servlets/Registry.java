@@ -113,10 +113,10 @@ public class Registry extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset.");
 				return;
 			}
-		} else if (action.equals("getLibrary")) {
-			clientResponse = registryClient.getLibrary(name);
+		} else if (action.equals("getAllLibraries")) {
+			clientResponse = registryClient.getAllLibraries();
 			if (clientResponse != null) {
-				res = clientResponse.toLibrary();
+				res = clientResponse.getEntityResponse().toString();
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get library.");
 				return;
