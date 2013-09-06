@@ -42,9 +42,15 @@
 
                </xsd:documentation>
             </xsd:annotation>             
-            <xsd:sequence>  
-               
-              <xsd:element name="Beta"
+            <xsd:sequence>
+
+                <xsd:element name="AttributeMean"
+                             type="base:MatrixType"/>
+
+                <xsd:element name="AttributeMedian"
+                             type="base:MatrixType"/>
+
+                <xsd:element name="Beta"
                            type="base:MatrixType"/>                 
               
               <xsd:element name="D"
@@ -88,8 +94,9 @@
                            type="base:MatrixType"/>  
               
               <xsd:element name="SDMatrix"
-                           type="base:MatrixType"/>                              
-                                   
+                           type="base:MatrixType"/>
+
+
             </xsd:sequence>
         </xsd:complexType> 
     </xsd:element>    
