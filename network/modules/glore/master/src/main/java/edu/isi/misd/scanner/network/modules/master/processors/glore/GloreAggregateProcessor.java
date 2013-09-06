@@ -1,6 +1,7 @@
 package edu.isi.misd.scanner.network.modules.master.processors.glore;
 
 import Jama.Matrix;
+import java.text.DecimalFormat;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
@@ -37,6 +38,12 @@ public class GloreAggregateProcessor implements Processor
     
     private static final double epsilon = Math.pow(10.0, -6.0);
     private static final int max_iter = 20;
+
+     public double df(double a)
+     {
+         DecimalFormat f = new DecimalFormat(".000");
+         return Double.parseDouble(f.format(Double.valueOf(a)));
+     }
     
     /**
      * Camel {@link org.apache.camel.Processor} implementation -- 
@@ -60,8 +67,7 @@ public class GloreAggregateProcessor implements Processor
             
             // signal complete
             exchange.setProperty("status", "complete");           
-            return;            
-            
+            return;
         }
         
         List<GloreLogisticRegressionRequest> gloreRequestList = 
@@ -114,8 +120,9 @@ public class GloreAggregateProcessor implements Processor
                     GloreUtils.matrixToString(cov_matrix, 8, 6));
             }
             
-            gloreData.setCovarianceMatrix(
-                GloreUtils.convertMatrixToMatrixType(cov_matrix));
+            //gloreData.setCovarianceMatrix(GloreUtils.convertMatrixToMatrixType(cov_matrix));
+            // format the covariance matrix
+            gloreData.convertMatrixToMatrixTypeFormatted(GloreUtils.convertMatrixToMatrixType(cov_matrix));
             gloreData.setState("computeSDMatrix"); 
 
         } 
@@ -155,11 +162,11 @@ public class GloreAggregateProcessor implements Processor
 
             // set intercept
             Coefficient coefficient = new Coefficient();
-            coefficient.setB(fBeta.get(0,0));
-            coefficient.setSE(SD.get(0,0));
-            coefficient.setTStatistics(fBeta.get(0,0)/SD.get(0,0));
+            coefficient.setB(df(fBeta.get(0,0)));
+            coefficient.setSE(df(SD.get(0,0)));
+            coefficient.setTStatistics(df(fBeta.get(0,0)/SD.get(0,0)));
             coefficient.setDegreeOfFreedom(1);
-            coefficient.setPValue(ztest(fBeta.get(0,0)/SD.get(0,0)));
+            coefficient.setPValue(df(ztest(fBeta.get(0,0)/SD.get(0,0))));
             coefficient.setName("Intercept");
             target.add(coefficient);
 
@@ -167,11 +174,11 @@ public class GloreAggregateProcessor implements Processor
             for (int i=1; i<fBeta.getColumnPackedCopy().length;i++ )
             {
                 coefficient = new Coefficient();
-                coefficient.setB(fBeta.get(i,0));
-                coefficient.setSE(SD.get(0,i));
-                coefficient.setTStatistics(fBeta.get(i,0)/SD.get(0,i));
+                coefficient.setB(df(fBeta.get(i,0)));
+                coefficient.setSE(df(SD.get(0,i)));
+                coefficient.setTStatistics(df(fBeta.get(i,0)/SD.get(0,i)));
                 coefficient.setDegreeOfFreedom(1);
-                coefficient.setPValue(ztest(fBeta.get(i,0)/SD.get(0,i)));
+                coefficient.setPValue(df(ztest(fBeta.get(i,0)/SD.get(0,i))));
                 coefficient.setName(independentVariables.get(i-1));
                 target.add(coefficient);
             }
@@ -237,8 +244,7 @@ public class GloreAggregateProcessor implements Processor
                 log.debug("beta1:" + GloreUtils.matrixToString(beta1, 10, 12));
             }
 
-            gloreData.setBeta(
-                GloreUtils.convertMatrixToMatrixType(beta1));             
+            gloreData.setBeta(GloreUtils.convertMatrixToMatrixType(beta1));
             if (log.isDebugEnabled()) {
                 log.debug("Iteration " + iter + " value: " + 
                     GloreUtils.max_abs((beta1.minus(beta0)).getArray()));
@@ -258,6 +264,9 @@ public class GloreAggregateProcessor implements Processor
                         log.debug("Iteration final value: " + 
                             GloreUtils.max_abs((beta1.minus(beta0)).getArray()));    
                     }
+
+                    // format the beta1 output
+                    gloreData.setBeta(GloreUtils.convertMatrixToMatrixTypeFormatted(beta1));
                     gloreData.setState("computeCovarianceMatrix");        
                 }                                 
             }

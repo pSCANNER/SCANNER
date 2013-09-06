@@ -9,6 +9,7 @@ import java.util.List;
 import edu.isi.misd.scanner.network.types.base.DoubleType;
 import edu.isi.misd.scanner.network.types.base.MatrixType;
 import edu.isi.misd.scanner.network.types.base.MatrixRowType;
+import java.text.DecimalFormat;
 
 /**
  *  A collection of utility functions for working with GLORE structures.
@@ -66,6 +67,36 @@ public class GloreUtils
         MatrixType matrixType = new MatrixType();        
         matrixType.getMatrixRow().addAll(matrixRowsList);
         return matrixType;    
+    }
+
+    /**
+     * Converts a {@link Jama.Matrix} to a
+     * {@link edu.isi.misd.scanner.network.types.base.MatrixType}.
+     */
+    public static MatrixType convertMatrixToMatrixTypeFormatted(Matrix matrix)
+    {
+        ArrayList<MatrixRowType> matrixRowsList = new ArrayList<MatrixRowType>();
+        double[][] matrixArray = matrix.getArray();
+        DecimalFormat df = new DecimalFormat(".000");
+
+        for (int i = 0; i < matrixArray.length; i++)
+        {
+            ArrayList<DoubleType> columnList =
+                    new ArrayList<DoubleType>();
+            for (int j = 0; j < matrixArray[i].length; j++) {
+                DoubleType columnType = new DoubleType();
+                columnType.setValue( Double.parseDouble(df.format(Double.valueOf(matrixArray[i][j]))));
+                columnType.setName(Integer.toString(j));
+                columnList.add(columnType);
+            }
+            MatrixRowType matrixRow = new MatrixRowType();
+            matrixRow.getMatrixColumn().addAll(columnList);
+            matrixRowsList.add(matrixRow);
+        }
+
+        MatrixType matrixType = new MatrixType();
+        matrixType.getMatrixRow().addAll(matrixRowsList);
+        return matrixType;
     }
     /**
      * Converts a {@link edu.isi.misd.scanner.network.types.base.MatrixType} 
