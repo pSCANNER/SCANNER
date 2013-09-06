@@ -42,7 +42,8 @@ create table if not exists standard_role (
   standard_role_id serial not null primary key,
   standard_role_name text not null unique,
   description text,
-  create_by_default boolean default true
+  create_by_default boolean default true,
+  add_to_study_policy_by_default boolean default false
 );
 
 CREATE TABLE IF NOT EXISTS user_role (
@@ -145,9 +146,9 @@ create table if not exists site_policy (
   role_id integer not null references study_role(role_id)
 );
 
-create table if not exists study_policy (
+create table if not exists study_management_policy (
   study_policy_id serial not null primary key,
-  sstudy_id integer not null references study(study_id),
+  study_id integer not null references study(study_id),
   role_id integer not null references study_role(role_id)
 );
 
