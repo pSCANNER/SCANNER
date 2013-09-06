@@ -46,7 +46,7 @@ public class AnalysisPolicyStatementController extends BaseController
     {
         if (!paramMap.isEmpty()) 
         {
-            ArrayList missingParams = new ArrayList();            
+            ArrayList<String> missingParams = new ArrayList<String>();            
             String userId = paramMap.remove(REQUEST_PARAM_USER_ID);  
             if (userId == null) {
                 missingParams.add(REQUEST_PARAM_USER_ID);

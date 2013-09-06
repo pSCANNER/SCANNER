@@ -49,7 +49,7 @@ public class ToolLibraryController extends BaseController
     {
         if (!paramMap.isEmpty()) 
         {
-            ArrayList missingParams = new ArrayList();            
+            ArrayList<String> missingParams = new ArrayList<String>();            
             String userName = paramMap.remove(REQUEST_PARAM_USER_NAME);  
             if (userName == null) {
                 missingParams.add(REQUEST_PARAM_USER_NAME);

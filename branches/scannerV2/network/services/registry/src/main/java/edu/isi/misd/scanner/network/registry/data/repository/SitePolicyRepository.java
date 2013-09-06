@@ -13,5 +13,6 @@ public interface SitePolicyRepository
     extends CrudRepository<SitePolicy, Integer> 
 {
     SitePolicy findBySiteSiteName(String siteName);
+    List<SitePolicy> findByStudyRoleStudyStudyId(Integer studyId);    
     List<SitePolicy> findByStudyRoleRoleId(Integer roleId);
 }

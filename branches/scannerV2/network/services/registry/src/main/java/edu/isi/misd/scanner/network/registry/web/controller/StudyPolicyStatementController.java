@@ -46,7 +46,7 @@ public class StudyPolicyStatementController extends BaseController
     {
         if (!paramMap.isEmpty()) 
         {
-            ArrayList missingParams = new ArrayList();            
+            ArrayList<String> missingParams = new ArrayList<String>();            
             String studyId = paramMap.remove(REQUEST_PARAM_STUDY_ID);  
             if (studyId == null) {
                 missingParams.add(REQUEST_PARAM_STUDY_ID);

@@ -1,7 +1,6 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
-import edu.isi.misd.scanner.network.registry.data.domain.DataSetInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +19,5 @@ public class DataSetDefinitionControllerTest extends BaseControllerTest
         throws Exception
     {
         assertCanBeMapped(DataSetDefinition.class);
-        assertCanBeMapped(DataSetInstance.class);
     }    
 }

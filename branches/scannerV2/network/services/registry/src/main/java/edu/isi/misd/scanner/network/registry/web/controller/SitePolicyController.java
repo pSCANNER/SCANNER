@@ -34,6 +34,7 @@ public class SitePolicyController extends BaseController
         LogFactory.getLog(SitePolicyController.class.getName());
     
     public static final String REQUEST_PARAM_SITE_NAME = "siteName";
+    public static final String REQUEST_PARAM_STUDY_ID = "studyId";
     public static final String REQUEST_PARAM_STUDY_ROLE_ID = "studyRoleId";    
     
     @Autowired
@@ -44,10 +45,12 @@ public class SitePolicyController extends BaseController
            @RequestParam Map<String, String> paramMap) 
     {
         String siteName = null;
+        String studyId = null;
         String studyRoleId = null;
         if (!paramMap.isEmpty()) 
         {
             siteName = paramMap.remove(REQUEST_PARAM_SITE_NAME);
+            studyId = paramMap.remove(REQUEST_PARAM_STUDY_ID);            
             studyRoleId = paramMap.remove(REQUEST_PARAM_STUDY_ROLE_ID);
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
@@ -62,6 +65,11 @@ public class SitePolicyController extends BaseController
                 throw new ResourceNotFoundException(siteName);
             }
             sitePolicy.add(site);
+        } else if (studyId != null) {
+            return 
+                sitePolicyRepository.findByStudyRoleStudyStudyId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_STUDY_ID,studyId));          
         } else if (studyRoleId != null) {
             return 
                 sitePolicyRepository.findByStudyRoleRoleId(
