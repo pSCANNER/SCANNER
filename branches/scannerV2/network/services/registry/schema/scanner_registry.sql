@@ -38,6 +38,13 @@ create table if not exists study_role (
 
 COMMENT on column study_role.role_within_study is 'PI, CO-I, PM, etc.';
 
+create table if not exists standard_role (
+  standard_role_id serial not null primary key,
+  standard_role_name text not null unique,
+  description text,
+  create_by_default boolean default true
+);
+
 CREATE TABLE IF NOT EXISTS user_role (
   user_role_id serial not null primary key,
   user_id integer NOT NULL references scanner_user(user_id),
@@ -137,6 +144,13 @@ create table if not exists site_policy (
   site_id integer not null references site(site_id),
   role_id integer not null references study_role(role_id)
 );
+
+create table if not exists study_policy (
+  study_policy_id serial not null primary key,
+  sstudy_id integer not null references study(study_id),
+  role_id integer not null references study_role(role_id)
+);
+
 
 CREATE TABLE IF NOT EXISTS data_set_variable_metadata
 (
