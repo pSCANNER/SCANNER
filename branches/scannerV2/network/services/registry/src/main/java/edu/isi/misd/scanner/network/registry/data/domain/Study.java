@@ -11,7 +11,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -54,10 +53,13 @@ public class Study implements Serializable
     @Column(name = "clinical_trials_id")
     private Integer clinicalTrialsId;
     @Column(name = "analysis_plan")
-    private String analysisPlan;      
+    private String analysisPlan; 
+    // JsonIgnore studyStatusType since it is not being used right now 
+    @JsonIgnore 
     @JoinColumn(name = "study_status_type_id", referencedColumnName = "study_status_type_id")
     @ManyToOne(optional = false)
-    private StudyStatusType studyStatusType;
+    // just set studyStatusType by default to the only currently defined value (1)
+    private StudyStatusType studyStatusType = new StudyStatusType(1);
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
@@ -72,7 +74,10 @@ public class Study implements Serializable
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
     private List<StudyPolicyStatement> studyPolicyStatements;
-
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
+    private List<StudyManagementPolicy> studyManagementPolicies;
+    
     public Study() {
     }
 
@@ -196,6 +201,14 @@ public class Study implements Serializable
 
     public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
         this.studyPolicyStatements = studyPolicyStatements;
+    }
+
+    public List<StudyManagementPolicy> getStudyManagementPolicies() {
+        return studyManagementPolicies;
+    }
+
+    public void setStudyManagementPolicies(List<StudyManagementPolicy> studyManagementPolicies) {
+        this.studyManagementPolicies = studyManagementPolicies;
     }
     
     @Override

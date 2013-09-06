@@ -1,7 +1,7 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
-import edu.isi.misd.scanner.network.registry.data.domain.SitePolicy;
-import edu.isi.misd.scanner.network.registry.data.repository.SitePolicyRepository;
+import edu.isi.misd.scanner.network.registry.data.domain.StudyManagementPolicy;
+import edu.isi.misd.scanner.network.registry.data.repository.StudyManagementPolicyRepository;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
@@ -28,28 +28,25 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * 
  */
 @Controller
-public class SitePolicyController extends BaseController
+public class StudyManagementPolicyController extends BaseController
 {
     private static final Log log = 
-        LogFactory.getLog(SitePolicyController.class.getName());
+        LogFactory.getLog(StudyManagementPolicyController.class.getName());
     
-    public static final String REQUEST_PARAM_SITE_NAME = "siteName";
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";
     public static final String REQUEST_PARAM_STUDY_ROLE_ID = "studyRoleId";    
     
     @Autowired
-    private SitePolicyRepository sitePolicyRepository;   
+    private StudyManagementPolicyRepository studyManagementPolicyRepository;   
     
-	@RequestMapping(value = "/sitePolicies", method = RequestMethod.GET)
-	public @ResponseBody List<SitePolicy> getSitePolicies(
+	@RequestMapping(value = "/studyManagementPolicies", method = RequestMethod.GET)
+	public @ResponseBody List<StudyManagementPolicy> getSitePolicies(
            @RequestParam Map<String, String> paramMap) 
     {
-        String siteName = null;
         String studyId = null;
         String studyRoleId = null;
         if (!paramMap.isEmpty()) 
         {
-            siteName = paramMap.remove(REQUEST_PARAM_SITE_NAME);
             studyId = paramMap.remove(REQUEST_PARAM_STUDY_ID);            
             studyRoleId = paramMap.remove(REQUEST_PARAM_STUDY_ROLE_ID);
             if (!paramMap.isEmpty()) {
@@ -57,100 +54,103 @@ public class SitePolicyController extends BaseController
             }            
         }
         
-        List<SitePolicy> sitePolicy = new ArrayList<SitePolicy>();        
-        if (siteName != null) {
-            SitePolicy site = 
-                sitePolicyRepository.findBySiteSiteName(siteName);
-            if (site == null) {
-                throw new ResourceNotFoundException(siteName);
-            }
-            sitePolicy.add(site);
-        } else if (studyId != null) {
+        List<StudyManagementPolicy> studyManagementPolicy = 
+            new ArrayList<StudyManagementPolicy>();        
+        if (studyId != null) {
             return 
-                sitePolicyRepository.findByStudyRoleStudyStudyId(
+                studyManagementPolicyRepository.findByStudyStudyId(
                     validateIntegerParameter(
                         REQUEST_PARAM_STUDY_ID,studyId));          
         } else if (studyRoleId != null) {
             return 
-                sitePolicyRepository.findByStudyRoleRoleId(
+                studyManagementPolicyRepository.findByStudyRoleRoleId(
                     validateIntegerParameter(
                         REQUEST_PARAM_STUDY_ROLE_ID,studyRoleId));
         } else {
-            Iterator iter = sitePolicyRepository.findAll().iterator();
-            CollectionUtils.addAll(sitePolicy, iter);      
+            Iterator iter = 
+                studyManagementPolicyRepository.findAll().iterator();
+            CollectionUtils.addAll(studyManagementPolicy, iter);      
         }
-        return sitePolicy;           
+        return studyManagementPolicy;           
 	}
     
-    @RequestMapping(value = "/sitePolicies", method = RequestMethod.POST)
+    @RequestMapping(value = "/studyManagementPolicies", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody SitePolicy createSitePolicy(
-           @RequestBody SitePolicy site) 
+    public @ResponseBody StudyManagementPolicy createStudyManagementPolicy(
+           @RequestBody StudyManagementPolicy studyManagementPolicy) 
     {
         try {
-            sitePolicyRepository.save(site);
+            studyManagementPolicyRepository.save(studyManagementPolicy);
         } catch (DataIntegrityViolationException e) {
             log.warn("DataIntegrityViolationException: " + e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
-        return sitePolicyRepository.findOne(site.getSitePolicyId());
+        return 
+            studyManagementPolicyRepository.findOne(
+                studyManagementPolicy.getStudyPolicyId());
     }  
     
-    @RequestMapping(value = "/sitePolicies/{id}", method = RequestMethod.GET)
-    public @ResponseBody SitePolicy getSitePolicy(
+    @RequestMapping(value = "/studyManagementPolicies/{id}", method = RequestMethod.GET)
+    public @ResponseBody StudyManagementPolicy getStudyManagementPolicy(
            @PathVariable("id") Integer id) 
     {
-        SitePolicy foundSitePolicy = sitePolicyRepository.findOne(id);
+        StudyManagementPolicy foundStudyManagementPolicy = 
+            studyManagementPolicyRepository.findOne(id);
 
-        if (foundSitePolicy == null) {
+        if (foundStudyManagementPolicy == null) {
             throw new ResourceNotFoundException(id);
         }
-        return foundSitePolicy;
+        return foundStudyManagementPolicy;
     }  
     
-    @RequestMapping(value = "/sitePolicies/{id}", method = RequestMethod.PUT)
-    public @ResponseBody SitePolicy updateSitePolicy(
-           @PathVariable("id") Integer id, @RequestBody SitePolicy site) 
+    @RequestMapping(value = "/studyManagementPolicies/{id}", method = RequestMethod.PUT)
+    public @ResponseBody StudyManagementPolicy updateStudyManagementPolicy(
+           @PathVariable("id") Integer id,
+           @RequestBody StudyManagementPolicy studyManagementPolicy) 
     {
         // find the requested resource
-        SitePolicy foundSitePolicy = sitePolicyRepository.findOne(id);
+        StudyManagementPolicy foundStudyManagementPolicy = 
+            studyManagementPolicyRepository.findOne(id);
         // if the ID is not found then throw a ResourceNotFoundException (404)
-        if (foundSitePolicy == null) {
+        if (foundStudyManagementPolicy == null) {
             throw new ResourceNotFoundException(id);            
         }
         // if the ID in the request body is null, use the ID parsed from the URL
         // if the ID is found in the request body but does not match the ID in 
         // the current data, then throw a ConflictException (409)
-        Integer updateID = site.getSitePolicyId();
+        Integer updateID = studyManagementPolicy.getStudyPolicyId();
         if (updateID == null) {
-            site.setSitePolicyId(id);
-        } else if (!site.getSitePolicyId().equals(foundSitePolicy.getSitePolicyId())) {
+            studyManagementPolicy.setStudyPolicyId(id);
+        } else if (!studyManagementPolicy.getStudyPolicyId().equals(
+                    foundStudyManagementPolicy.getStudyPolicyId())) {
             throw new ConflictException(
                 "Update failed: specified object ID (" + 
-                site.getSitePolicyId() + 
+                studyManagementPolicy.getStudyPolicyId() + 
                 ") does not match referenced ID (" + 
-                foundSitePolicy.getSitePolicyId() + ")"); 
+                foundStudyManagementPolicy.getStudyPolicyId() + ")"); 
         }
         // ok, good to go
         try {
-            sitePolicyRepository.save(site);
+            studyManagementPolicyRepository.save(studyManagementPolicy);
         } catch (DataIntegrityViolationException e) {
             log.warn("DataIntegrityViolationException: " + e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
-        return sitePolicyRepository.findOne(site.getSitePolicyId());
+        return 
+            studyManagementPolicyRepository.findOne(
+                studyManagementPolicy.getStudyPolicyId());
     }     
     
-    @RequestMapping(value = "/sitePolicies/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = "/studyManagementPolicies/{id}", method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeSitePolicy(@PathVariable("id") Integer id) 
+    public void removeStudyManagementPolicy(@PathVariable("id") Integer id) 
     {
-        if (!sitePolicyRepository.exists(id)) {
+        if (!studyManagementPolicyRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }
-        sitePolicyRepository.delete(id);
+        studyManagementPolicyRepository.delete(id);
     } 
   
 }

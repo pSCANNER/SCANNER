@@ -60,7 +60,10 @@ public class StudyRole implements Serializable
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyRole")
     private List<StudyPolicyStatement> studyPolicyStatements;
-
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyRole")
+    private List<StudyManagementPolicy> studyManagementPolicies;
+    
     public StudyRole() {
     }
 
@@ -137,6 +140,14 @@ public class StudyRole implements Serializable
         this.studyPolicyStatements = studyPolicyStatements;
     }
 
+    public List<StudyManagementPolicy> getStudyManagementPolicies() {
+        return studyManagementPolicies;
+    }
+
+    public void setStudyManagementPolicies(List<StudyManagementPolicy> studyManagementPolicies) {
+        this.studyManagementPolicies = studyManagementPolicies;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
