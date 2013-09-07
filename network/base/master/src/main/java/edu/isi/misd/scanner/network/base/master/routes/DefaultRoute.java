@@ -197,6 +197,7 @@ public class DefaultRoute extends RouteBuilder
             onException(Exception.class).
             maximumRedeliveries(0).
             continued(true).
+            setProperty("status").constant("complete").
             end().            
             // recipientList does the actual multicast
             recipientList(getRecipientList()).          
