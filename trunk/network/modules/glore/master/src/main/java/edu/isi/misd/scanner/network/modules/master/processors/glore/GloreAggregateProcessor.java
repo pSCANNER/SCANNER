@@ -120,9 +120,9 @@ public class GloreAggregateProcessor implements Processor
                     GloreUtils.matrixToString(cov_matrix, 8, 6));
             }
             
-            //gloreData.setCovarianceMatrix(GloreUtils.convertMatrixToMatrixType(cov_matrix));
             // format the covariance matrix
-            gloreData.convertMatrixToMatrixTypeFormatted(GloreUtils.convertMatrixToMatrixType(cov_matrix));
+            gloreData.setCovarianceMatrix(
+                GloreUtils.convertMatrixToMatrixTypeFormatted(cov_matrix));
             gloreData.setState("computeSDMatrix"); 
 
         } 

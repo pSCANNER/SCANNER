@@ -23,13 +23,13 @@
                </xsd:documentation>
             </xsd:annotation>   
             <xsd:sequence>                                        
-              <xsd:element name="LogisticRegressionInput"
-                           type="regr:LogisticRegressionInput"
-                           minOccurs="1"
-                           maxOccurs="1"/>
-              <xsd:element ref="tns:GloreData"
-                           minOccurs="0"
-                           maxOccurs="1"/>
+                <xsd:element name="LogisticRegressionInput"
+                             type="regr:LogisticRegressionInput"
+                             minOccurs="1"
+                             maxOccurs="1"/>
+                <xsd:element ref="tns:GloreData"
+                             minOccurs="0"
+                             maxOccurs="1"/>
             </xsd:sequence>                      
         </xsd:complexType> 
     </xsd:element>  
@@ -53,26 +53,26 @@
                 <xsd:element name="Beta"
                            type="base:MatrixType"/>                 
               
-              <xsd:element name="D"
-                           type="base:MatrixType"/>   
-              
-              <xsd:element name="E"
-                           type="base:MatrixType"/>                                                                          
-              
-              <xsd:element name="CovarianceMatrix"
-                           type="base:MatrixType"/>  
-              
-              <xsd:element name="SDMatrix"
-                           type="base:MatrixType"/>                              
-              
-              <xsd:element name="iteration" 
-                           type="xsd:int"/>
+                <xsd:element name="D"
+                             type="base:MatrixType"/>   
 
-              <xsd:element name="features" 
-                           type="xsd:int"/>
-                                          
-              <xsd:element name="state" 
-                           type="xsd:string"/>                        
+                <xsd:element name="E"
+                             type="base:MatrixType"/>                                                                          
+
+                <xsd:element name="CovarianceMatrix"
+                             type="base:MatrixType"/>  
+
+                <xsd:element name="SDMatrix"
+                             type="base:MatrixType"/>                              
+
+                <xsd:element name="iteration" 
+                             type="xsd:int"/>
+
+                <xsd:element name="features" 
+                             type="xsd:int"/>
+
+                <xsd:element name="state" 
+                             type="xsd:string"/>                        
             </xsd:sequence>
         </xsd:complexType> 
     </xsd:element>  
@@ -87,14 +87,14 @@
             </xsd:annotation>             
             <xsd:sequence>                                                                                        
               
-              <xsd:element name="Beta"
-                           type="base:MatrixType"/>     
-                              
-              <xsd:element name="CovarianceMatrix"
-                           type="base:MatrixType"/>  
-              
-              <xsd:element name="SDMatrix"
-                           type="base:MatrixType"/>
+                <xsd:element name="Beta"
+                             type="base:MatrixType"/>     
+
+                <xsd:element name="CovarianceMatrix"
+                             type="base:MatrixType"/>  
+
+                <xsd:element name="SDMatrix"
+                             type="base:MatrixType"/>
 
 
             </xsd:sequence>
@@ -110,10 +110,10 @@
                </xsd:documentation>
             </xsd:annotation>
             <xsd:sequence>                                        
-              <xsd:element name="LogisticRegressionResponse"
-                           type="regr:LogisticRegressionResponse"
-                           minOccurs="1"
-                           maxOccurs="1"/>
+                <xsd:element name="LogisticRegressionResponse"
+                             type="regr:LogisticRegressionResponse"
+                             minOccurs="1"
+                             maxOccurs="1"/>
             </xsd:sequence>                     
         </xsd:complexType> 
     </xsd:element>   
