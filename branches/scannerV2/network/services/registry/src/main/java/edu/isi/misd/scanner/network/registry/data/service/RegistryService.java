@@ -1,8 +1,8 @@
 package edu.isi.misd.scanner.network.registry.data.service;
 
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
+import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
-import java.util.List;
 
 /**
  *
@@ -10,13 +10,25 @@ import java.util.List;
 public interface RegistryService 
 {
     /**
-     * Creates or updates a single ToolLibrary, with optional creation of AnalysisTool child relations.
+     * Creates a single Study.
+     * @param Study
+     */
+    public Study createStudy(Study study); 
+    
+    /**
+     * Deletes a single Study by studyId.
+     * @param studyId
+     */
+    public void deleteStudy(Integer studyId);
+    
+    /**
+     * Creates or updates a single ToolLibrary.
      * @param library
      */
     public ToolLibrary saveToolLibrary(ToolLibrary library);
     
     /**
-     * Creates or updates a single DataSetDefinition, with optional creation of DataSetInstance child relations.
+     * Creates or updates a single DataSetDefinition.
      * @param dataSet
      */
     public DataSetDefinition saveDataSetDefinition(DataSetDefinition dataSet);          

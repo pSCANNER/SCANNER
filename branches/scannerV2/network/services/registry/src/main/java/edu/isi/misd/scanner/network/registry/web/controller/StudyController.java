@@ -2,6 +2,7 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import edu.isi.misd.scanner.network.registry.data.repository.StudyRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
@@ -39,6 +40,9 @@ public class StudyController extends BaseController
     
     @Autowired
     private StudyRepository studyRepository;   
+    
+    @Autowired
+    private RegistryService registryService;   
     
 	@RequestMapping(value = "/studies", method = RequestMethod.GET)
 	public @ResponseBody List<Study> getStudies(
@@ -85,7 +89,7 @@ public class StudyController extends BaseController
            @RequestBody Study study) 
     {
         try {
-            studyRepository.save(study);
+            registryService.createStudy(study);
         } catch (DataIntegrityViolationException e) {
             log.warn("DataIntegrityViolationException: " + e);
             throw new ConflictException(e.getMostSpecificCause());
@@ -147,7 +151,7 @@ public class StudyController extends BaseController
         if (!studyRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }
-        studyRepository.delete(id);
+        registryService.deleteStudy(id);
     } 
   
 }

@@ -115,7 +115,7 @@ public class Study implements Serializable
         this.description = description;
     }
     
-    public int getIrbId() {
+    public Integer getIrbId() {
         return irbId;
     }
 
