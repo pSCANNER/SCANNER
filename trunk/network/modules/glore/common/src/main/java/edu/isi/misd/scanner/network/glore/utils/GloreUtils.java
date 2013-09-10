@@ -46,38 +46,19 @@ public class GloreUtils
      */
     public static MatrixType convertMatrixToMatrixType(Matrix matrix)
     {
-        ArrayList<MatrixRowType> matrixRowsList = new ArrayList<MatrixRowType>();        
-        double[][] matrixArray = matrix.getArray();
-        
-        for (int i = 0; i < matrixArray.length; i++) 
-        {
-            ArrayList<DoubleType> columnList = 
-                new ArrayList<DoubleType>();
-            for (int j = 0; j < matrixArray[i].length; j++) {
-                DoubleType columnType = new DoubleType();
-                columnType.setValue(Double.valueOf(matrixArray[i][j]));
-                columnType.setName(Integer.toString(j));
-                columnList.add(columnType);
-            }
-            MatrixRowType matrixRow = new MatrixRowType();
-            matrixRow.getMatrixColumn().addAll(columnList);
-            matrixRowsList.add(matrixRow);
-        }
-        
-        MatrixType matrixType = new MatrixType();        
-        matrixType.getMatrixRow().addAll(matrixRowsList);
-        return matrixType;    
+        return convertMatrixToMatrixType(matrix, false);
     }
 
     /**
      * Converts a {@link Jama.Matrix} to a
-     * {@link edu.isi.misd.scanner.network.types.base.MatrixType}.
+     * {@link edu.isi.misd.scanner.network.types.base.MatrixType} 
+     * with optional formatting.
      */
-    public static MatrixType convertMatrixToMatrixTypeFormatted(Matrix matrix)
+    public static MatrixType convertMatrixToMatrixType(
+        Matrix matrix, boolean format)
     {
         ArrayList<MatrixRowType> matrixRowsList = new ArrayList<MatrixRowType>();
         double[][] matrixArray = matrix.getArray();
-        DecimalFormat df = new DecimalFormat(".000");
 
         for (int i = 0; i < matrixArray.length; i++)
         {
@@ -85,7 +66,8 @@ public class GloreUtils
                     new ArrayList<DoubleType>();
             for (int j = 0; j < matrixArray[i].length; j++) {
                 DoubleType columnType = new DoubleType();
-                columnType.setValue( Double.parseDouble(df.format(Double.valueOf(matrixArray[i][j]))));
+                double columnValue = Double.valueOf(matrixArray[i][j]);
+                columnType.setValue((format) ? df(columnValue) : columnValue);
                 columnType.setName(Integer.toString(j));
                 columnList.add(columnType);
             }
@@ -238,5 +220,21 @@ public class GloreUtils
             M.set(i,i,A[i]);
         }
         return M;
-    }     
+    }  
+    
+    /**
+     * Formats a double to a fixed (currently three) number of decimal places.
+     */    
+    public static double df(double a)
+    {
+        DecimalFormat f = new DecimalFormat(".000");
+        Double input = Double.valueOf(a);
+        // check for special values so that they are not parsed
+        if (input.equals(Double.NEGATIVE_INFINITY) ||
+            input.equals(Double.POSITIVE_INFINITY) || 
+            input.equals(Double.NaN)) {
+            return input.doubleValue();
+        }
+        return Double.parseDouble(f.format(input));
+    }    
 }
