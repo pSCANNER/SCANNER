@@ -121,10 +121,10 @@ public class Registry extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get library.");
 				return;
 			}
-		} else if (action.equals("getMethod")) {
-			clientResponse = registryClient.getMethod(name, lib);
+		} else if (action.equals("getAllSites")) {
+			clientResponse = registryClient.getAllSites();
 			if (clientResponse != null) {
-				res = clientResponse.toMethod();
+				res = clientResponse.getEntityResponse().toString();
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get method.");
 				return;

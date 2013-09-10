@@ -714,6 +714,13 @@ public interface RegistryClient {
      */
 	public RegistryClientResponse getAllLibraries();
 	
+    /**
+     * Gets the studies. 
+     * 
+     * @return The client response.
+     */
+	public RegistryClientResponse getAllSites();
+	
 
 	public RegistryClientResponse getPI();
 	public RegistryClientResponse getUsers();

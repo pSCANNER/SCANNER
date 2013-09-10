@@ -213,6 +213,29 @@
 												</tr>
 											</table>
 										</div>
+										<p class="wizard_heading">Manage Study Sites</p>
+										<div class="wizard_content">
+											<table class="manageStudyRolesTable">
+												<tbody id="manageStudySitesTbody"></tbody>
+											</table>
+											<br />
+											<table>
+												<tr>
+													<td>
+														<table class="update_study">
+															<tbody id="addSiteTable">
+																<tr>
+																	<td><select id="siteSelect"></select></td>
+																</tr>
+															</tbody>
+														</table>
+													</td>
+													<td>
+														<button id="addSiteButton" onclick="addSite();">Add Site</button>
+													</td>
+												</tr>
+											</table>
+										</div>
 										<p class="wizard_heading">Manage Study Staff</p>
 										<div class="wizard_content">
 											<table class="manageStudyStaffTable">
@@ -235,11 +258,6 @@
 																		<select id="staffRoles">
 																		</select> 
 																	</td>
-																	<td>in affilation with</td>
-																	<td>
-																		<select id="studySites">
-																		</select> 
-																	</td>
 																</tr>
 															</tbody>
 														</table>
@@ -252,16 +270,60 @@
 										</div>
 										<p class="wizard_heading">Manage Study Protocols</p>
 										<div class="wizard_content">
+											<table id="manageStudyPoliciesProtocols" class="manageStudyProtocols">
+												<thead>
+													<tr>
+														<th class="protocol_border">Method</th>
+														<th class="protocol_border">Data Set</th>
+														<th class="protocol_border">Result Transfer Policy</th>
+														<th></th>
+													</tr>
+												</thead>
+												<tbody id="manageStudyPoliciesProtocolsTbody"></tbody>
+											</table>
+											<br />
+											<div id="add_policies_protocol_div">
+												<table>
+													<tr>
+														<td>
+															<table class="add_protocol">
+																<tbody id="addPoliciesProtocolTable">
+																	<tr>
+																		<td>
+																			<select id="modelPoliciesNames">
+																			</select> 
+																		</td>
+																		<td>
+																			<select id="datasetPoliciesNames">
+																			</select> 
+																		</td>
+																		<td>
+																			<select id="studyPoliciesSendOptions">
+																			</select> 
+																		</td>
+																	</tr>
+																</tbody>
+															</table>
+														</td>
+														<td>
+															<button id="addPoliciesProtocolButton" onclick="addPoliciesProtocol();">Add Protocol</button>
+														</td>
+													</tr>
+												</table>
+											</div>
+										</div>
+										<p class="wizard_heading">Manage Sites Protocols</p>
+										<div class="wizard_content">
 											<table id="manageStudyProtocols" class="manageStudyProtocols">
 												<thead>
 													<tr>
 														<th class="protocol_border">Method</th>
-														<th class="protocol_border">Site</th>
 														<th class="protocol_border">Data Set</th>
-														<th class="protocol_border">URL</th>
+														<th class="protocol_border">Data Source</th>
+														<th class="protocol_border">Site</th>
 														<th class="protocol_border">Node</th>
-														<th class="protocol_border">Result Transfer Policy</th>
-														<th></th>
+														<th class="protocol_border">Result Transfer</th>
+														<th class="protocol_border">Role</th>
 														<th></th>
 													</tr>
 												</thead>
@@ -276,11 +338,7 @@
 																<tbody id="addProtocolTable">
 																	<tr>
 																		<td>
-																			<select id="modelNames">
-																			</select> 
-																		</td>
-																		<td>
-																			<select id="datasetNames">
+																			<select id="estimateSiteSelect">
 																			</select> 
 																		</td>
 																		<td>
@@ -288,7 +346,7 @@
 																			</select> 
 																		</td>
 																		<td>
-																			<select id="studySendOptions">
+																			<select id="studyInvestigatorSelect">
 																			</select> 
 																		</td>
 																	</tr>
@@ -338,6 +396,23 @@
 												</table>
 											</div>
 										</div>
+										<p class="wizard_heading">View Sites Protocols</p>
+										<div class="wizard_content">
+											<table id="viewStudyProtocols" class="manageStudyProtocols">
+												<thead>
+													<tr>
+														<th class="protocol_border">Method</th>
+														<th class="protocol_border">Data Set</th>
+														<th class="protocol_border">Data Source</th>
+														<th class="protocol_border">Site</th>
+														<th class="protocol_border">Node</th>
+														<th class="protocol_border">Result Transfer</th>
+														<th class="protocol_border">Role</th>
+													</tr>
+												</thead>
+												<tbody id="viewStudyProtocolsTbody"></tbody>
+											</table>
+										</div>
 										<p class="wizard_heading">Manage Documentation</p>
 										<div class="wizard_content">
 											<div class="placeHolder">
@@ -356,8 +431,358 @@
 							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Prep to Research" onShow="hideQuery();">
-							<div id="prepToResearchDiv"></div>
+							title="Prep to Research" onShow="showPrepToResearch();">
+							<div id="prepToResearchDiv">
+<div class=WordSection1>
+
+<div align=center>
+
+<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=710
+ style='width:7.4in;border-collapse:collapse'>
+ <tr style='page-break-inside:avoid;height:.25in'>
+  <td colspan=8 width=800 valign=bottom style='padding:0in 1.45pt 0in 2.9pt;
+  height:.25in'><span style='font-size:8.0pt;font-family:"Arial","sans-serif"'><br
+  clear=all style='page-break-before:always'>
+  </span>
+  <p class=PIHeader>Program Director/Principal Investigator (Last, First, Middle):<input type=text' value='PI LAST,Middle,First' style='background-color:lightgray;'> </p>
+  </td>
+  <td width=331 colspan=5 style='width:3.45in;padding:0in 1.45pt 0in 2.9pt;
+  height:.25in'>
+  <p class=DataField11pt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid;height:4.3pt'>
+  <td width=710 colspan=8 valign=bottom style='width:7.4in;padding:0in 1.45pt 0in 2.9pt;
+  height:4.3pt'>
+  <p class=DataField11pt>&nbsp;</p>
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid;height:33.1pt'>
+  <td width=710 colspan=8 style='width:7.4in;padding:0in 1.45pt 0in 2.9pt;
+  height:33.1pt'>
+
+  <h2>Targeted/Planned Enrollment Table</h2>
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid;height:30.25pt'>
+  <td width=710 colspan=8 style='width:7.4in;padding:0in 1.45pt 0in 2.9pt;
+  height:30.25pt'>
+  <h1><span style='color:red'>This report format should NOT be used for data
+  collection from study participants.</span></h1>
+  </td>
+ </tr>
+
+ <tr style='page-break-inside:avoid;height:23.15pt'>
+  <td width=710 valign=bottom style=padding:0in 0in 0in 0in;
+  height:23.15pt'>
+  <p class=Arial10BoldText>Study Title:<input type=text style='background-color:lightgray;'></p>
+  </td>
+  <td width=628 colspan=7 valign=bottom style='width:470.65pt;padding:0in 1.45pt 0in 2.9pt;
+  height:23.15pt'>
+  <p class=DataField11pt><a name=Text35></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+ </tr>
+
+ <tr style='page-break-inside:avoid;height:23.05pt'>
+  <td width=710 colspan=2 valign=bottom style='padding:0in 0in 0in 0in;
+  height:23.05pt'>
+  <p class=Arial10BoldText>Total Planned Enrollment:<input type=text style='background-color:lightgray;'></p>
+  </td>
+  <td width=534 colspan=6 valign=bottom style='width:400.35pt;padding:0in 1.45pt 0in 2.9pt;
+  height:23.05pt'>
+  <p class=DataField11pt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+ </tr>
+
+ <tr style='page-break-inside:avoid;height:.2in'>
+  <td width=710 colspan=8 valign=bottom style='width:7.4in;border:none;
+  border-bottom:solid windowtext 1.0pt;padding:0in 1.45pt 0in 2.9pt;height:
+  .2in'>
+  <p class=MsoNormal><span style='font-size:11.0pt'>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr style='height:.4in'>
+  <td width=710 colspan=8 style='width:7.4in;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.4in'>
+  <p class=Arial10BoldText align=center style='text-align:center'>TARGETED/PLANNED
+  ENROLLMENT: Number of Subjects</p>
+
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid;height:.4in'>
+  <td width=426 colspan=4 style='width:319.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.4in'>
+  <p class=Arial10BoldText align=center style='text-align:center'>Ethnic
+  Category</p>
+  </td>
+  <td width=97 colspan=2 style='width:72.95pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in 1.45pt 0in 2.9pt;height:.4in'>
+  <p class=Arial10BoldText align=center style='text-align:center'>Females</p>
+
+  </td>
+  <td width=96 style='width:1.0in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 1.45pt 0in 2.9pt;
+  height:.4in'>
+  <p class=Arial10BoldText align=center style='text-align:center'>Males</p>
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in 1.45pt 0in 2.9pt;
+  height:.4in'>
+  <p class=Arial10BoldText align=center style='text-align:center'>Total</p>
+  </td>
+ </tr>
+
+ <tr style='height:.3in'>
+  <td width=426 colspan=4 style='width:319.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10ptlineitem>Hispanic or Latino</p>
+  </td>
+  <td width=97 colspan=2 style='width:72.95pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=96 style='width:1.0in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+ </tr>
+ <tr style='height:.3in'>
+  <td width=426 colspan=4 style='width:319.45pt;border-top:none;border-left:
+  solid windowtext 1.0pt;border-bottom:double windowtext 1.5pt;border-right:
+  solid windowtext 1.0pt;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10ptlineitem>Not Hispanic or Latino</p>
+
+  </td>
+  <td width=97 colspan=2 style='width:72.95pt;border-top:none;border-left:none;
+  border-bottom:double windowtext 1.5pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=96 style='width:1.0in;border-top:none;border-left:none;border-bottom:
+  double windowtext 1.5pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  double windowtext 1.5pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+ </tr>
+ <tr style='height:.3in'>
+  <td width=426 colspan=4 style='width:319.45pt;border-top:none;border-left:
+  solid windowtext 1.0pt;border-bottom:double windowtext 1.5pt;border-right:
+  solid windowtext 1.0pt;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10BoldText>Ethnic Category: Total of All Subjects *</p>
+  </td>
+  <td width=97 colspan=2 style='width:72.95pt;border-top:none;border-left:none;
+  border-bottom:double windowtext 1.5pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+  <td width=96 style='width:1.0in;border-top:none;border-left:none;border-bottom:
+  double windowtext 1.5pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  double windowtext 1.5pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+ </tr>
+ <tr style='height:.4in'>
+
+  <td width=426 colspan=4 style='width:319.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.4in'>
+  <p class=Arial10BoldText align=center style='text-align:center'>Racial
+  Categories</p>
+  </td>
+  <td width=284 colspan=4 style='width:213.35pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.4in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;</p>
+  </td>
+ </tr>
+ <tr style='height:.3in'>
+
+  <td width=426 colspan=4 style='width:319.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10ptlineitem>American Indian/Alaska Native</p>
+  </td>
+  <td width=96 style='width:71.9pt;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=97 colspan=2 style='width:73.05pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+ </tr>
+ <tr style='height:.3in'>
+  <td width=426 colspan=4 style='width:319.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10ptlineitem>Asian</p>
+
+  </td>
+  <td width=96 style='width:71.9pt;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=97 colspan=2 style='width:73.05pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+ </tr>
+ <tr style='height:.3in'>
+  <td width=426 colspan=4 style='width:319.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10ptlineitem>Native Hawaiian or Other Pacific Islander </p>
+  </td>
+  <td width=96 style='width:71.9pt;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+  <td width=97 colspan=2 style='width:73.05pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+ </tr>
+ <tr style='height:.3in'>
+
+  <td width=426 colspan=4 style='width:319.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10ptlineitem>Black or African American </p>
+  </td>
+  <td width=96 style='width:71.9pt;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=97 colspan=2 style='width:73.05pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+ </tr>
+ <tr style='height:.3in'>
+  <td width=426 colspan=4 style='width:319.45pt;border-top:none;border-left:
+  solid windowtext 1.0pt;border-bottom:double windowtext 1.5pt;border-right:
+  solid windowtext 1.0pt;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10ptlineitem>White</p>
+
+  </td>
+  <td width=96 style='width:71.9pt;border-top:none;border-left:none;border-bottom:
+  double windowtext 1.5pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=97 colspan=2 style='width:73.05pt;border-top:none;border-left:none;
+  border-bottom:double windowtext 1.5pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  double windowtext 1.5pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+ </tr>
+ <tr style='height:.3in'>
+  <td width=426 colspan=4 style='width:319.45pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0in 1.45pt 0in 2.9pt;height:.3in'>
+  <p class=Arial10BoldText>Racial Categories: Total of All Subjects *</p>
+  </td>
+  <td width=96 style='width:71.9pt;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+
+  </td>
+  <td width=97 colspan=2 style='width:73.05pt;border-top:none;border-left:none;
+  border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0in .1in .7pt 2.9pt;height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+  <td width=91 style='width:.95in;border-top:none;border-left:none;border-bottom:
+  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0in .1in .7pt 2.9pt;
+  height:.3in'>
+  <p class=DataField11pt align=right style='text-align:right'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid;height:260.65pt'>
+
+  <td width=710 colspan=8 valign=top style='width:7.4in;border:none;border-bottom:
+  solid windowtext 1.0pt;padding:4.3pt 1.45pt 0in 2.9pt;height:260.65pt'>
+  <p class=FormFieldCaption>* The “Ethnic Category: Total of All Subjects” must
+  be equal to the “Racial Categories: Total of All Subjects.”</p>
+  </td>
+ </tr>
+ <tr height=0>
+  <td width=83 style='border:none'></td>
+  <td width=94 style='border:none'></td>
+  <td width=203 style='border:none'></td>
+
+  <td width=47 style='border:none'></td>
+  <td width=96 style='border:none'></td>
+  <td width=1 style='border:none'></td>
+  <td width=96 style='border:none'></td>
+  <td width=91 style='border:none'></td>
+ </tr>
+</table>
+
+</div>
+
+<p class=FormFooter>PHS 398/2590 (Rev. 06/09)                                                                Page
+
+<span class=MsoPageNumber><span style='font-size:10.0pt'>&nbsp;&nbsp;&nbsp;</span></span>                          <b>Targeted/Planned
+Enrollment Table Format Page</b></p>
+
+</div>
+							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane" title="Analyze"
 							data-dojo-props="selected:true" onShow="showQuery();">
@@ -387,26 +812,16 @@
 													</tr>
 												</tbody>
 											</table>
-											<br/><br/>
+										</td>
+										<td valign="top" style="width: 35%;">
 											<span class="double_bottom_border"> Sites Status </span> <br/><br/> 
 											<div>Refreshing every 5 minutes. Last refresh was performed 
 												<span id="refreshTimestamp"></span>.
 											</div>
-											<br/>
 											<table>
 												<tbody id="sitesStatusBody">
 												</tbody>
 											</table>
-										</td>
-										<td valign="top" style="width: 35%;">
-											<div id="queryHelp">
-												<span class="double_bottom_border"> Quick Help </span> <br/> <br/>
-												<span>Select dataset, site(s), method and library on
-													the left</span><br/> <br />
-												<span id="datasetHelp"></span> <br/> <br/> 
-												<span id="libraryHelp"></span> <br/> <br/>
-												<span id="methodHelp"></span> 
-											</div>
 										</td>
 									</tr>
 								</tbody>
@@ -454,7 +869,7 @@
 										<td id="profileStudyCount"></td>
 									</tr>
 									<tr>
-										<td class="nowrap">Query count</td>
+										<td class="nowrap">Analyze count</td>
 										<td id="profileQueryCount"></td>
 									</tr>
 									<tr>
@@ -491,7 +906,7 @@
 										<p style="display:none;">
 											<input type="checkbox" id="asyncCheckBox" checked="checked" >Asynchronous (Debug only)
 										</p>
-										<input type="button" value="Query" id="submitQueryButton" onclick="submitQuery('queryDivContent', null, -1, null);"
+										<input type="button" value="Analyze" id="submitQueryButton" onclick="submitQuery('queryDivContent', null, -1, null);"
 											class="method_margin"> <input type="button" value="Clear"
 											onclick="renderAvailableStudies();"> <br />
 										<br />
@@ -506,12 +921,12 @@
 										</div>
 									</div>
 									<div id="queryDiv" style="display: none;" >
-										<h2 id="queryTitle">Query Results</h2>
+										<h2 id="queryTitle">Analyze Results</h2>
 										<img src="resources/images/expand.jpg" id="expandQueryResultsArrow"
 											alt="Expand" onclick="expandQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');"/>
 										<img src="resources/images/collapse.jpg" id="collapseQueryResultsArrow"
 											alt="Collapse"  onclick="collapseQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');" style="display: none;"/>
-										<div id="queryDivContent" style="display: none;">
+										<div id="queryDivContent">
 										</div>
 										<br/><br/><br/>
 									</div>
@@ -548,12 +963,12 @@
 					title="Processing..." alt="Spinner" />
 			</div>
 			<div id="replayDiv" style="display: none;" >
-				<h2 id="replayTitle">Query Results</h2>
+				<h2 id="replayTitle">Analyze Results</h2>
 				<img src="resources/images/expand.jpg" id="expandResults"
 					alt="Expand" onclick="expandQueryResults('replayDivContent', 'expandResults', 'collapseResults');"/>
 				<img src="resources/images/collapse.jpg" id="collapseResults"
 					alt="Collapse"  onclick="collapseQueryResults('replayDivContent', 'expandResults', 'collapseResults');" style="display: none;"/>
-				<div id="replayDivContent" style="display: none;">
+				<div id="replayDivContent">
 				</div>
 				<br/><br/><br/>
 			</div>
