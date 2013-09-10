@@ -2763,15 +2763,6 @@ function manageStudy(hideMode) {
 	});
 	$('#addStaffButton').attr('disabled', 'disabled');
 	$('#addProtocolButton').attr('disabled', 'disabled');
-	if ($('#manageStudyProtocolsTbody').children().length == 0) {
-		$('#manageStudyProtocols').hide();
-	}
-	if ($('#viewStudyProtocolsTbody').children().length == 0) {
-		$('#viewStudyProtocols').hide();
-	}
-	if ($('#manageStudyPoliciesProtocolsTbody').children().length == 0) {
-		$('#manageStudyPoliciesProtocols').hide();
-	}
 	$('#manageStudyStaffTbody').html('');
 	$.each(activeStudy['staff'], function(i, staff) {
 		addStaffRow(staff);
@@ -2841,6 +2832,15 @@ function manageStudy(hideMode) {
 	$('#addInstanceButton').attr('disabled', 'disabled');
 	$('#add_protocol_div').show();
 	$('#add_instance_div').hide();
+	if ($('#viewStudyProtocolsTbody').children().length == 0) {
+		$('#viewStudyProtocols').hide();
+	}
+	if ($('#manageStudyPoliciesProtocolsTbody').children().length == 0) {
+		$('#manageStudyPoliciesProtocols').hide();
+	}
+	if ($('#manageStudyProtocolsTbody').children().length == 0) {
+		$('#manageStudyProtocols').hide();
+	}
 	checkUpdateStudyButton();
 	checkAddPoliciesProtocolButton();
 	checkAddSiteButton();
@@ -3465,11 +3465,7 @@ function removeProtocol(button, obj) {
 			return false;
 		}
 	});
-	button.parent().parent().remove();
-	if ($('#manageStudyProtocolsTbody').children().length == 0) {
-		$('#manageStudyProtocols').hide();
-	}
-	updateBasicInfo();
+	manageStudy(false);
 }
 
 function removePoliciesProtocol(button, obj) {
@@ -3489,11 +3485,6 @@ function removePoliciesProtocol(button, obj) {
 		}
 	});
 	manageStudy(false);
-	return;
-	button.parent().parent().remove();
-	if ($('#manageStudyPoliciesProtocolsTbody').children().length == 0) {
-		$('#manageStudyPoliciesProtocols').hide();
-	}
 }
 
 function setActive(id) {
