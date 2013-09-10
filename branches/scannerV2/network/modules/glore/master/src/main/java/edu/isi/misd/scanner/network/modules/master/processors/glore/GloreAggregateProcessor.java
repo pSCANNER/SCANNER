@@ -75,7 +75,8 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
         if (gloreRequestList.isEmpty()) {
             ErrorUtils.setHttpError(
                 exchange, 
-                new NullPointerException("Null Glore aggregate results"), 500);           
+                new NullPointerException("Null Glore aggregate results"), 500);
+            return;
         }
         
         GloreLogisticRegressionRequest request = gloreRequestList.get(0);
@@ -83,7 +84,8 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
         if (gloreData == null) {
             ErrorUtils.setHttpError(
                 exchange, 
-                new NullPointerException("Null Glore state data"), 500);           
+                new NullPointerException("Null Glore state data"), 500);
+            return;
         }
 
         // replace the getFeatures with the standardized input parameters
@@ -161,11 +163,11 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
 
             // set intercept
             Coefficient coefficient = new Coefficient();
-            coefficient.setB(fBeta.get(0,0));
-            coefficient.setSE(SD.get(0,0));
-            coefficient.setTStatistics(fBeta.get(0,0)/SD.get(0,0));
+            coefficient.setB(GloreUtils.df(fBeta.get(0,0)));
+            coefficient.setSE(GloreUtils.df(SD.get(0,0)));
+            coefficient.setTStatistics(GloreUtils.df(fBeta.get(0,0)/SD.get(0,0)));
             coefficient.setDegreeOfFreedom(1);
-            coefficient.setPValue(ztest(fBeta.get(0,0)/SD.get(0,0)));
+            coefficient.setPValue(GloreUtils.df(ztest(fBeta.get(0,0)/SD.get(0,0))));
             coefficient.setName("Intercept");
             target.add(coefficient);
 
@@ -173,14 +175,14 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
             for (int i=1; i<fBeta.getColumnPackedCopy().length;i++ )
             {
                 coefficient = new Coefficient();
-                coefficient.setB(fBeta.get(i,0));
-                coefficient.setSE(SD.get(0,i));
-                coefficient.setTStatistics(fBeta.get(i,0)/SD.get(0,i));
+                coefficient.setB(GloreUtils.df(fBeta.get(i,0)));
+                coefficient.setSE(GloreUtils.df(SD.get(0,i)));
+                coefficient.setTStatistics(GloreUtils.df(fBeta.get(i,0)/SD.get(0,i)));
                 coefficient.setDegreeOfFreedom(1);
-                coefficient.setPValue(ztest(fBeta.get(i,0)/SD.get(0,i)));
+                coefficient.setPValue(GloreUtils.df(ztest(fBeta.get(i,0)/SD.get(0,i))));
                 coefficient.setName(independentVariables.get(i-1));
                 target.add(coefficient);
-            }            
+            }         
             gloreResponse.setLogisticRegressionResponse(lrResponse);
             
             // format the service response objects and set as the result body
