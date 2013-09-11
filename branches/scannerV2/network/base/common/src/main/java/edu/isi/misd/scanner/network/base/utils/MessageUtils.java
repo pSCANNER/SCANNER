@@ -3,8 +3,6 @@ package edu.isi.misd.scanner.network.base.utils;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
 import edu.isi.misd.scanner.network.types.base.ServiceResponseMetadata;
-import edu.isi.misd.scanner.network.types.base.SiteInfo;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -211,36 +209,24 @@ public class MessageUtils
     }
     
     /**
-     * Populates a {@link edu.isi.misd.scanner.network.types.base.SiteInfo}
-     * object with values resolved from the properties of the current 
-     * {@link org.apache.camel.CamelContext}.
-     * 
+     * Returns the site name of the node with a value resolved from the 
+     * properties of the current {@link org.apache.camel.CamelContext}.
      * 
      * @param exchange The current exchange.
-     * @return The populated SiteInfo.
-     * @throws Exception 
+     * @return The site name, or null.
      */
-    public static SiteInfo getSiteInfo(Exchange exchange) 
-        throws Exception
+    public static String getSiteName(Exchange exchange) 
     {
         CamelContext context = exchange.getContext();
-        SiteInfo siteInfo = new SiteInfo();
-        
-        String siteID =
-            context.resolvePropertyPlaceholders(
-                BaseConstants.SITE_ID_PROPERTY);
-        String siteName = 
-            context.resolvePropertyPlaceholders(
+        String siteName = null;
+        try {
+            siteName = context.resolvePropertyPlaceholders(
                 BaseConstants.SITE_NAME_PROPERTY); 
-        String siteDesc = 
-            context.resolvePropertyPlaceholders(
-                BaseConstants.SITE_DESC_PROPERTY);
-        
-        siteInfo.setSiteID(siteID);
-        siteInfo.setSiteName(siteName);
-        siteInfo.setSiteDescription(siteDesc);
-        
-        return siteInfo;
+        } catch (Exception e) {
+            log.warn("Exception trying to resolve property " + 
+                      BaseConstants.SITE_NAME_PROPERTY + " - " + e);
+        }
+        return siteName;
     }
     
     public static ServiceResponseMetadata createServiceResponseMetadata(
@@ -255,13 +241,8 @@ public class MessageUtils
             exchange.getProperty(BaseConstants.REQUEST_URL,String.class));             
         serviceResponseMetadata.setRequestState(state);
         serviceResponseMetadata.setRequestStateDetail(stateDetail);  
-        try {
-            serviceResponseMetadata.setRequestSiteInfo(
-                MessageUtils.getSiteInfo(exchange));
-        } catch (Exception ex) {
-            log.warn(
-                "Exception while getting local SiteInfo: " + ex.toString());
-        } 
+        serviceResponseMetadata.setRequestSiteName(
+            MessageUtils.getSiteName(exchange));
         return serviceResponseMetadata;
     }
 }

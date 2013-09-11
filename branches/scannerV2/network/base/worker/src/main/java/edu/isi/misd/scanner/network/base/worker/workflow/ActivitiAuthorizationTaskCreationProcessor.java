@@ -1,6 +1,5 @@
 package edu.isi.misd.scanner.network.base.worker.workflow;
 
-import edu.isi.misd.scanner.network.types.base.SiteInfo;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import java.io.BufferedInputStream;
@@ -51,8 +50,7 @@ public class ActivitiAuthorizationTaskCreationProcessor implements Processor
         String id = exchange.getIn().getHeader(BaseConstants.ID,String.class); 
         String url = 
             exchange.getProperty(BaseConstants.REQUEST_URL, String.class);
-        SiteInfo siteInfo = MessageUtils.getSiteInfo(exchange);
-        String siteID = siteInfo.getSiteName();
+        String siteID = MessageUtils.getSiteName(exchange);
         // create Activiti process variables
         HashMap<String, Object> variables = new HashMap<String, Object>();
         variables.put(BaseConstants.ID, id);

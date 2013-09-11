@@ -6,29 +6,7 @@
             xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
             xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
             jaxb:version="2.0" jaxb:extensionBindingPrefixes="xjc"            
-            elementFormDefault="qualified">                   
-              
-    <xsd:complexType name="SiteInfo">
-        <xsd:annotation>
-            <xsd:documentation>
-                A structure describing remote site information
-            </xsd:documentation>
-        </xsd:annotation>          
-        <xsd:sequence>
-            <xsd:element name="SiteID" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>            
-            <xsd:element name="SiteName" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>
-            <xsd:element name="SiteDescription" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>                          
-        </xsd:sequence>
-    </xsd:complexType>                                    
+            elementFormDefault="qualified">                                                      
    
     <xsd:simpleType name="ServiceRequestStateType">
         <xsd:restriction base="xsd:string">
@@ -64,8 +42,8 @@
                              type="xsd:string"
                              minOccurs="0"
                              maxOccurs="1"/>                                   
-                <xsd:element name="RequestSiteInfo" 
-                             type="tns:SiteInfo"
+                <xsd:element name="RequestSiteName" 
+                             type="xsd:string"
                              minOccurs="0"
                              maxOccurs="1"/>              
             </xsd:sequence>               

@@ -189,7 +189,12 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
             ServiceResponseData responseData = new ServiceResponseData();           
             responseData.setAny(gloreResponse);            
             ServiceResponse response = new ServiceResponse();
-            response.setServiceResponseData(responseData);            
+            response.setServiceResponseData(responseData); 
+            ServiceResponseMetadata responseMetadata = 
+                MessageUtils.createServiceResponseMetadata(
+                    exchange, ServiceRequestStateType.COMPLETE,
+                    "The distributed GLORE analysis completed successfully.");
+            response.setServiceResponseMetadata(responseMetadata);
             ServiceResponses responses = new ServiceResponses();              
             responses.getServiceResponse().add(response);
             exchange.getIn().setBody(responses);   

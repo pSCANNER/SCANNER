@@ -5,6 +5,7 @@ import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils.ErrorProcessor;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.camel.Body;
 import org.apache.camel.Properties;
@@ -49,7 +50,9 @@ public class DefaultRoute extends RouteBuilder
     protected JaxbDataFormat jaxb = new JaxbDataFormat(); 
     protected JacksonDataFormat json = new JacksonDataFormat();        
     protected XmlJsonDataFormat xmlToJson = new XmlJsonDataFormat();    
-
+    protected Map<String,String> xmlNamespacePrefixMap = 
+        initXmlNamespacePrefixMap();
+    
     protected String getRouteName() {
         return getClass().getName();
     }
@@ -93,7 +96,7 @@ public class DefaultRoute extends RouteBuilder
     public String getJAXBContext() {
         return "edu.isi.misd.scanner.network.types.base";
     }
-
+    
     public String getJSONUnmarshallType() {
         return "edu.isi.misd.scanner.network.types.base.SimpleMap";
     }
@@ -104,6 +107,15 @@ public class DefaultRoute extends RouteBuilder
 
     protected ValueBuilder getDynamicRouter() {
         return method(getClass(),"defaultRoutingSlip");
+    }
+    
+    private Map<String,String> initXmlNamespacePrefixMap() {
+        return new HashMap<String,String>(
+            BaseConstants.BASE_XML_NAMESPACE_PREFIX_MAP);
+    }  
+    
+    public Map<String,String> getXmlNamespacePrefixMap() {
+        return xmlNamespacePrefixMap;
     }
     
     /**
@@ -120,7 +132,8 @@ public class DefaultRoute extends RouteBuilder
         jaxb.setFragment(true);
         jaxb.setPrettyPrint(false);        
         jaxb.setIgnoreJAXBElement(false);
-        jaxb.setContextPath(getJAXBContext());               
+        jaxb.setContextPath(getJAXBContext());  
+        jaxb.setNamespacePrefix(getXmlNamespacePrefixMap());
         json.setUnmarshalType(Class.forName(getJSONUnmarshallType()));
 
         xmlToJson.setForceTopLevelObject(true);

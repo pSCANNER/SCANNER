@@ -5,6 +5,8 @@ import edu.isi.misd.scanner.network.base.utils.ErrorUtils.ErrorProcessor;
 import edu.isi.misd.scanner.network.base.worker.processors.HoldingDirectoryWriteProcessor;
 import edu.isi.misd.scanner.network.base.worker.workflow.ActivitiAuthorizationTaskCreationProcessor;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.converter.jaxb.JaxbDataFormat;
 import org.slf4j.Logger;
@@ -33,6 +35,9 @@ public class DefaultRoute extends RouteBuilder
     protected static final String RELEASE_AUTH_INVOCATION_CLAUSE = 
         "${in.headers." + BaseConstants.RESULTS_RELEASE_AUTH_REQUIRED + 
         "} == 'true'";
+        
+    protected Map<String,String> xmlNamespacePrefixMap = 
+        initXmlNamespacePrefixMap();
     
     protected String getRouteName() {
         return this.getClass().getName();
@@ -82,6 +87,15 @@ public class DefaultRoute extends RouteBuilder
         return "edu.isi.misd.scanner.network.types.base";
     }
     
+    protected Map<String,String> initXmlNamespacePrefixMap() {
+        return new HashMap<String,String>(
+            BaseConstants.BASE_XML_NAMESPACE_PREFIX_MAP);
+    }  
+    
+    protected Map<String,String> getXmlNamespacePrefixMap() {
+        return xmlNamespacePrefixMap;
+    }
+    
     /**
      * Sets up the route using Camel Java DSL.  Creates routes to handle HTTP 
      * GET/POST requests and process those requests via delegated methods.
@@ -95,7 +109,8 @@ public class DefaultRoute extends RouteBuilder
         jaxb.setFragment(true);
         jaxb.setPrettyPrint(false);        
         jaxb.setIgnoreJAXBElement(false);
-        jaxb.setContextPath(getJAXBContext());            
+        jaxb.setContextPath(getJAXBContext());
+        jaxb.setNamespacePrefix(getXmlNamespacePrefixMap());
         
         from("direct:" + getRouteName()).
             processRef(getBaseRequestProcessorRef()).

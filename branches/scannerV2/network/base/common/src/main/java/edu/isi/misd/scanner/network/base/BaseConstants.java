@@ -1,5 +1,9 @@
 package edu.isi.misd.scanner.network.base;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Shared constants used by both the Master and Worker nodes of the network.
  */
@@ -80,20 +84,21 @@ public class BaseConstants
      */
     public static final String WORKER_OUTPUT_HOLDING_DIR_PROPERTY = 
         "{{worker.outputHoldingDir}}";  
-    
-    /**
-     *  The property name of the node's Site ID
-     */
-    public static final String SITE_ID_PROPERTY = 
-        "{{network.siteID}}";  
+     
     /**
      *  The property name of the node's Site Name
      */
     public static final String SITE_NAME_PROPERTY = 
-        "{{network.siteName}}";    
+        "{{network.siteName}}";  
+   
     /**
-     *  The property name of the node's Site Description
-     */
-    public static final String SITE_DESC_PROPERTY = 
-        "{{network.siteDescription}}";         
+     *  The base XML namespace prefix map, used for JAXB serialization.
+     */    
+    public static final Map<String,String> BASE_XML_NAMESPACE_PREFIX_MAP;
+    static {
+        HashMap<String, String> map = new HashMap<String,String>();
+        map.put("http://scanner.misd.isi.edu/network/types/base", "");
+        map.put("http://scanner.misd.isi.edu/network/types/regression","regr");
+        BASE_XML_NAMESPACE_PREFIX_MAP = Collections.unmodifiableMap(map);
+    }    
 }

@@ -10,7 +10,6 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import edu.isi.misd.scanner.network.types.base.ServiceResponse;
 import edu.isi.misd.scanner.network.types.base.ServiceResponseMetadata;
-import edu.isi.misd.scanner.network.types.base.SiteInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import org.slf4j.Logger;
@@ -142,10 +141,7 @@ public class ResultsReleaseDelegate implements JavaDelegate
             ServiceRequestStateType.REJECTED);                
         responseMetadata.setRequestStateDetail("Reason: " + 
             (comments.isEmpty() ? "not specified." : comments));
-        SiteInfo siteInfo = new SiteInfo();
-        siteInfo.setSiteID(siteID);
-        siteInfo.setSiteName(siteID);
-        responseMetadata.setRequestSiteInfo(siteInfo);
+        responseMetadata.setRequestSiteName(siteID);
         response.setServiceResponseMetadata(responseMetadata);  
         
         // 2. Write out the result response using JAXB
