@@ -117,7 +117,7 @@ INSERT INTO data_set_variable_metadata (data_set_definition, variable_name, vari
 (1, 'a1c final', 'a1c final', 'continuous', NULL),
 (1, 'bmi final', 'bmi final', 'continuous', NULL),
 (1, 'sybp final', 'sybp final', 'continuous', NULL),
-(1, 'dibp_final', 'dibp final', 'continuous', NULL),
+(1, 'dibp final', 'dibp final', 'continuous', NULL),
 (1, 'ldl final', 'ldl final', 'continuous', NULL),
 (1, 'totchol final', 'totchol final', 'continuous', NULL),
 (1, 'trig final', 'trig final', 'continuous', NULL),
