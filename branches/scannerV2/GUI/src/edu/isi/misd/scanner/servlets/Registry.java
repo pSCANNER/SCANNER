@@ -110,7 +110,7 @@ public class Registry extends HttpServlet {
 			if (clientResponse != null) {
 				res = clientResponse.getEntityResponse().toString();
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
 				return;
 			}
 		} else if (action.equals("getAllLibraries")) {
@@ -118,7 +118,7 @@ public class Registry extends HttpServlet {
 			if (clientResponse != null) {
 				res = clientResponse.getEntityResponse().toString();
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get library.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get libraries.");
 				return;
 			}
 		} else if (action.equals("getAllSites")) {
@@ -126,31 +126,31 @@ public class Registry extends HttpServlet {
 			if (clientResponse != null) {
 				res = clientResponse.getEntityResponse().toString();
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get method.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
 				return;
 			}
-		} else if (action.equals("getMaster")) {
-			clientResponse = registryClient.getMaster();
+		} else if (action.equals("getAllNodes")) {
+			clientResponse = registryClient.getAllNodes();
 			if (clientResponse != null) {
-				res = clientResponse.toMaster();
+				res = clientResponse.getEntityResponse().toString();
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get master.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get nodes.");
 				return;
 			}
-		} else if (action.equals("getParameter")) {
-			clientResponse = registryClient.getParameter(name, func, lib);
+		} else if (action.equals("getAllStandardRoles")) {
+			clientResponse = registryClient.getAllStandardRoles();
 			if (clientResponse != null) {
-				res = clientResponse.toParameter();
+				res = clientResponse.getEntityResponse().toString();
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get parameter.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get standard roles.");
 				return;
 			}
-		} else if (action.equals("getWorker")) {
-			clientResponse = registryClient.getWorker(study, dataset, lib, func, site);
+		} else if (action.equals("getAllStudyManagementPolicies")) {
+			clientResponse = registryClient.getAllStudyManagementPolicies();
 			if (clientResponse != null) {
-				res = clientResponse.toWorker();
+				res = clientResponse.getEntityResponse().toString();
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get worker.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies.");
 				return;
 			}
 		} else if (action.equals("getSite")) {

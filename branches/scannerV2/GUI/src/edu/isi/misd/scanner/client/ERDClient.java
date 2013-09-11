@@ -45,9 +45,9 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject investigator = new JSONObject();
 			investigator.put("userId", Integer.parseInt(principalInvestigator));
 			body.put("principalInvestigator", investigator);
-			JSONObject status = new JSONObject();
-			status.put("studyStatusTypeId", Integer.parseInt(studyStatusType));
-			body.put("studyStatusType", status);
+			//JSONObject status = new JSONObject();
+			//status.put("studyStatusTypeId", Integer.parseInt(studyStatusType));
+			//body.put("studyStatusType", status);
 			System.out.println("POST: " + url);
 			System.out.println("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString());
@@ -223,9 +223,9 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject investigator = new JSONObject();
 			investigator.put("userId", Integer.parseInt(principalInvestigator));
 			body.put("principalInvestigator", investigator);
-			JSONObject status = new JSONObject();
-			status.put("studyStatusTypeId", Integer.parseInt(studyStatusType));
-			body.put("studyStatusType", status);
+			//JSONObject status = new JSONObject();
+			//status.put("studyStatusTypeId", Integer.parseInt(studyStatusType));
+			//body.put("studyStatusType", status);
 			body.put("description", description.length() == 0 ? JSONObject.NULL : description);
 			body.put("protocol", protocol.length() == 0 ? JSONObject.NULL : protocol);
 			body.put("startDate", startDate.length() == 0 ? JSONObject.NULL : startDate);
@@ -785,6 +785,33 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllSites() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "sites";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getAllNodes() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "nodes";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getAllStandardRoles() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "standardRoles";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getAllStudyManagementPolicies() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyManagementPolicies";
 		System.out.println("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null);
 		ret = new ERDClientResponse(rsp);

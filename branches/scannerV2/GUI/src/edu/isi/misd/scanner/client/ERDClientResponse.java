@@ -88,7 +88,8 @@ public class ERDClientResponse implements RegistryClientResponse {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < entityResponse.length(); i++) {
 				JSONObject obj = entityResponse.getJSONObject(i);
-				ret.put(obj.getString("studyName"), obj.getString("description"));
+				String description = obj.optString("description", "");
+				ret.put(obj.getString("studyName"), description);
 			}
 			result = ret.toString();
 		} catch (JSONException e) {

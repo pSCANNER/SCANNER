@@ -138,8 +138,8 @@
 																<tr>
 																	<td class="tag">Principal Investigator:</td>
 																	<td><select id="createStudyPrincipalInvestigator"></select></td>
-																	<td class="tag">Study Status Type:</td>
-																	<td>
+																	<td class="tag" style="display:none;">Study Status Type:</td>
+																	<td style="display:none;">
 																		<select id="createStudyStatusType">
 																			<option value="1">defined</option>
 																		</select>
@@ -177,12 +177,8 @@
 																<tr>
 																	<td class="tag">Principal Investigator:</td>
 																	<td><select id="updateStudyPrincipalInvestigator"></select></td>
-																	<td class="tag">Study Status Type:</td>
-																	<td>
-																		<select id="updateStudyStatusType">
-																			<option value="1">defined</option>
-																		</select>
-																	</td>
+																	<td class="tag">Analysis Plan:</td>
+																	<td><input type="text" id="projectAnalysisPlan" size="50"></td>
 																</tr>
 																<tr>
 																	<td class="tag">Description:</td>
@@ -199,8 +195,12 @@
 																<tr>
 																	<td class="tag">Clinical Trials Id:</td>
 																	<td><input type="text" id="projectClinicalTrialsId"></td>
-																	<td class="tag">Analysis Plan:</td>
-																	<td><input type="text" id="projectAnalysisPlan" size="50"></td>
+																	<td class="tag" style="display:none;">Study Status Type:</td>
+																	<td style="display:none;">
+																		<select id="updateStudyStatusType">
+																			<option value="1">defined</option>
+																		</select>
+																	</td>
 																</tr>
 															</tbody>
 														</table>
