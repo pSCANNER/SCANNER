@@ -152,6 +152,12 @@ create table if not exists study_management_policy (
   role_id integer not null references study_role(role_id)
 );
 
+create table if not exists study_requested_site (
+  study_requested_site_id serial not null primary key,
+  study_id integer not null references study(study_id),
+  site_id integer not null references site(site_id),
+  unique(study_id, site_id)
+);
 
 CREATE TABLE IF NOT EXISTS data_set_variable_metadata
 (
