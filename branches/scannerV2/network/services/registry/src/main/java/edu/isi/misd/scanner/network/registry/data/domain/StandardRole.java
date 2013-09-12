@@ -31,7 +31,9 @@ public class StandardRole implements Serializable
     private Boolean createByDefault;
     @Column(name = "add_to_study_policy_by_default")
     private Boolean addToStudyPolicyByDefault;
-
+    @Column(name = "add_to_user_role_by_default")
+    private Boolean addToUserRoleByDefault;
+    
     public StandardRole() {
     }
 
@@ -84,6 +86,14 @@ public class StandardRole implements Serializable
         this.addToStudyPolicyByDefault = addToStudyPolicyByDefault;
     }
 
+    public Boolean getAddToUserRoleByDefault() {
+        return addToUserRoleByDefault;
+    }
+
+    public void setAddToUserRoleByDefault(Boolean addToUserRoleByDefault) {
+        this.addToUserRoleByDefault = addToUserRoleByDefault;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

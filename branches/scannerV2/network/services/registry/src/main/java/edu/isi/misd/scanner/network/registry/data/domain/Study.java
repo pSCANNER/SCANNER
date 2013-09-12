@@ -65,18 +65,21 @@ public class Study implements Serializable
     @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
     private ScannerUser principalInvestigator;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudy")
+    private List<DataSetDefinition> dataSetDefinitions;    
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
     private List<StudyRole> studyRoles;       
-    @JsonIgnore    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudy")
-    private List<DataSetDefinition> dataSetDefinitions;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
     private List<StudyPolicyStatement> studyPolicyStatements;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
     private List<StudyManagementPolicy> studyManagementPolicies;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
+    private List<StudyRequestedSite> studyRequestedSites;
     
     public Study() {
     }
@@ -210,6 +213,14 @@ public class Study implements Serializable
     public void setStudyManagementPolicies(List<StudyManagementPolicy> studyManagementPolicies) {
         this.studyManagementPolicies = studyManagementPolicies;
     }
+    
+    public List<StudyRequestedSite> getStudyRequestedSites() {
+        return studyRequestedSites;
+    }
+
+    public void setStudyRequestedSites(List<StudyRequestedSite> studyRequestedSites) {
+        this.studyRequestedSites = studyRequestedSites;
+    }  
     
     @Override
     public int hashCode() {

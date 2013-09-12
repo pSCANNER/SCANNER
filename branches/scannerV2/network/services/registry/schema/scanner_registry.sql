@@ -44,7 +44,7 @@ create table if not exists standard_role (
   description text,
   create_by_default boolean default true,
   add_to_study_policy_by_default boolean default false,
-  add_to_user_by_default boolean default false
+  add_to_user_role_by_default boolean default false
 );
 
 CREATE TABLE IF NOT EXISTS user_role (

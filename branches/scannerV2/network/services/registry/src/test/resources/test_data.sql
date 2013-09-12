@@ -23,17 +23,17 @@ INSERT INTO study (study_name, description, IRB_ID, Protocol, Principal_Investig
 ('MTM', 'Medication Therapy Management', 1, 'Analyze MTM data on multiple sites with both OCEANS and GLORE', 1, '2013-08-15', '2013-08-15', 0, 'Very Important Analysis on Multiple Sites',1),
 ('BEARI', 'Behavioral Economics for Acute Respitory Infections', 2, 'Analyze BEARI data on multiple ISI VMs with both OCEANS and GLORE', 1, '2013-08-15', '2013-08-15', 0, 'Determine if performance is contingent on principal diagnosis',1);
 
-INSERT INTO standard_role(standard_role_name, description, create_by_default, add_to_study_policy_by_default) VALUES
-('Principal Investigator','Manages study roles and defines study policies',true,true),
-('Site Administrator','Controls access to local site resources by defining site policies',true,false),
-('Investigator', 'Can execute analysis programs based on predefined study and site policies',true,false);
+INSERT INTO standard_role(standard_role_name, description, create_by_default, add_to_study_policy_by_default, add_to_user_role_by_default) VALUES
+('Principal Investigator','Manages study roles and defines study policies',true,true,true),
+('Site PI','Controls access to local site resources by defining site policies',true,false,false),
+('Investigator', 'Can execute analysis programs based on predefined study and site policies',true,false,true);
 
 INSERT INTO study_role (study_id,role_within_study) VALUES
 (1,'Principal Investigator'),
-(1,'Site Administrator'),
+(1,'Site PI'),
 (1,'Investigator'),
 (2,'Principal Investigator'),
-(2,'Site Administrator'),
+(2,'Site PI'),
 (2,'Investigator');
 
 INSERT INTO user_role(user_id, role_id) VALUES
@@ -47,6 +47,13 @@ INSERT INTO user_role(user_id, role_id) VALUES
 INSERT INTO study_management_policy(study_id, role_id) VALUES
 (1,1),
 (2,4);
+
+INSERT INTO study_requested_site(study_id, site_id) VALUES
+(1,1),
+(1,2),
+(1,3),
+(1,4),
+(2,1);
 
 INSERT INTO site_policy(site_id, role_id) VALUES
 (1,2),

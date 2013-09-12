@@ -37,7 +37,10 @@ public class Site implements Serializable
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "site")
     private List<Node> nodes;
-
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "site")
+    private List<StudyRequestedSite> studyRequestedSites;
+    
     public Site() {
     }
 
@@ -90,6 +93,14 @@ public class Site implements Serializable
         this.nodes = nodes;
     }
 
+    public List<StudyRequestedSite> getStudyRequestedSites() {
+        return studyRequestedSites;
+    }
+
+    public void setStudyRequestedSites(List<StudyRequestedSite> studyRequestedSites) {
+        this.studyRequestedSites = studyRequestedSites;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

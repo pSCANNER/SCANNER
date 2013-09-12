@@ -93,32 +93,47 @@ public class RegistryServiceImpl implements RegistryService
     @Transactional    
     public Study createStudy(Study study) 
     {
-        // 1. Create the Study
+        // default role assignment lists based on StandardRole configuration
+        ArrayList<StudyRole> defaultStudyManagementRoles = 
+            new ArrayList<StudyRole>();
+        ArrayList<StudyRole> defaultStudyRolesToUserRoles = 
+            new ArrayList<StudyRole>();  
+        
+        /**
+         * 1. Create the Study
+         */
         Study createdStudy = studyRepository.save(study);
         
-        // 2. Create the default StudyRoles based on the predefined 
-        //    StandardRoles.  Also store (in a separate list) any StandardRoles 
-        //    that have AddToStudyPolicyByDefault set, as they will then be 
-        //    saved later to the StudyManagementPolicy table.
-        ArrayList<StudyRole> studyRoles = new ArrayList<StudyRole>();
-        ArrayList<StudyRole> studyManagementRoles = new ArrayList<StudyRole>();        
-        for (StandardRole standardRole :standardRoleRoleRepository.findAll())
+        /**
+         *   2. Create the default StudyRoles based on the predefined 
+         *   StandardRoles.  Also store (in a separate list) any StandardRoles 
+         *   that have AddToStudyPolicyByDefault set, as they will then be 
+         *   saved later to the StudyManagementPolicy table.  Same applies to
+         *   default UserRole creation based on getAddToUserRoleByDefault.
+         */
+        ArrayList<StudyRole> studyRoles = new ArrayList<StudyRole>();        
+        for (StandardRole standardRole : standardRoleRoleRepository.findAll())
         {
             StudyRole studyRole = new StudyRole();
             studyRole.setRoleWithinStudy(standardRole.getStandardRoleName());
             studyRole.setStudy(createdStudy);
             studyRoles.add(studyRole);
             if (standardRole.getAddToStudyPolicyByDefault()) {
-                studyManagementRoles.add(studyRole);
+                defaultStudyManagementRoles.add(studyRole);
+            }
+            if (standardRole.getAddToUserRoleByDefault()) {
+                defaultStudyRolesToUserRoles.add(studyRole);
             }
         }
         studyRoleRepository.save(studyRoles);        
         
-        // 3. Add any of the flagged StudyManagement default roles to the 
-        //    StudyManagementPolicy table
+        /**
+         * 3. Add any of the flagged StudyManagement default roles to the 
+         *   StudyManagementPolicy table
+         */
         ArrayList<StudyManagementPolicy> studyManagementPolicies = 
             new ArrayList<StudyManagementPolicy>();
-        for (StudyRole studyManagementRole : studyManagementRoles) 
+        for (StudyRole studyManagementRole : defaultStudyManagementRoles) 
         {
             StudyManagementPolicy studyManagementPolicy = 
                 new StudyManagementPolicy();
@@ -128,11 +143,13 @@ public class RegistryServiceImpl implements RegistryService
         }
         studyManagementPolicyRepository.save(studyManagementPolicies);
         
-        // 4. Add UserRole-to-StudyRole mappings for the Study creator for the
-        //    newly created StudyRoles
+        /**
+         * 4. Add UserRole-to-StudyRole mappings for the Study creator for the
+         *    newly created StudyRoles
+         */
         ScannerUser creator = createdStudy.getPrincipalInvestigator();
         ArrayList<UserRole> userRoles = new ArrayList<UserRole>();
-        for (StudyRole studyRole : studyRoles) 
+        for (StudyRole studyRole : defaultStudyRolesToUserRoles) 
         {
             UserRole userRole = new UserRole();
             userRole.setUser(creator);
