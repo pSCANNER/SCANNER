@@ -14,4 +14,9 @@ public interface StudyManagementPolicyRepository
 {
     List<StudyManagementPolicy> findByStudyStudyId(Integer studyId);
     List<StudyManagementPolicy> findByStudyRoleRoleId(Integer roleId);
+    List<StudyManagementPolicy> 
+        findByStudyRoleScannerUsersUserId(Integer userId);      
+    List<StudyManagementPolicy> 
+        findByStudyStudyIdAndStudyRoleScannerUsersUserId(
+            Integer studyId, Integer userId);    
 }

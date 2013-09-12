@@ -35,28 +35,45 @@ public class StudyManagementPolicyController extends BaseController
     
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";
     public static final String REQUEST_PARAM_STUDY_ROLE_ID = "studyRoleId";    
+    public static final String REQUEST_PARAM_USER_ID = "userId";
     
     @Autowired
     private StudyManagementPolicyRepository studyManagementPolicyRepository;   
     
-	@RequestMapping(value = "/studyManagementPolicies", method = RequestMethod.GET)
-	public @ResponseBody List<StudyManagementPolicy> getSitePolicies(
+	@RequestMapping(value = "/studyManagementPolicies", 
+                    method = RequestMethod.GET)
+	public @ResponseBody List<StudyManagementPolicy> getStudyManagementPolicies(
            @RequestParam Map<String, String> paramMap) 
     {
         String studyId = null;
         String studyRoleId = null;
+        String userId = null;
         if (!paramMap.isEmpty()) 
         {
             studyId = paramMap.remove(REQUEST_PARAM_STUDY_ID);            
             studyRoleId = paramMap.remove(REQUEST_PARAM_STUDY_ROLE_ID);
+            userId = paramMap.remove(REQUEST_PARAM_USER_ID);
             if (!paramMap.isEmpty()) {
                 throw new BadRequestException(paramMap.keySet());
             }            
         }
-        
-        List<StudyManagementPolicy> studyManagementPolicy = 
-            new ArrayList<StudyManagementPolicy>();        
-        if (studyId != null) {
+        if ((studyId != null) && (userId != null)) {
+            return 
+                studyManagementPolicyRepository.
+                    findByStudyStudyIdAndStudyRoleScannerUsersUserId(
+                        validateIntegerParameter(
+                            REQUEST_PARAM_STUDY_ID,studyId),
+                        validateIntegerParameter(
+                            REQUEST_PARAM_USER_ID,userId));     
+        }
+        else if (userId != null) {
+            return 
+                studyManagementPolicyRepository.
+                    findByStudyRoleScannerUsersUserId(
+                        validateIntegerParameter(
+                            REQUEST_PARAM_USER_ID,userId));          
+        }         
+        else if (studyId != null) {
             return 
                 studyManagementPolicyRepository.findByStudyStudyId(
                     validateIntegerParameter(
@@ -67,14 +84,17 @@ public class StudyManagementPolicyController extends BaseController
                     validateIntegerParameter(
                         REQUEST_PARAM_STUDY_ROLE_ID,studyRoleId));
         } else {
+            List<StudyManagementPolicy> studyManagementPolicy = 
+                new ArrayList<StudyManagementPolicy>();             
             Iterator iter = 
                 studyManagementPolicyRepository.findAll().iterator();
             CollectionUtils.addAll(studyManagementPolicy, iter);      
-        }
-        return studyManagementPolicy;           
+            return studyManagementPolicy;                
+        }       
 	}
     
-    @RequestMapping(value = "/studyManagementPolicies", method = RequestMethod.POST)
+    @RequestMapping(value = "/studyManagementPolicies", 
+                    method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody StudyManagementPolicy createStudyManagementPolicy(
            @RequestBody StudyManagementPolicy studyManagementPolicy) 
@@ -91,7 +111,8 @@ public class StudyManagementPolicyController extends BaseController
                 studyManagementPolicy.getStudyPolicyId());
     }  
     
-    @RequestMapping(value = "/studyManagementPolicies/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/studyManagementPolicies/{id}", 
+                    method = RequestMethod.GET)
     public @ResponseBody StudyManagementPolicy getStudyManagementPolicy(
            @PathVariable("id") Integer id) 
     {
@@ -104,7 +125,8 @@ public class StudyManagementPolicyController extends BaseController
         return foundStudyManagementPolicy;
     }  
     
-    @RequestMapping(value = "/studyManagementPolicies/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/studyManagementPolicies/{id}", 
+                    method = RequestMethod.PUT)
     public @ResponseBody StudyManagementPolicy updateStudyManagementPolicy(
            @PathVariable("id") Integer id,
            @RequestBody StudyManagementPolicy studyManagementPolicy) 
@@ -143,7 +165,8 @@ public class StudyManagementPolicyController extends BaseController
                 studyManagementPolicy.getStudyPolicyId());
     }     
     
-    @RequestMapping(value = "/studyManagementPolicies/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = "/studyManagementPolicies/{id}", 
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeStudyManagementPolicy(@PathVariable("id") Integer id) 
     {
