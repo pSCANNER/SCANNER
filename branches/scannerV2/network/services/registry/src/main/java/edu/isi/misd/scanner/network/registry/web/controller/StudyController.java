@@ -133,9 +133,9 @@ public class StudyController extends BaseController
                 ") does not match referenced ID (" + 
                 foundStudy.getStudyId() + ")"); 
         }
-        // ok, good to go
+        // perform the update
         try {
-            studyRepository.save(study);
+            registryService.updateStudy(study);
         } catch (DataIntegrityViolationException e) {
             log.warn("DataIntegrityViolationException: " + e);
             throw new ConflictException(e.getMostSpecificCause());

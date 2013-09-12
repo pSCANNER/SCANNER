@@ -100,7 +100,7 @@ public class RegistryServiceImpl implements RegistryService
             new ArrayList<StudyRole>();  
         
         /**
-         * 1. Create the Study
+         *   1. Create the Study
          */
         Study createdStudy = studyRepository.save(study);
         
@@ -128,7 +128,7 @@ public class RegistryServiceImpl implements RegistryService
         studyRoleRepository.save(studyRoles);        
         
         /**
-         * 3. Add any of the flagged StudyManagement default roles to the 
+         *   3. Add any of the flagged StudyManagement default roles to the 
          *   StudyManagementPolicy table
          */
         ArrayList<StudyManagementPolicy> studyManagementPolicies = 
@@ -144,8 +144,8 @@ public class RegistryServiceImpl implements RegistryService
         studyManagementPolicyRepository.save(studyManagementPolicies);
         
         /**
-         * 4. Add UserRole-to-StudyRole mappings for the Study creator for the
-         *    newly created StudyRoles
+         *   4. Add UserRole-to-StudyRole mappings for the Study creator for the
+         *   newly created StudyRoles
          */
         ScannerUser creator = createdStudy.getPrincipalInvestigator();
         ArrayList<UserRole> userRoles = new ArrayList<UserRole>();
@@ -161,6 +161,59 @@ public class RegistryServiceImpl implements RegistryService
         return createdStudy;
     }
 
+    /**
+     * Updates a single Study, altering UserRole references (where required).
+     * @param study
+     */    
+    @Override
+    @Transactional        
+    public void updateStudy(Study study) 
+    {
+        ArrayList<StudyRole> defaultStudyRolesToUserRoles = 
+            new ArrayList<StudyRole>();          
+        List<StudyRole> studyRoles = 
+            studyRoleRepository.findByStudyStudyId(study.getStudyId());
+        /*
+         * Find the set of default study roles that need to have corresponding 
+         * user roles automatically created.
+         */
+        for (StandardRole standardRole : standardRoleRoleRepository.findAll())
+        {
+            if (standardRole.getAddToUserRoleByDefault()) {
+                for (StudyRole studyRole : studyRoles) {
+                    if (studyRole.getRoleWithinStudy().equalsIgnoreCase(
+                        standardRole.getStandardRoleName()))
+                        defaultStudyRolesToUserRoles.add(studyRole);
+                }
+            }
+        }    
+        /*
+         * Create default user roles for the (potentially) new owner of the 
+         * study, if those roles do not exist already.  If the owner has not 
+         * changed, then the roles will exist already and no UserRole update 
+         * will take place.
+         */
+        ArrayList<UserRole> newUserRoles = new ArrayList<UserRole>();            
+        List<StudyRole> studyRolesForUser = 
+            studyRoleRepository.findByStudyStudyIdAndScannerUsersUserId(
+                study.getStudyId(), 
+                study.getPrincipalInvestigator().getUserId());
+        for (StudyRole studyRole : defaultStudyRolesToUserRoles) 
+        {                
+            if (studyRolesForUser.contains(studyRole)) {
+                continue;
+            }
+            UserRole userRole = new UserRole();
+            userRole.setUser(study.getPrincipalInvestigator());
+            userRole.setStudyRole(studyRole);
+            newUserRoles.add(userRole);
+        }
+        if (!newUserRoles.isEmpty()) {
+            userRoleRepository.save(newUserRoles);
+        }
+        studyRepository.save(study);
+    }
+    
     /**
      * Deletes a single Study by Id, deleting references first (where 
      * explicity required).

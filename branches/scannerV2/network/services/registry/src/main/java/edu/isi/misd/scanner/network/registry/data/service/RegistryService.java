@@ -16,6 +16,12 @@ public interface RegistryService
     public Study createStudy(Study study); 
     
     /**
+     * Updates a single Study.
+     * @param studyId
+     */    
+    public void updateStudy(Study study); 
+        
+    /**
      * Deletes a single Study by studyId.
      * @param studyId
      */
