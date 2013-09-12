@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS study (
   description text,
   irb_id integer NOT NULL,
   protocol text,
-  principal_investigator_uid integer NOT NULL references scanner_user(user_id),
+  study_owner integer NOT NULL references scanner_user(user_id),
   start_date date,
   end_date date,
   clinical_trials_id integer,

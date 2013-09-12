@@ -62,9 +62,9 @@ public class Study implements Serializable
     private StudyStatusType studyStatusType = new StudyStatusType(1);
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
     @JsonIdentityReference(alwaysAsId=true)        
-    @JoinColumn(name = "principal_investigator_uid", referencedColumnName = "user_id")
+    @JoinColumn(name = "study_owner", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
-    private ScannerUser principalInvestigator;
+    private ScannerUser studyOwner;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "originatingStudy")
     private List<DataSetDefinition> dataSetDefinitions;    
@@ -174,12 +174,12 @@ public class Study implements Serializable
         this.studyStatusType = studyStatusType;
     }
 
-    public ScannerUser getPrincipalInvestigator() {
-        return principalInvestigator;
+    public ScannerUser getStudyOwner() {
+        return studyOwner;
     }
 
-    public void setPrincipalInvestigator(ScannerUser principalInvestigator) {
-        this.principalInvestigator = principalInvestigator;
+    public void setStudyOwner(ScannerUser studyOwner) {
+        this.studyOwner = studyOwner;
     }
     
     public List<StudyRole> getStudyRoles() {

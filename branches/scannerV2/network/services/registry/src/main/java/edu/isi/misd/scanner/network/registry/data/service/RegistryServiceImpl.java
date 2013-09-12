@@ -147,12 +147,12 @@ public class RegistryServiceImpl implements RegistryService
          *   4. Add UserRole-to-StudyRole mappings for the Study creator for the
          *   newly created StudyRoles
          */
-        ScannerUser creator = createdStudy.getPrincipalInvestigator();
+        ScannerUser owner = createdStudy.getStudyOwner();
         ArrayList<UserRole> userRoles = new ArrayList<UserRole>();
         for (StudyRole studyRole : defaultStudyRolesToUserRoles) 
         {
             UserRole userRole = new UserRole();
-            userRole.setUser(creator);
+            userRole.setUser(owner);
             userRole.setStudyRole(studyRole);
             userRoles.add(userRole);
         }
@@ -196,15 +196,14 @@ public class RegistryServiceImpl implements RegistryService
         ArrayList<UserRole> newUserRoles = new ArrayList<UserRole>();            
         List<StudyRole> studyRolesForUser = 
             studyRoleRepository.findByStudyStudyIdAndScannerUsersUserId(
-                study.getStudyId(), 
-                study.getPrincipalInvestigator().getUserId());
+                study.getStudyId(), study.getStudyOwner().getUserId());
         for (StudyRole studyRole : defaultStudyRolesToUserRoles) 
         {                
             if (studyRolesForUser.contains(studyRole)) {
                 continue;
             }
             UserRole userRole = new UserRole();
-            userRole.setUser(study.getPrincipalInvestigator());
+            userRole.setUser(study.getStudyOwner());
             userRole.setStudyRole(studyRole);
             newUserRoles.add(userRole);
         }

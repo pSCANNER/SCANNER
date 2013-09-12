@@ -63,7 +63,7 @@ public class ScannerUser implements Serializable
     @ManyToMany(mappedBy = "scannerUsers")
     private List<StudyRole> studyRoles;   
     @JsonIgnore    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "principalInvestigator")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "studyOwner")
     private List<Study> studies;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "author")
