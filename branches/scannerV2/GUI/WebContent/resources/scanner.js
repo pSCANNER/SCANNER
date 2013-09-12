@@ -981,6 +981,7 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	var async = data['async'];
 	data = data['data'];
 	resultDiv.html('');
+	resultDiv.show();
 	var a = $('<a>');
 	a.addClass('link-style banner-text');
 	a.attr('href', 'javascript:buildTable("'+tab+'");');
@@ -2727,11 +2728,11 @@ function manageStudy(hideMode) {
 	option.text('Select Role...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(studyRolesList, function(i, studyRole) {
-		if (studyRole['study'] == 1 && studyRole['roleWithinStudy'] != 'Principal Investigator') {
+	$.each(standardRolesList, function(i, role) {
+		if (!role['addToStudyPolicyByDefault']) {
 			option = $('<option>');
-			option.text(studyRole['roleWithinStudy']);
-			option.attr('value', studyRole['roleId']);
+			option.text(role['standardRoleName']);
+			option.attr('value', role['standardRoleId']);
 			select.append(option);
 		}
 	});
@@ -2841,6 +2842,7 @@ function manageStudy(hideMode) {
 				obj['tool'] = protocol['tool'];
 				obj['dataset'] = protocol['dataset'];
 				obj['accessMode'] = protocol['accessMode'];
+				obj['role'] = protocol['role'];
 				addProtocolPoliciesRow(obj, true);
 			}
 		});
@@ -2945,7 +2947,7 @@ function checkAddSiteProtocolButton() {
 		$('#add_site_protocol_div').hide();
 		$('#add_instance_div').show();
 	} else if ($('#estimateStudyProtocolSelect').val() != '' && 
-			$('#datasetInstances').val() != '' && $('#studyInvestigatorSelect').val() != '') {
+			$('#datasetInstances').val() != '') {
 		$('#addSiteProtocolButton').removeAttr('disabled');
 	} else {
 		$('#addSiteProtocolButton').attr('disabled', 'disabled');
@@ -2954,7 +2956,7 @@ function checkAddSiteProtocolButton() {
 
 function checkAddStudyProtocolButton() {
 	if ($('#modelNames').val() != '' && $('#datasetNames').val() != '' && 
-			$('#studySendOptions').val() != '') {
+			$('#studySendOptions').val() != '' && $('#studyInvestigatorSelect').val() != '') {
 		$('#addStudyProtocolButton').removeAttr('disabled');
 	} else {
 		$('#addStudyProtocolButton').attr('disabled', 'disabled');
@@ -2982,7 +2984,7 @@ function addSite() {
 function addStaff() {
 	var obj = {};
 	obj['userId'] = $('#staffNames').val();
-	obj['role'] = studyRolesDict[$('#staffRoles').val()]['roleWithinStudy'];
+	obj['role'] = standardRolesDict[$('#staffRoles').val()]['standardRoleName'];
 	activeStudy['staff'].push(obj);
 	addStaffRow(obj);
 	updateBasicInfo();
@@ -3119,15 +3121,20 @@ function createStudy() {
 
 function postCreateStudy(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
+	postInitStudies(data['allStudies'], null, null, false);
+	postInitUserRoles(data['userRoles'], null, null, false);
+	postInitStudyRoles(data['studiesRoles'], null, null, false);
+	postInitStudyManagementPolicies(data['studyManagementPolicies'], null, null, false);
+	data = data['study'];
 	if (data['studyId'] == null) {
 		alert('Error Status Code: ' + data['errorStatusCode'] + '\nError Message: ' + data['errorMessage'] + '\nError Detail: ' + data['errorDetail']);
 		return;
 	}
 	activeStudy = {};
 	myStudies.push(activeStudy);
+	activeStudy['staff'] = getStaff(data['studyId']);
 	activeStudy['studyPolicies'] = [];
 	activeStudy['sites'] = {};
-	activeStudy['staff'] = [];
 	activeStudy['protocols'] = [];
 	activeStudy['studyId'] = data['studyId'];
 	activeStudy['studyName'] = data['studyName'];
@@ -3137,7 +3144,6 @@ function postCreateStudy(data, textStatus, jqXHR, param) {
 	appendStudy(activeStudy);
 	setActive(activeStudy['studyId']);
 	$('#manageStudiesDivLink').click();
-	refreshStudies();
 }
 
 function updateStudy() {
@@ -3181,6 +3187,11 @@ function updateStudy() {
 
 function postUpdateStudy(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
+	postInitStudies(data['allStudies'], null, null, false);
+	postInitUserRoles(data['userRoles'], null, null, false);
+	postInitStudyRoles(data['studiesRoles'], null, null, false);
+	postInitStudyManagementPolicies(data['studyManagementPolicies'], null, null, false);
+	data = data['study'];
 	if (data['studyId'] == null) {
 		alert('Error Status Code: ' + data['errorStatusCode'] + '\nError Message: ' + data['errorMessage'] + '\nError Detail: ' + data['errorDetail']);
 		return;
@@ -3197,6 +3208,7 @@ function postUpdateStudy(data, textStatus, jqXHR, param) {
 	activeStudy['endDate'] = data['endDate'];
 	activeStudy['clinicalTrialsId'] = data['clinicalTrialsId'];
 	activeStudy['analysisPlan'] = data['analysisPlan'];
+	activeStudy['staff'] = getStaff(data['studyId']);
 	
 	$('#manageStudyH2').html('Manage Research Study ' + data['studyId'] + ': ' + data['studyName']);
 	if (data['description'] != null) {
@@ -3204,7 +3216,7 @@ function postUpdateStudy(data, textStatus, jqXHR, param) {
 	}
 	$('#updateStudyIRBInput').val(activeStudy['irbId']);
 	updateBasicInfo();
-	refreshStudies();
+	manageStudy(false);
 }
 
 function addStudyProtocol() {
@@ -3212,10 +3224,12 @@ function addStudyProtocol() {
 	obj['tool'] = $('#modelNames').val();
 	obj['dataset'] = $('#datasetNames').val();
 	obj['accessMode'] = $('#studySendOptions').val();
+	obj['role'] = standardRolesDict[$('#studyInvestigatorSelect').val()];
 	addProtocolPoliciesRow(obj, true);
 	$('#modelNames').val('');
 	$('#datasetNames').val('');
 	$('#studySendOptions').val('');
+	$('#studyInvestigatorSelect').val('');
 	addProtocolSelect();
 }
 
@@ -3226,7 +3240,7 @@ function addSiteProtocol() {
 	obj['dataset'] = protocol['dataset'];
 	obj['datasetInstance'] = $('#datasetInstances').val();
 	obj['accessMode'] = protocol['accessMode'];
-	obj['role'] = studyRolesDict[$('#studyInvestigatorSelect').val()];
+	obj['role'] = protocol['role'];
 	activeStudy['protocols'].push(obj);
 	addProtocolRow(obj);
 	if (activeStudy['studyId'] != 1) {
@@ -3272,7 +3286,7 @@ function addProtocolRow(obj) {
 	tr.append(td);
 	td.addClass('protocol_border');
 	var role = obj['role'];
-	td.html(role['roleWithinStudy']);
+	td.html(role['standardRoleName']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3324,7 +3338,7 @@ function addProtocolViewRow(obj) {
 	tr.append(td);
 	td.addClass('protocol_border');
 	var role = obj['role'];
-	td.html(role['roleWithinStudy']);
+	td.html(role['standardRoleName']);
 	$('#viewSitesProtocols').show();
 }
 
@@ -3347,6 +3361,11 @@ function addProtocolPoliciesRow(obj, appendMode) {
 	td.addClass('protocol_border');
 	var accessMode = accessModeDict[obj['accessMode']];
 	td.html(accessMode['description']);
+	td = $('<td>');
+	tr.append(td);
+	td.addClass('protocol_border');
+	var role = obj['role'];
+	td.html(role['standardRoleName']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3376,11 +3395,12 @@ function addProtocolSelect() {
 	select.append(option);
 	$.each(activeStudy['studyPolicies'], function(i, policy) {
 		option = $('<option>');
+		var standardRoleName = policy['role']['standardRoleName'];
 		var lib = librariesDict[toolsDict[policy['tool']]['toolParentLibrary']];
 		var method = lib['libraryName'] + ' ' + toolsDict[policy['tool']]['toolName'];
 		var dataset = datasetDefinitionDict[policy['dataset']]['dataSetName'];
 		var accessMode = accessModeDict[policy['accessMode']]['description'];
-		option.text(method + ' on ' + dataset + ' ' + accessMode);
+		option.text(method + ' as ' + standardRoleName +  ' on ' + dataset + ' ' + accessMode);
 		option.attr('value', i);
 		select.append(option);
 	});
@@ -3389,18 +3409,18 @@ function addProtocolSelect() {
 	var select = $('#studyInvestigatorSelect');
 	select.html('');
 	var option = $('<option>');
-	option.text('and role...');
+	option.text('with role...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(studyRolesList, function(i, studyRole) {
-		if (studyRole['study'] == 1) {
+	$.each(standardRolesList, function(i, role) {
+		if (!role['addToStudyPolicyByDefault']) {
 			option = $('<option>');
-			option.text(studyRole['roleWithinStudy']);
-			option.attr('value', studyRole['roleId']);
+			option.text(role['standardRoleName']);
+			option.attr('value', role['standardRoleId']);
 			select.append(option);
 		}
 	});
-	select.change(function(event) {checkAddSiteProtocolButton();});
+	select.change(function(event) {checkAddStudyProtocolButton();});
 }
 
 function addStudyRoleRow(studyRole) {
@@ -3791,6 +3811,7 @@ function addDatasetInstance(name, datasource, datasetInstance, description) {
 	$('#datasetInstances').val(instanceIdCounter);
 	$('#add_site_protocol_div').show();
 	$('#add_instance_div').hide();
+	checkAddSiteProtocolButton();
 }
 
 function cancelInstance() {
@@ -4223,12 +4244,16 @@ function getPolicies(study) {
 	var ret = [];
 	var policyDict = {};
 	$.each(analysisPolicies, function(i, policy) {
-		var parentStudyPolicyStatement = policy['parentStudyPolicyStatement'];
 		$.each(studyPoliciesList, function(j, studyPolicy) {
-			if (studyPolicy['studyPolicyStatementId'] == parentStudyPolicyStatement && studyPolicy['study'] == study) {
+			if (studyPolicy['studyRole'] == policy['studyRole'] && studyPolicy['study'] == study &&
+					studyPolicy['analysisTool'] == policy['analysisTool'] && 
+					studyPolicy['accessMode']['accessModeId'] == policy['accessMode']['accessModeId'] &&
+					studyRolesDict[policy['studyRole']]['roleWithinStudy'] != 'Principal Investigator') {
 				var obj = {};
-				if (study == 1) {
-					obj['role'] = studyRolesDict[3];
+				var roleWithinStudy = studyRolesDict[studyPolicy['studyRole']]['roleWithinStudy'];
+				var standardRole = getStandardRole(roleWithinStudy);
+				if (standardRole != null) {
+					obj['role'] = standardRole;
 				}
 				obj['dataset'] = studyPolicy['dataSetDefinition'];
 				obj['tool'] = policy['analysisTool'];
@@ -4277,17 +4302,13 @@ function showPrepToResearch() {
 	$('#replayDivContent').hide();
 }
 
-function refreshStudies() {
-	initStudies(false);
-	initUserRoles(false);
-	initStudyRoles(false);
-	initStudyManagementPolicies(false);
-	//setTimeout("trace()", 10*1000);
-}
-
-function trace() {
-	alert(valueToString(allStudies));
-	alert(valueToString(userRolesList));
-	alert(valueToString(studyRolesList));
-	alert(valueToString(studyManagementPoliciesList));
+function getStandardRole(roleWithinStudy) {
+	var ret = null;
+	$.each(standardRolesList, function(k, standardRole) {
+		if (roleWithinStudy == standardRole['standardRoleName']) {
+			ret = standardRole;
+			return false;
+		}
+	});
+	return ret;
 }

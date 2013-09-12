@@ -273,6 +273,8 @@ public class Analyze extends HttpServlet {
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("hostUrl") + ":" + temp.getString("hostPort") + temp.getString("basePath");
+					clientResponse = registryClient.getMethods(study, dataset, "" + getLibraryId(lib));
+					retrievedTools = clientResponse.getEntityResponse();
 					clientResponse = new ERDClientResponse(retrievedTools);
 					res = clientResponse.toMethodString(func, "" + getLibraryId(lib));
 					clientResponse.release();

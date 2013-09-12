@@ -30,6 +30,7 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import edu.isi.misd.scanner.client.ERDClient;
 import edu.isi.misd.scanner.client.JakartaClient;
@@ -272,12 +273,42 @@ public class Registry extends HttpServlet {
 		String responseBody = null;
 		if (action.equals("createStudy")) {
 			clientResponse = registryClient.createStudy(studyName, irbId, principalInvestigator, studyStatusType);
-			if (clientResponse != null) {
-				responseBody = clientResponse.getEntity().toString();
-				System.out.println("responseBody: " + responseBody);
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create study.");
 				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("study", clientResponse.getEntity());
+				clientResponse = registryClient.getAllStudies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
+					return;
+				}
+				responseObject.put("allStudies", clientResponse.getEntityResponse());
+				clientResponse = registryClient.getUserRoles();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user roles.");
+					return;
+				}
+				responseObject.put("userRoles", clientResponse.getEntityResponse());
+				clientResponse = registryClient.getStudyRoles();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies roles.");
+					return;
+				}
+				responseObject.put("studiesRoles", clientResponse.getEntityResponse());
+				clientResponse = registryClient.getAllStudyManagementPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies management policies.");
+					return;
+				}
+				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		} else if (action.equals("createDataset")) {
 			try {
@@ -472,12 +503,42 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("updateStudy")) {
 			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, principalInvestigator, studyStatusType,
 					description, protocol, startDate, endDate, clinicalTrialsId, analysisPlan);
-			if (clientResponse != null) {
-				responseBody = clientResponse.getEntity().toString();
-				System.out.println("responseBody: " + responseBody);
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update study.");
 				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("study", clientResponse.getEntity());
+				clientResponse = registryClient.getAllStudies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
+					return;
+				}
+				responseObject.put("allStudies", clientResponse.getEntityResponse());
+				clientResponse = registryClient.getUserRoles();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user roles.");
+					return;
+				}
+				responseObject.put("userRoles", clientResponse.getEntityResponse());
+				clientResponse = registryClient.getStudyRoles();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies roles.");
+					return;
+				}
+				responseObject.put("studiesRoles", clientResponse.getEntityResponse());
+				clientResponse = registryClient.getAllStudyManagementPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies management policies.");
+					return;
+				}
+				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		} else if (action.equals("updateDataset")) {
 			try {
