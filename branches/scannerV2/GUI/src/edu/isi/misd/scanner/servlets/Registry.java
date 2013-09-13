@@ -154,6 +154,22 @@ public class Registry extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies.");
 				return;
 			}
+		}  else if (action.equals("getAllSitesPolicies")) {
+			clientResponse = registryClient.getAllSitesPolicies();
+			if (clientResponse != null) {
+				res = clientResponse.getEntityResponse().toString();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies.");
+				return;
+			}
+		}  else if (action.equals("getAllStudyRequestedSites")) {
+			clientResponse = registryClient.getAllStudyRequestedSites();
+			if (clientResponse != null) {
+				res = clientResponse.getEntityResponse().toString();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies.");
+				return;
+			}
 		} else if (action.equals("getSite")) {
 			clientResponse = registryClient.getSite(name);
 			if (clientResponse != null) {

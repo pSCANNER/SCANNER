@@ -167,7 +167,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 				JSONObject datasetObj = entityResponse.getJSONObject(i);
 				JSONObject node = datasetObj.getJSONObject("node");
 				JSONObject siteObj = node.getJSONObject("site");
-				ret.put(siteObj.getString("siteName") + ":" + node.getInt("nodeId"), node.getInt("nodeId"));
+				ret.put(siteObj.getString("siteName") + " - " + node.getString("nodeName"), node.getInt("nodeId"));
 			}
 			result = ret.toString();
 		} catch (JSONException e) {
@@ -334,7 +334,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 				JSONObject instance = entityResponse.getJSONObject(i);
 				JSONObject node = instance.getJSONObject("node");
 				JSONObject siteObj = node.getJSONObject("site");
-				String site = siteObj.getString("siteName") + ":" + node.getInt("nodeId");
+				String site = siteObj.getString("siteName") + " - " + node.getString("nodeName");
 				if (sites.contains(site)) {
 					nodes.put(instance);
 				}
@@ -372,7 +372,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 					String key = obj.getString("hostUrl") + ":" + obj.getInt("hostPort");
 					String rURL = key + obj.getString("basePath");
 					JSONObject site = obj.getJSONObject("site");
-					String cname = site.getString("siteName") + ":" + obj.getInt("nodeId");
+					String cname = site.getString("siteName") + " - " + obj.getString("nodeName");
 					map.put(key, cname);
 					targets.put(rURL, cname);
 				}

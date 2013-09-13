@@ -511,7 +511,7 @@ public class Analyze extends HttpServlet {
 			for (int i=0; i < retrievedDatasetInstances.length(); i++) {
 				JSONObject instance = retrievedDatasetInstances.getJSONObject(i);
 				JSONObject node = instance.getJSONObject("node");
-				String site = node.getString("site") + ":" + node.getInt("nodeId");
+				String site = node.getString("site") + " - " + node.getString("nodeName");
 				if (values.contains(site)) {
 					ret.put(instance.getInt("dataSetInstanceId"));
 				}

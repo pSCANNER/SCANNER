@@ -742,6 +742,20 @@ public interface RegistryClient {
      */
 	public RegistryClientResponse getAllStudyManagementPolicies();
 	
+    /**
+     * Gets the studies. 
+     * 
+     * @return The client response.
+     */
+	public RegistryClientResponse getAllSitesPolicies();
+	
+    /**
+     * Gets the studies. 
+     * 
+     * @return The client response.
+     */
+	public RegistryClientResponse getAllStudyRequestedSites();
+	
 
 	public RegistryClientResponse getPI();
 	public RegistryClientResponse getUsers();

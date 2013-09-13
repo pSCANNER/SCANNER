@@ -106,6 +106,12 @@ var standardRolesDict = null;
 var studyManagementPoliciesList = null;
 var studyManagementPoliciesDict = null;
 
+var studyRequestedSitesList = null;
+var studyRequestedSitesDict = null;
+
+var sitesPoliciesList = null;
+var sitesPoliciesDict = null;
+
 var instanceIdCounter = 0;
 
 var activeStudy = null;
@@ -2834,10 +2840,10 @@ function manageStudy(hideMode) {
 	$.each(datasetInstancesList, function(i, datasetInstance) {
 		var node = datasetInstance['node'];
 		var site = node['site'];
-		if (!selectNodes.contains(site['siteName'] + ':' + node['nodeId'])) {
-			selectNodes.push(site['siteName'] + ':' + node['nodeId']);
+		if (!selectNodes.contains(site['siteName'] + ' - ' + node['nodeName'])) {
+			selectNodes.push(site['siteName'] + ' - ' + node['nodeName']);
 			option = $('<option>');
-			option.text(site['siteName'] + ':' + node['nodeId']);
+			option.text(site['siteName'] + ' - ' + node['nodeName']);
 			option.attr('value', datasetInstance['dataSetInstanceId']);
 			select.append(option);
 		}
@@ -3225,7 +3231,7 @@ function addProtocolRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(node['nodeId']);
+	td.html(node['nodeName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
@@ -3277,7 +3283,7 @@ function addProtocolViewRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(node['nodeId']);
+	td.html(node['nodeName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
@@ -4037,8 +4043,73 @@ function postInitSites(data, textStatus, jqXHR, param) {
 		sitesDict[site['siteId']] = site;
 	});
 	if (param) {
+		initSitesPolicies(param);
+	}
+}
+
+function initSitesPolicies(all) {
+	var url = HOME + '/registry';
+	var obj = new Object();
+	obj['action'] = 'getAllSitesPolicies';
+	scanner.RETRIEVE(url, obj, true, postInitSitesPolicies, all, null, 0);
+}
+
+function postInitSitesPolicies(data, textStatus, jqXHR, param) {
+	sitesPoliciesList = data;
+	sitesPoliciesDict = {};
+	$.each(sitesPoliciesList, function(i, policy) {
+		sitesPoliciesDict[policy['sitePolicyId']] = policy;
+	});
+	sitesPoliciesList.sort(compareSitesPolicies);
+	if (param) {
+		initStudyRequestedSites(param);
+	}
+}
+
+function initStudyRequestedSites(all) {
+	var url = HOME + '/registry';
+	var obj = new Object();
+	obj['action'] = 'getAllStudyRequestedSites';
+	scanner.RETRIEVE(url, obj, true, postInitStudyRequestedSites, all, null, 0);
+}
+
+function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
+	studyRequestedSitesList = data;
+	studyRequestedSitesDict = {};
+	$.each(studyRequestedSitesList, function(i, site) {
+		studyRequestedSitesDict[site['studyRequestedSiteId']] = site;
+	});
+	studyRequestedSitesList.sort(compareStudyRequestedSites);
+	if (param) {
 		setContacts();
 	}
+}
+
+function compareStudyRequestedSites(studyRequestedSite1, studyRequestedSite2) {
+	var study1 = studyRequestedSite1['study'];
+	var study2 = studyRequestedSite2['study'];
+	var ret = compareNumbers(study1, study2);
+	if (ret == 0) {
+		var site1 = sitesDict[studyRequestedSite1['site']];
+		var site2 = sitesDict[studyRequestedSite2['site']];
+		ret = compareIgnoreCase(site1['siteName'], site2['siteName']);
+	}
+	return ret;
+}
+
+function compareSitesPolicies(sitePolicy1, sitePolicy2) {
+	var studyRole1 = sitePolicy1['studyRole'];
+	var studyRole2 = sitePolicy2['studyRole'];
+	var ret = compareNumbers(studyRole1['study'], studyRole2['study']);
+	if (ret == 0) {
+		var site1 = sitePolicy1['site'];
+		var site2 = sitePolicy2['site'];
+		ret = compareIgnoreCase(site1['siteName'], site2['siteName']);
+		if (ret == 0) {
+			ret = compareIgnoreCase(studyRole1['roleWithinStudy'], studyRole2['roleWithinStudy']);
+		}
+	}
+	return ret;
 }
 
 function compareStudyManagementPolicies(policy1, policy2) {
@@ -4060,13 +4131,13 @@ function compareUsers(user1, user2) {
 function compareInstances(datasetInstance1, datasetInstance2) {
 	var node1 = datasetInstance1['node'];
 	var node2 = datasetInstance2['node'];
-	var val1 = node1['site'] + ':' + node1['nodeId'];
-	var val2 = node2['site'] + ':' + node2['nodeId'];
+	var val1 = node1['site'] + ' - ' + node1['nodeName'];
+	var val2 = node2['site'] + ' - ' + node2['nodeName'];
 	return compareIgnoreCase(val1, val2);
 }
 
 function compareNodes(node1, node2) {
-	return compareNumbers(node1['nodeId'], node2['nodeId']);
+	return compareIgnoreCase(node1['nodeName'], node2['nodeName']);
 }
 
 function compareTools(tool1, tool2) {
