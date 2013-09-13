@@ -35,7 +35,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#createStudy(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse createStudy(String studyName, String irbId, String principalInvestigator, String studyStatusType) {
+	public RegistryClientResponse createStudy(String studyName, String irbId, String studyOwner, String studyStatusType) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studies";
 		try {
@@ -43,8 +43,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			body.put("studyName", studyName);
 			body.put("irbId", irbId != null ? Integer.parseInt(irbId) : 0);
 			JSONObject investigator = new JSONObject();
-			investigator.put("userId", Integer.parseInt(principalInvestigator));
-			body.put("principalInvestigator", investigator);
+			investigator.put("userId", Integer.parseInt(studyOwner));
+			body.put("studyOwner", investigator);
 			//JSONObject status = new JSONObject();
 			//status.put("studyStatusTypeId", Integer.parseInt(studyStatusType));
 			//body.put("studyStatusType", status);
@@ -211,7 +211,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#updateStudy(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse updateStudy(String studyId, String studyName, String irbId, String principalInvestigator, 
+	public RegistryClientResponse updateStudy(String studyId, String studyName, String irbId, String studyOwner, 
 			String studyStatusType, String description, String protocol, String startDate, String endDate, 
 			String clinicalTrialsId, String analysisPlan) {
 		RegistryClientResponse ret = null;
@@ -221,8 +221,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			body.put("studyName", studyName);
 			body.put("irbId", irbId != null ? Integer.parseInt(irbId) : 0);
 			JSONObject investigator = new JSONObject();
-			investigator.put("userId", Integer.parseInt(principalInvestigator));
-			body.put("principalInvestigator", investigator);
+			investigator.put("userId", Integer.parseInt(studyOwner));
+			body.put("studyOwner", investigator);
 			//JSONObject status = new JSONObject();
 			//status.put("studyStatusTypeId", Integer.parseInt(studyStatusType));
 			//body.put("studyStatusType", status);

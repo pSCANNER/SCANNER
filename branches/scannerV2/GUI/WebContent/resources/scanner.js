@@ -401,9 +401,7 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 		}
 	});
 	$.each(successConnections, function(i, siteInfo) {
-		var siteName = siteInfo['RequestSiteInfo']['SiteName'];
-		var url = siteInfo['RequestURL'];
-		siteName = getSiteName(siteName, url);
+		var siteName = siteInfo['RequestSiteName'] + ' - ' + siteInfo['RequestNodeName'];
 		var tr = $('<tr>');
 		tbody.append(tr);
 		var td = $('<td>');
@@ -418,15 +416,13 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 		var label = $('<label>');
 		td.append(label);
 		label.html(siteName);
-		var description = 'Status: Up<br/>Description: ' + siteInfo['RequestSiteInfo']['SiteDescription']; 
+		var description = 'Status: Up'; 
 		label.hover(
 				function(event) {DisplayTipBox(event, description);}, 
 				function(){HideTipBox();});
 	});
 	$.each(errorConnections, function(i, siteInfo) {
-		var siteName = siteInfo['RequestSiteInfo']['SiteName'];
-		var url = siteInfo['RequestURL'];
-		siteName = getSiteName(siteName, url);
+		var siteName = siteInfo['RequestSiteName'] + ' - ' + siteInfo['RequestNodeName'];
 		var tr = $('<tr>');
 		tbody.append(tr);
 		var td = $('<td>');
@@ -1303,17 +1299,9 @@ function buildDataTable(tab) {
 				var siteInfo = sites[siteNo++];
 				if (siteInfo != null) {
 					var value = '';
-					var siteName = siteInfo['RequestSiteInfo']['SiteName'];
-					var url = siteInfo['RequestURL'];
-					siteName = getSiteName(siteName, url);
+					var siteName = siteInfo['RequestSiteName'] + ' - ' + siteInfo['RequestNodeName'];
 					if (siteName != null) {
 						value = 'Site Name: ' + siteName;
-					}
-					if (siteInfo['RequestSiteInfo']['SiteDescription'] != null) {
-						if (value.length > 0) {
-							value += '<br/>';
-						}
-						value += 'Site Description: ' + siteInfo['RequestSiteInfo']['SiteDescription'];
 					}
 					td.html(value);
 				} else {
@@ -1349,7 +1337,7 @@ function buildStatusDataTable(tab) {
 	res = dict['data'];
 	resultDiv = dict['statusDiv'];
 	tableId = dict['statusTableId'];
-	var columns = ['Site', 'Site Description', 'State', 'State Detail'];
+	var columns = ['Site', 'State', 'State Detail'];
 	var rows = [];
 	var complete = true;
 	var serviceResponse = res['ServiceResponses']['ServiceResponse'];
@@ -1360,12 +1348,9 @@ function buildStatusDataTable(tab) {
 	$.each(serviceResponse, function(i, elem) {
 		var serviceResponseMetadata = elem['ServiceResponseMetadata'];
 		if (serviceResponseMetadata != null) {
-			var siteName = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
-			var url = serviceResponseMetadata['RequestURL'];
-			siteName = getSiteName(siteName, url);
+			var siteName = serviceResponseMetadata['RequestSiteName'] + ' - ' + serviceResponseMetadata['RequestNodeName'];
 			var row = [];
 			row.push(siteName);
-			row.push(serviceResponseMetadata['RequestSiteInfo']['SiteDescription']);
 			row.push(serviceResponseMetadata['RequestState']);
 			row.push(serviceResponseMetadata['RequestStateDetail']);
 			rows.push(row);
@@ -1945,23 +1930,11 @@ function compareIgnoreCase(str1, str2) {
  * 	1 if str1 > str2
  */
 function compareServiceResponseMetadata(obj1, obj2) {
-	var serviceResponseMetadata = obj1['ServiceResponseMetadata'];
-	var val1 = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
-	var url = serviceResponseMetadata['RequestURL'];
-	val1 = getSiteName(val1, url);
-	serviceResponseMetadata = obj2['ServiceResponseMetadata'];
-	var val2 = serviceResponseMetadata['RequestSiteInfo']['SiteName'];
-	url = serviceResponseMetadata['RequestURL'];
-	val2 = getSiteName(val2, url);
-	var val1 = val1.toLowerCase();
-	var val2 = val2.toLowerCase();
-	if (val1 == val2) {
-		return 0;
-	} else if (val1 < val2) {
-		return -1;
-	} else {
-		return 1;
-	}
+	var serviceResponseMetadata1 = obj1['ServiceResponseMetadata'];
+	var serviceResponseMetadata2 = obj2['ServiceResponseMetadata'];
+	var val1 = serviceResponseMetadata1['RequestSiteName'] + ' - ' + serviceResponseMetadata1['RequestNodeName'];
+	var val2 = serviceResponseMetadata2['RequestSiteName'] + ' - ' + serviceResponseMetadata2['RequestNodeName'];
+	return compareIgnoreCase(val1, val2);
 }
 
 /**
@@ -2680,8 +2653,7 @@ function manageStudy(hideMode) {
 	
 	$('#projectTitle').val(activeStudy['studyName']);
 	$('#updateStudyIRBInput').val(activeStudy['irbId']);
-	$('#updateStudyPrincipalInvestigator').val(activeStudy['principalInvestigator']);
-	//$('#updateStudyStatusType').val(activeStudy['studyStatusType']);
+	$('#updateStudyPrincipalInvestigator').val(activeStudy['studyOwner']);
 	$('#projectDescription').val('');
 	$('#projectProtocol').val('');
 	$('#projectStartDate').val('');
@@ -2827,22 +2799,13 @@ function manageStudy(hideMode) {
 	});
 	
 	if (activeStudy['studyPolicies'].length == 0) {
-		var activePolicies = [];
-		$.each(activeStudy['protocols'], function(i, protocol) {
-			var hasPolicy = false;
-			$.each(activePolicies, function(j, elem) {
-				if (elem['tool'] == protocol['tool'] && elem['dataset'] == protocol['dataset'] && elem['accessMode'] == protocol['accessMode']) {
-					hasPolicy = true;
-					return false;
-				}
-			});
-			if (!hasPolicy) {
-				activePolicies.push(protocol);
+		$.each(studyPoliciesList, function(i, studyPolicy) {
+			if (activeStudy['studyId'] == studyPolicy['study']) {
 				var obj = {};
-				obj['tool'] = protocol['tool'];
-				obj['dataset'] = protocol['dataset'];
-				obj['accessMode'] = protocol['accessMode'];
-				obj['role'] = protocol['role'];
+				obj['tool'] = studyPolicy['analysisTool'];
+				obj['dataset'] = studyPolicy['dataSetDefinition'];
+				obj['accessMode'] = studyPolicy['accessMode']['accessModeId'];
+				obj['role'] = studyRolesDict[studyPolicy['studyRole']];
 				addProtocolPoliciesRow(obj, true);
 			}
 		});
@@ -3032,17 +2995,6 @@ function removeStaff(button, obj) {
 	updateBasicInfo();
 }
 
-function getSiteName(siteName, url) {
-	url = url.split('//');
-	var protocol = url[0] + '//';
-	url = url[1].split('/');
-	var value = sitesMap[protocol + url[0]];
-	if (value != null) {
-		siteName = value;
-	}
-	return siteName;
-}
-
 function expandQueryResults(divId, expandId, colappseId) {
 	$('#' + divId).show();
 	$('#' + expandId).hide();
@@ -3113,8 +3065,7 @@ function createStudy() {
 			return;
 		}
 	}
-	obj['principalInvestigator'] = $('#createStudyPrincipalInvestigator').val();
-	//obj['studyStatusType'] = $('#createStudyStatusType').val();
+	obj['studyOwner'] = $('#createStudyPrincipalInvestigator').val();
 	var url =  HOME + '/registry';
 	scanner.POST(url, obj, true, postCreateStudy, null, null, 0);
 }
@@ -3139,7 +3090,7 @@ function postCreateStudy(data, textStatus, jqXHR, param) {
 	activeStudy['studyId'] = data['studyId'];
 	activeStudy['studyName'] = data['studyName'];
 	activeStudy['irbId'] = data['irbId'];
-	activeStudy['principalInvestigator'] = data['principalInvestigator'];
+	activeStudy['studyOwner'] = data['studyOwner'];
 	$('#projectTitle').val(data['studyName']);
 	appendStudy(activeStudy);
 	setActive(activeStudy['studyId']);
@@ -3173,8 +3124,7 @@ function updateStudy() {
 	} else {
 		obj['clinicalTrialsId'] = '';
 	}
-	obj['principalInvestigator'] = $('#updateStudyPrincipalInvestigator').val();
-	//obj['studyStatusType'] = $('#updateStudyStatusType').val();
+	obj['studyOwner'] = $('#updateStudyPrincipalInvestigator').val();
 	obj['description'] = $('#projectDescription').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['protocol'] = $('#projectProtocol').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['startDate'] = $('#projectStartDate').val().replace(/^\s*/, "").replace(/\s*$/, "");
@@ -3200,8 +3150,7 @@ function postUpdateStudy(data, textStatus, jqXHR, param) {
 	}
 	activeStudy['studyName'] = data['studyName'];
 	activeStudy['irbId'] = data['irbId'];
-	activeStudy['principalInvestigator'] = data['principalInvestigator'];
-	//activeStudy['studyStatusType'] = data['studyStatusType'];
+	activeStudy['studyOwner'] = data['studyOwner'];
 	activeStudy['description'] = data['description'];
 	activeStudy['protocol'] = data['protocol'];
 	activeStudy['startDate'] = data['startDate'];
@@ -3550,7 +3499,6 @@ function postGetMyStudies(data, textStatus, jqXHR, param) {
 	var div = $('#lisyMyStudiesDiv');
 	div.html('');
 	$.each(myStudies, function(i, study) {
-		//study['studyStatusType'] = study['studyStatusType']['description'];
 		study['staff'] = getStaff(study['studyId']);
 		study['protocols'] = getPolicies(study['studyId']);
 		study['sites'] = getSites(study['studyId']);
@@ -3689,15 +3637,6 @@ function appendStudyContent(study) {
 	var ol = $('<ol>');
 	contentDiv.append(ol);
 	ol.addClass('blank');
-	var li = $('<li>');
-	ol.append(li);
-	var b = $('<b>');
-	li.append(b);
-	b.html('Principal Investigator: ');
-	var label = $('<label>');
-	li.append(label);
-	var user = scannerUsersDict[study['principalInvestigator']];
-	label.html(user['firstName'] + ' ' + user['lastName']);
 	$.each(study['staff'], function(i, staff) {
 		var li = $('<li>');
 		ol.append(li);
@@ -4206,7 +4145,7 @@ function getStaff(study) {
 	var ret = [];
 	$.each(userRolesList, function(i, userRole) {
 		var studyRole = userRole['studyRole'];
-		if (studyRole['study'] == study && studyRole['roleWithinStudy'] != 'Principal Investigator') {
+		if (studyRole['study'] == study) {
 			var roleId = studyRole['roleId'];
 			var obj = {};
 			obj['userId'] = userRole['user'];
@@ -4244,27 +4183,16 @@ function getPolicies(study) {
 	var ret = [];
 	var policyDict = {};
 	$.each(analysisPolicies, function(i, policy) {
-		$.each(studyPoliciesList, function(j, studyPolicy) {
-			if (studyPolicy['studyRole'] == policy['studyRole'] && studyPolicy['study'] == study &&
-					studyPolicy['analysisTool'] == policy['analysisTool'] && 
-					studyPolicy['accessMode']['accessModeId'] == policy['accessMode']['accessModeId'] &&
-					studyRolesDict[policy['studyRole']]['roleWithinStudy'] != 'Principal Investigator') {
-				var obj = {};
-				obj['role'] = studyRolesDict[studyPolicy['studyRole']];
-				obj['dataset'] = studyPolicy['dataSetDefinition'];
-				obj['tool'] = policy['analysisTool'];
-				obj['datasetInstance'] = policy['dataSetInstance'];
-				obj['accessMode'] = policy['accessMode']['accessModeId'];
-				if (policyDict[obj['tool']] == null) {
-					policyDict[obj['tool']] = [];
-				}
-				if (!policyDict[obj['tool']].contains(obj['datasetInstance'])) {
-					policyDict[obj['tool']].push(obj['datasetInstance']);
-					ret.push(obj);
-				}
-				return false;
-			}
-		});
+		var studyPolicy = studyPoliciesDict[policy['parentStudyPolicyStatement']];
+		if (studyPolicy['study'] == study) {
+			var obj = {};
+			obj['role'] = studyRolesDict[studyPolicy['studyRole']];
+			obj['dataset'] = studyPolicy['dataSetDefinition'];
+			obj['tool'] = policy['analysisTool'];
+			obj['datasetInstance'] = policy['dataSetInstance'];
+			obj['accessMode'] = policy['accessMode']['accessModeId'];
+			ret.push(obj);
+		}
 	});
 	return ret;
 }

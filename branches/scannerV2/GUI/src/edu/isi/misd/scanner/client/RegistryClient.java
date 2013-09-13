@@ -49,7 +49,7 @@ public interface RegistryClient {
      *            the website for the study approvals.
      * @return The client response.
      */
-	public RegistryClientResponse createStudy(String studyName, String irbId, String principalInvestigator, String studyStatusType);
+	public RegistryClientResponse createStudy(String studyName, String irbId, String studyOwner, String studyStatusType);
 	
     /**
      * Creates an entry of "dataset" type in the registry.
@@ -299,7 +299,7 @@ public interface RegistryClient {
      *            the new website for the study approvals.
      * @return The client response.
      */
-	public RegistryClientResponse updateStudy(String studyId, String studyName, String irbId, String principalInvestigator, 
+	public RegistryClientResponse updateStudy(String studyId, String studyName, String irbId, String studyOwner, 
 			String studyStatusType, String description, String protocol, String startDate, String endDate, 
 			String clinicalTrialsId, String analysisPlan);
 	
