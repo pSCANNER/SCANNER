@@ -395,8 +395,12 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 		sitesStatus.push(data['echo']['ServiceResponses']['ServiceResponse']);
 	}
 	sitesStatus.sort(compareServiceResponseMetadata);
-	var refreshTimestamp = $('#refreshTimestamp');
-	refreshTimestamp.html(data['timestamp']);
+	var description = 'Refreshing every 5 minutes. Last refresh was performed on <br/>' + data['timestamp'];
+	var span = $('#sitesStatusSpan');
+	span.unbind();
+	span.hover(
+			function(event) {DisplayTipBox(event, description);}, 
+			function(){HideTipBox();});
 	var successConnections = [];
 	var errorConnections = [];
 	$.each(sitesStatus, function(i, elem) {
