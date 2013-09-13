@@ -113,6 +113,7 @@ create table if not exists site (
 CREATE TABLE IF NOT EXISTS node (
   node_id serial NOT NULL primary key,
   site_id integer not null references site(site_id),
+  node_name text NOT NULL,
   host_url text NOT NULL,
   host_port integer NOT NULL,
   base_path text NOT NULL,

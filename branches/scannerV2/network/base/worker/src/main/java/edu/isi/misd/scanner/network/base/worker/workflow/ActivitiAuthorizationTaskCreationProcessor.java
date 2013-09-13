@@ -24,7 +24,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ActivitiAuthorizationTaskCreationProcessor implements Processor 
 {
-    public static final String SITE_ID = "siteID";
+    public static final String SITE_NAME = "siteName";
+    public static final String NODE_NAME = "nodeName";    
     public static final String FILE_PATH = "filePath";
     public static final String HOLDING_PATH = "holdingPath";
     public static final String PROCESS_INSTANCE_KEY = 
@@ -50,12 +51,14 @@ public class ActivitiAuthorizationTaskCreationProcessor implements Processor
         String id = exchange.getIn().getHeader(BaseConstants.ID,String.class); 
         String url = 
             exchange.getProperty(BaseConstants.REQUEST_URL, String.class);
-        String siteID = MessageUtils.getSiteName(exchange);
+        String siteName = MessageUtils.getSiteName(exchange);
+        String nodeName = MessageUtils.getNodeName(exchange);        
         // create Activiti process variables
         HashMap<String, Object> variables = new HashMap<String, Object>();
         variables.put(BaseConstants.ID, id);
         variables.put(BaseConstants.REQUEST_URL, url);
-        variables.put(SITE_ID, siteID);
+        variables.put(SITE_NAME, siteName);
+        variables.put(NODE_NAME, nodeName);        
         variables.put(FILE_PATH, exchange.getProperty(FILE_PATH));
         variables.put(HOLDING_PATH, exchange.getProperty(HOLDING_PATH));
         variables.put("mailNotificationsEnabled",

@@ -32,6 +32,9 @@ public class Node implements Serializable
     @Column(name = "node_id")
     private Integer nodeId;
     @Basic(optional = false)
+    @Column(name = "node_name")
+    private String nodeName;    
+    @Basic(optional = false)
     @Column(name = "host_url")
     private String hostUrl;
     @Basic(optional = false)
@@ -59,8 +62,9 @@ public class Node implements Serializable
         this.nodeId = nodeId;
     }
 
-    public Node(Integer nodeId, String hostUrl, int hostPort, String basePath) {
+    public Node(Integer nodeId, String nodeName, String hostUrl, int hostPort, String basePath) {
         this.nodeId = nodeId;
+        this.nodeName = nodeName;        
         this.hostUrl = hostUrl;
         this.hostPort = hostPort;
         this.basePath = basePath;
@@ -74,6 +78,14 @@ public class Node implements Serializable
         this.nodeId = nodeId;
     }
 
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
+    }
+    
     public String getHostUrl() {
         return hostUrl;
     }

@@ -7,11 +7,11 @@ INSERT into site (site_name, description) VALUES
 ('RAND', 'RAND Corporation'),
 ('LAHEY', 'Lahey Health');
  
-INSERT INTO node (site_id,host_url, host_port, base_path, description, is_master) VALUES
-(1, 'https://scanner.misd.isi.edu', 9998, '/scanner/query/', 'SCANNER MASTER', true),
-(1, 'https://scanner-node1.misd.isi.edu', 8888, '/scanner/dataset/','ALTAMED SIM', false),
-(1, 'https://scanner-node2.misd.isi.edu', 8888, '/scanner/dataset/', 'RAND SIM', false),
-(1, 'https://scanner-node3.misd.isi.edu', 8888, '/scanner/dataset/', 'UCSD SIM', false);
+INSERT INTO node (site_id, node_name, host_url, host_port, base_path, description, is_master) VALUES
+(1, 'Test Master', 'https://scanner.misd.isi.edu', 9998, '/scanner/query/', 'ISI Test Network Master Node', true),
+(1, 'Test Worker 1', 'https://scanner-node1.misd.isi.edu', 8888, '/scanner/dataset/','ISI Test Network Worker Node (ALTAMED SIM)', false),
+(1, 'Test Worker 2', 'https://scanner-node2.misd.isi.edu', 8888, '/scanner/dataset/', 'ISI Test Network Worker Node (RAND SIM)', false),
+(1, 'Test Worker 3', 'https://scanner-node3.misd.isi.edu', 8888, '/scanner/dataset/', 'ISI Test Network Worker Node (UCSD SIM)', false);
 
 INSERT INTO scanner_user (user_name, email, HSPC_documents, Phone, Reports_To, Active, First_Name, Middle_Initial, Last_Name, PubMed_Author_ID, is_superuser) VALUES
 ('dmeeker', 'dmeeker@rand.org', null, '2139262658', 0, true, 'Daniella', 'EP', 'Meeker', NULL, true),
@@ -85,24 +85,12 @@ INSERT INTO study_policy_statement (study_id, data_set_definition_id, policy_aut
 (1, 1, 400, 1, ' DataSetDefinition 1 will be analyzed with with OCEANS Logistic Regression in a mode without approval before transfer of aggregate/patient-level data by role Investigator.  ', 3, 1, 0, 0);
 
 INSERT INTO analysis_policy_statement (data_set_instance_id, role_id, analysis_tool_id, access_mode_id, policy_status_id, parent_study_policy_statement_id) VALUES
-(1,1,1,1,0,2),
-(2,1,1,0,0,3),
-(3,1,1,0,0,3),
-(1,2,1,1,0,2),
-(2,2,1,0,0,3),
-(3,2,1,0,0,3),
-(1,3,1,1,0,2),
-(2,3,1,0,0,3),
-(3,3,1,0,0,3),
-(1,1,2,0,0,1),
-(2,1,2,0,0,1),
-(3,1,2,0,0,1),
-(1,2,2,0,0,1),
-(2,2,2,0,0,1),
-(3,2,2,0,0,1),
-(1,3,2,0,0,1),
-(2,3,2,0,0,1),
-(3,3,2,0,0,1);
+(1,3,1,1,0,4),
+(2,3,1,0,0,6),
+(3,3,1,0,0,6),
+(1,3,2,0,0,2),
+(2,3,2,0,0,2),
+(3,3,2,0,0,2);
 
 INSERT INTO data_set_variable_metadata (data_set_definition, variable_name, variable_description, variable_type, variable_options) VALUES
 (1, 'group', 'group', 'binary', NULL),

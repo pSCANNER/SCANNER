@@ -20,7 +20,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ResultsReleaseDelegate implements JavaDelegate 
 {      
-    public static final String SITE_ID = "siteID";
+    public static final String SITE_NAME = "siteName";
+    public static final String NODE_NAME = "nodeName";    
     public static final String APPROVED = "approved";
     public static final String COMMENTS= "comments";
     public static final String FILE_PATH = "filePath";
@@ -42,9 +43,14 @@ public class ResultsReleaseDelegate implements JavaDelegate
                 "Variable not present: " + BaseConstants.REQUEST_URL);            
         }
 
-        if (!execution.hasVariable(SITE_ID)) {
+        if (!execution.hasVariable(SITE_NAME)) {
             throw new Exception(
-                "Variable not present: " + SITE_ID);            
+                "Variable not present: " + SITE_NAME);            
+        }
+        
+        if (!execution.hasVariable(NODE_NAME)) {
+            throw new Exception(
+                "Variable not present: " + NODE_NAME);            
         }
         
         if (!execution.hasVariable(COMMENTS)) {
@@ -74,7 +80,8 @@ public class ResultsReleaseDelegate implements JavaDelegate
         
         String id = (String)execution.getVariable(BaseConstants.ID);
         String url = (String)execution.getVariable(BaseConstants.REQUEST_URL);
-        String siteID = (String)execution.getVariable(SITE_ID);
+        String siteName = (String)execution.getVariable(SITE_NAME);
+        String nodeName = (String)execution.getVariable(NODE_NAME);        
         String approved = (String)execution.getVariable(APPROVED);
         String comments = (String)execution.getVariable(COMMENTS);
         if (!Boolean.parseBoolean(approved)) 
@@ -84,7 +91,7 @@ public class ResultsReleaseDelegate implements JavaDelegate
                      holdingFile.getCanonicalPath());            
             try {
                 writeRejectedServiceResponse(
-                    id, url, siteID, comments, outputFile);                
+                    id, url, siteName, nodeName, comments, outputFile);                
             } catch (Exception e) {
                  log.warn("Could write service response output file " + 
                           outputFile.getCanonicalPath() + " : Exception: " + e);  
@@ -126,7 +133,8 @@ public class ResultsReleaseDelegate implements JavaDelegate
     
     private void writeRejectedServiceResponse(String id,
                                               String url,
-                                              String siteID,
+                                              String siteName,
+                                              String nodeName,
                                               String comments,
                                               File outputFile)
         throws Exception
@@ -141,7 +149,8 @@ public class ResultsReleaseDelegate implements JavaDelegate
             ServiceRequestStateType.REJECTED);                
         responseMetadata.setRequestStateDetail("Reason: " + 
             (comments.isEmpty() ? "not specified." : comments));
-        responseMetadata.setRequestSiteName(siteID);
+        responseMetadata.setRequestSiteName(siteName);        
+        responseMetadata.setRequestNodeName(nodeName);
         response.setServiceResponseMetadata(responseMetadata);  
         
         // 2. Write out the result response using JAXB

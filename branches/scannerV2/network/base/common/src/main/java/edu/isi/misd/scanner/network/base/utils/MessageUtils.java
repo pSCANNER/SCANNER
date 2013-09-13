@@ -229,6 +229,27 @@ public class MessageUtils
         return siteName;
     }
     
+    /**
+     * Returns the external name of the node with a value resolved from the 
+     * properties of the current {@link org.apache.camel.CamelContext}.
+     * 
+     * @param exchange The current exchange.
+     * @return The site name, or null.
+     */
+    public static String getNodeName(Exchange exchange) 
+    {
+        CamelContext context = exchange.getContext();
+        String siteName = null;
+        try {
+            siteName = context.resolvePropertyPlaceholders(
+                BaseConstants.NODE_NAME_PROPERTY); 
+        } catch (Exception e) {
+            log.warn("Exception trying to resolve property " + 
+                      BaseConstants.NODE_NAME_PROPERTY + " - " + e);
+        }
+        return siteName;
+    }
+    
     public static ServiceResponseMetadata createServiceResponseMetadata(
         Exchange exchange,
         ServiceRequestStateType state,
@@ -242,7 +263,9 @@ public class MessageUtils
         serviceResponseMetadata.setRequestState(state);
         serviceResponseMetadata.setRequestStateDetail(stateDetail);  
         serviceResponseMetadata.setRequestSiteName(
-            MessageUtils.getSiteName(exchange));
+            MessageUtils.getSiteName(exchange));        
+        serviceResponseMetadata.setRequestNodeName(
+            MessageUtils.getNodeName(exchange));
         return serviceResponseMetadata;
     }
 }

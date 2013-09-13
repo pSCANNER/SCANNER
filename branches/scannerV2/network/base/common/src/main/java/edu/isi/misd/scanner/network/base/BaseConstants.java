@@ -92,6 +92,12 @@ public class BaseConstants
         "{{network.siteName}}";  
    
     /**
+     *  The property name of the node's externally visible name
+     */
+    public static final String NODE_NAME_PROPERTY = 
+        "{{network.nodeName}}";  
+    
+    /**
      *  The base XML namespace prefix map, used for JAXB serialization.
      */    
     public static final Map<String,String> BASE_XML_NAMESPACE_PREFIX_MAP;
