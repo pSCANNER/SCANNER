@@ -2728,11 +2728,11 @@ function manageStudy(hideMode) {
 	option.text('Select Role...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(standardRolesList, function(i, role) {
-		if (!role['addToStudyPolicyByDefault']) {
+	$.each(studyRolesList, function(i, role) {
+		if (role['study'] == activeStudy['studyId']) {
 			option = $('<option>');
-			option.text(role['standardRoleName']);
-			option.attr('value', role['standardRoleId']);
+			option.text(role['roleWithinStudy']);
+			option.attr('value', role['roleId']);
 			select.append(option);
 		}
 	});
@@ -2984,7 +2984,7 @@ function addSite() {
 function addStaff() {
 	var obj = {};
 	obj['userId'] = $('#staffNames').val();
-	obj['role'] = standardRolesDict[$('#staffRoles').val()]['standardRoleName'];
+	obj['role'] = studyRolesDict[$('#staffRoles').val()]['roleWithinStudy'];
 	activeStudy['staff'].push(obj);
 	addStaffRow(obj);
 	updateBasicInfo();
@@ -3224,7 +3224,7 @@ function addStudyProtocol() {
 	obj['tool'] = $('#modelNames').val();
 	obj['dataset'] = $('#datasetNames').val();
 	obj['accessMode'] = $('#studySendOptions').val();
-	obj['role'] = standardRolesDict[$('#studyInvestigatorSelect').val()];
+	obj['role'] = studyRolesDict[$('#studyInvestigatorSelect').val()];
 	addProtocolPoliciesRow(obj, true);
 	$('#modelNames').val('');
 	$('#datasetNames').val('');
@@ -3286,7 +3286,7 @@ function addProtocolRow(obj) {
 	tr.append(td);
 	td.addClass('protocol_border');
 	var role = obj['role'];
-	td.html(role['standardRoleName']);
+	td.html(role['roleWithinStudy']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3338,7 +3338,7 @@ function addProtocolViewRow(obj) {
 	tr.append(td);
 	td.addClass('protocol_border');
 	var role = obj['role'];
-	td.html(role['standardRoleName']);
+	td.html(role['roleWithinStudy']);
 	$('#viewSitesProtocols').show();
 }
 
@@ -3365,7 +3365,7 @@ function addProtocolPoliciesRow(obj, appendMode) {
 	tr.append(td);
 	td.addClass('protocol_border');
 	var role = obj['role'];
-	td.html(role['standardRoleName']);
+	td.html(role['roleWithinStudy']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3395,12 +3395,12 @@ function addProtocolSelect() {
 	select.append(option);
 	$.each(activeStudy['studyPolicies'], function(i, policy) {
 		option = $('<option>');
-		var standardRoleName = policy['role']['standardRoleName'];
+		var roleWithinStudy = policy['role']['roleWithinStudy'];
 		var lib = librariesDict[toolsDict[policy['tool']]['toolParentLibrary']];
 		var method = lib['libraryName'] + ' ' + toolsDict[policy['tool']]['toolName'];
 		var dataset = datasetDefinitionDict[policy['dataset']]['dataSetName'];
 		var accessMode = accessModeDict[policy['accessMode']]['description'];
-		option.text(method + ' as ' + standardRoleName +  ' on ' + dataset + ' ' + accessMode);
+		option.text(method + ' as ' + roleWithinStudy +  ' on ' + dataset + ' ' + accessMode);
 		option.attr('value', i);
 		select.append(option);
 	});
@@ -3412,11 +3412,11 @@ function addProtocolSelect() {
 	option.text('with role...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(standardRolesList, function(i, role) {
-		if (!role['addToStudyPolicyByDefault']) {
+	$.each(studyRolesList, function(i, role) {
+		if (role['study'] == activeStudy['studyId']) {
 			option = $('<option>');
-			option.text(role['standardRoleName']);
-			option.attr('value', role['standardRoleId']);
+			option.text(role['roleWithinStudy']);
+			option.attr('value', role['roleId']);
 			select.append(option);
 		}
 	});
@@ -4250,11 +4250,7 @@ function getPolicies(study) {
 					studyPolicy['accessMode']['accessModeId'] == policy['accessMode']['accessModeId'] &&
 					studyRolesDict[policy['studyRole']]['roleWithinStudy'] != 'Principal Investigator') {
 				var obj = {};
-				var roleWithinStudy = studyRolesDict[studyPolicy['studyRole']]['roleWithinStudy'];
-				var standardRole = getStandardRole(roleWithinStudy);
-				if (standardRole != null) {
-					obj['role'] = standardRole;
-				}
+				obj['role'] = studyRolesDict[studyPolicy['studyRole']];
 				obj['dataset'] = studyPolicy['dataSetDefinition'];
 				obj['tool'] = policy['analysisTool'];
 				obj['datasetInstance'] = policy['dataSetInstance'];
@@ -4302,13 +4298,3 @@ function showPrepToResearch() {
 	$('#replayDivContent').hide();
 }
 
-function getStandardRole(roleWithinStudy) {
-	var ret = null;
-	$.each(standardRolesList, function(k, standardRole) {
-		if (roleWithinStudy == standardRole['standardRoleName']) {
-			ret = standardRole;
-			return false;
-		}
-	});
-	return ret;
-}
