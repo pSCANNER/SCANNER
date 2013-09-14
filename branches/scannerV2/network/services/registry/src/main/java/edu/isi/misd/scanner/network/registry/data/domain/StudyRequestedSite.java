@@ -26,14 +26,10 @@ public class StudyRequestedSite implements Serializable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "study_requested_site_id")
-    private Integer studyRequestedSiteId;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyId")
-    @JsonIdentityReference(alwaysAsId=true)        
+    private Integer studyRequestedSiteId;   
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
-    private Study study;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="siteId")
-    @JsonIdentityReference(alwaysAsId=true)        
+    private Study study;    
     @JoinColumn(name = "site_id", referencedColumnName = "site_id")
     @ManyToOne(optional = false)
     private Site site;
@@ -65,7 +61,7 @@ public class StudyRequestedSite implements Serializable
         return site;
     }
 
-    public void setSiteId(Site site) {
+    public void setSite(Site site) {
         this.site = site;
     }
 
