@@ -27,13 +27,15 @@ public class ERDClientResponse implements RegistryClientResponse {
 	public ERDClientResponse(ClientURLResponse rsp) {
 		response = rsp;
 		String res = response.getEntityString();
-		try {
-			entityResponse = new JSONArray(res);
-		} catch (JSONException e) {
+		if (res != null) {
 			try {
-				entityObject = new JSONObject(res);
-			} catch (JSONException e1) {
-				e1.printStackTrace();
+				entityResponse = new JSONArray(res);
+			} catch (JSONException e) {
+				try {
+					entityObject = new JSONObject(res);
+				} catch (JSONException e1) {
+					e1.printStackTrace();
+				}
 			}
 		}
 	}

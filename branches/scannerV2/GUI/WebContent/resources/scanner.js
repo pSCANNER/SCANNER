@@ -2623,6 +2623,17 @@ function manageStudy(hideMode) {
 		$('#updateStudyDiv').hide();
 		return;
 	}
+	var url = HOME + '/registry';
+	var obj = new Object();
+	obj['action'] = 'getStudyData';
+	obj['studyId'] = activeStudy['studyId'];
+	scanner.RETRIEVE(url, obj, true, postManageStudy, hideMode, null, 0);
+	
+}
+function postManageStudy(data, textStatus, jqXHR, param) {
+	var hideMode = param;
+	activeStudy['sites'] = data['sites'];
+	activeStudy['sites'].sort(compareStudyRequestedSites);
 	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['studyId'] + ': ' + activeStudy['studyName']);
 	if (activeStudy['description'] != null) {
 		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + activeStudy['description']);
@@ -2725,10 +2736,10 @@ function manageStudy(hideMode) {
 	option.text('Select Site...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(sitesList, function(i, site) {
+	$.each(studyRequestedSitesList, function(i, studyRequestedSite) {
 		option = $('<option>');
-		option.text(site['siteName']);
-		option.attr('value', site['siteId']);
+		option.text(studyRequestedSite['site']['siteName']);
+		option.attr('value', studyRequestedSite['studyRequestedSiteId']);
 		select.append(option);
 	});
 	var select = $('#modelNames');
@@ -2827,11 +2838,9 @@ function manageStudy(hideMode) {
 	
 	addProtocolSelect();
 	$('#manageStudySitesTbody').html('');
-	if (activeStudy['sites'] != null) {
-		$.each(activeStudy['sites'], function(key, site) {
-			addSiteRow(site);
-		});
-	} 
+	$.each(activeStudy['sites'], function(i, site) {
+		addSiteRow(site);
+	});
 
 	var select = $('#nodeNames');
 	select.html('');
@@ -2869,6 +2878,7 @@ function manageStudy(hideMode) {
 	checkUpdateStudyButton();
 	checkAddStudyProtocolButton();
 	checkAddSiteButton();
+	appendStudyContent(activeStudy);
 }
 
 function checkAddRoleButton() {
@@ -2946,12 +2956,22 @@ function checkAddInstanceButton() {
 }
 
 function addSite() {
-	var site = sitesDict[$('#siteSelect').val()];
-	activeStudy['sites'][site['siteId']] = site;
+	obj = {};
+	obj['action'] = 'createStudyRequestedSites';
+	obj['studyId'] = activeStudy['studyId'];
+	obj['siteId'] = studyRequestedSitesDict[$('#siteSelect').val()]['site']['siteId'];
+	var url =  HOME + '/registry';
+	scanner.POST(url, obj, true, postAddSite, null, null, 0);
+}
+
+function postAddSite(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	var site = data['site'];
+	postInitStudyRequestedSites(data['allSites'], null, null, false);
 	$('#siteSelect').val('');
 	checkAddSiteButton();
 	addSiteRow(site);
-	appendStudyContent(activeStudy);
+	manageStudy(false);
 }
 
 function addStaff() {
@@ -3095,7 +3115,6 @@ function postCreateStudy(data, textStatus, jqXHR, param) {
 	myStudies.push(activeStudy);
 	activeStudy['staff'] = getStaff(data['studyId']);
 	activeStudy['studyPolicies'] = [];
-	activeStudy['sites'] = {};
 	activeStudy['protocols'] = [];
 	activeStudy['studyId'] = data['studyId'];
 	activeStudy['studyName'] = data['studyName'];
@@ -3402,7 +3421,7 @@ function addStudyRoleRow(studyRole) {
 
 function addSiteRow(site) {
 	$.each($('option', $('#siteSelect')), function(i, option) {
-		if ($(option).attr('value') == site['siteId']) {
+		if ($(option).attr('value') != '' && studyRequestedSitesDict[$(option).attr('value')]['site']['siteName'] == site['site']['siteName']) {
 			$(option).hide();
 			return false;
 		}
@@ -3414,7 +3433,7 @@ function addSiteRow(site) {
 	tr.append(td);
 	var b = $('<b>');
 	td.append(b);
-	b.html(site['siteName']);
+	b.html(site['site']['siteName']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3427,13 +3446,23 @@ function addSiteRow(site) {
 function removeStudySite(button, site) {
 	button.parent().parent().remove();
 	$.each($('option', $('#siteSelect')), function(i, option) {
-		if ($(option).attr('value') == site['siteId']) {
+		if ($(option).attr('value') != '' && studyRequestedSitesDict[$(option).attr('value')]['site']['siteName'] == site['site']['siteName']) {
 			$(option).show();
 			return false;
 		}
 	});
-	delete activeStudy['sites'][site['siteId']];
-	appendStudyContent(activeStudy);
+	obj = {};
+	obj['action'] = 'deleteStudyRequestedSites';
+	obj['studyRequestedSiteId'] = site['studyRequestedSiteId'];
+	var url =  HOME + '/registry';
+	scanner.POST(url, obj, true, postRemoveStudySite, null, null, 0);
+}
+
+function postRemoveStudySite(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitStudyRequestedSites(data['allSites'], null, null, false);
+	$('#siteSelect').val('');
+	manageStudy(false);
 }
 
 function removeStudyRole(button, studyRole) {
@@ -3511,7 +3540,6 @@ function postGetMyStudies(data, textStatus, jqXHR, param) {
 	$.each(myStudies, function(i, study) {
 		study['staff'] = getStaff(study['studyId']);
 		study['protocols'] = getPolicies(study['studyId']);
-		study['sites'] = getSites(study['studyId']);
 		study['studyPolicies'] = [];
 		appendStudy(study);
 	});
@@ -3552,7 +3580,6 @@ function appendStudy(study) {
 	p.click(function() {
 		$(this).next(".wizard_content").toggle();
 	});
-	appendStudyContent(study);
 }
 
 function updateBasicInfo() {
@@ -3562,7 +3589,6 @@ function updateBasicInfo() {
 		value += ' - ' + activeStudy['description'];
 	}
 	label.html(value);
-	appendStudyContent(activeStudy);
 }
 
 function setActiveStudy(name) {
@@ -3686,11 +3712,9 @@ function appendStudyContent(study) {
 		var lib = librariesDict[tool['toolParentLibrary']];
 		models.push(lib['libraryName'] + ' - ' + tool['toolName']);
 	});
-	if (study['sites'] != null) {
-		$.each(study['sites'], function(i, site) {
-			sites.push(site['siteName']);
-		});
-	} 
+	$.each(study['sites'], function(i, site) {
+		sites.push(site['site']['siteName']);
+	});
 	var ol = $('<ol>');
 	contentDiv.append(ol);
 	ol.addClass('blank');
@@ -4078,10 +4102,15 @@ function initStudyRequestedSites(all) {
 }
 
 function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
-	studyRequestedSitesList = data;
+	studyRequestedSitesList = [];
+	var sites = [];
 	studyRequestedSitesDict = {};
-	$.each(studyRequestedSitesList, function(i, site) {
-		studyRequestedSitesDict[site['studyRequestedSiteId']] = site;
+	$.each(data, function(i, site) {
+		if (!sites.contains(site['site']['siteId'])) {
+			sites.push(site['site']['siteId']);
+			studyRequestedSitesList.push(site);
+			studyRequestedSitesDict[site['studyRequestedSiteId']] = site;
+		}
 	});
 	studyRequestedSitesList.sort(compareStudyRequestedSites);
 	if (param) {
@@ -4090,14 +4119,9 @@ function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
 }
 
 function compareStudyRequestedSites(studyRequestedSite1, studyRequestedSite2) {
-	var study1 = studyRequestedSite1['study'];
-	var study2 = studyRequestedSite2['study'];
-	var ret = compareNumbers(study1, study2);
-	if (ret == 0) {
-		var site1 = sitesDict[studyRequestedSite1['site']];
-		var site2 = sitesDict[studyRequestedSite2['site']];
-		ret = compareIgnoreCase(site1['siteName'], site2['siteName']);
-	}
+	var site1 = studyRequestedSite1['site'];
+	var site2 = studyRequestedSite2['site'];
+	ret = compareIgnoreCase(site1['siteName'], site2['siteName']);
 	return ret;
 }
 
@@ -4267,24 +4291,6 @@ function getPolicies(study) {
 			obj['datasetInstance'] = policy['dataSetInstance'];
 			obj['accessMode'] = policy['accessMode']['accessModeId'];
 			ret.push(obj);
-		}
-	});
-	return ret;
-}
-
-function getSites(study) {
-	var ret = {};
-	var datasetIds = [];
-	$.each(datasetDefinitionList, function(i, dataset) {
-		if (dataset['originatingStudy'] == study) {
-			datasetIds.push(dataset['dataSetDefinitionId']);
-		}
-	});
-	$.each(datasetInstancesList, function(i, instance) {
-		if (datasetIds.contains(instance['dataSetDefinition'])) {
-			var node = instance['node'];
-			var site = node['site'];
-			ret[site['siteId']] = site;
 		}
 	});
 	return ret;

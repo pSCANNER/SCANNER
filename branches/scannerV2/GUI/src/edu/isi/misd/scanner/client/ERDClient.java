@@ -835,5 +835,47 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse createStudyRequestedSites(Integer studyId,
+			Integer siteId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyRequestedSites";
+		try {
+			JSONObject body = new JSONObject();
+			JSONObject study = new JSONObject();
+			study.put("studyId", studyId);
+			body.put("study", study);
+			JSONObject site = new JSONObject();
+			site.put("siteId", siteId);
+			body.put("site", site);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			ClientURLResponse rsp = postRegistry(url, body.toString());
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteStudyRequestedSites(
+			Integer studyRequestedSiteId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyRequestedSites/" + studyRequestedSiteId;
+		System.out.println("DELETE: " + url);
+		ClientURLResponse rsp = delete(url, null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getStudyRequestedSites(Integer studyId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyRequestedSites?studyId=" + studyId;
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 	
 }

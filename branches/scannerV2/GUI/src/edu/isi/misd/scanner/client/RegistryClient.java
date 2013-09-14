@@ -51,7 +51,8 @@ public interface RegistryClient {
      */
 	public RegistryClientResponse createStudy(String studyName, String irbId, String studyOwner, String studyStatusType);
 	
-    /**
+
+	/**
      * Creates an entry of "dataset" type in the registry.
      * 
      * @param name
@@ -754,9 +755,9 @@ public interface RegistryClient {
      * 
      * @return The client response.
      */
-	public RegistryClientResponse getAllStudyRequestedSites();
 	
 
+	public RegistryClientResponse getAllStudyRequestedSites();
 	public RegistryClientResponse getPI();
 	public RegistryClientResponse getUsers();
 	public RegistryClientResponse getNodes();
@@ -769,4 +770,9 @@ public interface RegistryClient {
 	public RegistryClientResponse getUserRoles();
 	public RegistryClientResponse getStudyPolicies();
 	public RegistryClientResponse getStudyRoles();
+	
+	public RegistryClientResponse createStudyRequestedSites(Integer studyId, Integer siteId);
+	public RegistryClientResponse deleteStudyRequestedSites(Integer studyRequestedSiteId);
+	public RegistryClientResponse getStudyRequestedSites(Integer studyId);
+	
 }
