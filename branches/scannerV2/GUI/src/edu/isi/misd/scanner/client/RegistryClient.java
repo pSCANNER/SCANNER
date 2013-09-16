@@ -768,11 +768,15 @@ public interface RegistryClient {
 	public RegistryClientResponse getAnalysisPolicies(int userId, int toolId, int datasetInstanceId);
 	public RegistryClientResponse getAnalysisPolicies();
 	public RegistryClientResponse getUserRoles();
+	public RegistryClientResponse getUserRoles(int studyId);
 	public RegistryClientResponse getStudyPolicies();
 	public RegistryClientResponse getStudyRoles();
+	public RegistryClientResponse getStudyRoles(int studyId);
 	
 	public RegistryClientResponse createStudyRequestedSites(Integer studyId, Integer siteId);
 	public RegistryClientResponse deleteStudyRequestedSites(Integer studyRequestedSiteId);
 	public RegistryClientResponse getStudyRequestedSites(Integer studyId);
 	
+	public RegistryClientResponse createUserRole(Integer userId, Integer roleId);
+	public RegistryClientResponse deleteUserRole(Integer userRoleId);
 }

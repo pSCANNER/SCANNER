@@ -117,6 +117,20 @@ public class Registry extends HttpServlet {
 				JSONObject responseObject = new JSONObject();
 				JSONArray responseArray = clientResponse.getEntityResponse();
 				responseObject.put("sites", responseArray);
+				clientResponse = registryClient.getUserRoles(Integer.parseInt(studyId));
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study staff." + studyId);
+					return;
+				}
+				responseArray = clientResponse.getEntityResponse();
+				responseObject.put("staff", responseArray);
+				clientResponse = registryClient.getStudyRoles(Integer.parseInt(studyId));
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study roles." + studyId);
+					return;
+				}
+				responseArray = clientResponse.getEntityResponse();
+				responseObject.put("studyRoles", responseArray);
 				res = responseObject.toString();
 				System.out.println("getStudyData responseBody: " + res);
 			} catch (JSONException e) {
@@ -280,6 +294,9 @@ public class Registry extends HttpServlet {
 		String startDate = request.getParameter("startDate"); 
 		String endDate = request.getParameter("endDate"); 
 		String analysisPlan = request.getParameter("analysisPlan"); 
+		String userId = request.getParameter("userId");
+		String roleId = request.getParameter("roleId");
+		String userRoleId = request.getParameter("userRoleId");
 		
 		
 		String study = request.getParameter("study");
@@ -374,6 +391,27 @@ public class Registry extends HttpServlet {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} else if (action.equals("createUserRole")) {
+			clientResponse = registryClient.createUserRole(Integer.parseInt(userId), Integer.parseInt(roleId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create user role.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("staff", clientResponse.getEntity());
+				clientResponse = registryClient.getUserRoles();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all users roles.");
+					return;
+				}
+				responseObject.put("userRoles", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("createStudyRequestedSites responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else if (action.equals("deleteStudyRequestedSites")) {
 			clientResponse = registryClient.deleteStudyRequestedSites(Integer.parseInt(studyRequestedSiteId));
 			if (clientResponse == null) {
@@ -390,6 +428,26 @@ public class Registry extends HttpServlet {
 				responseObject.put("allSites", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("deleteStudyRequestedSites responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (action.equals("deleteUserRole")) {
+			clientResponse = registryClient.deleteUserRole(Integer.parseInt(userRoleId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete user role.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse = registryClient.getUserRoles();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all users roles.");
+					return;
+				}
+				responseObject.put("userRoles", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("deleteUserRole responseBody: " + responseBody);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

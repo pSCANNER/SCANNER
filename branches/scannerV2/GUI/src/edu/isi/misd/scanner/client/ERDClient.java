@@ -877,5 +877,54 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse getUserRoles(int studyId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "userRoles?studyId=" + studyId;
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse createUserRole(Integer userId, Integer roleId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "userRoles";
+		try {
+			JSONObject body = new JSONObject();
+			JSONObject user = new JSONObject();
+			user.put("userId", userId);
+			body.put("user", user);
+			JSONObject studyRole = new JSONObject();
+			studyRole.put("roleId", roleId);
+			body.put("studyRole", studyRole);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			ClientURLResponse rsp = postRegistry(url, body.toString());
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteUserRole(Integer userRoleId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "userRoles/" + userRoleId;
+		System.out.println("DELETE: " + url);
+		ClientURLResponse rsp = delete(url, null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getStudyRoles(int studyId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyRoles?studyId=" + studyId;
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 	
 }
