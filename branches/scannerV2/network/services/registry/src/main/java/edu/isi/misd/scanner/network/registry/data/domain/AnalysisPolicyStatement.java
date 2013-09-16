@@ -26,22 +26,16 @@ public class AnalysisPolicyStatement implements Serializable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "analysis_policy_statement_id")
-    private Integer analysisPolicyStatementId;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleId")
-    @JsonIdentityReference(alwaysAsId=true)            
+    private Integer analysisPolicyStatementId;         
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole studyRole;
     @JoinColumn(name = "policy_status_id", referencedColumnName = "policy_status_type_id")
     @ManyToOne(optional = false)
-    private PolicyStatusType policyStatus;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetInstanceId")
-    @JsonIdentityReference(alwaysAsId=true)        
+    private PolicyStatusType policyStatus;    
     @JoinColumn(name = "data_set_instance_id", referencedColumnName = "data_set_instance_id")
     @ManyToOne(optional = false)
-    private DataSetInstance dataSetInstance;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="toolId")
-    @JsonIdentityReference(alwaysAsId=true)        
+    private DataSetInstance dataSetInstance;      
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
     private AnalysisTool analysisTool;      

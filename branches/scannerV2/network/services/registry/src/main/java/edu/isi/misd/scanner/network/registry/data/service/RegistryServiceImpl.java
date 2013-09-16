@@ -11,6 +11,7 @@ import edu.isi.misd.scanner.network.registry.data.domain.StudyRole;
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 import edu.isi.misd.scanner.network.registry.data.domain.UserRole;
 import edu.isi.misd.scanner.network.registry.data.repository.*;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -230,16 +231,35 @@ public class RegistryServiceImpl implements RegistryService
         studyRepository.delete(studyId);
     }
 
+    /**
+     * Checks if the userName specified has the superuser flag set.
+     * @param userName
+     * @return true if the user is a superuser, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */      
     @Override
     public boolean userIsSuperuser(String userName) 
+        throws ForbiddenException
     {
         ScannerUser user = 
-            scannerUserRepository.findByUserNameAndIsSuperuserTrue(userName);
-        return (user != null) ? true : false;
+            scannerUserRepository.findByUserName(userName);
+        if (user == null) {
+            throw new ForbiddenException(
+                userName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
+        }
+        return user.getIsSuperuser();
     }
     
+    /**
+     * Checks if the userName specified can manage the studyId specified.
+     * @param studyId
+     * @param userName
+     * @return true if the user can manage the study, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */      
     @Override    
     public boolean userCanManageStudy(Integer studyId, String userName)
+        throws ForbiddenException
     {
         // maybe this should be disabled
         if (userIsSuperuser(userName)) {

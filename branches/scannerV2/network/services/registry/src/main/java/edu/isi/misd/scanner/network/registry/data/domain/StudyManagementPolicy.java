@@ -26,14 +26,10 @@ public class StudyManagementPolicy implements Serializable
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "study_policy_id")
-    private Integer studyPolicyId;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleId")
-    @JsonIdentityReference(alwaysAsId=true)    
+    private Integer studyPolicyId;  
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
     private StudyRole studyRole;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyId")
-    @JsonIdentityReference(alwaysAsId=true)    
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;

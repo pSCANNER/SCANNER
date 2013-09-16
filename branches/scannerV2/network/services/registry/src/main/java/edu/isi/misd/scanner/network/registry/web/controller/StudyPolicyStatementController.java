@@ -1,6 +1,7 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.StudyPolicyStatement;
+import edu.isi.misd.scanner.network.registry.data.repository.ScannerUserRepository;
 import edu.isi.misd.scanner.network.registry.data.repository.StudyPolicyStatementRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
@@ -45,6 +46,9 @@ public class StudyPolicyStatementController extends BaseController
     
     @Autowired
     private StudyPolicyStatementRepository studyPolicyStatementRepository;   
+    
+    @Autowired
+    private ScannerUserRepository scannerUserRepository;  
     
     @Autowired
     private RegistryService registryService;  
@@ -118,7 +122,9 @@ public class StudyPolicyStatementController extends BaseController
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
-        }          
+        }
+        studyPolicyStatement.setPolicyOriginator(
+            scannerUserRepository.findByUserName(loginName));
         try {
             studyPolicyStatementRepository.save(studyPolicyStatement);
         } catch (DataIntegrityViolationException e) {

@@ -95,7 +95,7 @@ create table study_policy_statement (
   study_policy_statement_id serial not null primary key,
   study_id integer not null references study(study_id),
   data_set_definition_id integer not null references data_set_definition(data_set_definition_id),
-  policy_authority integer not null references data_set_policy_authority(data_set_policy_authority_id),
+  policy_authority integer references data_set_policy_authority(data_set_policy_authority_id),
   policy_originator integer not null references scanner_user(user_id),
   attestation text,
   role_id integer not null references study_role(role_id),

@@ -32,17 +32,13 @@ public class StudyPolicyStatement implements Serializable
     @Column(name = "study_policy_statement_id")
     private Integer studyPolicyStatementId;
     @Column(name = "attestation")
-    private String attestation;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="roleId")
-    @JsonIdentityReference(alwaysAsId=true)            
+    private String attestation;        
     @JoinColumn(name = "role_id", referencedColumnName = "role_id")
     @ManyToOne(optional = false)
-    private StudyRole studyRole;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyId")
-    @JsonIdentityReference(alwaysAsId=true)          
+    private StudyRole studyRole;        
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
-    private Study study;
+    private Study study;       
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
     @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "policy_originator", referencedColumnName = "user_id")
@@ -52,15 +48,11 @@ public class StudyPolicyStatement implements Serializable
     @ManyToOne(optional = false)
     private PolicyStatusType policyStatus;
     @JoinColumn(name = "policy_authority", referencedColumnName = "data_set_policy_authority_id")
-    @ManyToOne(optional = false)
-    private DataSetPolicyAuthority policyAuthority;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetDefinitionId")
-    @JsonIdentityReference(alwaysAsId=true)          
+    @ManyToOne
+    private DataSetPolicyAuthority policyAuthority;      
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)
-    private DataSetDefinition dataSetDefinition;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="toolId")
-    @JsonIdentityReference(alwaysAsId=true)        
+    private DataSetDefinition dataSetDefinition;     
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
     private AnalysisTool analysisTool;
