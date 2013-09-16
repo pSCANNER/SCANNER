@@ -2,7 +2,6 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.StandardRole;
 import edu.isi.misd.scanner.network.registry.data.repository.StandardRoleRepository;
-import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
@@ -33,24 +32,23 @@ public class StandardRoleController extends BaseController
     private static final Log log = 
         LogFactory.getLog(StandardRoleController.class.getName());
     
-    public static final String REQUEST_PARAM_SITE_NAME = "roleName";
+    public static final String BASE_PATH = "/standardRoles";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
+    public static final String REQUEST_PARAM_ROLE_NAME = "roleName";
     
     @Autowired
     private StandardRoleRepository standardRoleRepository;   
     
-	@RequestMapping(value = "/standardRoles", method = RequestMethod.GET)
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<StandardRole> getStandardRoles(
            @RequestParam Map<String, String> paramMap) 
     {
-        String standardRoleName = null;
-        if (!paramMap.isEmpty()) 
-        {
-            standardRoleName = paramMap.remove(REQUEST_PARAM_SITE_NAME);
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }            
-        }
+        Map<String,String> params = 
+            validateParameterMap(paramMap, REQUEST_PARAM_ROLE_NAME); 
         
+        String standardRoleName = params.get(REQUEST_PARAM_ROLE_NAME);        
         List<StandardRole> standardRoles = new ArrayList<StandardRole>();        
         if (standardRoleName != null) {
             StandardRole standardRole = 
@@ -66,7 +64,10 @@ public class StandardRoleController extends BaseController
         return standardRoles;           
 	}
     
-    @RequestMapping(value = "/standardRoles", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody StandardRole createStandardRole(
            @RequestBody StandardRole standardRole) 
@@ -74,16 +75,18 @@ public class StandardRoleController extends BaseController
         try {
             standardRoleRepository.save(standardRole);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
         return standardRoleRepository.findOne(standardRole.getStandardRoleId());
     }  
     
-    @RequestMapping(value = "/standardRoles/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StandardRole getStandardRole(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         StandardRole foundStandardRole = standardRoleRepository.findOne(id);
 
@@ -93,9 +96,12 @@ public class StandardRoleController extends BaseController
         return foundStandardRole;
     }  
     
-    @RequestMapping(value = "/standardRoles/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StandardRole updateStandardRole(
-           @PathVariable("id") Integer id, 
+           @PathVariable(ID_URL_PATH_VAR) Integer id, 
            @RequestBody StandardRole standardRole) 
     {
         // find the requested resource
@@ -113,25 +119,24 @@ public class StandardRoleController extends BaseController
         } else if (!standardRole.getStandardRoleId().equals(
                     foundStandardRole.getStandardRoleId())) {
             throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                standardRole.getStandardRoleId() + 
-                ") does not match referenced ID (" + 
-                foundStandardRole.getStandardRoleId() + ")"); 
+                standardRole.getStandardRoleId(),
+                foundStandardRole.getStandardRoleId()); 
         }
-        // ok, good to go
+
         try {
             standardRoleRepository.save(standardRole);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
         return standardRoleRepository.findOne(standardRole.getStandardRoleId());
     }     
     
-    @RequestMapping(value = "/standardRoles/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeStandardRole(@PathVariable("id") Integer id) 
+    public void removeStandardRole(@PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!standardRoleRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            

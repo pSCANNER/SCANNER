@@ -33,6 +33,8 @@ public class DataSetInstanceController extends BaseController
     private static final Log log = 
         LogFactory.getLog(DataSetInstanceController.class.getName());
 
+    public static final String BASE_PATH = "/instances";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_DATASET_ID = "dataSetId";
     public static final String REQUEST_PARAM_DATASET_NAME = "dataSetName";    
     public static final String REQUEST_PARAM_USER_NAME = "userName";
@@ -40,18 +42,24 @@ public class DataSetInstanceController extends BaseController
     @Autowired
     private DataSetInstanceRepository dataSetInstanceRepository;   
     
-	@RequestMapping(value = "/instances", method = RequestMethod.GET)
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<DataSetInstance> getDataSetInstances(
            @RequestParam Map<String, String> paramMap)        
     {
-        if (!paramMap.isEmpty()) 
+        Map<String,String> params = 
+            validateParameterMap(
+                paramMap,
+                REQUEST_PARAM_DATASET_ID,
+                REQUEST_PARAM_DATASET_NAME,
+                REQUEST_PARAM_USER_NAME);
+        
+        if (!params.isEmpty()) 
         {
-            String dataSetId = paramMap.remove(REQUEST_PARAM_DATASET_ID);
-            String dataSetName = paramMap.remove(REQUEST_PARAM_DATASET_NAME);            
-            String userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }
+            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);
+            String dataSetName = params.get(REQUEST_PARAM_DATASET_NAME);            
+            String userName = params.get(REQUEST_PARAM_USER_NAME);
             if ((dataSetId != null) && (userName != null)) {              
                 return
                     dataSetInstanceRepository.
@@ -85,7 +93,10 @@ public class DataSetInstanceController extends BaseController
         return dataSetInstances;                     
 	}
     
-    @RequestMapping(value = "/instances", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody DataSetInstance createDataSetInstance(
            @RequestBody DataSetInstance dataSetInstance) 
@@ -93,7 +104,7 @@ public class DataSetInstanceController extends BaseController
         try {
             dataSetInstanceRepository.save(dataSetInstance);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
@@ -101,9 +112,11 @@ public class DataSetInstanceController extends BaseController
             dataSetInstance.getDataSetInstanceId());
     }  
     
-    @RequestMapping(value = "/instances/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetInstance getDataSetInstance(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         DataSetInstance foundDataSet = 
             dataSetInstanceRepository.findOne(id);
@@ -114,9 +127,12 @@ public class DataSetInstanceController extends BaseController
         return foundDataSet;
     }  
     
-    @RequestMapping(value = "/instances/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetInstance updateDataSetInstance(
-           @PathVariable("id") Integer id, 
+           @PathVariable(ID_URL_PATH_VAR) Integer id, 
            @RequestBody DataSetInstance dataSetInstance) 
     {
         // find the requested resource
@@ -134,17 +150,15 @@ public class DataSetInstanceController extends BaseController
             dataSetInstance.setDataSetInstanceId(id);
         } else if (!dataSetInstance.getDataSetInstanceId().equals(
                     foundDataSetInstance.getDataSetInstanceId())) {
-            throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                dataSetInstance.getDataSetInstanceId() + 
-                ") does not match referenced ID (" + 
-                foundDataSetInstance.getDataSetInstanceId() + ")"); 
+            throw new ConflictException( 
+                dataSetInstance.getDataSetInstanceId(),
+                foundDataSetInstance.getDataSetInstanceId()); 
         }
-        // ok, good to go
+
         try {
             dataSetInstanceRepository.save(dataSetInstance);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
@@ -152,9 +166,11 @@ public class DataSetInstanceController extends BaseController
             dataSetInstance.getDataSetInstanceId());
     }     
     
-    @RequestMapping(value = "/instances/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeDataSetInstance(@PathVariable("id") Integer id) 
+    public void removeDataSetInstance(
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!dataSetInstanceRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            

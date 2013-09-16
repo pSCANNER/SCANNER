@@ -2,7 +2,6 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.ScannerUser;
 import edu.isi.misd.scanner.network.registry.data.repository.ScannerUserRepository;
-import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
@@ -33,24 +32,23 @@ public class ScannerUserController extends BaseController
     private static final Log log = 
         LogFactory.getLog(ScannerUserController.class.getName());
     
+    public static final String BASE_PATH = "/users";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_USER_NAME = "userName";
     
     @Autowired
     private ScannerUserRepository scannerUserRepository;   
     
-	@RequestMapping(value = "/users", method = RequestMethod.GET)
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<ScannerUser> getScannerUsers(
            @RequestParam Map<String, String> paramMap) 
     {
-        String userName = null;
-        if (!paramMap.isEmpty()) 
-        {
-            userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }            
-        }
+        Map<String,String> params = 
+            validateParameterMap(paramMap, REQUEST_PARAM_USER_NAME);    
         
+        String userName = params.get(REQUEST_PARAM_USER_NAME);        
         List<ScannerUser> users = new ArrayList<ScannerUser>();        
         if (userName != null) {
             ScannerUser user = scannerUserRepository.findByUserName(userName);
@@ -65,7 +63,10 @@ public class ScannerUserController extends BaseController
         return users;           
 	}
     
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody ScannerUser createScannerUser(
            @RequestBody ScannerUser user) 
@@ -73,16 +74,18 @@ public class ScannerUserController extends BaseController
         try {
             scannerUserRepository.save(user);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
         return scannerUserRepository.findOne(user.getUserId());
     }  
     
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody ScannerUser getScannerUser(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         ScannerUser foundUser = scannerUserRepository.findOne(id);
 
@@ -92,9 +95,13 @@ public class ScannerUserController extends BaseController
         return foundUser;
     }  
     
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody ScannerUser updateScannerUser(
-           @PathVariable("id") Integer id, @RequestBody ScannerUser user) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id,
+           @RequestBody ScannerUser user) 
     {
         // find the requested resource
         ScannerUser foundUser = scannerUserRepository.findOne(id);
@@ -109,26 +116,23 @@ public class ScannerUserController extends BaseController
         if (updateID == null) {
             user.setUserId(id);
         } else if (!user.getUserId().equals(foundUser.getUserId())) {
-            throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                user.getUserId() + 
-                ") does not match referenced ID (" + 
-                foundUser.getUserId() + ")"); 
+            throw new ConflictException(user.getUserId(),foundUser.getUserId()); 
         }
-        // ok, good to go
+
         try {
             scannerUserRepository.save(user);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
         return scannerUserRepository.findOne(user.getUserId());
     }     
     
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeScannerUser(@PathVariable("id") Integer id) 
+    public void removeScannerUser(@PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!scannerUserRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            

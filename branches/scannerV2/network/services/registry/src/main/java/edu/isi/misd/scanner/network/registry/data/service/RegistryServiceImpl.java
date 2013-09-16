@@ -39,7 +39,8 @@ public class RegistryServiceImpl implements RegistryService
     private UserRoleRepository userRoleRepository;   
     @Autowired
     private StandardRoleRepository standardRoleRoleRepository;   
-    
+    @Autowired
+    private ScannerUserRepository scannerUserRepository;       
     /**
      * Creates or updates a single ToolLibrary, with optional creation of 
      * AnalysisTool child relations.
@@ -228,4 +229,33 @@ public class RegistryServiceImpl implements RegistryService
         
         studyRepository.delete(studyId);
     }
+
+    @Override
+    public boolean userIsSuperuser(String userName) 
+    {
+        ScannerUser user = 
+            scannerUserRepository.findByUserNameAndIsSuperuserTrue(userName);
+        return (user != null) ? true : false;
+    }
+    
+    @Override    
+    public boolean userCanManageStudy(Integer studyId, String userName)
+    {
+        // maybe this should be disabled
+        if (userIsSuperuser(userName)) {
+            return true;
+        }
+        
+        // check that the current user has the proper role for this operation
+        // if so, one or more StudyManagementPolicies will be returned.
+        List<StudyManagementPolicy> studyManagementPolicies = 
+            studyManagementPolicyRepository.
+                findByStudyStudyIdAndStudyRoleScannerUsersUserName(
+                    studyId, userName);
+        
+        if (studyManagementPolicies.isEmpty()) {
+            return false;
+        }        
+        return true;
+    }      
 }

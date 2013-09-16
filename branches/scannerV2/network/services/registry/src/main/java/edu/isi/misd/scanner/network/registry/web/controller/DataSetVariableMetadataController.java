@@ -33,23 +33,28 @@ public class DataSetVariableMetadataController extends BaseController
     private static final Log log = 
         LogFactory.getLog(DataSetVariableMetadataController.class.getName());
 
+    public static final String BASE_PATH = "/variables";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_DATASET_ID = "dataSetId";
     public static final String REQUEST_PARAM_DATASET_NAME = "dataSetName"; 
      
     @Autowired
     private DataSetVariableMetadataRepository dataSetVariableMetadataRepository;   
     
-	@RequestMapping(value = "/variables", method = RequestMethod.GET)
-	public @ResponseBody List<DataSetVariableMetadata> getDataSetVariableMetadatas(
-           @RequestParam Map<String, String> paramMap)        
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+	public @ResponseBody List<DataSetVariableMetadata> 
+        getDataSetVariableMetadata(@RequestParam Map<String, String> paramMap)        
     {
-        if (!paramMap.isEmpty()) 
+        Map<String,String> params = 
+            validateParameterMap(
+                paramMap, REQUEST_PARAM_DATASET_ID, REQUEST_PARAM_DATASET_NAME);
+        
+        if (!params.isEmpty()) 
         {
-            String dataSetId = paramMap.remove(REQUEST_PARAM_DATASET_ID);
-            String dataSetName = paramMap.remove(REQUEST_PARAM_DATASET_NAME);            
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }
+            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);
+            String dataSetName = params.get(REQUEST_PARAM_DATASET_NAME);
             if (dataSetId != null) {             
                 return
                     dataSetVariableMetadataRepository.
@@ -77,7 +82,10 @@ public class DataSetVariableMetadataController extends BaseController
         return dataSetVariableMetadata;                     
 	}
     
-    @RequestMapping(value = "/variables", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody DataSetVariableMetadata createDataSetVariableMetadata(
            @RequestBody DataSetVariableMetadata dataSetVariableMetadata) 
@@ -85,7 +93,7 @@ public class DataSetVariableMetadataController extends BaseController
         try {
             dataSetVariableMetadataRepository.save(dataSetVariableMetadata);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
@@ -93,9 +101,11 @@ public class DataSetVariableMetadataController extends BaseController
             dataSetVariableMetadata.getDataSetVariableMetadataId());
     }  
     
-    @RequestMapping(value = "/variables/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetVariableMetadata getDataSetVariableMetadata(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         DataSetVariableMetadata foundDataSetVariableMetadata = 
             dataSetVariableMetadataRepository.findOne(id);
@@ -106,9 +116,12 @@ public class DataSetVariableMetadataController extends BaseController
         return foundDataSetVariableMetadata;
     }  
     
-    @RequestMapping(value = "/variables/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetVariableMetadata updateDataSetVariableMetadata(
-           @PathVariable("id") Integer id, 
+           @PathVariable(ID_URL_PATH_VAR) Integer id, 
            @RequestBody DataSetVariableMetadata dataSetVariableMetadata) 
     {
         // find the requested resource
@@ -121,22 +134,23 @@ public class DataSetVariableMetadataController extends BaseController
         // if the ID in the request body is null, use the ID parsed from the URL
         // if the ID is found in the request body but does not match the ID in 
         // the current data, then throw a ConflictException (409)
-        Integer updateID = dataSetVariableMetadata.getDataSetVariableMetadataId();
+        Integer updateID = 
+            dataSetVariableMetadata.getDataSetVariableMetadataId();
         if (updateID == null) {
             dataSetVariableMetadata.setDataSetVariableMetadataId(id);
-        } else if (!dataSetVariableMetadata.getDataSetVariableMetadataId().equals(
-                    foundDataSetVariableMetadata.getDataSetVariableMetadataId())) {
+        } else if (
+            !dataSetVariableMetadata.getDataSetVariableMetadataId().equals(
+            foundDataSetVariableMetadata.getDataSetVariableMetadataId())) 
+        {
             throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                dataSetVariableMetadata.getDataSetVariableMetadataId() + 
-                ") does not match referenced ID (" + 
-                foundDataSetVariableMetadata.getDataSetVariableMetadataId() + ")"); 
+                dataSetVariableMetadata.getDataSetVariableMetadataId(),
+                foundDataSetVariableMetadata.getDataSetVariableMetadataId()); 
         }
-        // ok, good to go
+
         try {
             dataSetVariableMetadataRepository.save(dataSetVariableMetadata);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
@@ -144,9 +158,11 @@ public class DataSetVariableMetadataController extends BaseController
             dataSetVariableMetadata.getDataSetVariableMetadataId());
     }     
     
-    @RequestMapping(value = "/variables/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeDataSetVariableMetadata(@PathVariable("id") Integer id) 
+    public void removeDataSetVariableMetadata(
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!dataSetVariableMetadataRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            

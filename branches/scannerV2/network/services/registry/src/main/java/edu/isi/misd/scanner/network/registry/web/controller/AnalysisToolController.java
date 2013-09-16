@@ -33,6 +33,8 @@ public class AnalysisToolController extends BaseController
     private static final Log log = 
         LogFactory.getLog(AnalysisToolController.class.getName());
     
+    public static final String BASE_PATH = "/tools";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_USER_NAME = "userName";  
     public static final String REQUEST_PARAM_STUDY_NAME = "studyName";      
     public static final String REQUEST_PARAM_DATASET_NAME = "dataSetName"; 
@@ -41,32 +43,39 @@ public class AnalysisToolController extends BaseController
     @Autowired
     private AnalysisToolRepository analysisToolRepository;   
     
-	@RequestMapping(value = "/tools", method = RequestMethod.GET)
+	@RequestMapping(value = BASE_PATH, 
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<AnalysisTool> getAnalysisTools(
            @RequestParam Map<String, String> paramMap) 
     {
-        if (!paramMap.isEmpty()) 
+        Map<String,String> params = 
+            validateParameterMap(
+                paramMap,
+                REQUEST_PARAM_USER_NAME,
+                REQUEST_PARAM_STUDY_NAME,
+                REQUEST_PARAM_DATASET_NAME,
+                REQUEST_PARAM_LIBRARY_ID);  
+        
+        if (!params.isEmpty()) 
         {
             ArrayList<String> missingParams = new ArrayList<String>();            
-            String userName = paramMap.remove(REQUEST_PARAM_USER_NAME);  
+            String userName = params.get(REQUEST_PARAM_USER_NAME);  
             if (userName == null) {
                 missingParams.add(REQUEST_PARAM_USER_NAME);
             }   
-            String studyName = paramMap.remove(REQUEST_PARAM_STUDY_NAME);
+            String studyName = params.get(REQUEST_PARAM_STUDY_NAME);
             if (studyName == null) {
                 missingParams.add(REQUEST_PARAM_STUDY_NAME);
             }                  
-            String dataSetName = paramMap.remove(REQUEST_PARAM_DATASET_NAME);
+            String dataSetName = params.get(REQUEST_PARAM_DATASET_NAME);
             if (dataSetName == null) {
                 missingParams.add(REQUEST_PARAM_DATASET_NAME);
             }
-            String libraryId = paramMap.remove(REQUEST_PARAM_LIBRARY_ID);
+            String libraryId = params.get(REQUEST_PARAM_LIBRARY_ID);
             if (libraryId == null) {
                 missingParams.add(REQUEST_PARAM_LIBRARY_ID);
             }               
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }
             if ((userName == null) || 
                 (studyName == null) ||                
                 (dataSetName == null) ||
@@ -74,8 +83,7 @@ public class AnalysisToolController extends BaseController
             {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
-            }            
-              
+            }                          
             return
                 analysisToolRepository.
                     findAnalysisToolByStudyPolicyStatement(
@@ -92,7 +100,10 @@ public class AnalysisToolController extends BaseController
         return toolLibraries;         
 	}
     
-    @RequestMapping(value = "/tools", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody AnalysisTool createAnalysisTool(
            @RequestBody AnalysisTool tool) 
@@ -100,18 +111,18 @@ public class AnalysisToolController extends BaseController
         try {
             analysisToolRepository.save(tool);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
-            // throwing nested MostSpecificCause should probably be replaced
-            // eventually for privacy reasons, but for now it is good for debugging
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
         return analysisToolRepository.findOne(tool.getToolId());
     }  
     
-    @RequestMapping(value = "/tools/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody AnalysisTool getAnalysisTool(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         AnalysisTool toolLib = analysisToolRepository.findOne(id);
 
@@ -121,9 +132,12 @@ public class AnalysisToolController extends BaseController
         return toolLib;
     }  
     
-    @RequestMapping(value = "/tools/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody AnalysisTool updateAnalysisTool(
-           @PathVariable("id") Integer id, @RequestBody AnalysisTool tool) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id, @RequestBody AnalysisTool tool) 
     {
         // find the requested resource
         AnalysisTool toolLib = analysisToolRepository.findOne(id);
@@ -138,26 +152,23 @@ public class AnalysisToolController extends BaseController
         if (updateID == null) {
             tool.setToolId(id);
         } else if (!tool.getToolId().equals(toolLib.getToolId())) {
-            throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                tool.getToolId() + 
-                ") does not match referenced ID (" + 
-                toolLib.getToolId() + ")"); 
+            throw new ConflictException(tool.getToolId(),toolLib.getToolId()); 
         }
-        // ok, good to go
+
         try {
             analysisToolRepository.save(tool);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
         return analysisToolRepository.findOne(tool.getToolId());
     }     
     
-    @RequestMapping(value = "/tools/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeAnalysisTool(@PathVariable("id") Integer id) 
+    public void removeAnalysisTool(@PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!analysisToolRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            

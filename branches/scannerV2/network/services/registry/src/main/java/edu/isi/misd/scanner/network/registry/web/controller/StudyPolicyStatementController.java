@@ -2,8 +2,11 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.StudyPolicyStatement;
 import edu.isi.misd.scanner.network.registry.data.repository.StudyPolicyStatementRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +37,8 @@ public class StudyPolicyStatementController extends BaseController
     private static final Log log = 
         LogFactory.getLog(StudyPolicyStatementController.class.getName());
     
+    public static final String BASE_PATH = "/studyPolicies";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;     
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";   
     public static final String REQUEST_PARAM_DATASET_ID = "dataSetId"; 
     public static final String REQUEST_PARAM_ANALYSIS_TOOL_ID = "analysisToolId";     
@@ -40,36 +46,44 @@ public class StudyPolicyStatementController extends BaseController
     @Autowired
     private StudyPolicyStatementRepository studyPolicyStatementRepository;   
     
-	@RequestMapping(value = "/studyPolicies", method = RequestMethod.GET)
+    @Autowired
+    private RegistryService registryService;  
+    
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<StudyPolicyStatement> 
         getStudyPolicyStatements(@RequestParam Map<String, String> paramMap) 
     {
-        if (!paramMap.isEmpty()) 
+        Map<String,String> params = 
+            validateParameterMap(
+                paramMap,
+                REQUEST_PARAM_STUDY_ID,
+                REQUEST_PARAM_DATASET_ID,
+                REQUEST_PARAM_ANALYSIS_TOOL_ID);   
+        
+        if (!params.isEmpty()) 
         {
             ArrayList<String> missingParams = new ArrayList<String>();            
-            String studyId = paramMap.remove(REQUEST_PARAM_STUDY_ID);  
+            String studyId = params.get(REQUEST_PARAM_STUDY_ID);  
             if (studyId == null) {
                 missingParams.add(REQUEST_PARAM_STUDY_ID);
             }              
-            String dataSetId = paramMap.remove(REQUEST_PARAM_DATASET_ID);
+            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);
             if (dataSetId == null) {
                 missingParams.add(REQUEST_PARAM_DATASET_ID);
             }
-            String toolId = paramMap.remove(REQUEST_PARAM_ANALYSIS_TOOL_ID);
+            String toolId = params.get(REQUEST_PARAM_ANALYSIS_TOOL_ID);
             if (toolId == null) {
                 missingParams.add(REQUEST_PARAM_ANALYSIS_TOOL_ID);
             }               
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }
             if ((studyId == null) || 
                 (dataSetId == null) ||                
                 (toolId == null)) 
             {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
-            }            
-               
+            }                           
             return
                 studyPolicyStatementRepository.
                     findStudyPolicyStatementByStudyIdAndDataSetIdAndToolId(
@@ -89,15 +103,26 @@ public class StudyPolicyStatementController extends BaseController
         return studyPolicyStatements;         
 	}
     
-    @RequestMapping(value = "/studyPolicies", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody StudyPolicyStatement createStudyPolicyStatement(
+           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
            @RequestBody StudyPolicyStatement studyPolicyStatement) 
     {
+        // check that the user can perform the create
+        if (!registryService.userCanManageStudy(
+            studyPolicyStatement.getStudy().getStudyId(),loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
+        }          
         try {
             studyPolicyStatementRepository.save(studyPolicyStatement);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
@@ -105,9 +130,11 @@ public class StudyPolicyStatementController extends BaseController
             studyPolicyStatement.getStudyPolicyStatementId());
     }  
     
-    @RequestMapping(value = "/studyPolicies/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StudyPolicyStatement getStudyPolicyStatement(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         StudyPolicyStatement foundStudyPolicyStatement = 
             studyPolicyStatementRepository.findOne(id);
@@ -118,9 +145,13 @@ public class StudyPolicyStatementController extends BaseController
         return foundStudyPolicyStatement;
     }  
     
-    @RequestMapping(value = "/studyPolicies/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StudyPolicyStatement updateStudyPolicyStatement(
-           @PathVariable("id") Integer id,
+           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
+           @PathVariable(ID_URL_PATH_VAR) Integer id,
            @RequestBody StudyPolicyStatement studyPolicyStatement) 
     {
         // find the requested resource
@@ -141,16 +172,21 @@ public class StudyPolicyStatementController extends BaseController
                     foundStudyPolicyStatement.getStudyPolicyStatementId())) 
         {
             throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                studyPolicyStatement.getStudyPolicyStatementId() + 
-                ") does not match referenced ID (" + 
-                foundStudyPolicyStatement.getStudyPolicyStatementId() + ")"); 
+                studyPolicyStatement.getStudyPolicyStatementId(),
+                foundStudyPolicyStatement.getStudyPolicyStatementId()); 
         }
-        // ok, good to go
+        // check that the user can perform the update
+        if (!registryService.userCanManageStudy(
+            studyPolicyStatement.getStudy().getStudyId(),loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
+        }
+        
         try {
             studyPolicyStatementRepository.save(studyPolicyStatement);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
@@ -158,13 +194,27 @@ public class StudyPolicyStatementController extends BaseController
             studyPolicyStatement.getStudyPolicyStatementId());
     }     
     
-    @RequestMapping(value = "/studyPolicies/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeStudyPolicyStatement(@PathVariable("id") Integer id) 
+    public void removeStudyPolicyStatement(
+        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        if (!studyPolicyStatementRepository.exists(id)) {
+        // find the requested resource
+        StudyPolicyStatement studyPolicyStatement = 
+            studyPolicyStatementRepository.findOne(id);
+        // if the ID is not found then throw a ResourceNotFoundException (404)
+        if (studyPolicyStatement == null) {
             throw new ResourceNotFoundException(id);            
         }
+        // check that the user can perform the delete
+        if (!registryService.userCanManageStudy(
+            studyPolicyStatement.getStudy().getStudyId(),loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
+        }         
         studyPolicyStatementRepository.delete(id);
     } 
   

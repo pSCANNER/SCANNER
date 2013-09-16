@@ -33,6 +33,8 @@ public class AnalysisPolicyStatementController extends BaseController
     private static final Log log = 
         LogFactory.getLog(AnalysisPolicyStatementController.class.getName());
     
+    public static final String BASE_PATH = "/analysisPolicies";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_USER_ID = "userId";   
     public static final String REQUEST_PARAM_INSTANCE_ID = "dataSetInstanceId"; 
     public static final String REQUEST_PARAM_ANALYSIS_TOOL_ID = "analysisToolId";     
@@ -40,36 +42,41 @@ public class AnalysisPolicyStatementController extends BaseController
     @Autowired
     private AnalysisPolicyStatementRepository analysisPolicyStatementRepository;   
     
-	@RequestMapping(value = "/analysisPolicies", method = RequestMethod.GET)
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<AnalysisPolicyStatement> 
         getAnalysisPolicyStatements(@RequestParam Map<String, String> paramMap) 
     {
-        if (!paramMap.isEmpty()) 
+        Map<String,String> params = 
+            validateParameterMap(
+                paramMap,
+                REQUEST_PARAM_USER_ID,
+                REQUEST_PARAM_INSTANCE_ID,
+                REQUEST_PARAM_ANALYSIS_TOOL_ID);
+        
+        if (!params.isEmpty()) 
         {
             ArrayList<String> missingParams = new ArrayList<String>();            
-            String userId = paramMap.remove(REQUEST_PARAM_USER_ID);  
+            String userId = params.get(REQUEST_PARAM_USER_ID);  
             if (userId == null) {
                 missingParams.add(REQUEST_PARAM_USER_ID);
             }              
-            String instanceId = paramMap.remove(REQUEST_PARAM_INSTANCE_ID);
+            String instanceId = params.get(REQUEST_PARAM_INSTANCE_ID);
             if (instanceId == null) {
                 missingParams.add(REQUEST_PARAM_INSTANCE_ID);
             }
-            String toolId = paramMap.remove(REQUEST_PARAM_ANALYSIS_TOOL_ID);
+            String toolId = params.get(REQUEST_PARAM_ANALYSIS_TOOL_ID);
             if (toolId == null) {
                 missingParams.add(REQUEST_PARAM_ANALYSIS_TOOL_ID);
-            }             
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }          
+            }                     
             if ((userId == null) || 
                 (instanceId == null) ||                
                 (toolId == null)) 
             {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
-            } 
-            
+            }             
             return
                 analysisPolicyStatementRepository.
                     findAnalysisPolicyStatementByUserIdAndInstanceIdAndToolId(
@@ -90,7 +97,10 @@ public class AnalysisPolicyStatementController extends BaseController
         return analysisPolicyStatements;         
 	}
     
-    @RequestMapping(value = "/analysisPolicies", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody AnalysisPolicyStatement createAnalysisPolicyStatement(
            @RequestBody AnalysisPolicyStatement analysisPolicyStatement) 
@@ -98,7 +108,7 @@ public class AnalysisPolicyStatementController extends BaseController
         try {
             analysisPolicyStatementRepository.save(analysisPolicyStatement);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
@@ -106,9 +116,11 @@ public class AnalysisPolicyStatementController extends BaseController
             analysisPolicyStatement.getAnalysisPolicyStatementId());
     }  
     
-    @RequestMapping(value = "/analysisPolicies/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH, 
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody AnalysisPolicyStatement getAnalysisPolicyStatement(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         AnalysisPolicyStatement foundAnalysisPolicyStatement = 
             analysisPolicyStatementRepository.findOne(id);
@@ -119,9 +131,12 @@ public class AnalysisPolicyStatementController extends BaseController
         return foundAnalysisPolicyStatement;
     }  
     
-    @RequestMapping(value = "/analysisPolicies/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody AnalysisPolicyStatement updateAnalysisPolicyStatement(
-           @PathVariable("id") Integer id,
+           @PathVariable(ID_URL_PATH_VAR) Integer id,
            @RequestBody AnalysisPolicyStatement analysisPolicyStatement) 
     {
         // find the requested resource
@@ -138,20 +153,19 @@ public class AnalysisPolicyStatementController extends BaseController
             analysisPolicyStatement.getAnalysisPolicyStatementId();
         if (updateID == null) {
             analysisPolicyStatement.setAnalysisPolicyStatementId(id);
-        } else if (!analysisPolicyStatement.getAnalysisPolicyStatementId().equals(
-                    foundAnalysisPolicyStatement.getAnalysisPolicyStatementId())) 
+        } else if (
+            !analysisPolicyStatement.getAnalysisPolicyStatementId().equals(
+            foundAnalysisPolicyStatement.getAnalysisPolicyStatementId())) 
         {
             throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                analysisPolicyStatement.getAnalysisPolicyStatementId() + 
-                ") does not match referenced ID (" + 
-                foundAnalysisPolicyStatement.getAnalysisPolicyStatementId() + ")"); 
+                analysisPolicyStatement.getAnalysisPolicyStatementId(),
+                foundAnalysisPolicyStatement.getAnalysisPolicyStatementId()); 
         }
-        // ok, good to go
+
         try {
             analysisPolicyStatementRepository.save(analysisPolicyStatement);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
@@ -159,9 +173,11 @@ public class AnalysisPolicyStatementController extends BaseController
             analysisPolicyStatement.getAnalysisPolicyStatementId());
     }     
     
-    @RequestMapping(value = "/analysisPolicies/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH, 
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeAnalysisPolicyStatement(@PathVariable("id") Integer id) 
+    public void removeAnalysisPolicyStatement(
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!analysisPolicyStatementRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            

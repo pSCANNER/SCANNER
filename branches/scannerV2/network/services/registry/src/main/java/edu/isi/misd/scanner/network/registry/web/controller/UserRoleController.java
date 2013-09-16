@@ -2,8 +2,10 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.UserRole;
 import edu.isi.misd.scanner.network.registry.data.repository.UserRoleRepository;
-import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,27 +36,29 @@ public class UserRoleController extends BaseController
     private static final Log log = 
         LogFactory.getLog(UserRoleController.class.getName());
     
+    public static final String BASE_PATH = "/userRoles";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH; 
     public static final String REQUEST_PARAM_USER_ID = "userId";      
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";  
     
     @Autowired
     private UserRoleRepository userRoleRepository;   
     
-	@RequestMapping(value = "/userRoles", method = RequestMethod.GET)
+    @Autowired
+    private RegistryService registryService;  
+    
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<UserRole> getUserRoles(
            @RequestParam Map<String, String> paramMap) 
     {
-        String userId = null;        
-        String studyId = null;
-        if (!paramMap.isEmpty()) 
-        {
-            userId = paramMap.remove(REQUEST_PARAM_USER_ID);            
-            studyId = paramMap.remove(REQUEST_PARAM_STUDY_ID);                       
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }            
-        }
+        Map<String,String> params = 
+            validateParameterMap(
+                paramMap, REQUEST_PARAM_USER_ID, REQUEST_PARAM_STUDY_ID); 
         
+        String userId = params.get(REQUEST_PARAM_USER_ID);        
+        String studyId = params.get(REQUEST_PARAM_STUDY_ID);        
         if ((userId != null) && (studyId != null)) 
         {
             return 
@@ -81,24 +86,37 @@ public class UserRoleController extends BaseController
         }
     }
     
-    @RequestMapping(value = "/userRoles", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody UserRole createUserRole(
+           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
            @RequestBody UserRole userRole) 
     {
+        // check that the user can perform the create
+        if (!registryService.userCanManageStudy(
+            userRole.getStudyRole().getStudy().getStudyId(),loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
+        }         
         try {
             userRoleRepository.save(userRole);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
         return userRoleRepository.findOne(userRole.getUserRoleId());
     }  
     
-    @RequestMapping(value = "/userRoles/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody UserRole getUserRole(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         UserRole foundUserRole = userRoleRepository.findOne(id);
 
@@ -108,9 +126,14 @@ public class UserRoleController extends BaseController
         return foundUserRole;
     }  
     
-    @RequestMapping(value = "/userRoles/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody UserRole updateUserRole(
-           @PathVariable("id") Integer id, @RequestBody UserRole userRole) 
+           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+           @PathVariable(ID_URL_PATH_VAR) Integer id,
+           @RequestBody UserRole userRole) 
     {
         // find the requested resource
         UserRole foundUserRole = userRoleRepository.findOne(id);
@@ -127,29 +150,46 @@ public class UserRoleController extends BaseController
         } else if (!userRole.getUserRoleId().equals(
                    foundUserRole.getUserRoleId())) {
             throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                userRole.getUserRoleId() + 
-                ") does not match referenced ID (" + 
-                foundUserRole.getUserRoleId() + ")"); 
+                userRole.getUserRoleId(), foundUserRole.getUserRoleId()); 
         }
-        // ok, good to go
+
+        // check that the user can perform the update
+        if (!registryService.userCanManageStudy(
+            userRole.getStudyRole().getStudy().getStudyId(),loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
+        } 
         try {
             userRoleRepository.save(userRole);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
         return userRoleRepository.findOne(userRole.getUserRoleId());
     }     
     
-    @RequestMapping(value = "/userRoles/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeUserRole(@PathVariable("id") Integer id) 
+    public void removeUserRole(
+        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        if (!userRoleRepository.exists(id)) {
+        // find the requested resource
+        UserRole userRole = userRoleRepository.findOne(id);
+        // if the ID is not found then throw a ResourceNotFoundException (404)
+        if (userRole == null) {
             throw new ResourceNotFoundException(id);            
         }
+        // check that the user can perform the delete
+        if (!registryService.userCanManageStudy(
+            userRole.getStudyRole().getStudy().getStudyId(),loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
+        }          
         userRoleRepository.delete(id);
     } 
   

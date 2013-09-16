@@ -3,8 +3,11 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ErrorMessage;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.MethodNotAllowedException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -22,6 +25,13 @@ public class BaseController
 {
     private static final Log log = 
         LogFactory.getLog(BaseController.class.getName());
+    
+    public static final String ID_URL_PATH_VAR= "id"; 
+    public static final String ID_URL_PATH = "/{" + ID_URL_PATH_VAR + "}";
+    
+    public static final String HEADER_LOGIN_NAME = "loginName";    
+    public static final String HEADER_JSON_MEDIA_TYPE = 
+        "application/json;charset=UTF-8";
     
     @ExceptionHandler(Exception.class)
     @ResponseBody
@@ -46,6 +56,17 @@ public class BaseController
             HttpStatus.NOT_FOUND.getReasonPhrase(),                    
             e.getLocalizedMessage());
     }   
+    
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseBody
+    @ResponseStatus(value=HttpStatus.FORBIDDEN)    
+    public ErrorMessage handleForbiddenException(Exception e) 
+    {
+        return new ErrorMessage(
+            HttpStatus.FORBIDDEN.value(),
+            HttpStatus.FORBIDDEN.getReasonPhrase(),                    
+            e.getLocalizedMessage());
+    }
     
     @ExceptionHandler({BadRequestException.class, 
                        HttpMessageNotReadableException.class, 
@@ -82,6 +103,28 @@ public class BaseController
             HttpStatus.METHOD_NOT_ALLOWED.value(),
             HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(),                    
             e.getLocalizedMessage());
+    }    
+    
+    public static Map validateParameterMap(Map<String,String> paramMap,
+                                           String ... paramNames)
+        throws BadRequestException
+    {
+        HashMap<String,String> validParams = new HashMap<String,String>();        
+        if (!paramMap.isEmpty()) 
+        {
+            String paramValue;
+            for (String paramName : paramNames) {
+               paramValue = paramMap.remove(paramName);
+               if (paramValue != null) {
+                   validParams.put(paramName, paramValue);
+               }
+            }
+           
+            if (!paramMap.isEmpty()) {
+                throw new BadRequestException(paramMap.keySet());
+            }
+        }    
+        return validParams;        
     }
     
     public static Integer validateIntegerParameter(String param, String value)

@@ -2,7 +2,6 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.ConditionsCodeSet;
 import edu.isi.misd.scanner.network.registry.data.repository.ConditionsCodeSetRepository;
-import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.List;
 import java.util.Map;
@@ -25,24 +24,23 @@ public class ConditionsCodeSetController extends BaseController
     private static final Log log = 
         LogFactory.getLog(ConditionsCodeSetController.class.getName());
     
+    public static final String BASE_PATH = "/conditions";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_SEARCH_TERM = "search";
     
     @Autowired
     private ConditionsCodeSetRepository conditionsCodeSetRepository;   
     
-	@RequestMapping(value = "/conditions", method = RequestMethod.GET)
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<ConditionsCodeSet> getConditions(
            @RequestParam Map<String, String> paramMap) 
     {
-        String searchTerm = null;
-        if (!paramMap.isEmpty()) 
-        {
-            searchTerm = paramMap.remove(REQUEST_PARAM_SEARCH_TERM);
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }            
-        }
-              
+        Map<String,String> params = 
+            validateParameterMap(paramMap,REQUEST_PARAM_SEARCH_TERM);  
+        
+        String searchTerm = params.get(REQUEST_PARAM_SEARCH_TERM);
         if (searchTerm != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Search query issued using term: " + searchTerm);
@@ -60,9 +58,11 @@ public class ConditionsCodeSetController extends BaseController
         }           
 	}
     
-    @RequestMapping(value = "/conditions/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody ConditionsCodeSet getCondition(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         ConditionsCodeSet foundCondition =
             conditionsCodeSetRepository.findOne(id);

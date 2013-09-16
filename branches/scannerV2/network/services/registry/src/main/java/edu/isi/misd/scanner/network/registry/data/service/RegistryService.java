@@ -28,6 +28,19 @@ public interface RegistryService
     public void deleteStudy(Integer studyId);
     
     /**
+     * Checks that the user is authorized to manage a Study
+     * @param studyId
+     * @param userName
+     */    
+    public boolean userCanManageStudy(Integer studyId, String userName);
+    
+    /**
+     * Checks if the user is a superuser
+     * @param userName
+     */    
+    public boolean userIsSuperuser(String userName);
+    
+    /**
      * Creates or updates a single ToolLibrary.
      * @param library
      */

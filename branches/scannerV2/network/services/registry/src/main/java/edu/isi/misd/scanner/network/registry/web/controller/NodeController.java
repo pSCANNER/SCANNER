@@ -2,7 +2,6 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.Node;
 import edu.isi.misd.scanner.network.registry.data.repository.NodeRepository;
-import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
@@ -33,27 +32,25 @@ public class NodeController extends BaseController
     private static final Log log = 
         LogFactory.getLog(NodeController.class.getName());
     
+    public static final String BASE_PATH = "/nodes";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_NODE_TYPE = "nodeType";
     
     @Autowired
     private NodeRepository nodeRepository;   
     
-	@RequestMapping(value = "/nodes", method = RequestMethod.GET)
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<Node> getNodes(
            @RequestParam Map<String, String> paramMap) 
     {
-        String nodeType = null;
-        if (!paramMap.isEmpty()) 
-        {
-            nodeType = paramMap.remove(REQUEST_PARAM_NODE_TYPE);
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }            
-        }
+        Map<String,String> params = 
+            validateParameterMap(paramMap, REQUEST_PARAM_NODE_TYPE);   
         
-        Iterator iter;
+        String nodeType = params.get(REQUEST_PARAM_NODE_TYPE);        
         List<Node> nodes = new ArrayList<Node>();
-        
+        Iterator iter;        
         if (nodeType != null) {
             if ("master".equalsIgnoreCase(nodeType)) {
                 iter = nodeRepository.findByIsMasterTrue().iterator();
@@ -68,7 +65,10 @@ public class NodeController extends BaseController
         return nodes;         
 	}
     
-    @RequestMapping(value = "/nodes", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody Node createNode(
            @RequestBody Node node) 
@@ -76,16 +76,18 @@ public class NodeController extends BaseController
         try {
             nodeRepository.save(node);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
         return nodeRepository.findOne(node.getNodeId());
     }  
     
-    @RequestMapping(value = "/nodes/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody Node getNode(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         Node foundNode = nodeRepository.findOne(id);
 
@@ -95,9 +97,12 @@ public class NodeController extends BaseController
         return foundNode;
     }  
     
-    @RequestMapping(value = "/nodes/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody Node updateNode(
-           @PathVariable("id") Integer id, @RequestBody Node node) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id, @RequestBody Node node) 
     {
         // find the requested resource
         Node foundNode = nodeRepository.findOne(id);
@@ -112,26 +117,23 @@ public class NodeController extends BaseController
         if (updateID == null) {
             node.setNodeId(id);
         } else if (!node.getNodeId().equals(foundNode.getNodeId())) {
-            throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                node.getNodeId() + 
-                ") does not match referenced ID (" + 
-                foundNode.getNodeId() + ")"); 
+            throw new ConflictException(node.getNodeId(),foundNode.getNodeId()); 
         }
-        // ok, good to go
+
         try {
             nodeRepository.save(node);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
         return nodeRepository.findOne(node.getNodeId());
     }     
     
-    @RequestMapping(value = "/nodes/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeNode(@PathVariable("id") Integer id) 
+    public void removeNode(@PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!nodeRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            

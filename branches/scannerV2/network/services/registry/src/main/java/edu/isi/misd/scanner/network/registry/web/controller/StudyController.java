@@ -3,8 +3,9 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import edu.isi.misd.scanner.network.registry.data.repository.StudyRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
-import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,33 +36,34 @@ public class StudyController extends BaseController
     private static final Log log = 
         LogFactory.getLog(StudyController.class.getName());
     
+    public static final String BASE_PATH = "/studies"; 
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;
     public static final String REQUEST_PARAM_STUDY_NAME = "studyName";
     public static final String REQUEST_PARAM_USER_NAME = "userName";
     public static final String REQUEST_PARAM_USER_ID = "userId";    
     
     @Autowired
-    private StudyRepository studyRepository;   
+    private StudyRepository studyRepository;       
     
     @Autowired
     private RegistryService registryService;   
     
-	@RequestMapping(value = "/studies", method = RequestMethod.GET)
-	public @ResponseBody List<Study> getStudies(
-           @RequestParam Map<String, String> paramMap) 
+	@RequestMapping(value = BASE_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces=HEADER_JSON_MEDIA_TYPE)                    
+	public @ResponseBody List<Study> getStudies(      
+        @RequestParam Map<String, String> paramMap) 
     {
-        String studyName = null;
-        String userName = null;
-        String userId = null;
-        if (!paramMap.isEmpty()) 
-        {
-            studyName = paramMap.remove(REQUEST_PARAM_STUDY_NAME);            
-            userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
-            userId = paramMap.remove(REQUEST_PARAM_USER_ID);            
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }            
-        }
+        Map<String,String> params = 
+            validateParameterMap(
+                paramMap,
+                REQUEST_PARAM_STUDY_NAME,
+                REQUEST_PARAM_USER_NAME,
+                REQUEST_PARAM_USER_ID);  
         
+        String studyName = params.get(REQUEST_PARAM_STUDY_NAME);
+        String userName = params.get(REQUEST_PARAM_USER_NAME);
+        String userId = params.get(REQUEST_PARAM_USER_ID);        
         List<Study> studies = new ArrayList<Study>();        
         if (studyName != null) {
             Study study = studyRepository.findByStudyName(studyName);
@@ -83,24 +86,28 @@ public class StudyController extends BaseController
         return studies;   
     }
     
-    @RequestMapping(value = "/studies", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody Study createStudy(
-           @RequestBody Study study) 
+    public @ResponseBody Study createStudy(@RequestBody Study study) 
     {
         try {
             registryService.createStudy(study);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
         return studyRepository.findOne(study.getStudyId());
     }  
     
-    @RequestMapping(value = "/studies/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH, 
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody Study getStudy(
-           @PathVariable("id") Integer id) 
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         Study foundStudy = studyRepository.findOne(id);
 
@@ -110,9 +117,14 @@ public class StudyController extends BaseController
         return foundStudy;
     }  
     
-    @RequestMapping(value = "/studies/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)                    
     public @ResponseBody Study updateStudy(
-           @PathVariable("id") Integer id, @RequestBody Study study) 
+        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,    
+        @PathVariable(ID_URL_PATH_VAR) Integer id,
+        @RequestBody Study study) 
     {
         // find the requested resource
         Study foundStudy = studyRepository.findOne(id);
@@ -128,29 +140,43 @@ public class StudyController extends BaseController
             study.setStudyId(id);
         } else if (!study.getStudyId().equals(foundStudy.getStudyId())) {
             throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                study.getStudyId() + 
-                ") does not match referenced ID (" + 
-                foundStudy.getStudyId() + ")"); 
+                study.getStudyId(),foundStudy.getStudyId()); 
         }
+
+        // check that the user can perform the update
+        if (!registryService.userCanManageStudy(study.getStudyId(),loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);            
+        }
+        
         // perform the update
         try {
             registryService.updateStudy(study);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
         return studyRepository.findOne(study.getStudyId());
     }     
     
-    @RequestMapping(value = "/studies/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE)                
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeStudy(@PathVariable("id") Integer id) 
+    public void removeStudy(
+        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,     
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!studyRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }
+        // check that the user can perform the delete
+        if (!registryService.userCanManageStudy(id,loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);             
+        }        
         registryService.deleteStudy(id);
     } 
   

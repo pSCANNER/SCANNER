@@ -9,7 +9,12 @@ public final class ConflictException extends RuntimeException
     public ConflictException(String message) {
         super(message);
     }
-
+    
+    public ConflictException(Integer newId, Integer oldId) {
+        super("The specified object ID (" + newId + 
+              ") does not match referenced ID (" + oldId + ")");       
+    }
+    
     public ConflictException(String message, Throwable cause) {
         super(message, cause);
     }

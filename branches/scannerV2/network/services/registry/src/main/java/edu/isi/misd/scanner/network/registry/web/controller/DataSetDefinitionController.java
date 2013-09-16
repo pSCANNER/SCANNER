@@ -34,6 +34,8 @@ public class DataSetDefinitionController extends BaseController
     private static final Log log = 
         LogFactory.getLog(DataSetDefinitionController.class.getName());
 
+    public static final String BASE_PATH = "/datasets";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_STUDY_NAME = "studyName";
     public static final String REQUEST_PARAM_USER_NAME = "userName";
     
@@ -42,17 +44,20 @@ public class DataSetDefinitionController extends BaseController
     @Autowired
     private DataSetDefinitionRepository dataSetDefinitionRepository;   
     
-	@RequestMapping(value = "/datasets", method = RequestMethod.GET)
+	@RequestMapping(value = BASE_PATH, 
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<DataSetDefinition> getDataSetDefinitions(
            @RequestParam Map<String, String> paramMap)        
     {
-        if (!paramMap.isEmpty()) 
+        Map<String,String> params = 
+            validateParameterMap(
+                paramMap, REQUEST_PARAM_STUDY_NAME, REQUEST_PARAM_USER_NAME); 
+        
+        if (!params.isEmpty()) 
         {
-            String studyName = paramMap.remove(REQUEST_PARAM_STUDY_NAME);
-            String userName = paramMap.remove(REQUEST_PARAM_USER_NAME);
-            if (!paramMap.isEmpty()) {
-                throw new BadRequestException(paramMap.keySet());
-            }
+            String studyName = params.get(REQUEST_PARAM_STUDY_NAME);
+            String userName = params.get(REQUEST_PARAM_USER_NAME);
             if ((studyName != null) && (userName != null)) {
                 return
                     dataSetDefinitionRepository.
@@ -77,7 +82,10 @@ public class DataSetDefinitionController extends BaseController
         return dataSetDefinitions;                     
 	}
     
-    @RequestMapping(value = "/datasets", method = RequestMethod.POST)
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody DataSetDefinition createDataSetDefinition(
            @RequestBody DataSetDefinition dataSet) 
@@ -85,7 +93,7 @@ public class DataSetDefinitionController extends BaseController
         try {
             registryService.saveDataSetDefinition(dataSet);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }
         // force the re-query to ensure a complete result view if updated
@@ -93,9 +101,11 @@ public class DataSetDefinitionController extends BaseController
             dataSet.getDataSetDefinitionId());
     }  
     
-    @RequestMapping(value = "/datasets/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetDefinition getDataSetDefinition(
-           @PathVariable("id") Integer id) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         DataSetDefinition foundDataSet = 
             dataSetDefinitionRepository.findOne(id);
@@ -106,9 +116,12 @@ public class DataSetDefinitionController extends BaseController
         return foundDataSet;
     }  
     
-    @RequestMapping(value = "/datasets/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.PUT,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetDefinition updateDataSetDefinition(
-           @PathVariable("id") Integer id, 
+           @PathVariable(ID_URL_PATH_VAR) Integer id, 
            @RequestBody DataSetDefinition dataSet) 
     {
         // find the requested resource
@@ -127,16 +140,14 @@ public class DataSetDefinitionController extends BaseController
         } else if (!dataSet.getDataSetDefinitionId().equals(
                     foundDataSet.getDataSetDefinitionId())) {
             throw new ConflictException(
-                "Update failed: specified object ID (" + 
-                dataSet.getDataSetDefinitionId() + 
-                ") does not match referenced ID (" + 
-                foundDataSet.getDataSetDefinitionId() + ")"); 
+                dataSet.getDataSetDefinitionId(),
+                foundDataSet.getDataSetDefinitionId()); 
         }
-        // ok, good to go
+
         try {
             registryService.saveDataSetDefinition(dataSet);
         } catch (DataIntegrityViolationException e) {
-            log.warn("DataIntegrityViolationException: " + e);
+            log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
@@ -144,9 +155,11 @@ public class DataSetDefinitionController extends BaseController
             dataSet.getDataSetDefinitionId());
     }     
     
-    @RequestMapping(value = "/datasets/{id}", method = RequestMethod.DELETE) 
+    @RequestMapping(value = ENTITY_PATH,
+                    method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeDataSetDefinition(@PathVariable("id") Integer id) 
+    public void removeDataSetDefinition(
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!dataSetDefinitionRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
