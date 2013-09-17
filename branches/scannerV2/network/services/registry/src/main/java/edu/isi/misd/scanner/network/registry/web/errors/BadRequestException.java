@@ -22,5 +22,12 @@ public final class BadRequestException extends RuntimeException
     
     public BadRequestException(Collection badParams) {
         super("Invalid parameter(s) specified: " + badParams);
-    }    
+    }
+    
+    public BadRequestException(String entityNameRequested,
+                               Integer entityIdNotFound) {
+        super(String.format(
+            "A valid [%s] could not be found matching the requested ID: %s", 
+            entityNameRequested, entityIdNotFound));
+    }      
 }

@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ErrorMessage;
@@ -68,7 +69,8 @@ public class BaseController
             e.getLocalizedMessage());
     }
     
-    @ExceptionHandler({BadRequestException.class, 
+    @ExceptionHandler({BadRequestException.class,
+                       IllegalArgumentException.class,
                        HttpMessageNotReadableException.class, 
                        TypeMismatchException.class})
     @ResponseBody
@@ -104,6 +106,12 @@ public class BaseController
             HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(),                    
             e.getLocalizedMessage());
     }    
+    
+    public static String nullVariableMsg(String variableName) {
+        return 
+            String.format(
+                RegistryServiceConstants.MSG_NULL_VARIABLE, variableName);
+    }
     
     public static Map validateParameterMap(Map<String,String> paramMap,
                                            String ... paramNames)

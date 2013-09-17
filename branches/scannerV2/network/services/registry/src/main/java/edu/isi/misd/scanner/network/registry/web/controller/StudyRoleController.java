@@ -1,9 +1,12 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
+import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import edu.isi.misd.scanner.network.registry.data.domain.StudyRole;
+import edu.isi.misd.scanner.network.registry.data.repository.StudyRepository;
 import edu.isi.misd.scanner.network.registry.data.repository.StudyRoleRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
+import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
@@ -18,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -44,6 +48,9 @@ public class StudyRoleController extends BaseController
     @Autowired
     private StudyRoleRepository studyRoleRepository;   
 
+    @Autowired
+    private StudyRepository studyRepository;   
+    
     @Autowired
     private RegistryService registryService; 
     
@@ -94,10 +101,18 @@ public class StudyRoleController extends BaseController
     public @ResponseBody StudyRole createStudyRole(
            @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
            @RequestBody StudyRole studyRole) 
-    {
+    {        
+        // first, check that the requested Study association is valid
+        Assert.notNull(studyRole.getStudy(), 
+            nullVariableMsg(Study.class.getSimpleName()));           
+        Integer studyId = studyRole.getStudy().getStudyId();
+        Study study = studyRepository.findOne(studyId);
+        if (study == null) {
+            throw new BadRequestException(
+                Study.class.getSimpleName(),studyId);
+        }        
         // check that the user can perform the create
-        if (!registryService.userCanManageStudy(
-            studyRole.getStudy().getStudyId(),loginName)) {
+        if (!registryService.userCanManageStudy(study.getStudyId(),loginName)) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
