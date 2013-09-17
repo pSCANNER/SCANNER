@@ -2628,8 +2628,8 @@ function manageStudy(hideMode) {
 	obj['action'] = 'getStudyData';
 	obj['studyId'] = activeStudy['studyId'];
 	scanner.RETRIEVE(url, obj, true, postManageStudy, hideMode, null, 0);
-	
 }
+
 function postManageStudy(data, textStatus, jqXHR, param) {
 	var hideMode = param;
 	activeStudy['sites'] = data['sites'];
@@ -2638,6 +2638,10 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	activeStudy['staff'].sort(compareRoles);
 	activeStudy['studyRoles'] = data['studyRoles'];
 	activeStudy['studyRoles'].sort(compareStudyRoles);
+	activeStudy['studyPolicies'] = data['studyPolicies'];
+	activeStudy['studyPolicies'].sort(compareStudyPolicy);
+	activeStudy['analysisPolicies'] = data['analysisPolicies'];
+	activeStudy['analysisPolicies'].sort(compareAnalysisPolicies);
 	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['studyId'] + ': ' + activeStudy['studyName']);
 	if (activeStudy['description'] != null) {
 		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + activeStudy['description']);
@@ -2816,28 +2820,15 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	$('#manageSitesProtocolsTbody').html('');
 	$('#viewSitesProtocolsTbody').html('');
 	$('#manageStudyProtocolsTbody').html('');
-	$.each(activeStudy['protocols'], function(i, protocol) {
+	$.each(activeStudy['analysisPolicies'], function(i, protocol) {
 		addProtocolRow(protocol);
 		addProtocolViewRow(protocol);
 	});
 	
-	if (activeStudy['studyPolicies'].length == 0) {
-		$.each(studyPoliciesList, function(i, studyPolicy) {
-			if (activeStudy['studyId'] == studyPolicy['study']) {
-				var obj = {};
-				obj['tool'] = studyPolicy['analysisTool'];
-				obj['dataset'] = studyPolicy['dataSetDefinition'];
-				obj['accessMode'] = studyPolicy['accessMode']['accessModeId'];
-				obj['role'] = studyRolesDict[studyPolicy['studyRole']];
-				addProtocolPoliciesRow(obj, true);
-			}
-		});
-	} else {
-		$.each(activeStudy['studyPolicies'], function(i, policy) {
-			addProtocolPoliciesRow(policy, false);
-		});
-	}
-	
+	$.each(activeStudy['studyPolicies'], function(i, policy) {
+		addProtocolPoliciesRow(policy);
+	});
+
 	addProtocolSelect();
 	$('#manageStudySitesTbody').html('');
 	$.each(activeStudy['sites'], function(i, site) {
@@ -3127,8 +3118,6 @@ function postCreateStudy(data, textStatus, jqXHR, param) {
 	}
 	activeStudy = {};
 	myStudies.push(activeStudy);
-	activeStudy['studyPolicies'] = [];
-	activeStudy['protocols'] = [];
 	activeStudy['studyId'] = data['studyId'];
 	activeStudy['studyName'] = data['studyName'];
 	activeStudy['irbId'] = data['irbId'];
@@ -3215,7 +3204,7 @@ function addStudyProtocol() {
 	obj['dataset'] = $('#datasetNames').val();
 	obj['accessMode'] = $('#studySendOptions').val();
 	obj['role'] = studyRolesDict[$('#studyInvestigatorSelect').val()];
-	addProtocolPoliciesRow(obj, true);
+	addProtocolPoliciesRow(obj);
 	$('#modelNames').val('');
 	$('#datasetNames').val('');
 	$('#studySendOptions').val('');
@@ -3236,11 +3225,10 @@ function addSiteProtocol() {
 	if (activeStudy['studyId'] != 1) {
 		addProtocolViewRow(obj);
 	}
-	updateBasicInfo();
 }
 
 function addProtocolRow(obj) {
-	var node = datasetInstancesDict[obj['datasetInstance']]['node'];
+	var node = obj['dataSetInstance']['node'];
 	var site = node['site'];
 	var tbody = $('#manageSitesProtocolsTbody');
 	var tr = $('<tr>');
@@ -3248,17 +3236,17 @@ function addProtocolRow(obj) {
 	var td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var lib = librariesDict[toolsDict[obj['tool']]['toolParentLibrary']];
-	var method = lib['libraryName'] + ' - ' + toolsDict[obj['tool']]['toolName'];
+	var lib = librariesDict[obj['analysisTool']['toolParentLibrary']];
+	var method = lib['libraryName'] + ' - ' + obj['analysisTool']['toolName'];
 	td.html(method);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(datasetDefinitionDict[obj['dataset']]['dataSetName']);
+	td.html(datasetDefinitionDict[obj['dataSetInstance']['dataSetDefinition']]['dataSetName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(datasetInstancesDict[obj['datasetInstance']]['dataSource']);
+	td.html(obj['dataSetInstance']['dataSource']);
 	td = $('<td>');
 	td.addClass('protocol_border');
 	tr.append(td);
@@ -3270,13 +3258,11 @@ function addProtocolRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var accessMode = accessModeDict[obj['accessMode']];
-	td.html(accessMode['description']);
+	td.html(obj['accessMode']['description']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var role = obj['role'];
-	td.html(role['roleWithinStudy']);
+	td.html(obj['studyRole']['roleWithinStudy']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3292,7 +3278,7 @@ function addProtocolRow(obj) {
 }
 
 function addProtocolViewRow(obj) {
-	var node = datasetInstancesDict[obj['datasetInstance']]['node'];
+	var node = obj['dataSetInstance']['node'];
 	var site = node['site'];
 	var tbody = $('#viewSitesProtocolsTbody');
 	var tr = $('<tr>');
@@ -3300,17 +3286,18 @@ function addProtocolViewRow(obj) {
 	var td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var lib = librariesDict[toolsDict[obj['tool']]['toolParentLibrary']];
-	var method = lib['libraryName'] + ' - ' + toolsDict[obj['tool']]['toolName'];
+	var lib = librariesDict[obj['analysisTool']['toolParentLibrary']];
+	var method = lib['libraryName'] + ' - ' + obj['analysisTool']['toolName'];
 	td.html(method);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(datasetDefinitionDict[obj['dataset']]['dataSetName']);
+	td.html(datasetDefinitionDict[obj['dataSetInstance']['dataSetDefinition']]['dataSetName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(datasetInstancesDict[obj['datasetInstance']]['dataSource']);
+	td.html(obj['dataSetInstance']['dataSource']);
+	td = $('<td>');
 	td = $('<td>');
 	td.addClass('protocol_border');
 	tr.append(td);
@@ -3322,40 +3309,37 @@ function addProtocolViewRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var accessMode = accessModeDict[obj['accessMode']];
-	td.html(accessMode['description']);
+	td.html(obj['accessMode']['description']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var role = obj['role'];
-	td.html(role['roleWithinStudy']);
+	td.html(obj['studyRole']['roleWithinStudy']);
 	$('#viewSitesProtocols').show();
 }
 
-function addProtocolPoliciesRow(obj, appendMode) {
+function addProtocolPoliciesRow(obj) {
 	var tbody = $('#manageStudyProtocolsTbody');
 	var tr = $('<tr>');
 	tbody.append(tr);
 	var td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var lib = librariesDict[toolsDict[obj['tool']]['toolParentLibrary']];
-	var method = lib['libraryName'] + ' - ' + toolsDict[obj['tool']]['toolName'];
+	var lib = librariesDict[obj['analysisTool']['toolParentLibrary']];
+	var method = lib['libraryName'] + ' - ' + obj['analysisTool']['toolName'];
 	td.html(method);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(datasetDefinitionDict[obj['dataset']]['dataSetName']);
+	td.html(obj['dataSetDefinition']['dataSetName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var accessMode = accessModeDict[obj['accessMode']];
-	td.html(accessMode['description']);
+	td.html(obj['accessMode']['description']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var role = obj['role'];
-	td.html(role['roleWithinStudy']);
+	var studyRole = obj['studyRole'];
+	td.html(studyRole['roleWithinStudy']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
@@ -3369,10 +3353,6 @@ function addProtocolPoliciesRow(obj, appendMode) {
 	$('#studySendOptions').val('');
 	$('#addStudyProtocolButton').attr('disabled', 'disabled');
 	$('#manageStudyProtocols').show();
-	if (appendMode) {
-		activeStudy['studyPolicies'].push(obj);
-	}
-	updateBasicInfo();
 }
 
 function addProtocolSelect() {
@@ -3385,11 +3365,11 @@ function addProtocolSelect() {
 	select.append(option);
 	$.each(activeStudy['studyPolicies'], function(i, policy) {
 		option = $('<option>');
-		var roleWithinStudy = policy['role']['roleWithinStudy'];
-		var lib = librariesDict[toolsDict[policy['tool']]['toolParentLibrary']];
-		var method = lib['libraryName'] + ' ' + toolsDict[policy['tool']]['toolName'];
-		var dataset = datasetDefinitionDict[policy['dataset']]['dataSetName'];
-		var accessMode = accessModeDict[policy['accessMode']]['description'];
+		var roleWithinStudy = policy['studyRole']['roleWithinStudy'];
+		var lib = librariesDict[policy['analysisTool']['toolParentLibrary']];
+		var method = lib['libraryName'] + ' ' + policy['analysisTool']['toolName'];
+		var dataset = policy['dataSetDefinition']['dataSetName'];
+		var accessMode = policy['accessMode']['description'];
 		option.text(method + ' as ' + roleWithinStudy +  ' on ' + dataset + ' ' + accessMode);
 		option.attr('value', i);
 		select.append(option);
@@ -3402,13 +3382,11 @@ function addProtocolSelect() {
 	option.text('with role...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(studyRolesList, function(i, role) {
-		if (role['study'] == activeStudy['studyId']) {
-			option = $('<option>');
-			option.text(role['roleWithinStudy']);
-			option.attr('value', role['roleId']);
-			select.append(option);
-		}
+	$.each(activeStudy['studyRoles'], function(i, role) {
+		option = $('<option>');
+		option.text(role['roleWithinStudy']);
+		option.attr('value', role['roleId']);
+		select.append(option);
 	});
 	select.change(function(event) {checkAddStudyProtocolButton();});
 }
@@ -3550,8 +3528,6 @@ function postGetMyStudies(data, textStatus, jqXHR, param) {
 	var div = $('#lisyMyStudiesDiv');
 	div.html('');
 	$.each(myStudies, function(i, study) {
-		study['protocols'] = getPolicies(study['studyId']);
-		study['studyPolicies'] = [];
 		appendStudy(study);
 	});
 	setActiveStudy(getSelectedStudyName());
@@ -3702,20 +3678,18 @@ function appendStudyContent(study) {
 	var datasets = [];
 	var models = [];
 	var sites = [];
-	var datasetIds = [];
 	$.each(datasetDefinitionList, function(i, dataset) {
-		if (dataset['originatingStudy'] == study['studyId']) {
+		if (dataset['originatingStudy']['studyId'] == study['studyId']) {
 			datasets.push(dataset['dataSetName']);
-			datasetIds.push(dataset['dataSetDefinitionId']);
 		}
 	});
 	var studyModels = [];
 	var studyModelsIds = [];
 	$.each(study['studyPolicies'], function(i, obj) {
-		var toolId = obj['tool'];
+		var toolId = obj['analysisTool']['toolId'];
 		if (!studyModelsIds.contains(toolId)) {
 			studyModelsIds.push(toolId);
-			studyModels.push(toolsDict[toolId]);
+			studyModels.push(obj['analysisTool']);
 		}
 	});
 	studyModels.sort(compareTools);
@@ -3926,6 +3900,25 @@ function postInitUserRoles(data, textStatus, jqXHR, param) {
 	});
 	userRolesList.sort(compareRoles);
 	if (param) {
+		initStudyRoles(param);
+	}
+}
+
+function initStudyRoles(all) {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getStudyRoles';
+	scanner.RETRIEVE(url, obj, true, postInitStudyRoles, all, null, 0);
+}
+
+function postInitStudyRoles(data, textStatus, jqXHR, param) {
+	studyRolesList = data;
+	studyRolesDict = {};
+	$.each(data, function(i, role) {
+		studyRolesDict[role['roleId']] = role;
+	});
+	studyRolesList.sort(compareStudyRoles);
+	if (param) {
 		initStudyPolicies(param);
 	}
 }
@@ -3953,26 +3946,8 @@ function postInitStudyPolicies(data, textStatus, jqXHR, param) {
 			accessModeDict[id] = accessMode;
 		}
 	});
+	studyPoliciesList.sort(compareStudyPolicy);
 	accessModeList.sort(compareAccessMode);
-	if (param) {
-		initStudyRoles(param);
-	}
-}
-
-function initStudyRoles(all) {
-	var url = HOME + '/query';
-	var obj = new Object();
-	obj['action'] = 'getStudyRoles';
-	scanner.RETRIEVE(url, obj, true, postInitStudyRoles, all, null, 0);
-}
-
-function postInitStudyRoles(data, textStatus, jqXHR, param) {
-	studyRolesList = data;
-	studyRolesDict = {};
-	$.each(data, function(i, role) {
-		studyRolesDict[role['roleId']] = role;
-	});
-	studyRolesList.sort(compareStudyRoles);
 	if (param) {
 		initAnalysisPolicies(param);
 	}
@@ -4152,7 +4127,7 @@ function compareSitesPolicies(sitePolicy1, sitePolicy2) {
 }
 
 function compareStudyManagementPolicies(policy1, policy2) {
-	return compareNumbers(policy1['study'], policy2['study']);
+	return compareNumbers(policy1['study']['studyId'], policy2['study']['studyId']);
 }
 
 function compareStandardRoles(role1, role2) {
@@ -4170,8 +4145,8 @@ function compareUsers(user1, user2) {
 function compareInstances(datasetInstance1, datasetInstance2) {
 	var node1 = datasetInstance1['node'];
 	var node2 = datasetInstance2['node'];
-	var val1 = node1['site'] + ' - ' + node1['nodeName'];
-	var val2 = node2['site'] + ' - ' + node2['nodeName'];
+	var val1 = node1['site']['siteName'] + ' - ' + node1['nodeName'];
+	var val2 = node2['site']['siteName'] + ' - ' + node2['nodeName'];
 	return compareIgnoreCase(val1, val2);
 }
 
@@ -4225,16 +4200,30 @@ function compareAccessMode(accessMode1, accessMode2) {
 function compareAnalysisPolicies(analysisPolicy1, analysisPolicy2) {
 	var studyPolicy1 = studyPoliciesDict[analysisPolicy1['parentStudyPolicyStatement']];
 	var studyPolicy2 = studyPoliciesDict[analysisPolicy2['parentStudyPolicyStatement']];
-	var ret = compareNumbers(studyPolicy1['study'], studyPolicy2['study']);
+	var ret = compareNumbers(studyPolicy1['study']['studyId'], studyPolicy2['study']['studyId']);
 	if (ret == 0) {
-		ret = compareNumbers(studyPolicy1['dataSetDefinition'], studyPolicy2['dataSetDefinition']);
+		ret = compareNumbers(studyPolicy1['dataSetDefinition']['dataSetDefinitionId'], studyPolicy2['dataSetDefinition']['dataSetDefinitionId']);
 		if (ret == 0) {
-			ret = compareNumbers(analysisPolicy1['analysisTool'], analysisPolicy2['analysisTool']);
+			ret = compareNumbers(analysisPolicy1['analysisTool']['toolId'], analysisPolicy2['analysisTool']['toolId']);
 			if (ret == 0) {
-				ret = compareNumbers(analysisPolicy1['dataSetInstance'], analysisPolicy2['dataSetInstance']);
+				ret = compareNumbers(analysisPolicy1['dataSetInstance']['dataSetInstanceId'], analysisPolicy2['dataSetInstance']['dataSetInstanceId']);
 				if (ret == 0) {
 					ret = compareNumbers(analysisPolicy1['accessMode']['accessModeId'], analysisPolicy2['accessMode']['accessModeId']);
 				}
+			}
+		}
+	}
+	return ret;
+}
+
+function compareStudyPolicy(studyPolicy1, studyPolicy2) {
+	var ret = compareNumbers(studyPolicy1['study']['studyId'], studyPolicy2['study']['studyId']);
+	if (ret == 0) {
+		ret = compareNumbers(studyPolicy1['dataSetDefinition']['dataSetDefinitionId'], studyPolicy2['dataSetDefinition']['dataSetDefinitionId']);
+		if (ret == 0) {
+			ret = compareNumbers(studyPolicy1['analysisTool']['toolId'], studyPolicy2['analysisTool']['toolId']);
+			if (ret == 0) {
+				ret = compareNumbers(studyPolicy1['accessMode']['accessModeId'], studyPolicy2['accessMode']['accessModeId']);
 			}
 		}
 	}
@@ -4270,24 +4259,6 @@ function getStudyPolicies(study) {
 				return false;
 			}
 		});
-	});
-	return ret;
-}
-
-function getPolicies(study) {
-	var ret = [];
-	var policyDict = {};
-	$.each(analysisPolicies, function(i, policy) {
-		var studyPolicy = studyPoliciesDict[policy['parentStudyPolicyStatement']];
-		if (studyPolicy['study'] == study) {
-			var obj = {};
-			obj['role'] = studyRolesDict[studyPolicy['studyRole']];
-			obj['dataset'] = studyPolicy['dataSetDefinition'];
-			obj['tool'] = policy['analysisTool'];
-			obj['datasetInstance'] = policy['dataSetInstance'];
-			obj['accessMode'] = policy['accessMode']['accessModeId'];
-			ret.push(obj);
-		}
 	});
 	return ret;
 }

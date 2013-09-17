@@ -117,6 +117,7 @@ public class Registry extends HttpServlet {
 				JSONObject responseObject = new JSONObject();
 				JSONArray responseArray = clientResponse.getEntityResponse();
 				responseObject.put("sites", responseArray);
+				clientResponse.release();
 				clientResponse = registryClient.getUserRoles(Integer.parseInt(studyId));
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study staff." + studyId);
@@ -124,6 +125,7 @@ public class Registry extends HttpServlet {
 				}
 				responseArray = clientResponse.getEntityResponse();
 				responseObject.put("staff", responseArray);
+				clientResponse.release();
 				clientResponse = registryClient.getStudyRoles(Integer.parseInt(studyId));
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study roles." + studyId);
@@ -131,6 +133,37 @@ public class Registry extends HttpServlet {
 				}
 				responseArray = clientResponse.getEntityResponse();
 				responseObject.put("studyRoles", responseArray);
+				clientResponse.release();
+				clientResponse = registryClient.getStudyPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study policies." + studyId);
+					return;
+				}
+				responseArray = clientResponse.getEntityResponse();
+				for (int i=responseArray.length() - 1; i >=0; i--) {
+					JSONObject studyPolicy = responseArray.getJSONObject(i);
+					JSONObject obj = studyPolicy.getJSONObject("study");
+					if (obj.getInt("studyId") != Integer.parseInt(studyId)) {
+						responseArray.remove(i);
+					}
+				}
+				responseObject.put("studyPolicies", responseArray);
+				clientResponse.release();
+				clientResponse = registryClient.getAnalysisPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analyze policies." + studyId);
+					return;
+				}
+				responseArray = clientResponse.getEntityResponse();
+				for (int i=responseArray.length() - 1; i >=0; i--) {
+					JSONObject analysisPolicy = responseArray.getJSONObject(i);
+					JSONObject obj = analysisPolicy.getJSONObject("studyRole");
+					if (obj.getInt("study") != Integer.parseInt(studyId)) {
+						responseArray.remove(i);
+					}
+				}
+				responseObject.put("analysisPolicies", responseArray);
+				clientResponse.release();
 				res = responseObject.toString();
 				System.out.println("getStudyData responseBody: " + res);
 			} catch (JSONException e) {
@@ -340,24 +373,28 @@ public class Registry extends HttpServlet {
 			try {
 				JSONObject responseObject = new JSONObject();
 				responseObject.put("study", clientResponse.getEntity());
+				clientResponse.release();
 				clientResponse = registryClient.getAllStudies();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
 					return;
 				}
 				responseObject.put("allStudies", clientResponse.getEntityResponse());
+				clientResponse.release();
 				clientResponse = registryClient.getUserRoles();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user roles.");
 					return;
 				}
 				responseObject.put("userRoles", clientResponse.getEntityResponse());
+				clientResponse.release();
 				clientResponse = registryClient.getStudyRoles();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies roles.");
 					return;
 				}
 				responseObject.put("studiesRoles", clientResponse.getEntityResponse());
+				clientResponse.release();
 				clientResponse = registryClient.getAllStudyManagementPolicies();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies management policies.");
@@ -379,6 +416,7 @@ public class Registry extends HttpServlet {
 			try {
 				JSONObject responseObject = new JSONObject();
 				responseObject.put("site", clientResponse.getEntity());
+				clientResponse.release();
 				clientResponse = registryClient.getAllStudyRequestedSites();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all studies requested sites.");
@@ -400,6 +438,7 @@ public class Registry extends HttpServlet {
 			try {
 				JSONObject responseObject = new JSONObject();
 				responseObject.put("staff", clientResponse.getEntity());
+				clientResponse.release();
 				clientResponse = registryClient.getUserRoles();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all users roles.");
@@ -420,6 +459,7 @@ public class Registry extends HttpServlet {
 			}
 			try {
 				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
 				clientResponse = registryClient.getAllStudyRequestedSites();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all studies requested sites.");
@@ -440,6 +480,7 @@ public class Registry extends HttpServlet {
 			}
 			try {
 				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
 				clientResponse = registryClient.getUserRoles();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all users roles.");
@@ -652,24 +693,28 @@ public class Registry extends HttpServlet {
 			try {
 				JSONObject responseObject = new JSONObject();
 				responseObject.put("study", clientResponse.getEntity());
+				clientResponse.release();
 				clientResponse = registryClient.getAllStudies();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
 					return;
 				}
 				responseObject.put("allStudies", clientResponse.getEntityResponse());
+				clientResponse.release();
 				clientResponse = registryClient.getUserRoles();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user roles.");
 					return;
 				}
 				responseObject.put("userRoles", clientResponse.getEntityResponse());
+				clientResponse.release();
 				clientResponse = registryClient.getStudyRoles();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies roles.");
 					return;
 				}
 				responseObject.put("studiesRoles", clientResponse.getEntityResponse());
+				clientResponse.release();
 				clientResponse = registryClient.getAllStudyManagementPolicies();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies management policies.");
