@@ -369,6 +369,10 @@ public class Registry extends HttpServlet {
 			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create study.");
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
 			try {
 				JSONObject responseObject = new JSONObject();
@@ -434,10 +438,13 @@ public class Registry extends HttpServlet {
 			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create user role.");
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
 			try {
 				JSONObject responseObject = new JSONObject();
-				responseObject.put("userRoles", clientResponse.getEntity());
+				responseObject.put("userRole", clientResponse.getEntity());
 				clientResponse.release();
 				clientResponse = registryClient.getUserRoles();
 				if (clientResponse == null) {

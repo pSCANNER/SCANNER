@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +25,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 	protected ClientURLResponse response;
 	protected JSONArray entityResponse;
 	protected JSONObject entityObject;
+	protected JSONObject errorObject;
 
 	public ERDClientResponse(ClientURLResponse rsp) {
 		response = rsp;
@@ -33,6 +36,9 @@ public class ERDClientResponse implements RegistryClientResponse {
 			} catch (JSONException e) {
 				try {
 					entityObject = new JSONObject(res);
+					if (entityObject.has("errorStatusCode") && entityObject.has("errorMessage")) {
+						errorObject = entityObject;
+					}
 				} catch (JSONException e1) {
 					e1.printStackTrace();
 				}
@@ -49,8 +55,16 @@ public class ERDClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public int getStatus() {
-		// TODO Auto-generated method stub
-		return 0;
+		int status = HttpServletResponse.SC_OK;
+		try {
+			if (errorObject != null) {
+				status = errorObject.getInt("errorStatusCode");
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+			status = 0;
+		}
+		return status;
 	}
 
 	/* (non-Javadoc)
@@ -66,8 +80,18 @@ public class ERDClientResponse implements RegistryClientResponse {
 	 */
 	@Override
 	public String getErrorMessage() {
-		// TODO Auto-generated method stub
-		return null;
+		String ret = "";
+		try {
+			if (errorObject != null) {
+				ret = errorObject.getString("errorMessage");
+				if (errorObject.has("errorDetail")) {
+					ret += "\n" + errorObject.getString("errorDetail");
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
 	}
 
 	/* (non-Javadoc)
