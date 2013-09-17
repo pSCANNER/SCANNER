@@ -302,8 +302,9 @@ public class JakartaClient {
      *            the request body.
      * @return The HTTP response.
      */
-    public ClientURLResponse postRegistry(String url, String body) {
+    public ClientURLResponse postRegistry(String url, String body, String user) {
         HttpPost httppost = new HttpPost(url);
+        httppost.setHeader("loginName", user);
         httppost.setHeader("Accept", "application/json");
         httppost.setHeader("Content-Type", "application/json; charset=UTF-8");
         if (body != null) {
@@ -329,8 +330,9 @@ public class JakartaClient {
      *            the request body.
      * @return The HTTP response.
      */
-    public ClientURLResponse putRegistry(String url, String body) {
+    public ClientURLResponse putRegistry(String url, String body, String user) {
         HttpPut httpput = new HttpPut(url);
+        httpput.setHeader("loginName", user);
         httpput.setHeader("Accept", "application/json");
         httpput.setHeader("Content-Type", "application/json; charset=UTF-8");
         if (body != null) {
@@ -378,8 +380,9 @@ public class JakartaClient {
      *            the cookie to be set in the request.
      * @return The HTTP response.
      */
-    public ClientURLResponse delete(String url, String cookie) {
+    public ClientURLResponse delete(String url, String cookie, String user) {
 		HttpDelete httpdelete = new HttpDelete(url);
+		httpdelete.setHeader("loginName", user);
 		return execute(httpdelete, cookie);
 	}
     
@@ -394,6 +397,22 @@ public class JakartaClient {
      */
     public ClientURLResponse get(String url, String cookie) {
 		HttpGet httpget = new HttpGet(url);
+    	httpget.setHeader("Accept", "application/json");
+		return execute(httpget, cookie);
+	}
+    
+    /**
+     * Execute a GET request.
+     * 
+     * @param url
+     *            the query URL.
+     * @param cookie
+     *            the cookie to be set in the request.
+     * @return The HTTP response.
+     */
+    public ClientURLResponse get(String url, String cookie, String user) {
+		HttpGet httpget = new HttpGet(url);
+		httpget.setHeader("loginName", user);
     	httpget.setHeader("Accept", "application/json");
 		return execute(httpget, cookie);
 	}

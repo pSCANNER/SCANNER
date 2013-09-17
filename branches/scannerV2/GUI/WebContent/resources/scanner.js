@@ -2634,8 +2634,8 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	var hideMode = param;
 	activeStudy['sites'] = data['sites'];
 	activeStudy['sites'].sort(compareStudyRequestedSites);
-	activeStudy['staff'] = data['staff'];
-	activeStudy['staff'].sort(compareRoles);
+	activeStudy['userRoles'] = data['userRoles'];
+	activeStudy['userRoles'].sort(compareRoles);
 	activeStudy['studyRoles'] = data['studyRoles'];
 	activeStudy['studyRoles'].sort(compareStudyRoles);
 	activeStudy['studyPolicies'] = data['studyPolicies'];
@@ -2814,8 +2814,8 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	$('#addStaffButton').attr('disabled', 'disabled');
 	$('#addSiteProtocolButton').attr('disabled', 'disabled');
 	$('#manageStudyStaffTbody').html('');
-	$.each(activeStudy['staff'], function(i, staff) {
-		addStaffRow(staff);
+	$.each(activeStudy['userRoles'], function(i, userRole) {
+		addStaffRow(userRole);
 	});
 	$('#manageSitesProtocolsTbody').html('');
 	$('#viewSitesProtocolsTbody').html('');
@@ -2978,9 +2978,9 @@ function addStaff() {
 
 function postAddStaff(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
-	var staff = data['staff'];
+	var userRoles = data['userRoles'];
 	postInitUserRoles(data['userRoles'], null, null, false);
-	addStaffRow(staff);
+	addStaffRow(userRoles);
 	manageStudy(false);
 }
 
@@ -3015,11 +3015,11 @@ function addStaffRow(obj) {
 	$('#addStaffButton').attr('disabled', 'disabled');
 }
 
-function removeStaff(button, staff) {
+function removeStaff(button, userRoles) {
 	button.parent().parent().remove();
 	obj = {};
 	obj['action'] = 'deleteUserRole';
-	obj['userRoleId'] = staff['userRoleId'];
+	obj['userRoleId'] = userRoles['userRoleId'];
 	var url =  HOME + '/registry';
 	scanner.POST(url, obj, true, postRemoveStaff, null, null, 0);
 }
@@ -3660,15 +3660,15 @@ function appendStudyContent(study) {
 	var ol = $('<ol>');
 	contentDiv.append(ol);
 	ol.addClass('blank');
-	$.each(study['staff'], function(i, staff) {
+	$.each(study['userRoles'], function(i, userRoles) {
 		var li = $('<li>');
 		ol.append(li);
 		var b = $('<b>');
 		li.append(b);
-		b.html(staff['studyRole']['roleWithinStudy'] + ': ');
+		b.html(userRoles['studyRole']['roleWithinStudy'] + ': ');
 		var label = $('<label>');
 		li.append(label);
-		var user = scannerUsersDict[staff['user']];
+		var user = scannerUsersDict[userRoles['user']];
 		label.html(user['firstName'] + ' ' + user['lastName']);
 	});
 	

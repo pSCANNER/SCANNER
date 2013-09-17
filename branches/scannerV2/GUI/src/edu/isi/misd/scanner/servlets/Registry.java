@@ -120,11 +120,11 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getUserRoles(Integer.parseInt(studyId));
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study staff." + studyId);
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get users roles." + studyId);
 					return;
 				}
 				responseArray = clientResponse.getEntityResponse();
-				responseObject.put("staff", responseArray);
+				responseObject.put("userRoles", responseArray);
 				clientResponse.release();
 				clientResponse = registryClient.getStudyRoles(Integer.parseInt(studyId));
 				if (clientResponse == null) {
@@ -437,7 +437,7 @@ public class Registry extends HttpServlet {
 			}
 			try {
 				JSONObject responseObject = new JSONObject();
-				responseObject.put("staff", clientResponse.getEntity());
+				responseObject.put("userRoles", clientResponse.getEntity());
 				clientResponse.release();
 				clientResponse = registryClient.getUserRoles();
 				if (clientResponse == null) {
