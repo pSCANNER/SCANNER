@@ -231,9 +231,8 @@ function initScanner() {
 				});
 				select.change(function(event) {checkCreateStudyButton();});
 			} else if (divId == 'manageStudiesDiv') {
-				manageStudy(true);
+				manageStudy(false);
 			} else if (divId == 'myStudiesDiv') {
-				collapseMyStudies();
 			}
 		}
 	});
@@ -2614,7 +2613,8 @@ function showProjects() {
 	$('#paramsWrapperDiv').hide();
 	$('#replayDivWrapper').hide();
 	$('#statusReplayWrapperDiv').hide();
-
+	collapseMyStudies();
+	$('.wizard_content', $('#manageStudiesDiv')).hide();
 }
 
 function manageStudy(hideMode) {
@@ -3745,7 +3745,6 @@ function appendStudyContent(study) {
 		ol1.append(li1);
 		li1.html(site);
 	});
-	contentDiv.hide();
 }
 
 function addInstance() {
