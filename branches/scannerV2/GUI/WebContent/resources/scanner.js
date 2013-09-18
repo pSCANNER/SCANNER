@@ -1566,6 +1566,7 @@ function getHTMLErrorMessage(msg) {
  */
 var scanner = {
 		POST: function(url, obj, async, successCallback, param, errorCallback, count) {
+			document.body.style.cursor = "wait";
 			$.ajax({
 				url: url,
 				headers: {'User-agent': 'Scanner/1.0'},
@@ -1575,6 +1576,7 @@ var scanner = {
 				timeout: AJAX_TIMEOUT,
 				async: async,
 				success: function(data, textStatus, jqXHR) {
+					document.body.style.cursor = "default";
 					successCallback(data, textStatus, jqXHR, param);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1590,6 +1592,7 @@ var scanner = {
 			scanner.fetch(url, null, async, successCallback, param, errorCallback, count);
 		},
 		fetch: function(url, obj, async, successCallback, param, errorCallback, count) {
+			document.body.style.cursor = "wait";
 			$.ajax({
 				url: url,
 				headers: {'User-agent': 'Scanner/1.0'},
@@ -1598,6 +1601,7 @@ var scanner = {
 				accepts: {text: 'application/json'},
 				dataType: 'json',
 				success: function(data, textStatus, jqXHR) {
+					document.body.style.cursor = "default";
 					successCallback(data, textStatus, jqXHR, param);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1610,6 +1614,7 @@ var scanner = {
 			});
 		},
 		RETRIEVE: function(url, obj, async, successCallback, param, errorCallback, count) {
+			document.body.style.cursor = "wait";
 			$.ajax({
 				url: url,
 				headers: {'User-agent': 'Scanner/1.0'},
@@ -1619,6 +1624,7 @@ var scanner = {
 				accepts: {text: 'application/json'},
 				dataType: 'json',
 				success: function(data, textStatus, jqXHR) {
+					document.body.style.cursor = "default";
 					successCallback(data, textStatus, jqXHR, param);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1634,6 +1640,7 @@ var scanner = {
 			scanner.remove(url, null, async, successCallback, param, errorCallback, count);
 		},
 		remove: function(url, obj, async, successCallback, param, errorCallback, count) {
+			document.body.style.cursor = "wait";
 			$.ajax({
 				url: url,
 				headers: {'User-agent': 'Scanner/1.0'},
@@ -1643,6 +1650,7 @@ var scanner = {
 				accepts: {text: 'application/json'},
 				dataType: 'json',
 				success: function(data, textStatus, jqXHR) {
+					document.body.style.cursor = "default";
 					successCallback(data, textStatus, jqXHR, param);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1655,6 +1663,7 @@ var scanner = {
 			});
 		},
 		PUT: function(url, obj, async, successCallback, param, errorCallback, count) {
+			document.body.style.cursor = "wait";
 			$.ajax({
 				url: url,
 				headers: {'User-agent': 'Scanner/1.0'},
@@ -1664,6 +1673,7 @@ var scanner = {
 				timeout: AJAX_TIMEOUT,
 				async: async,
 				success: function(data, textStatus, jqXHR) {
+					document.body.style.cursor = "default";
 					successCallback(data, textStatus, jqXHR, param);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1680,12 +1690,10 @@ var scanner = {
 function submitLogin() {
 	var url = HOME + '/login';
 	var obj = new Object();
-	document.body.style.cursor = "wait";
 	scanner.POST(url, obj, true, postSubmitLogin, null, null, 0);
 }
 
 function postSubmitLogin(data, textStatus, jqXHR, param) {
-	document.body.style.cursor = "default";
 	var res = $.parseJSON(data);
 	var loginDiv = $('#loginForm');
 	$('#errorDiv').remove();
@@ -2514,12 +2522,10 @@ function disableIndependentVariableName() {
 
 function submitLogout() {
 	var url = HOME + '/logout';
-	document.body.style.cursor = "wait";
 	scanner.POST(url, null, true, postSubmitLogout, null, null, 0);
 }
 
 function postSubmitLogout(data, textStatus, jqXHR, param) {
-	document.body.style.cursor = "default";
 	alert('Please close your browser to logoff.');
 	$('#logoutButton').hide();
 	window.location = HOME;
