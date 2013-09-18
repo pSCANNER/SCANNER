@@ -60,28 +60,16 @@ public class ScannerUserController extends BaseController
         List<ScannerUser> users = new ArrayList<ScannerUser>();
         boolean isSuperuser = registryService.userIsSuperuser(loginName);
         if (userName != null) {
-            if (userName.equalsIgnoreCase(loginName) || isSuperuser) {
-                ScannerUser user = 
-                    scannerUserRepository.findByUserName(userName);
-                if (user == null) {
-                    throw new ResourceNotFoundException(userName);
-                }
-                users.add(user);
-            } else {
-                throw new ForbiddenException(
-                    loginName,
-                    "Unable to view a user record for another user. " +
-                    RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);            
-            }            
+            ScannerUser user = 
+                scannerUserRepository.findByUserName(userName);
+            if (user == null) {
+                throw new ResourceNotFoundException(userName);
+            }
+            users.add(user);           
         } else if (isSuperuser) {
             Iterator iter = scannerUserRepository.findAll().iterator();
             CollectionUtils.addAll(users, iter);      
-        } else {
-            throw new ForbiddenException(
-                loginName,
-                "Unable to view user records for other users. " +
-                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);            
-        }     
+        }  
         return users;           
 	}
     
@@ -117,24 +105,24 @@ public class ScannerUserController extends BaseController
            @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {        
         // get the user record for the current user
-        ScannerUser loggedInUser = 
-            scannerUserRepository.findByUserName(loginName);
-        if (loggedInUser == null) {
-            throw new ForbiddenException(
-                loginName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
-        }         
+//        ScannerUser loggedInUser = 
+//            scannerUserRepository.findByUserName(loginName);
+//        if (loggedInUser == null) {
+//            throw new ForbiddenException(
+//                loginName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
+//        }         
         ScannerUser foundUser = scannerUserRepository.findOne(id);
         if (foundUser == null) {
             throw new ResourceNotFoundException(id);
         }        
         // check that the current user can view this record        
-        if ((!loginName.equalsIgnoreCase(foundUser.getUserName()) &&
-            (!loggedInUser.getIsSuperuser()))) {
-            throw new ForbiddenException(
-                loginName,
-                "Unable to view a user record for another user. " +
-                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
-        }        
+//        if ((!loginName.equalsIgnoreCase(foundUser.getUserName()) &&
+//            (!loggedInUser.getIsSuperuser()))) {
+//            throw new ForbiddenException(
+//                loginName,
+//                "Unable to view a user record for another user. " +
+//                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+//        }        
         return foundUser;
     }  
     
