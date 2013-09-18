@@ -12,7 +12,7 @@ public interface StudyRoleRepository
     extends CrudRepository<StudyRole, Integer> 
 {
    List<StudyRole> findByStudyStudyId(Integer studyId);       
-   List<StudyRole> findByScannerUsersUserId(Integer userId); 
-   List<StudyRole> findByStudyStudyIdAndScannerUsersUserId(
-       Integer studyId, Integer userId);   
+   List<StudyRole> findByScannerUsersUserName(String userName); 
+   List<StudyRole> findByStudyStudyIdAndScannerUsersUserName(
+       Integer studyId, String userName);   
 }

@@ -36,7 +36,7 @@ public class DataSetDefinitionController extends BaseController
 
     public static final String BASE_PATH = "/datasets";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
-    public static final String REQUEST_PARAM_STUDY_NAME = "studyName";
+    public static final String REQUEST_PARAM_STUDY_ID = "studyId";
     public static final String REQUEST_PARAM_USER_NAME = "userName";
     
     @Autowired    
@@ -52,26 +52,30 @@ public class DataSetDefinitionController extends BaseController
     {
         Map<String,String> params = 
             validateParameterMap(
-                paramMap, REQUEST_PARAM_STUDY_NAME, REQUEST_PARAM_USER_NAME); 
+                paramMap, REQUEST_PARAM_STUDY_ID, REQUEST_PARAM_USER_NAME); 
         
         if (!params.isEmpty()) 
         {
-            String studyName = params.get(REQUEST_PARAM_STUDY_NAME);
+            String studyId = params.get(REQUEST_PARAM_STUDY_ID);
             String userName = params.get(REQUEST_PARAM_USER_NAME);
-            if ((studyName != null) && (userName != null)) {
+            if ((studyId != null) && (userName != null)) {
                 return
                     dataSetDefinitionRepository.
-                        findDataSetsForStudyNameAndUserName(
-                            studyName, userName);
+                        findDataSetsForStudyIdAndUserName(
+                            validateIntegerParameter(
+                                REQUEST_PARAM_STUDY_ID,studyId),
+                            userName);
             }
-            if (studyName != null) {
+            if (studyId != null) {
                 return 
                     dataSetDefinitionRepository.
-                        findDataSetsForStudyName(studyName);
+                        findDataSetsForStudyId(
+                            validateIntegerParameter(
+                                REQUEST_PARAM_STUDY_ID,studyId));
             }
-            if (studyName == null) {
+            if (studyId == null) {
                 throw new BadRequestException(
-                    "Required parameter missing: " + REQUEST_PARAM_STUDY_NAME);                
+                    "Required parameter missing: " + REQUEST_PARAM_STUDY_ID);                
             }
         }
 

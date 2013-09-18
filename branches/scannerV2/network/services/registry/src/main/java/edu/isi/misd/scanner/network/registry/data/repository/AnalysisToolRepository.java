@@ -18,13 +18,13 @@ public interface AnalysisToolRepository
            "JOIN t.studyPolicyStatements p " +
            "JOIN p.studyRole r JOIN r.userRoles ur " +
            "WHERE ur.user.userName = :userName " +
-           "AND p.study.studyName = :studyName " +
-           "AND p.dataSetDefinition.dataSetName = :dataSetName " +
+           "AND p.study.studyId = :studyId " +
+           "AND p.dataSetDefinition.dataSetDefinitionId = :dataSetId " +
            "AND t.toolParentLibrary.libraryId = :libraryId " +        
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
     List<AnalysisTool> findAnalysisToolByStudyPolicyStatement(
         @Param("userName") String userName,
-        @Param("studyName") String studyName,
-        @Param("dataSetName") String dataSetName,
+        @Param("studyId") Integer studyId,
+        @Param("dataSetId") Integer dataSetId,
         @Param("libraryId") Integer libraryId);
 }

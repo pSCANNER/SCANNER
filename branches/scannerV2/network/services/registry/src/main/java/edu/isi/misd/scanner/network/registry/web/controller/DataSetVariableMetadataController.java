@@ -48,31 +48,16 @@ public class DataSetVariableMetadataController extends BaseController
         getDataSetVariableMetadata(@RequestParam Map<String, String> paramMap)        
     {
         Map<String,String> params = 
-            validateParameterMap(
-                paramMap, REQUEST_PARAM_DATASET_ID, REQUEST_PARAM_DATASET_NAME);
+            validateParameterMap(paramMap, REQUEST_PARAM_DATASET_ID);
         
         if (!params.isEmpty()) 
         {
-            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);
-            String dataSetName = params.get(REQUEST_PARAM_DATASET_NAME);
-            if (dataSetId != null) {             
-                return
-                    dataSetVariableMetadataRepository.
-                        findByDataSetDefinitionDataSetDefinitionId(
-                            validateIntegerParameter(
-                                REQUEST_PARAM_DATASET_ID, dataSetId));
-            }
-            if (dataSetName != null) {            
-                return
-                    dataSetVariableMetadataRepository.
-                        findByDataSetDefinitionDataSetName(dataSetName);
-            }            
-            if ((dataSetId == null) && (dataSetName == null)) {
-                throw new BadRequestException(
-                    "Required parameter missing, must provide either " + 
-                    REQUEST_PARAM_DATASET_ID + " or " + 
-                    REQUEST_PARAM_DATASET_NAME);                
-            }        
+            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);            
+            return
+                dataSetVariableMetadataRepository.
+                    findByDataSetDefinitionDataSetDefinitionId(
+                        validateIntegerParameter(
+                            REQUEST_PARAM_DATASET_ID, dataSetId));              
         }
 
         List<DataSetVariableMetadata> dataSetVariableMetadata = 

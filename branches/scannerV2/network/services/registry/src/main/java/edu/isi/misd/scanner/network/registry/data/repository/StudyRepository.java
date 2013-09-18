@@ -15,13 +15,7 @@ public interface StudyRepository
     extends CrudRepository<Study, Integer> 
 {
     Study findByStudyName(String studyName);
-   
-    @Query("SELECT DISTINCT s FROM UserRole ur " + 
-           "JOIN ur.studyRole r JOIN r.study s " +
-           "WHERE ur.user.userId = :userId " +
-           "ORDER BY s.studyId")
-    List<Study> findStudiesForUserId( @Param("userId")Integer userId);
-       
+          
     @Query("SELECT DISTINCT s FROM UserRole ur " + 
            "JOIN ur.studyRole r JOIN r.study s " +
            "WHERE ur.user.userName = :userName " +

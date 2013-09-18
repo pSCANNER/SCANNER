@@ -43,7 +43,7 @@ public class StudyRoleController extends BaseController
     public static final String BASE_PATH = "/studyRoles";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;     
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";
-    public static final String REQUEST_PARAM_USER_ID = "userId";    
+    public static final String REQUEST_PARAM_USER_NAME = "userName";    
     
     @Autowired
     private StudyRoleRepository studyRoleRepository;   
@@ -62,29 +62,24 @@ public class StudyRoleController extends BaseController
     {
         Map<String,String> params = 
             validateParameterMap(
-                paramMap, REQUEST_PARAM_STUDY_ID, REQUEST_PARAM_USER_ID);  
+                paramMap, REQUEST_PARAM_STUDY_ID, REQUEST_PARAM_USER_NAME);  
         
         String studyId = params.get(REQUEST_PARAM_STUDY_ID);
-        String userId = params.get(REQUEST_PARAM_USER_ID);           
-        if ((studyId != null) && (userId != null)) 
+        String userName = params.get(REQUEST_PARAM_USER_NAME);           
+        if ((studyId != null) && (userName != null)) 
         {
             return 
-                studyRoleRepository.findByStudyStudyIdAndScannerUsersUserId(
-                    validateIntegerParameter(
-                        REQUEST_PARAM_STUDY_ID, studyId),
-                    validateIntegerParameter(
-                        REQUEST_PARAM_USER_ID, userId)
-                );            
+                studyRoleRepository.findByStudyStudyIdAndScannerUsersUserName(
+                    validateIntegerParameter(REQUEST_PARAM_STUDY_ID, studyId),
+                    userName);     
         } else if (studyId != null) {
             return
                 studyRoleRepository.findByStudyStudyId(
                     validateIntegerParameter(
                         REQUEST_PARAM_STUDY_ID, studyId));
-        } else if (userId != null) {
+        } else if (userName != null) {
             return 
-                studyRoleRepository.findByScannerUsersUserId(
-                    validateIntegerParameter(
-                        REQUEST_PARAM_USER_ID, userId));
+                studyRoleRepository.findByScannerUsersUserName(userName);
         } else {
             List<StudyRole> roles = new ArrayList<StudyRole>();                
             Iterator iter = studyRoleRepository.findAll().iterator();

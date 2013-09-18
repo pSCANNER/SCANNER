@@ -38,8 +38,8 @@ public class ToolLibraryController extends BaseController
     public static final String BASE_PATH = "/libraries";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;     
     public static final String REQUEST_PARAM_USER_NAME = "userName";
-    public static final String REQUEST_PARAM_STUDY_NAME = "studyName";       
-    public static final String REQUEST_PARAM_DATASET_NAME = "dataSetName"; 
+    public static final String REQUEST_PARAM_STUDY_ID = "studyId";       
+    public static final String REQUEST_PARAM_DATASET_ID = "dataSetId"; 
     
     @Autowired    
     private RegistryService registryService;
@@ -56,8 +56,8 @@ public class ToolLibraryController extends BaseController
             validateParameterMap(
                 paramMap,
                 REQUEST_PARAM_USER_NAME,
-                REQUEST_PARAM_STUDY_NAME,
-                REQUEST_PARAM_DATASET_NAME);  
+                REQUEST_PARAM_STUDY_ID,
+                REQUEST_PARAM_DATASET_ID);  
         
         if (!params.isEmpty()) 
         {
@@ -66,17 +66,17 @@ public class ToolLibraryController extends BaseController
             if (userName == null) {
                 missingParams.add(REQUEST_PARAM_USER_NAME);
             }
-            String studyName = params.get(REQUEST_PARAM_STUDY_NAME);
-            if (studyName == null) {
-                missingParams.add(REQUEST_PARAM_STUDY_NAME);
+            String studyId = params.get(REQUEST_PARAM_STUDY_ID);
+            if (studyId == null) {
+                missingParams.add(REQUEST_PARAM_STUDY_ID);
             }            
-            String dataSetName = params.get(REQUEST_PARAM_DATASET_NAME);
-            if (dataSetName == null) {
-                missingParams.add(REQUEST_PARAM_DATASET_NAME);
+            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);
+            if (dataSetId == null) {
+                missingParams.add(REQUEST_PARAM_DATASET_ID);
             }            
-            if ((studyName == null) || 
-                (userName == null) || 
-                (dataSetName == null)) 
+            if ((userName == null) || 
+                (studyId == null) || 
+                (dataSetId == null)) 
             {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
@@ -84,7 +84,12 @@ public class ToolLibraryController extends BaseController
             return
                 toolLibraryRepository.
                     findToolLibraryByStudyPolicyStatement(
-                        userName, studyName, dataSetName);
+                        userName,
+                        validateIntegerParameter(
+                            REQUEST_PARAM_STUDY_ID, studyId),
+                        validateIntegerParameter(
+                            REQUEST_PARAM_DATASET_ID, dataSetId)
+                    );
         }        
         List<ToolLibrary> toolLibraries = new ArrayList<ToolLibrary>();
         Iterator iter = toolLibraryRepository.findAll().iterator();

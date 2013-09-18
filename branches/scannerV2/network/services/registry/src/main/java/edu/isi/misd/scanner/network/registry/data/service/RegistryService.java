@@ -26,6 +26,13 @@ public interface RegistryService
      * @param studyId
      */
     public void deleteStudy(Integer studyId);
+
+    /**
+     * Checks that the user is authorized to view a Study
+     * @param studyId
+     * @param userName
+     */    
+    public boolean userCanViewStudy(Integer studyId, String userName);
     
     /**
      * Checks that the user is authorized to manage a Study

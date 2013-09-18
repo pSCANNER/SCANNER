@@ -35,8 +35,7 @@ public class DataSetInstanceController extends BaseController
 
     public static final String BASE_PATH = "/instances";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
-    public static final String REQUEST_PARAM_DATASET_ID = "dataSetId";
-    public static final String REQUEST_PARAM_DATASET_NAME = "dataSetName";    
+    public static final String REQUEST_PARAM_DATASET_ID = "dataSetId";    
     public static final String REQUEST_PARAM_USER_NAME = "userName";
      
     @Autowired
@@ -52,13 +51,11 @@ public class DataSetInstanceController extends BaseController
             validateParameterMap(
                 paramMap,
                 REQUEST_PARAM_DATASET_ID,
-                REQUEST_PARAM_DATASET_NAME,
                 REQUEST_PARAM_USER_NAME);
         
         if (!params.isEmpty()) 
         {
-            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);
-            String dataSetName = params.get(REQUEST_PARAM_DATASET_NAME);            
+            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);         
             String userName = params.get(REQUEST_PARAM_USER_NAME);
             if ((dataSetId != null) && (userName != null)) {              
                 return
@@ -67,18 +64,10 @@ public class DataSetInstanceController extends BaseController
                             validateIntegerParameter(
                                 REQUEST_PARAM_DATASET_ID, dataSetId),
                             userName);
-            }
-            if ((dataSetName!= null) && (userName != null)) {            
-                return
-                    dataSetInstanceRepository.
-                        findDataSetInstancesForDataSetNameAndUserName(
-                            dataSetName, userName);
-            }            
-            if ((dataSetId == null) && (dataSetName == null)) {
+            }           
+            if (dataSetId == null) {
                 throw new BadRequestException(
-                    "Required parameter missing, must provide either " + 
-                    REQUEST_PARAM_DATASET_ID + " or " + 
-                    REQUEST_PARAM_DATASET_NAME);                
+                    "Required parameter missing: " + REQUEST_PARAM_DATASET_ID);                
             }
             if (userName == null) {
                 throw new BadRequestException(

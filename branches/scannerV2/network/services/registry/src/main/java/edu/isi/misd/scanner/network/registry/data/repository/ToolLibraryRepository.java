@@ -17,11 +17,11 @@ public interface ToolLibraryRepository
            "JOIN l.analysisTools a JOIN a.studyPolicyStatements p " +
            "JOIN p.studyRole r JOIN r.userRoles ur " +
            "WHERE ur.user.userName = :userName " +
-           "AND p.study.studyName = :studyName " +
-           "AND p.dataSetDefinition.dataSetName = :dataSetName " +
+           "AND p.study.studyId = :studyId " +
+           "AND p.dataSetDefinition.dataSetDefinitionId = :dataSetId " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
     List<ToolLibrary> findToolLibraryByStudyPolicyStatement(
         @Param("userName")String userName,
-        @Param("studyName") String studyName,
-        @Param("dataSetName")String dataSetName);
+        @Param("studyId") Integer studyId,
+        @Param("dataSetId")Integer dataSetId);
 }

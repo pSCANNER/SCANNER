@@ -12,8 +12,8 @@ import org.springframework.data.repository.CrudRepository;
 public interface UserRoleRepository 
     extends CrudRepository<UserRole, Integer> 
 {
-   List<UserRole> findByUserUserId(Integer userId);  
+   List<UserRole> findByUserUserName(String userName);  
    List<UserRole> findByStudyRoleStudyStudyId(Integer studyId);       
-   List<UserRole> findByUserUserIdAndStudyRoleStudyStudyId(
-       Integer userId, Integer studyId);     
+   List<UserRole> findByUserUserNameAndStudyRoleStudyStudyId(
+       String userName, Integer studyId);     
 }

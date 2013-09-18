@@ -197,8 +197,8 @@ public class RegistryServiceImpl implements RegistryService
          */
         ArrayList<UserRole> newUserRoles = new ArrayList<UserRole>();            
         List<StudyRole> studyRolesForUser = 
-            studyRoleRepository.findByStudyStudyIdAndScannerUsersUserId(
-                study.getStudyId(), study.getStudyOwner().getUserId());
+            studyRoleRepository.findByStudyStudyIdAndScannerUsersUserName(
+                study.getStudyId(), study.getStudyOwner().getUserName());
         for (StudyRole studyRole : defaultStudyRolesToUserRoles) 
         {                
             if (studyRolesForUser.contains(studyRole)) {
@@ -251,6 +251,33 @@ public class RegistryServiceImpl implements RegistryService
     }
     
     /**
+     * Checks if the userName specified can view the studyId specified.
+     * @param studyId
+     * @param userName
+     * @return true if the user can view the study, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */      
+    @Override
+    public boolean userCanViewStudy(Integer studyId, String userName) 
+    {
+        // maybe this is too permissive and should be checked independently
+        if (userIsSuperuser(userName)) {
+            return true;
+        }
+        
+        // check that the current user has the proper role for this operation
+        // if so, one or more StudyRoles will be returned.
+        List<StudyRole> studyRoles = 
+            studyRoleRepository.findByStudyStudyIdAndScannerUsersUserName(
+                studyId, userName);
+        
+        if (studyRoles.isEmpty()) {
+            return false;
+        }        
+        return true;
+    }
+    
+    /**
      * Checks if the userName specified can manage the studyId specified.
      * @param studyId
      * @param userName
@@ -261,7 +288,7 @@ public class RegistryServiceImpl implements RegistryService
     public boolean userCanManageStudy(Integer studyId, String userName)
         throws ForbiddenException
     {
-        // maybe this should be disabled
+        // maybe this is too permissive and should be checked independently
         if (userIsSuperuser(userName)) {
             return true;
         }

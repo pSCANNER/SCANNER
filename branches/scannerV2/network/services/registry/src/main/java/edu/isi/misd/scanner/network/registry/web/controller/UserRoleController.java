@@ -42,7 +42,7 @@ public class UserRoleController extends BaseController
     
     public static final String BASE_PATH = "/userRoles";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH; 
-    public static final String REQUEST_PARAM_USER_ID = "userId";      
+    public static final String REQUEST_PARAM_USER_NAME = "userName";      
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";  
     
     @Autowired
@@ -62,24 +62,21 @@ public class UserRoleController extends BaseController
     {
         Map<String,String> params = 
             validateParameterMap(
-                paramMap, REQUEST_PARAM_USER_ID, REQUEST_PARAM_STUDY_ID); 
+                paramMap, REQUEST_PARAM_USER_NAME, REQUEST_PARAM_STUDY_ID); 
         
-        String userId = params.get(REQUEST_PARAM_USER_ID);        
+        String userName = params.get(REQUEST_PARAM_USER_NAME);        
         String studyId = params.get(REQUEST_PARAM_STUDY_ID);        
-        if ((userId != null) && (studyId != null)) 
+        if ((userName != null) && (studyId != null)) 
         {
             return 
-                userRoleRepository.findByUserUserIdAndStudyRoleStudyStudyId(
-                    validateIntegerParameter(
-                        REQUEST_PARAM_USER_ID, userId), 
+                userRoleRepository.findByUserUserNameAndStudyRoleStudyStudyId(
+                    userName, 
                     validateIntegerParameter(
                         REQUEST_PARAM_STUDY_ID, studyId)
                 );
-        } else if (userId != null) {
+        } else if (userName != null) {
             return 
-                userRoleRepository.findByUserUserId(
-                    validateIntegerParameter(
-                        REQUEST_PARAM_USER_ID, userId));
+                userRoleRepository.findByUserUserName(userName);
         } else if (studyId != null) {         
             return
                 userRoleRepository.findByStudyRoleStudyStudyId(

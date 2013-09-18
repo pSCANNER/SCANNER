@@ -15,18 +15,18 @@ public interface DataSetDefinitionRepository
 {   
     @Query("SELECT DISTINCT d FROM DataSetDefinition d " +  
            "JOIN d.studyPolicyStatements p JOIN p.study s " + 
-           "WHERE s.studyName = :studyName " +
+           "WHERE s.studyId = :studyId " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
-    List<DataSetDefinition> findDataSetsForStudyName(
-        @Param("studyName")String studyName);
+    List<DataSetDefinition> findDataSetsForStudyId(
+        @Param("studyId")Integer studyId);
     
  
     @Query("SELECT DISTINCT d FROM DataSetDefinition d " +  
            "JOIN d.studyPolicyStatements p JOIN p.study s " + 
            "JOIN p.studyRole r JOIN r.userRoles ur JOIN ur.user u " +
-           "WHERE s.studyName = :studyName AND u.userName = :userName " +
+           "WHERE s.studyId = :studyId AND u.userName = :userName " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
-    List<DataSetDefinition> findDataSetsForStudyNameAndUserName(
-        @Param("studyName")String studyName,
+    List<DataSetDefinition> findDataSetsForStudyIdAndUserName(
+        @Param("studyId")Integer studyId,
         @Param("userName")String userName);    
 }

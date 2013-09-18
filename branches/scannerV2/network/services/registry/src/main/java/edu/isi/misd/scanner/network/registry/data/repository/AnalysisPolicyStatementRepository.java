@@ -15,13 +15,13 @@ public interface AnalysisPolicyStatementRepository
 {               
     @Query("SELECT p FROM AnalysisPolicyStatement p " +
            "JOIN p.studyRole r JOIN r.userRoles ur JOIN ur.user u " +
-           "WHERE u.userId = :userId " + 
+           "WHERE u.userName = :userName " + 
            "AND p.dataSetInstance.dataSetInstanceId = :instanceId " +
            "AND p.analysisTool.toolId = :toolId " + 
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
     List<AnalysisPolicyStatement> 
-        findAnalysisPolicyStatementByUserIdAndInstanceIdAndToolId(
-            @Param("userId") Integer userId,
+        findAnalysisPolicyStatementByUserNameAndInstanceIdAndToolId(
+            @Param("userName") String userName,
             @Param("instanceId") Integer instanceId,
             @Param("toolId") Integer toolId); 
 }

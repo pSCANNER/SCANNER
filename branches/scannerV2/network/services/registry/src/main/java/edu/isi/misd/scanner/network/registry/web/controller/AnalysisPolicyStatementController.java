@@ -35,7 +35,7 @@ public class AnalysisPolicyStatementController extends BaseController
     
     public static final String BASE_PATH = "/analysisPolicies";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
-    public static final String REQUEST_PARAM_USER_ID = "userId";   
+    public static final String REQUEST_PARAM_USER_NAME = "userName";   
     public static final String REQUEST_PARAM_INSTANCE_ID = "dataSetInstanceId"; 
     public static final String REQUEST_PARAM_ANALYSIS_TOOL_ID = "analysisToolId";     
     
@@ -51,16 +51,16 @@ public class AnalysisPolicyStatementController extends BaseController
         Map<String,String> params = 
             validateParameterMap(
                 paramMap,
-                REQUEST_PARAM_USER_ID,
+                REQUEST_PARAM_USER_NAME,
                 REQUEST_PARAM_INSTANCE_ID,
                 REQUEST_PARAM_ANALYSIS_TOOL_ID);
         
         if (!params.isEmpty()) 
         {
             ArrayList<String> missingParams = new ArrayList<String>();            
-            String userId = params.get(REQUEST_PARAM_USER_ID);  
-            if (userId == null) {
-                missingParams.add(REQUEST_PARAM_USER_ID);
+            String userName = params.get(REQUEST_PARAM_USER_NAME);  
+            if (userName == null) {
+                missingParams.add(REQUEST_PARAM_USER_NAME);
             }              
             String instanceId = params.get(REQUEST_PARAM_INSTANCE_ID);
             if (instanceId == null) {
@@ -70,7 +70,7 @@ public class AnalysisPolicyStatementController extends BaseController
             if (toolId == null) {
                 missingParams.add(REQUEST_PARAM_ANALYSIS_TOOL_ID);
             }                     
-            if ((userId == null) || 
+            if ((userName == null) || 
                 (instanceId == null) ||                
                 (toolId == null)) 
             {
@@ -79,9 +79,8 @@ public class AnalysisPolicyStatementController extends BaseController
             }             
             return
                 analysisPolicyStatementRepository.
-                    findAnalysisPolicyStatementByUserIdAndInstanceIdAndToolId(
-                        validateIntegerParameter(
-                            REQUEST_PARAM_USER_ID, userId),
+                    findAnalysisPolicyStatementByUserNameAndInstanceIdAndToolId(
+                        userName,
                         validateIntegerParameter(
                             REQUEST_PARAM_INSTANCE_ID, instanceId),
                         validateIntegerParameter(

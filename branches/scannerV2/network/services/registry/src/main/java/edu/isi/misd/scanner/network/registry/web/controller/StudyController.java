@@ -1,6 +1,8 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
+import edu.isi.misd.scanner.network.registry.data.domain.ScannerUser;
 import edu.isi.misd.scanner.network.registry.data.domain.Study;
+import edu.isi.misd.scanner.network.registry.data.repository.ScannerUserRepository;
 import edu.isi.misd.scanner.network.registry.data.repository.StudyRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
@@ -39,11 +41,13 @@ public class StudyController extends BaseController
     public static final String BASE_PATH = "/studies"; 
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;
     public static final String REQUEST_PARAM_STUDY_NAME = "studyName";
-    public static final String REQUEST_PARAM_USER_NAME = "userName";
-    public static final String REQUEST_PARAM_USER_ID = "userId";    
+    public static final String REQUEST_PARAM_USER_NAME = "userName";  
     
     @Autowired
     private StudyRepository studyRepository;       
+    
+    @Autowired
+    private ScannerUserRepository scannerUserRepository;  
     
     @Autowired
     private RegistryService registryService;   
@@ -51,39 +55,59 @@ public class StudyController extends BaseController
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces=HEADER_JSON_MEDIA_TYPE)                    
-	public @ResponseBody List<Study> getStudies(      
+	public @ResponseBody List<Study> getStudies(
+        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,          
         @RequestParam Map<String, String> paramMap) 
     {
+        // get the user record for the current user
+        ScannerUser loggedInUser = 
+            scannerUserRepository.findByUserName(loginName);
+        if (loggedInUser == null) {
+            throw new ForbiddenException(
+                loginName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
+        }
+        
         Map<String,String> params = 
             validateParameterMap(
                 paramMap,
                 REQUEST_PARAM_STUDY_NAME,
-                REQUEST_PARAM_USER_NAME,
-                REQUEST_PARAM_USER_ID);  
+                REQUEST_PARAM_USER_NAME);  
         
         String studyName = params.get(REQUEST_PARAM_STUDY_NAME);
-        String userName = params.get(REQUEST_PARAM_USER_NAME);
-        String userId = params.get(REQUEST_PARAM_USER_ID);        
+        String userName = params.get(REQUEST_PARAM_USER_NAME);       
         List<Study> studies = new ArrayList<Study>();        
         if (studyName != null) {
             Study study = studyRepository.findByStudyName(studyName);
             if (study == null) {
                 throw new ResourceNotFoundException(studyName);
             }
+            if (!registryService.userCanViewStudy(
+                study.getStudyId(), loginName)) {
+                throw new ForbiddenException(
+                    loginName,
+                    "Unable to view study. " +
+                    RegistryServiceConstants.MSG_STUDY_ROLE_REQUIRED);                   
+            }
             studies.add(study);
-        } else if (userId != null) {
-            return 
-                studyRepository.findStudiesForUserId(
-                    validateIntegerParameter(
-                        REQUEST_PARAM_USER_ID, userId));
         } else if (userName != null) {
+            if ((!userName.equalsIgnoreCase(loggedInUser.getUserName())) && 
+                (!loggedInUser.getIsSuperuser())) {
+                throw new ForbiddenException(
+                    loginName,
+                    "Unable to view studies for another user. " +
+                    RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);                
+            }
             return 
                 studyRepository.findStudiesForUserName(userName);
         } else {
-            Iterator iter = studyRepository.findAll().iterator();
-            CollectionUtils.addAll(studies, iter);      
-        }
-        return studies;   
+            if (loggedInUser.getIsSuperuser()) {
+                Iterator iter = studyRepository.findAll().iterator();
+                CollectionUtils.addAll(studies, iter);              
+            } else {
+                return studyRepository.findStudiesForUserName(loginName);
+            }
+        }  
+        return studies;                 
     }
     
     @RequestMapping(value = BASE_PATH,
@@ -107,13 +131,20 @@ public class StudyController extends BaseController
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody Study getStudy(
+        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         Study foundStudy = studyRepository.findOne(id);
-
         if (foundStudy == null) {
             throw new ResourceNotFoundException(id);
-        }
+        }        
+        if (!registryService.userCanViewStudy(
+            foundStudy.getStudyId(), loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                "Unable to view study. " +
+                RegistryServiceConstants.MSG_STUDY_ROLE_REQUIRED);                   
+        }        
         return foundStudy;
     }  
     
