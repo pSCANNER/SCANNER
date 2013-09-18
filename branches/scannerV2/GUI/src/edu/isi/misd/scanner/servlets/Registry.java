@@ -18,7 +18,6 @@ package edu.isi.misd.scanner.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -36,7 +35,6 @@ import edu.isi.misd.scanner.client.ERDClient;
 import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.client.RegistryClient;
 import edu.isi.misd.scanner.client.RegistryClientResponse;
-import edu.isi.misd.scanner.utils.Utils;
 
 /**
  * Servlet for implementing the web service registry API.
@@ -91,13 +89,7 @@ public class Registry extends HttpServlet {
 		}
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		String res = "";
-		String name = request.getParameter("cname");
-		String study = request.getParameter("study");
 		String studyId = request.getParameter("studyId");
-		String lib = request.getParameter("library");
-		String dataset = request.getParameter("dataset");
-		String func = request.getParameter("method");
-		String site = request.getParameter("site");
 		RegistryClientResponse clientResponse = null;
 		if (action.equals("getMyStudies")) {
 			clientResponse = registryClient.getMyStudies();
@@ -167,7 +159,6 @@ public class Registry extends HttpServlet {
 				res = responseObject.toString();
 				System.out.println("getStudyData responseBody: " + res);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("getAllStudies")) {
@@ -240,22 +231,6 @@ public class Registry extends HttpServlet {
 				res = clientResponse.getEntityResponse().toString();
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies for study ." + studyId);
-				return;
-			}
-		} else if (action.equals("getSite")) {
-			clientResponse = registryClient.getSite(name);
-			if (clientResponse != null) {
-				res = clientResponse.toSite();
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site.");
-				return;
-			}
-		} else if (action.equals("getPI")) {
-			clientResponse = registryClient.getPI();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityString();
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site.");
 				return;
 			}
 		} else {
@@ -340,37 +315,6 @@ public class Registry extends HttpServlet {
 		String dataSource = request.getParameter("dataSource");
 		String nodeId = request.getParameter("nodeId");
 		
-		
-		String study = request.getParameter("study");
-		String id = request.getParameter("id");
-		String name = request.getParameter("cname");
-		String rpath = request.getParameter("rpath");
-		String lib = request.getParameter("library");
-		String rURL = request.getParameter("rURL");
-		String datasource = request.getParameter("datasource");
-		String dataset = request.getParameter("dataset");
-		String func = request.getParameter("method");
-		String site = request.getParameter("site");
-		String resourceValues = request.getParameter("values"); 
-		String title = request.getParameter("title"); 
-		String email = request.getParameter("email"); 
-		String phone = request.getParameter("phone"); 
-		String website = request.getParameter("website"); 
-		String address = request.getParameter("address"); 
-		String contact = request.getParameter("contact"); 
-		String approvals = request.getParameter("approvals"); 
-		String variables = request.getParameter("variables"); 
-		String path = request.getParameter("path"); 
-		String users = request.getParameter("users"); 
-		String agreement = request.getParameter("agreement"); 
-		Integer minOccurs = null; 
-		Integer maxOccurs = null; 
-		if (request.getParameter("minOccurs") != null) {
-			minOccurs = Integer.parseInt(request.getParameter("minOccurs"));
-		}
-		if (request.getParameter("maxOccurs") != null) {
-			maxOccurs = Integer.parseInt(request.getParameter("maxOccurs"));
-		}
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
 		if (action.equals("createStudy")) {
@@ -417,7 +361,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("createStudyRequestedSites")) {
@@ -439,7 +382,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("createStudyRequestedSites responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("createUserRole")) {
@@ -464,7 +406,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("createStudyRequestedSites responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("createStudyPolicy")) {
@@ -491,7 +432,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("createStudyPolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("createSitePolicy")) {
@@ -518,7 +458,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("createSitePolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("createDatasetInstance")) {
@@ -545,7 +484,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("createDatasetInstance responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("deleteStudyRequestedSites")) {
@@ -566,7 +504,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("deleteStudyRequestedSites responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("deleteUserRole")) {
@@ -587,7 +524,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("deleteUserRole responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("deleteStudyPolicy")) {
@@ -608,7 +544,6 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("deleteStudyPolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else if (action.equals("deleteAnalyzePolicy")) {
@@ -629,198 +564,7 @@ public class Registry extends HttpServlet {
 				responseBody = responseObject.toString();
 				System.out.println("deleteSitePolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
-		} else if (action.equals("createDataset")) {
-			try {
-				ArrayList<String> values = null;
-				if (variables != null) {
-					JSONArray arr = new JSONArray(variables);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				}
-				clientResponse = registryClient.createDataset(name, study, description, values);
-				if (clientResponse != null) {
-					responseBody = Utils.extractId(clientResponse.getEntityString());
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create dataset.");
-					return;
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("createLibrary")) {
-			clientResponse = registryClient.createLibrary(name, rpath, description);
-			if (clientResponse != null) {
-				responseBody = Utils.extractId(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create library.");
-				return;
-			}
-		} else if (action.equals("createMethod")) {
-			try {
-				ArrayList<String> values = null;
-				if (lib != null) {
-					JSONArray arr = new JSONArray(lib);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				}
-				clientResponse = registryClient.createMethod(name, values, rpath, description);
-				if (clientResponse != null) {
-					responseBody = Utils.extractId(clientResponse.getEntityString());
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create method.");
-					return;
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("createMaster")) {
-			clientResponse = registryClient.createMaster(rURL, title,
-					email, phone, website, address, contact);
-			if (clientResponse != null) {
-				responseBody = Utils.extractId(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create master.");
-				return;
-			}
-		} else if (action.equals("createWorker")) {
-				try {
-					ArrayList<String> values = null;
-					if (users != null) {
-						JSONArray arr;
-						arr = new JSONArray(users);
-						if (arr.length() > 0) {
-							values = new ArrayList<String>();
-							for (int i=0; i < arr.length(); i++) {
-								values.add(arr.getString(i));
-							}
-						}
-					}
-					clientResponse = registryClient.createWorker(study, dataset, lib, func, site, datasource, values);
-					if (clientResponse != null) {
-						responseBody = Utils.extractId(clientResponse.getEntityString());
-					} else {
-						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create worker.");
-						return;
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-		} else if (action.equals("createSite")) {
-			clientResponse = registryClient.createSite(name, rURL, title,
-					email, phone, website, address, agreement, contact);
-			if (clientResponse != null) {
-				responseBody = Utils.extractId(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create site.");
-				return;
-			}
-		} else if (action.equals("createParameter")) {
-			try {
-				ArrayList<String> values = null;
-				if (resourceValues != null) {
-					JSONArray arr = new JSONArray(resourceValues);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				}
-				ArrayList<String> libs = null;
-				if (resourceValues != null) {
-					JSONArray arr = new JSONArray(lib);
-					if (arr.length() > 0) {
-						libs = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							libs.add(arr.getString(i));
-						}
-					}
-				}
-				clientResponse = registryClient.createParameter(name, func, libs, 
-						minOccurs, maxOccurs, values, path, description);
-				if (clientResponse != null) {
-					responseBody = Utils.extractId(clientResponse.getEntityString());
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create parameter.");
-					return;
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("deleteMethod")) {
-			clientResponse = registryClient.deleteMethod(name, lib);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete method.");
-				return;
-			}
-		} else if (action.equals("deleteLibrary")) {
-			clientResponse = registryClient.deleteLibrary(name);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete library.");
-				return;
-			}
-		} else if (action.equals("deleteDataset")) {
-			clientResponse = registryClient.deleteDataset(name, study);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete dataset.");
-				return;
-			}
-		} else if (action.equals("deleteStudy")) {
-			clientResponse = registryClient.deleteStudy(name);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete study.");
-				return;
-			}
-		} else if (action.equals("deleteMaster")) {
-			clientResponse = registryClient.deleteMaster();
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete master.");
-				return;
-			}
-		}  else if (action.equals("deleteSite")) {
-			clientResponse = registryClient.deleteSite(name);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete site.");
-				return;
-			}
-		} else if (action.equals("deleteParameter")) {
-			clientResponse = registryClient.deleteParameter(name, func, lib);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete parameter.");
-				return;
-			}
-		} else if (action.equals("deleteWorker")) {
-			clientResponse = registryClient.deleteWorker(study, dataset, lib, func, site);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete worker.");
-				return;
 			}
 		} else if (action.equals("updateStudy")) {
 			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, studyOwner, studyStatusType,
@@ -862,134 +606,6 @@ public class Registry extends HttpServlet {
 				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("responseBody: " + responseBody);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} else if (action.equals("updateDataset")) {
-			try {
-				ArrayList<String> values = null;
-				if (variables != null) {
-					JSONArray arr = new JSONArray(variables);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				}
-				clientResponse = registryClient.updateDataset(id, name, study, description, values);
-				if (clientResponse != null) {
-					responseBody = Utils.getEntity(clientResponse.getEntityString());
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update dataset.");
-					return;
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("updateLibrary")) {
-			clientResponse = registryClient.updateLibrary(id, name, rpath, description);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update library.");
-				return;
-			}
-		} else if (action.equals("updateMethod")) {
-			try {
-				ArrayList<String> values = null;
-				if (lib != null) {
-					JSONArray arr = new JSONArray(lib);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				}
-				clientResponse = registryClient.updateMethod(id, name, values, rpath, description);
-				if (clientResponse != null) {
-					responseBody = Utils.getEntity(clientResponse.getEntityString());
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update method.");
-					return;
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("updateMaster")) {
-			clientResponse = registryClient.updateMaster(rURL, title,
-					email, phone, website, address, contact);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update master.");
-				return;
-			}
-		}  else if (action.equals("updateSite")) {
-			clientResponse = registryClient.updateSite(id, name, rURL, title,
-					email, phone, website, address, agreement, contact);
-			if (clientResponse != null) {
-				responseBody = Utils.getEntity(clientResponse.getEntityString());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update site.");
-				return;
-			}
-		} else if (action.equals("updateWorker")) {
-			try {
-				ArrayList<String> values = null;
-				if (users != null) {
-					JSONArray arr;
-					arr = new JSONArray(users);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				}
-				clientResponse = registryClient.updateWorker(id, study, dataset, lib, func, site, 
-						datasource, values);
-				if (clientResponse != null) {
-					responseBody = Utils.getEntity(clientResponse.getEntityString());
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update worker.");
-					return;
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		} else if (action.equals("updateParameter")) {
-			try {
-				ArrayList<String> values = null;
-				ArrayList<String> libs = null;
-				if (resourceValues != null) {
-					JSONArray arr = new JSONArray(resourceValues);
-					if (arr.length() > 0) {
-						values = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							values.add(arr.getString(i));
-						}
-					}
-				}
-				if (lib != null) {
-					JSONArray arr = new JSONArray(lib);
-					if (arr.length() > 0) {
-						libs = new ArrayList<String>();
-						for (int i=0; i < arr.length(); i++) {
-							libs.add(arr.getString(i));
-						}
-					}
-				}
-				clientResponse = registryClient.updateParameter(id, name, func, libs, 
-					 minOccurs, maxOccurs, values, path, description);
-				if (clientResponse != null) {
-					responseBody = Utils.getEntity(clientResponse.getEntityString());
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update parameter.");
-					return;
-				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

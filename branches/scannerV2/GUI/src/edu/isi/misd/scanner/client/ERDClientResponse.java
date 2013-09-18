@@ -213,96 +213,6 @@ public class ERDClientResponse implements RegistryClientResponse {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toWorkers()
-	 */
-	@Override
-	public String toWorkers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toContacts()
-	 */
-	@Override
-	public String toContacts() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toStudy()
-	 */
-	@Override
-	public String toStudy() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toDataset()
-	 */
-	@Override
-	public String toDataset() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toLibrary()
-	 */
-	@Override
-	public String toLibrary() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toMethod()
-	 */
-	@Override
-	public String toMethod() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toMaster()
-	 */
-	@Override
-	public String toMaster() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toWorker()
-	 */
-	@Override
-	public String toWorker() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toParameter()
-	 */
-	@Override
-	public String toParameter() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toSite()
-	 */
-	@Override
-	public String toSite() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toMasterString()
 	 */
 	@Override
@@ -340,15 +250,6 @@ public class ERDClientResponse implements RegistryClientResponse {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toLibraryString()
-	 */
-	@Override
-	public String toLibraryString() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#toSiteString()
 	 */
 	@Override
@@ -370,15 +271,6 @@ public class ERDClientResponse implements RegistryClientResponse {
 			e.printStackTrace();
 		}
 		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClientResponse#getResourceId()
-	 */
-	@Override
-	public String getResourceId() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/* (non-Javadoc)
@@ -427,7 +319,6 @@ public class ERDClientResponse implements RegistryClientResponse {
 				ret.put(rootObj);
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -464,7 +355,6 @@ public class ERDClientResponse implements RegistryClientResponse {
 				}
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -482,7 +372,6 @@ public class ERDClientResponse implements RegistryClientResponse {
 				ret.put(jsonValues.get(i));
 			}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -500,7 +389,6 @@ public class ERDClientResponse implements RegistryClientResponse {
 
 	@Override
 	public JSONArray toNodes() {
-		// TODO Auto-generated method stub
 		JSONArray ret = new JSONArray();
 		try {
 			for (int i=0; i < entityResponse.length(); i++) {

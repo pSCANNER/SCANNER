@@ -89,11 +89,6 @@ public class Analyze extends HttpServlet {
 		String action = request.getParameter("action");
 		HttpSession session = request.getSession(false);
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
-		if (!registryClient.hasRoles()) {
-			PrintWriter out = response.getWriter();
-			out.print("{}");
-			return;
-		}
 		if (action.equals("getStudies")) {
 			RegistryClientResponse clientResponse = registryClient.getStudies();
 			retrievedStudies = clientResponse.getEntityResponse();
@@ -256,10 +251,6 @@ public class Analyze extends HttpServlet {
 			} else if (action.equals("getResultsAsync")) {
 				try {
 					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
-					if (!registryClient.hasRoles()) {
-						response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-						return;
-					}
 					int userId = (Integer) session.getAttribute("userId");
 					String params = request.getParameter("parameters");
 					String sites = request.getParameter("sites");

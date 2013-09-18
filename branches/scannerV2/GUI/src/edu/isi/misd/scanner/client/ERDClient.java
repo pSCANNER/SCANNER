@@ -9,8 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,154 +54,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createDataset(java.lang.String, java.lang.String, java.lang.String, java.util.List)
-	 */
-	@Override
-	public RegistryClientResponse createDataset(String name, String study,
-			String description, List<String> variables) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createLibrary(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse createLibrary(String name, String urlPath,
-			String description) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createMethod(java.lang.String, java.util.List, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse createMethod(String name, List<String> libs,
-			String urlPath, String description) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createMaster(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse createMaster(String url, String title,
-			String email, String phone, String website, String address,
-			String contact) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createSite(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse createSite(String name, String rURL,
-			String title, String email, String phone, String website,
-			String address, String agreement, String contact) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createParameter(java.lang.String, java.lang.String, java.util.List, java.lang.Integer, java.lang.Integer, java.util.List, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse createParameter(String name, String func,
-			List<String> libs, Integer minOccurs, Integer maxOccurs,
-			List<String> values, String path, String description) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#createWorker(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List)
-	 */
-	@Override
-	public RegistryClientResponse createWorker(String study, String dataset,
-			String lib, String func, String site, String sourceData,
-			List<String> users) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteStudy(java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse deleteStudy(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteDataset(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse deleteDataset(String name, String study) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteLibrary(java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse deleteLibrary(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteMethod(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse deleteMethod(String name, String lib) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteMaster()
-	 */
-	@Override
-	public RegistryClientResponse deleteMaster() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteSite(java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse deleteSite(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteParameter(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse deleteParameter(String name, String func,
-			String lib) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#deleteWorker(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse deleteWorker(String study, String dataset,
-			String lib, String func, String site) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClient#updateStudy(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -233,81 +83,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			e.printStackTrace();
 		}
 		return ret;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#updateDataset(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List)
-	 */
-	@Override
-	public RegistryClientResponse updateDataset(String id, String name,
-			String study, String description, List<String> variables) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#updateLibrary(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse updateLibrary(String id, String name,
-			String urlPath, String description) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#updateMethod(java.lang.String, java.lang.String, java.util.List, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse updateMethod(String id, String name,
-			List<String> libs, String urlPath, String description) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#updateParameter(java.lang.String, java.lang.String, java.lang.String, java.util.List, java.lang.Integer, java.lang.Integer, java.util.List, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse updateParameter(String id, String name,
-			String func, List<String> libs, Integer minOccurs,
-			Integer maxOccurs, List<String> values, String path,
-			String description) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#updateMaster(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse updateMaster(String url, String title,
-			String email, String phone, String website, String address,
-			String contact) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#updateSite(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse updateSite(String id, String name,
-			String rURL, String title, String email, String phone,
-			String website, String address, String agreement, String contact) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#updateWorker(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List)
-	 */
-	@Override
-	public RegistryClientResponse updateWorker(String id, String study,
-			String dataset, String lib, String func, String site,
-			String sourceData, List<String> users) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/* (non-Javadoc)
@@ -416,15 +191,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getVariables(java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getVariables(String dataset) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getSites(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -442,61 +208,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getWorkers(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.List)
-	 */
-	@Override
-	public RegistryClientResponse getWorkers(String study, String dataset,
-			String lib, String func, List<String> sites) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getStudy(java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getStudy(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getDataset(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getDataset(String name, String study) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getLibrary(java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getLibrary(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getLibraryObject(java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getLibraryObject(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getMethod(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getMethod(String name, String lib) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getMethodObject(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -507,15 +218,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getMaster()
-	 */
-	@Override
-	public RegistryClientResponse getMaster() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/* (non-Javadoc)
@@ -532,70 +234,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getParameter(java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getParameter(String name, String func,
-			String lib) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getWorker(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getWorker(String study, String dataset,
-			String lib, String func, String site) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getSite(java.lang.String)
-	 */
-	@Override
-	public RegistryClientResponse getSite(String site) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getSiteObject(java.util.List)
-	 */
-	@Override
-	public RegistryClientResponse getSiteObject(List<String> sites, String study) {
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getContacts()
-	 */
-	@Override
-	public RegistryClientResponse getContacts() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#hasRoles()
-	 */
-	@Override
-	public boolean hasRoles() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getRoles()
-	 */
-	@Override
-	public List<String> getRoles() {
-		// TODO Auto-generated method stub
-		return new ArrayList<String>();
-	}
-
-	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getSitesMap()
 	 */
 	@Override
@@ -606,15 +244,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
-	}
-
-	/* (non-Javadoc)
-	 * @see edu.isi.misd.scanner.client.RegistryClient#getPI()
-	 */
-	@Override
-	public RegistryClientResponse getPI() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	protected String getUserPredicate(String prefix) {
@@ -846,7 +475,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -896,7 +524,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -949,7 +576,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -994,7 +620,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
@@ -1033,7 +658,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ret;
