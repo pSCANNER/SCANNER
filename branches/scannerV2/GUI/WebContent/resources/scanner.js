@@ -2766,8 +2766,6 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	select.html('');
 	select.change(function(event) {checkAddStudyProtocolButton();});
 	var option = $('<option>');
-	option.text('Estimate model...');
-	var option = $('<option>');
 	option.text('using data set...');
 	option.attr('value', '');
 	select.append(option);
@@ -2799,8 +2797,6 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	var select = $('#studySendOptions');
 	select.html('');
 	select.change(function(event) {checkAddStudyProtocolButton();});
-	var option = $('<option>');
-	option.text('Estimate model...');
 	var option = $('<option>');
 	option.text('and release results...');
 	option.attr('value', '');
@@ -3222,17 +3218,23 @@ function postAddStudyProtocol(data, textStatus, jqXHR, param) {
 
 function addSiteProtocol() {
 	var obj = {};
-	var protocol = activeStudy['studyPolicies'][$('#estimateStudyProtocolSelect').val()];
-	obj['tool'] = protocol['tool'];
-	obj['dataset'] = protocol['dataset'];
-	obj['datasetInstance'] = $('#datasetInstances').val();
-	obj['accessMode'] = protocol['accessMode'];
-	obj['role'] = protocol['role'];
-	activeStudy['protocols'].push(obj);
-	addProtocolRow(obj);
-	if (activeStudy['studyId'] != 1) {
-		addProtocolViewRow(obj);
-	}
+	obj['action'] = 'createSitePolicy';
+	var protocol = studyPoliciesDict[$('#estimateStudyProtocolSelect').val()];
+	obj['roleId'] = protocol['studyRole']['roleId'];
+	obj['dataSetInstanceId'] = $('#datasetInstances').val();
+	obj['toolId'] = protocol['analysisTool']['toolId'];
+	obj['accessModeId'] = protocol['accessMode']['accessModeId'];
+	obj['studyPolicyStatementId'] = protocol['studyPolicyStatementId'];
+	var url =  HOME + '/registry';
+	scanner.POST(url, obj, true, postAddSiteProtocol, null, null, 0);
+}
+
+function postAddSiteProtocol(data, textStatus, jqXHR, param) {
+	$('#estimateStudyProtocolSelect').val('');
+	$('#datasetInstances').val('');
+	data = $.parseJSON(data);
+	postInitAnalysisPolicies(data['analysisPolicies'], null, null, false);
+	manageStudy(false);
 }
 
 function addProtocolRow(obj) {
@@ -3379,7 +3381,7 @@ function addProtocolSelect() {
 		var dataset = policy['dataSetDefinition']['dataSetName'];
 		var accessMode = policy['accessMode']['description'];
 		option.text(method + ' as ' + roleWithinStudy +  ' on ' + dataset + ' ' + accessMode);
-		option.attr('value', i);
+		option.attr('value', policy['studyPolicyStatementId']);
 		select.append(option);
 	});
 	select.change(function(event) {checkAddSiteProtocolButton();});
@@ -3472,17 +3474,17 @@ function updateStaffSelectRole(studyRole) {
 	
 }
 
-function removeProtocol(button, obj) {
-	var protocolValues = activeStudy['protocols'];
-	var roleId = obj['role']['roleId'];
-	$.each(protocolValues, function(i, elem) {
-		var studyRoleId = elem['role']['roleId'];
-		if (elem['tool'] == obj['tool'] && elem['dataset'] == obj['dataset'] && elem['datasetInstance'] == obj['datasetInstance'] && 
-				roleId == studyRoleId && elem['accessMode'] == obj['accessMode']) {
-			protocolValues.splice(i, 1);
-			return false;
-		}
-	});
+function removeProtocol(button, policy) {
+	var obj = {};
+	obj['action'] = 'deleteAnalyzePolicy';
+	obj['analysisPolicyStatementId'] = policy['analysisPolicyStatementId'];
+	var url =  HOME + '/registry';
+	scanner.POST(url, obj, true, postRemoveProtocol, null, null, 0);
+}
+
+function postRemoveProtocol(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitAnalysisPolicies(data['analysisPolicies'], null, null, false);
 	manageStudy(false);
 }
 

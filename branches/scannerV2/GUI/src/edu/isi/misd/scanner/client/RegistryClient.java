@@ -782,4 +782,7 @@ public interface RegistryClient {
 	
 	public RegistryClientResponse createStudyPolicy(int roleId, int studyId, int dataSetDefinitionId, int toolId, int accessModeId);
 	public RegistryClientResponse deleteStudyPolicy(int studyPolicyStatementId);
+	
+	public RegistryClientResponse createSitePolicy(int roleId, int dataSetInstanceId, int studyPolicyStatementId, int toolId, int accessModeId);
+	public RegistryClientResponse deleteAnalyzePolicy(int analysisPolicyStatementId);
 }

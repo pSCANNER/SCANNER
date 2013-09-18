@@ -334,6 +334,8 @@ public class Registry extends HttpServlet {
 		String toolId = request.getParameter("toolId");
 		String accessModeId = request.getParameter("accessModeId");
 		String studyPolicyStatementId = request.getParameter("studyPolicyStatementId");
+		String dataSetInstanceId = request.getParameter("dataSetInstanceId");
+		String analysisPolicyStatementId = request.getParameter("analysisPolicyStatementId");
 		
 		
 		String study = request.getParameter("study");
@@ -489,6 +491,33 @@ public class Registry extends HttpServlet {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} else if (action.equals("createSitePolicy")) {
+			clientResponse = registryClient.createSitePolicy(Integer.parseInt(roleId), Integer.parseInt(dataSetInstanceId), 
+					Integer.parseInt(studyPolicyStatementId), Integer.parseInt(toolId), Integer.parseInt(accessModeId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create site protocol.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("createSitePolicy:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("analysisPolicy", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getAnalysisPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analysis policies.");
+					return;
+				}
+				responseObject.put("analysisPolicies", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("createSitePolicy responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else if (action.equals("deleteStudyRequestedSites")) {
 			clientResponse = registryClient.deleteStudyRequestedSites(Integer.parseInt(studyRequestedSiteId));
 			if (clientResponse == null) {
@@ -548,6 +577,27 @@ public class Registry extends HttpServlet {
 				responseObject.put("studyPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("deleteStudyPolicy responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (action.equals("deleteAnalyzePolicy")) {
+			clientResponse = registryClient.deleteAnalyzePolicy(Integer.parseInt(analysisPolicyStatementId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete site policy.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
+				clientResponse = registryClient.getAnalysisPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site policies.");
+					return;
+				}
+				responseObject.put("analysisPolicies", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("deleteSitePolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
