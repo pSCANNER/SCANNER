@@ -58,7 +58,6 @@ public class ScannerUserController extends BaseController
         
         String userName = params.get(REQUEST_PARAM_USER_NAME);        
         List<ScannerUser> users = new ArrayList<ScannerUser>();
-        boolean isSuperuser = registryService.userIsSuperuser(loginName);
         if (userName != null) {
             ScannerUser user = 
                 scannerUserRepository.findByUserName(userName);
@@ -66,7 +65,7 @@ public class ScannerUserController extends BaseController
                 throw new ResourceNotFoundException(userName);
             }
             users.add(user);           
-        } else if (isSuperuser) {
+        } else {
             Iterator iter = scannerUserRepository.findAll().iterator();
             CollectionUtils.addAll(users, iter);      
         }  
@@ -103,26 +102,11 @@ public class ScannerUserController extends BaseController
     public @ResponseBody ScannerUser getScannerUser(
            @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,          
            @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {        
-        // get the user record for the current user
-//        ScannerUser loggedInUser = 
-//            scannerUserRepository.findByUserName(loginName);
-//        if (loggedInUser == null) {
-//            throw new ForbiddenException(
-//                loginName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
-//        }         
+    {            
         ScannerUser foundUser = scannerUserRepository.findOne(id);
         if (foundUser == null) {
             throw new ResourceNotFoundException(id);
-        }        
-        // check that the current user can view this record        
-//        if ((!loginName.equalsIgnoreCase(foundUser.getUserName()) &&
-//            (!loggedInUser.getIsSuperuser()))) {
-//            throw new ForbiddenException(
-//                loginName,
-//                "Unable to view a user record for another user. " +
-//                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
-//        }        
+        }             
         return foundUser;
     }  
     
