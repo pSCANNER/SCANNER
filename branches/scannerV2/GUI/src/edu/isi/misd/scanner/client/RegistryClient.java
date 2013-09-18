@@ -785,4 +785,6 @@ public interface RegistryClient {
 	
 	public RegistryClientResponse createSitePolicy(int roleId, int dataSetInstanceId, int studyPolicyStatementId, int toolId, int accessModeId);
 	public RegistryClientResponse deleteAnalyzePolicy(int analysisPolicyStatementId);
+	
+	public RegistryClientResponse createDatasetInstance(String dataSetInstanceName, String description, String dataSource, int dataSetDefinitionId, int nodeId);
 }

@@ -1009,5 +1009,34 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse createDatasetInstance(
+			String dataSetInstanceName, String description, String dataSource,
+			int dataSetDefinitionId, int nodeId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "instances";
+		try {
+			JSONObject body = new JSONObject();
+			body.put("dataSetInstanceName", dataSetInstanceName);
+			if (description.length() > 0) {
+				body.put("description", description);
+			}
+			body.put("dataSource", dataSource);
+			JSONObject dataSetDefinition = new JSONObject();
+			dataSetDefinition.put("dataSetDefinitionId", dataSetDefinitionId);
+			body.put("dataSetDefinition", dataSetDefinition);
+			JSONObject node = new JSONObject();
+			node.put("nodeId", nodeId);
+			body.put("node", node);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
 	
 }

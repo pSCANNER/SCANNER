@@ -112,8 +112,6 @@ var studyRequestedSitesDict = null;
 var sitesPoliciesList = null;
 var sitesPoliciesDict = null;
 
-var instanceIdCounter = 0;
-
 var activeStudy = null;
 
 
@@ -2838,15 +2836,11 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	option.text('for node...');
 	option.attr('value', '');
 	select.append(option);
-	var selectNodes = [];
-	$.each(datasetInstancesList, function(i, datasetInstance) {
-		var node = datasetInstance['node'];
-		var site = node['site'];
-		if (!selectNodes.contains(site['siteName'] + ' - ' + node['nodeName'])) {
-			selectNodes.push(site['siteName'] + ' - ' + node['nodeName']);
+	$.each(nodesList, function(i, node) {
+		if (!node['isMaster']) {
 			option = $('<option>');
-			option.text(site['siteName'] + ' - ' + node['nodeName']);
-			option.attr('value', datasetInstance['dataSetInstanceId']);
+			option.text(node['site']['siteName'] + ' - ' + node['nodeName']);
+			option.attr('value', node['nodeId']);
 			select.append(option);
 		}
 	});
@@ -2867,6 +2861,7 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	checkUpdateStudyButton();
 	checkAddStudyProtocolButton();
 	checkAddSiteButton();
+	checkAddSiteProtocolButton();
 	appendStudyContent(activeStudy);
 }
 
@@ -2911,6 +2906,11 @@ function checkAddSiteButton() {
 }
 
 function checkAddSiteProtocolButton() {
+	if ($('#estimateStudyProtocolSelect').val() == '') {
+		$('#add_new_dataset_instance_option').hide();
+	} else {
+		$('#add_new_dataset_instance_option').show();
+	}
 	if ($('#datasetInstances').val() == 'Add new...') {
 		$('#instanceName').val('');
 		$('#nodeNames').val('');
@@ -2945,7 +2945,7 @@ function checkAddInstanceButton() {
 }
 
 function addSite() {
-	obj = {};
+	var obj = {};
 	obj['action'] = 'createStudyRequestedSites';
 	obj['studyId'] = activeStudy['studyId'];
 	obj['siteId'] = studyRequestedSitesDict[$('#siteSelect').val()]['site']['siteId'];
@@ -2964,7 +2964,7 @@ function postAddSite(data, textStatus, jqXHR, param) {
 }
 
 function addStaff() {
-	obj = {};
+	var obj = {};
 	obj['action'] = 'createUserRole';
 	obj['userId'] = $('#staffNames').val();
 	obj['roleId'] = $('#staffRoles').val();
@@ -3013,7 +3013,7 @@ function addStaffRow(obj) {
 
 function removeStaff(button, userRoles) {
 	button.parent().parent().remove();
-	obj = {};
+	var obj = {};
 	obj['action'] = 'deleteUserRole';
 	obj['userRoleId'] = userRoles['userRoleId'];
 	var url =  HOME + '/registry';
@@ -3084,7 +3084,7 @@ function checkError(data) {
  * 	the id of the tree
  */
 function createStudy() {
-	obj = {};
+	var obj = {};
 	obj['action'] = 'createStudy';
 	obj['studyName'] = $('#studyTitleInput').val();
 	var irb = $('#createStudyIRBInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
@@ -3125,7 +3125,7 @@ function postCreateStudy(data, textStatus, jqXHR, param) {
 }
 
 function updateStudy() {
-	obj = {};
+	var obj = {};
 	obj['action'] = 'updateStudy';
 	obj['studyName'] = $('#projectTitle').val();
 	obj['studyId'] = activeStudy['studyId'];
@@ -3753,24 +3753,33 @@ function appendStudyContent(study) {
 }
 
 function addInstance() {
-	addDatasetInstance($('#instanceName').val(), $('#instanceDataSource').val(), $('#nodeNames').val(), $('#instanceDescription').val());
+	var obj = {};
+	var studyPolicy = studyPoliciesDict[$('#estimateStudyProtocolSelect').val()];
+	obj['action'] = 'createDatasetInstance';
+	obj['dataSetInstanceName'] = $('#instanceName').val();
+	obj['description'] = $('#instanceDescription').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['dataSource'] = $('#instanceDataSource').val();
+	obj['nodeId'] = $('#nodeNames').val();
+	obj['dataSetDefinitionId'] = studyPolicy['dataSetDefinition']['dataSetDefinitionId'];
+	var url =  HOME + '/registry';
+	scanner.POST(url, obj, true, postAddInstance, null, null, 0);
 }
 
-function addDatasetInstance(name, datasource, datasetInstance, description) {
-	var obj = {};
-	obj['dataSetInstanceId'] = ++instanceIdCounter;
-	obj['dataSetInstanceName'] = name;
-	obj['description'] = description;
-	obj['dataSource'] = datasource;
-	obj['node'] = datasetInstancesDict[datasetInstance]['node'];
-	datasetInstancesList.unshift(obj);
-	datasetInstancesDict[instanceIdCounter] = obj;
-	var firstOption = $($('option', $('#datasetInstances'))[0]);
-	var option = $('<option>');
-	option.text(name);
-	option.attr('value', instanceIdCounter);
-	option.insertAfter(firstOption);
-	$('#datasetInstances').val(instanceIdCounter);
+function postAddInstance(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	var instance = data['instance'];
+	postInitDatasetInstances(data['instances'], null, null, false);
+	var optionsCount = $('option', $('#datasetInstances')).length;
+	var instanceOption = $('<option>');
+	instanceOption.text(instance['dataSetInstanceName']);
+	instanceOption.attr('value', instance['dataSetInstanceId']);
+	$.each($('option', $('#datasetInstances')), function(i, option) {
+		if ((i == optionsCount - 1) || (i != 0 && compareIgnoreCase(instance['dataSetInstanceName'], $(option).html()) < 0)) {
+			instanceOption.insertBefore(option);
+			return false;
+		}
+	});
+	$('#datasetInstances').val(instance['dataSetInstanceId']);
 	$('#add_site_protocol_div').show();
 	$('#add_instance_div').hide();
 	checkAddSiteProtocolButton();
@@ -3823,9 +3832,6 @@ function postInitDatasetInstances(data, textStatus, jqXHR, param) {
 	datasetInstancesList = data;
 	datasetInstancesDict = {};
 	$.each(data, function(i, datasetInstance) {
-		if (datasetInstance['dataSetInstanceId'] > instanceIdCounter) {
-			instanceIdCounter = datasetInstance['dataSetInstanceId'];
-		}
 		datasetInstancesDict[datasetInstance['dataSetInstanceId']] = datasetInstance;
 	});
 	datasetInstancesList.sort(compareInstances);
@@ -4155,7 +4161,9 @@ function compareInstances(datasetInstance1, datasetInstance2) {
 }
 
 function compareNodes(node1, node2) {
-	return compareIgnoreCase(node1['nodeName'], node2['nodeName']);
+	var val1 = node1['site']['siteName'] + node1['nodeName'];
+	var val2 = node2['site']['siteName'] + node2['nodeName'];
+	return compareIgnoreCase(val1, val2);
 }
 
 function compareTools(tool1, tool2) {

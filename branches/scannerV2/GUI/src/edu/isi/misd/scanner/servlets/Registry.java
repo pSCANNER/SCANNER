@@ -336,6 +336,9 @@ public class Registry extends HttpServlet {
 		String studyPolicyStatementId = request.getParameter("studyPolicyStatementId");
 		String dataSetInstanceId = request.getParameter("dataSetInstanceId");
 		String analysisPolicyStatementId = request.getParameter("analysisPolicyStatementId");
+		String dataSetInstanceName = request.getParameter("dataSetInstanceName");
+		String dataSource = request.getParameter("dataSource");
+		String nodeId = request.getParameter("nodeId");
 		
 		
 		String study = request.getParameter("study");
@@ -514,6 +517,33 @@ public class Registry extends HttpServlet {
 				responseObject.put("analysisPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("createSitePolicy responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (action.equals("createDatasetInstance")) {
+			clientResponse = registryClient.createDatasetInstance(dataSetInstanceName, description, 
+					dataSource, Integer.parseInt(dataSetDefinitionId), Integer.parseInt(nodeId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create dataset instance.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("createDatasetInstance:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("instance", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getDatasetInstances();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analysis policies.");
+					return;
+				}
+				responseObject.put("instances", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("createDatasetInstance responseBody: " + responseBody);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
