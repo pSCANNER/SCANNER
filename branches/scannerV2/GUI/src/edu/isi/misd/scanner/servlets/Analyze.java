@@ -99,7 +99,7 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getDatasets")) {
 			String study = request.getParameter("study");
-			RegistryClientResponse clientResponse = registryClient.getDatasets(study);
+			RegistryClientResponse clientResponse = registryClient.getDatasets(getStudyId(study));
 			retrievedDatasets = clientResponse.getEntityResponse();
 			String ret = clientResponse.toDatasets();
 			clientResponse.release();
@@ -110,7 +110,7 @@ public class Analyze extends HttpServlet {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
 			String sites = request.getParameter("site");
-			RegistryClientResponse clientResponse = registryClient.getLibraries(study, dataset, sites);
+			RegistryClientResponse clientResponse = registryClient.getLibraries(getStudyId(study), getDatasetId(dataset), sites);
 			retrievedLibraries = clientResponse.getEntityResponse();
 			String ret = clientResponse.toLibraries();
 			clientResponse.release();
@@ -121,7 +121,7 @@ public class Analyze extends HttpServlet {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
 			String lib = request.getParameter("library");
-			RegistryClientResponse clientResponse = registryClient.getMethods(study, dataset, "" + getLibraryId(lib));
+			RegistryClientResponse clientResponse = registryClient.getMethods(getStudyId(study), getDatasetId(dataset), getLibraryId(lib));
 			retrievedTools = clientResponse.getEntityResponse();
 			String ret = clientResponse.toMethods();
 			clientResponse.release();
@@ -130,7 +130,7 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getParameters")) {
 			String dataset = request.getParameter("dataset");
-			RegistryClientResponse clientResponse = registryClient.getParameters(dataset, webContentPath + "etc/parameterTypes/LogisticRegressionBase.json");
+			RegistryClientResponse clientResponse = registryClient.getParameters(getDatasetId(dataset), webContentPath + "etc/parameterTypes/LogisticRegressionBase.json");
 			String ret = clientResponse.toParameters();
 			clientResponse.release();
 			System.out.println("Analyze Get Parameters:\n"+ret);
@@ -139,7 +139,7 @@ public class Analyze extends HttpServlet {
 		} else if (action.equals("getSites")) {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
-			RegistryClientResponse clientResponse = registryClient.getSites(study, dataset);
+			RegistryClientResponse clientResponse = registryClient.getSites(getDatasetId(dataset));
 			retrievedDatasetInstances = clientResponse.getEntityResponse();
 			String ret = clientResponse.toSites(dataset);
 			clientResponse.release();
@@ -232,14 +232,6 @@ public class Analyze extends HttpServlet {
 				} else {
 					// to handle error case "user not found"
 				}
-				/*
-				RegistryClientResponse clientResponse = registryClient.getContacts();
-				String ret = clientResponse.toContacts();
-				clientResponse.release();
-				JSONArray arr = new JSONArray(ret);
-				obj.put("contacts", arr);
-				System.out.println("Get Contacts:\n"+ret);
-				*/
 				scannerClient = new ScannerClient(4, 8192, 300000,
 						trustStoreType, trustStorePassword, trustStoreResource,
 						keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
@@ -251,7 +243,7 @@ public class Analyze extends HttpServlet {
 			} else if (action.equals("getResultsAsync")) {
 				try {
 					RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
-					int userId = (Integer) session.getAttribute("userId");
+					String userName = (String) session.getAttribute("user");
 					String params = request.getParameter("parameters");
 					String sites = request.getParameter("sites");
 					String lib = request.getParameter("library");
@@ -264,7 +256,7 @@ public class Analyze extends HttpServlet {
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("hostUrl") + ":" + temp.getString("hostPort") + temp.getString("basePath");
-					clientResponse = registryClient.getMethods(study, dataset, "" + getLibraryId(lib));
+					clientResponse = registryClient.getMethods(getStudyId(study), getDatasetId(dataset), getLibraryId(lib));
 					retrievedTools = clientResponse.getEntityResponse();
 					clientResponse = new ERDClientResponse(retrievedTools);
 					res = clientResponse.toMethodString(func, "" + getLibraryId(lib));
@@ -293,7 +285,7 @@ public class Analyze extends HttpServlet {
 					for (int i=0; i < targets.length(); i++) {
 						// check authorization
 						temp = targets.getJSONObject(i);
-						RegistryClientResponse rsp = registryClient.getAnalysisPolicies(userId, toolId, temp.getInt("dataSetInstanceId"));
+						RegistryClientResponse rsp = registryClient.getAnalysisPolicies(userName, toolId, temp.getInt("dataSetInstanceId"));
 						JSONArray policy = rsp.getEntityResponse();
 						if (policy.length() == 0) {
 							isAuthorized = false;
@@ -333,7 +325,7 @@ public class Analyze extends HttpServlet {
 						if (trxTable != null) {
 							JSONObject trxTargets = trxTable.get(trxId);
 							// check authorization
-							int uid = trxTargets.getInt("userId");
+							String uid = trxTargets.getString("user");
 							int analysisToolId = trxTargets.getInt("analysisToolId");
 							JSONArray instances = trxTargets.getJSONArray("dataSetInstanceId");
 							for (int i=0; i < instances.length(); i++) {
@@ -380,7 +372,7 @@ public class Analyze extends HttpServlet {
 									session.setAttribute("trxIdTable", trxTable);
 								}
 								JSONObject analysisPolicies = new JSONObject();
-								analysisPolicies.put("userId", userId);
+								analysisPolicies.put("user", userName);
 								analysisPolicies.put("analysisToolId", toolId);
 								analysisPolicies.put("dataSetInstanceId", targets);
 								trxTable.put(rspId, analysisPolicies);

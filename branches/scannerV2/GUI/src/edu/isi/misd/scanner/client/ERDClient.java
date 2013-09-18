@@ -102,16 +102,12 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getDatasets(java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse getDatasets(String study) {
+	public RegistryClientResponse getDatasets(int studyId) {
 		RegistryClientResponse ret = null;
-		try {
-			String url = erdURL + "datasets?studyName=" + Utils.urlEncode(study) + getUserPredicate("&");
-			System.out.println("GET: " + url);
-			ClientURLResponse rsp = get(url, (String) null, loginUser);
-			ret = new ERDClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String url = erdURL + "datasets?studyId=" + studyId + getUserPredicate("&");
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
 
@@ -119,16 +115,12 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getLibraries(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse getLibraries(String study, String dataset, String sites) {
+	public RegistryClientResponse getLibraries(int studyId, int dataSetId, String sites) {
 		RegistryClientResponse ret = null;
-		try {
-			String url = erdURL + "libraries" + "?studyName=" + Utils.urlEncode(study) + "&dataSetName=" + Utils.urlEncode(dataset) + getUserPredicate("&");
-			System.out.println("GET: " + url);
-			ClientURLResponse rsp = get(url, (String) null, loginUser);
-			ret = new ERDClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String url = erdURL + "libraries" + "?studyId=" + studyId + "&dataSetId=" + dataSetId + getUserPredicate("&");
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
 
@@ -136,18 +128,13 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getMethods(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse getMethods(String study, String dataset,
-			String lib) {
+	public RegistryClientResponse getMethods(int studyId, int dataSetId, int libraryId) {
 		RegistryClientResponse ret = null;
-		try {
-			String url = erdURL + "tools" + "?studyName=" + Utils.urlEncode(study) + "&dataSetName=" + Utils.urlEncode(dataset) + 
-				"&libraryId=" + Utils.urlEncode(lib) + getUserPredicate("&");
-			System.out.println("GET: " + url);
-			ClientURLResponse rsp = get(url, (String) null, loginUser);
-			ret = new ERDClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String url = erdURL + "tools" + "?studyId=" + studyId + "&dataSetId=" + dataSetId + 
+			"&libraryId=" + libraryId + getUserPredicate("&");
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
 
@@ -155,11 +142,11 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getParameters(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse getParameters(String dataset, String jsonFile) {
+	public RegistryClientResponse getParameters(int dataSetId, String jsonFile) {
 		RegistryClientResponse clientResponse = null;
 		try {
 			JSONArray jsonRsp = readParameterFile(jsonFile);
-			String url = erdURL + "variables?dataSetName=" + Utils.urlEncode(dataset);
+			String url = erdURL + "variables?dataSetId=" + dataSetId;
 			System.out.println("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			RegistryClientResponse ret = new ERDClientResponse(rsp);
@@ -182,8 +169,6 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			}
 			ret.release();
 			clientResponse = new ERDClientResponse(jsonRsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -194,16 +179,12 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.client.RegistryClient#getSites(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse getSites(String study, String dataset) {
+	public RegistryClientResponse getSites(int dataSetId) {
 		RegistryClientResponse ret = null;
-		try {
-			String url = erdURL + "instances?dataSetName=" + Utils.urlEncode(dataset) + getUserPredicate("&");
-			System.out.println("GET: " + url);
-			ClientURLResponse rsp = get(url, (String) null, loginUser);
-			ret = new ERDClientResponse(rsp);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String url = erdURL + "instances?dataSetId=" + dataSetId + getUserPredicate("&");
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
 
@@ -331,13 +312,17 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		return ret;
 	}
 	@Override
-	public RegistryClientResponse getAnalysisPolicies(int userId,
+	public RegistryClientResponse getAnalysisPolicies(String userName,
 			int toolId, int datasetInstanceId) {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "analysisPolicies?userId=" + userId + "&analysisToolId=" + toolId + "&dataSetInstanceId=" + datasetInstanceId;
-		System.out.println("GET: " + url);
-		ClientURLResponse rsp = get(url, (String) null, loginUser);
-		ret = new ERDClientResponse(rsp);
+		try {
+			String url = erdURL + "analysisPolicies?userName=" + Utils.urlEncode(userName) + "&analysisToolId=" + toolId + "&dataSetInstanceId=" + datasetInstanceId;
+			System.out.println("GET: " + url);
+			ClientURLResponse rsp = get(url, (String) null, loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		return ret;
 	}
 	@Override

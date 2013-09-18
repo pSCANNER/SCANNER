@@ -93,7 +93,7 @@ public interface RegistryClient {
      *            the name of the study.
      * @return The client response.
      */
-	public RegistryClientResponse getDatasets(String study);
+	public RegistryClientResponse getDatasets(int studyId);
 	
     /**
      * Gets the libraries of a dataset. 
@@ -104,7 +104,7 @@ public interface RegistryClient {
      *            the name of the dataset the library belongs to.
      * @return The client response.
      */
-	public RegistryClientResponse getLibraries(String study, String dataset, String sites);
+	public RegistryClientResponse getLibraries(int studyId, int dataSetId, String sites);
 	
     /**
      * Gets the methods of a library. 
@@ -117,7 +117,7 @@ public interface RegistryClient {
      *            the name of the library the method belongs to.
      * @return The client response.
      */
-	public RegistryClientResponse getMethods(String study, String dataset, String lib);
+	public RegistryClientResponse getMethods(int studyId, int dataSetId, int libraryId);
 	
     /**
      * Gets the parameters of a method. 
@@ -128,7 +128,7 @@ public interface RegistryClient {
      *            the name of the library.
      * @return The client response.
      */
-	public RegistryClientResponse getParameters(String dataset, String jsonFile);
+	public RegistryClientResponse getParameters(int dataSetId, String jsonFile);
 	
     /**
      * Gets the sites for a given study, dataset, library and method. 
@@ -143,7 +143,7 @@ public interface RegistryClient {
      *            the method name.
      * @return The client response.
      */
-	public RegistryClientResponse getSites(String study, String dataset);
+	public RegistryClientResponse getSites(int dataSetId);
 	
     /**
      * Gets a method from the registry.
@@ -241,7 +241,7 @@ public interface RegistryClient {
 	public RegistryClientResponse getDatasetInstances();
 	public RegistryClientResponse getDatasetDefinitions();
 	public RegistryClientResponse getUser(String user);
-	public RegistryClientResponse getAnalysisPolicies(int userId, int toolId, int datasetInstanceId);
+	public RegistryClientResponse getAnalysisPolicies(String userName, int toolId, int datasetInstanceId);
 	public RegistryClientResponse getAnalysisPolicies();
 	public RegistryClientResponse getUserRoles();
 	public RegistryClientResponse getUserRoles(int studyId);

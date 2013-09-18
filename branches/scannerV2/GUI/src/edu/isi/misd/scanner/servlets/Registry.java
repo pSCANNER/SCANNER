@@ -403,6 +403,13 @@ public class Registry extends HttpServlet {
 					return;
 				}
 				responseObject.put("userRoles", clientResponse.getEntityResponse());
+				clientResponse.release();
+				clientResponse = registryClient.getAllStudyManagementPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all study management policies.");
+					return;
+				}
+				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("createStudyRequestedSites responseBody: " + responseBody);
 			} catch (JSONException e) {

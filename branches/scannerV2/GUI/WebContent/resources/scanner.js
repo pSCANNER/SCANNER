@@ -2982,6 +2982,7 @@ function postAddStaff(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	var userRole = data['userRole'];
 	postInitUserRoles(data['userRoles'], null, null, false);
+	postInitStudyManagementPolicies(data['studyManagementPolicies'], null, null, false);
 	addStaffRow(userRole);
 	manageStudy(false);
 }
