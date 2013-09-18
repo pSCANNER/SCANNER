@@ -779,4 +779,7 @@ public interface RegistryClient {
 	
 	public RegistryClientResponse createUserRole(Integer userId, Integer roleId);
 	public RegistryClientResponse deleteUserRole(Integer userRoleId);
+	
+	public RegistryClientResponse createStudyPolicy(int roleId, int studyId, int dataSetDefinitionId, int toolId, int accessModeId);
+	public RegistryClientResponse deleteStudyPolicy(int studyPolicyStatementId);
 }

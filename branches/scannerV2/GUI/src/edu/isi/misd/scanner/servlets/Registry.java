@@ -330,6 +330,10 @@ public class Registry extends HttpServlet {
 		String userId = request.getParameter("userId");
 		String roleId = request.getParameter("roleId");
 		String userRoleId = request.getParameter("userRoleId");
+		String dataSetDefinitionId = request.getParameter("dataSetDefinitionId");
+		String toolId = request.getParameter("toolId");
+		String accessModeId = request.getParameter("accessModeId");
+		String studyPolicyStatementId = request.getParameter("studyPolicyStatementId");
 		
 		
 		String study = request.getParameter("study");
@@ -458,6 +462,33 @@ public class Registry extends HttpServlet {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} else if (action.equals("createStudyPolicy")) {
+			clientResponse = registryClient.createStudyPolicy(Integer.parseInt(roleId), Integer.parseInt(studyId), 
+					Integer.parseInt(dataSetDefinitionId), Integer.parseInt(toolId), Integer.parseInt(accessModeId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create study protocol.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("createStudyPolicy:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("studyPolicy", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getStudyPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all studies requested sites.");
+					return;
+				}
+				responseObject.put("studyPolicies", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("createStudyPolicy responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else if (action.equals("deleteStudyRequestedSites")) {
 			clientResponse = registryClient.deleteStudyRequestedSites(Integer.parseInt(studyRequestedSiteId));
 			if (clientResponse == null) {
@@ -496,6 +527,27 @@ public class Registry extends HttpServlet {
 				responseObject.put("userRoles", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("deleteUserRole responseBody: " + responseBody);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else if (action.equals("deleteStudyPolicy")) {
+			clientResponse = registryClient.deleteStudyPolicy(Integer.parseInt(studyPolicyStatementId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete study policy.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
+				clientResponse = registryClient.getStudyPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study policies.");
+					return;
+				}
+				responseObject.put("studyPolicies", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("deleteStudyPolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

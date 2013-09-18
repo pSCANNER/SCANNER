@@ -919,5 +919,49 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse createStudyPolicy(int roleId, int studyId,
+			int dataSetDefinitionId, int toolId, int accessModeId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyPolicies";
+		try {
+			JSONObject body = new JSONObject();
+			JSONObject studyRole = new JSONObject();
+			studyRole.put("roleId", roleId);
+			body.put("studyRole", studyRole);
+			JSONObject study = new JSONObject();
+			study.put("studyId", studyId);
+			body.put("study", study);
+			JSONObject policyStatus = new JSONObject();
+			policyStatus.put("policyStatusTypeId", 0);
+			body.put("policyStatus", policyStatus);
+			JSONObject dataSetDefinition = new JSONObject();
+			dataSetDefinition.put("dataSetDefinitionId", dataSetDefinitionId);
+			body.put("dataSetDefinition", dataSetDefinition);
+			JSONObject analysisTool = new JSONObject();
+			analysisTool.put("toolId", toolId);
+			body.put("analysisTool", analysisTool);
+			JSONObject accessMode = new JSONObject();
+			accessMode.put("accessModeId", accessModeId);
+			body.put("accessMode", accessMode);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteStudyPolicy(int studyPolicyStatementId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyPolicies/" + studyPolicyStatementId;
+		System.out.println("DELETE: " + url);
+		ClientURLResponse rsp = delete(url, null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 	
 }
