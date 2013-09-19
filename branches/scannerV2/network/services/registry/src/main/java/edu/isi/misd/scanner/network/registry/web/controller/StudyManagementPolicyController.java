@@ -36,7 +36,7 @@ public class StudyManagementPolicyController extends BaseController
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";
     public static final String REQUEST_PARAM_STUDY_ROLE_ID = "studyRoleId";    
-    public static final String REQUEST_PARAM_USER_ID = "userId";
+    public static final String REQUEST_PARAM_USER_NAME = "userName";
     
     @Autowired
     private StudyManagementPolicyRepository studyManagementPolicyRepository;   
@@ -52,26 +52,23 @@ public class StudyManagementPolicyController extends BaseController
                 paramMap,
                 REQUEST_PARAM_STUDY_ID,
                 REQUEST_PARAM_STUDY_ROLE_ID,
-                REQUEST_PARAM_USER_ID);         
+                REQUEST_PARAM_USER_NAME);         
         
         String studyId = params.get(REQUEST_PARAM_STUDY_ID);
         String studyRoleId = params.get(REQUEST_PARAM_STUDY_ROLE_ID);
-        String userId = params.get(REQUEST_PARAM_USER_ID);
-        if ((studyId != null) && (userId != null)) {
+        String userName = params.get(REQUEST_PARAM_USER_NAME);
+        if ((studyId != null) && (userName != null)) {
             return 
                 studyManagementPolicyRepository.
-                    findByStudyStudyIdAndStudyRoleScannerUsersUserId(
+                    findByStudyStudyIdAndStudyRoleScannerUsersUserName(
                         validateIntegerParameter(
                             REQUEST_PARAM_STUDY_ID,studyId),
-                        validateIntegerParameter(
-                            REQUEST_PARAM_USER_ID,userId));     
+                        userName);     
         }
-        else if (userId != null) {
+        else if (userName != null) {
             return 
                 studyManagementPolicyRepository.
-                    findByStudyRoleScannerUsersUserId(
-                        validateIntegerParameter(
-                            REQUEST_PARAM_USER_ID,userId));          
+                    findByStudyRoleScannerUsersUserName(userName);          
         }         
         else if (studyId != null) {
             return 

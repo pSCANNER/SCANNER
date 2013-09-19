@@ -397,7 +397,7 @@ public class RegistryServiceImpl implements RegistryService
     public void deleteSite(Site site) 
     {
         for (SitePolicy sitePolicy : 
-             sitePolicyRepository.findBySiteSiteName(site.getSiteName())) 
+             sitePolicyRepository.findBySiteSiteId(site.getSiteId())) 
         {
             StudyRole studyRole = sitePolicy.getStudyRole();
             List<UserRole> userRoles = 

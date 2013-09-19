@@ -33,8 +33,9 @@ public class SitePolicyController extends BaseController
         LogFactory.getLog(SitePolicyController.class.getName());
     
     public static final String BASE_PATH = "/sitePolicies";
-    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
-    public static final String REQUEST_PARAM_SITE_NAME = "siteName";
+    public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;
+    public static final String REQUEST_PARAM_USER_NAME = "userName";    
+    public static final String REQUEST_PARAM_SITE_ID = "siteId";
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";
     public static final String REQUEST_PARAM_STUDY_ROLE_ID = "studyRoleId";    
     
@@ -50,17 +51,24 @@ public class SitePolicyController extends BaseController
         Map<String,String> params = 
             validateParameterMap(
                 paramMap,
-                REQUEST_PARAM_SITE_NAME,
+                REQUEST_PARAM_USER_NAME,
+                REQUEST_PARAM_SITE_ID,
                 REQUEST_PARAM_STUDY_ID,
                 REQUEST_PARAM_STUDY_ROLE_ID);
-        
-        String siteName = params.get(REQUEST_PARAM_SITE_NAME);
+
+        String userName = params.get(REQUEST_PARAM_USER_NAME);        
+        String siteId = params.get(REQUEST_PARAM_SITE_ID);
         String studyId = params.get(REQUEST_PARAM_STUDY_ID);
         String studyRoleId = params.get(REQUEST_PARAM_STUDY_ROLE_ID);
         List<SitePolicy> sitePolicy = new ArrayList<SitePolicy>();        
-        if (siteName != null) {
+        if ((siteId != null) && (userName != null)){
             return
-                sitePolicyRepository.findBySiteSiteName(siteName);
+                sitePolicyRepository.findBySiteIdAndUserName(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_STUDY_ID,siteId),userName);   
+        } else if (userName != null) {
+            return
+                sitePolicyRepository.findByUserName(userName);
         } else if (studyId != null) {
             return 
                 sitePolicyRepository.findByStudyRoleStudyStudyId(
@@ -115,7 +123,8 @@ public class SitePolicyController extends BaseController
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody SitePolicy updateSitePolicy(
-           @PathVariable(ID_URL_PATH_VAR) Integer id, @RequestBody SitePolicy site) 
+           @PathVariable(ID_URL_PATH_VAR) Integer id,
+           @RequestBody SitePolicy site) 
     {
         // find the requested resource
         SitePolicy foundSitePolicy = sitePolicyRepository.findOne(id);
