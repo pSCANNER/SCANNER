@@ -4170,11 +4170,7 @@ function compareUsers(user1, user2) {
 }
 
 function compareInstances(datasetInstance1, datasetInstance2) {
-	var node1 = datasetInstance1['node'];
-	var node2 = datasetInstance2['node'];
-	var val1 = node1['site']['siteName'] + ' - ' + node1['nodeName'];
-	var val2 = node2['site']['siteName'] + ' - ' + node2['nodeName'];
-	return compareIgnoreCase(val1, val2);
+	return compareIgnoreCase(datasetInstance1['dataSetInstanceName'], datasetInstance2['dataSetInstanceName']);
 }
 
 function compareNodes(node1, node2) {
