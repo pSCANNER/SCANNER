@@ -4,6 +4,8 @@ import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetInstance;
 import edu.isi.misd.scanner.network.registry.data.domain.ScannerUser;
+import edu.isi.misd.scanner.network.registry.data.domain.Site;
+import edu.isi.misd.scanner.network.registry.data.domain.SitePolicy;
 import edu.isi.misd.scanner.network.registry.data.domain.StandardRole;
 import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import edu.isi.misd.scanner.network.registry.data.domain.StudyManagementPolicy;
@@ -25,7 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("registryService")
 public class RegistryServiceImpl implements RegistryService 
 {
-
+    public static final String ROOT_STUDY_NAME = "SCANNER";
+    
     @Autowired
     private DataSetDefinitionRepository dataSetDefinitionRepository;
     @Autowired
@@ -39,9 +42,13 @@ public class RegistryServiceImpl implements RegistryService
     @Autowired
     private UserRoleRepository userRoleRepository;   
     @Autowired
-    private StandardRoleRepository standardRoleRoleRepository;   
+    private StandardRoleRepository standardRoleRepository;   
     @Autowired
-    private ScannerUserRepository scannerUserRepository;       
+    private ScannerUserRepository scannerUserRepository; 
+    @Autowired
+    private SiteRepository siteRepository;   
+    @Autowired
+    private SitePolicyRepository sitePolicyRepository;     
     /**
      * Creates or updates a single ToolLibrary, with optional creation of 
      * AnalysisTool child relations.
@@ -114,7 +121,7 @@ public class RegistryServiceImpl implements RegistryService
          *   default UserRole creation based on getAddToUserRoleByDefault.
          */
         ArrayList<StudyRole> studyRoles = new ArrayList<StudyRole>();        
-        for (StandardRole standardRole : standardRoleRoleRepository.findAll())
+        for (StandardRole standardRole : standardRoleRepository.findAll())
         {
             StudyRole studyRole = new StudyRole();
             studyRole.setRoleWithinStudy(standardRole.getStandardRoleName());
@@ -179,7 +186,7 @@ public class RegistryServiceImpl implements RegistryService
          * Find the set of default study roles that need to have corresponding 
          * user roles automatically created.
          */
-        for (StandardRole standardRole : standardRoleRoleRepository.findAll())
+        for (StandardRole standardRole : standardRoleRepository.findAll())
         {
             if (standardRole.getAddToUserRoleByDefault()) {
                 for (StudyRole studyRole : studyRoles) {
@@ -305,4 +312,124 @@ public class RegistryServiceImpl implements RegistryService
         }        
         return true;
     }      
+    
+    /**
+     * Creates a single Site with associated roles and role permissions.
+     * 
+     * 1.  Creates the site table entry for the new site. 
+     * 2.  Creates a role for the administrator at that site. 
+     *     The way we've set things up, roles are associated with studies; 
+     *     we use a study called "SCANNER" for this role,
+     *     and we call the role something like "SiteX Site Administrator".
+     * 3.  Creates an entry in the site_policy table giving the 
+     *     "SiteX Site Administrator" role permission to administer SiteX policy.
+     * 4.  Optionally assigns a user (if specified) the new site admin role.
+     * 
+     * @param site the site to create
+     * @param defaultSiteAdmin the user to assign as the default site admin
+     * @return the created site
+     */
+    @Override
+    @Transactional
+    public Site createSite(Site site, ScannerUser defaultSiteAdmin) 
+    {
+        /* 1. Create the site table entry for the new site. */
+        Site createdSite = siteRepository.save(site);
+        
+        /* 2. Create a role for the administrator at the new site. */
+        // First we have to find the correct root Study to associate the site
+        // with.  In this version, it is basically hard-coded to "SCANNER"
+        // which is of course hacky, but will have to suffice.
+        Study scannerStudy = 
+            studyRepository.findByStudyName(ROOT_STUDY_NAME);
+        if (scannerStudy == null) {
+            throw new RuntimeException(
+                String.format(
+                "Unable to locate the root administrative study.  " + 
+                "New sites cannot be created unless a study named %s " + 
+                "already exsists.", ROOT_STUDY_NAME));
+        }
+        // Now initialize the StudyRole for the site admin and associate it 
+        // with the root study, then try to create it.
+        StudyRole siteAdminRole = new StudyRole();
+        siteAdminRole.setStudy(scannerStudy);
+        siteAdminRole.setRoleWithinStudy(
+            String.format("%s Site Administrator", site.getSiteName()));
+        StudyRole createdSiteAdminRole = 
+            studyRoleRepository.save(siteAdminRole);
+        
+        /* 3. Create an entry in the SitePolicy table giving the 
+         * newly created role permission to administer the new site's policy. */
+        SitePolicy sitePolicy = new SitePolicy();
+        sitePolicy.setSite(createdSite);
+        sitePolicy.setStudyRole(createdSiteAdminRole);
+        sitePolicyRepository.save(sitePolicy);
+        
+        /* 4. If a default user was specifed, create a new UserRole for that 
+         *    user and map it to the new SiteAdminRole. */
+        if (defaultSiteAdmin != null) {
+            UserRole siteAdminUserRole = new UserRole();
+            siteAdminUserRole.setUser(defaultSiteAdmin);
+            siteAdminUserRole.setStudyRole(createdSiteAdminRole);
+            userRoleRepository.save(siteAdminUserRole);
+        }
+        return createdSite;
+    }
+    
+    /**
+     * See {@link #createSite(Site,ScannerUser) createSite}.
+     * @param site the site to create
+     * @return the created Site object
+     */
+    @Override
+    @Transactional
+    public Site createSite(Site site) {
+        return createSite(site,null);
+    }
+    
+    /**
+     * Deletes a single Site, removing any roles and privileges
+     * associated with the Site.
+     * @param site
+     */    
+    @Override
+    @Transactional
+    public void deleteSite(Site site) 
+    {
+        for (SitePolicy sitePolicy : 
+             sitePolicyRepository.findBySiteSiteName(site.getSiteName())) 
+        {
+            StudyRole studyRole = sitePolicy.getStudyRole();
+            List<UserRole> userRoles = 
+                userRoleRepository.findByStudyRoleRoleId(studyRole.getRoleId());
+            userRoleRepository.delete(userRoles);             
+        }
+        siteRepository.delete(site);
+    }
+    
+    /**
+     * Checks if the userName specified can manage the siteId specified.
+     * @param siteId
+     * @param userName
+     * @return true if the user can manage the study, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */      
+    @Override    
+    public boolean userCanManageSite(Integer siteId, String userName)
+        throws ForbiddenException
+    {
+        // maybe this is too permissive and should be checked independently
+        if (userIsSuperuser(userName)) {
+            return true;
+        }
+        
+        // check that the current user has the proper role for this operation
+        // if so, one or more SitePolicy objects will be returned.
+        List<SitePolicy> sitePolicies = 
+            sitePolicyRepository.findBySiteIdAndUserName(siteId, userName);        
+        if (sitePolicies.isEmpty()) {
+            return false;
+        }        
+        return true;
+    }        
 }

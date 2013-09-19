@@ -1,8 +1,14 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
+import edu.isi.misd.scanner.network.registry.data.domain.ScannerUser;
 import edu.isi.misd.scanner.network.registry.data.domain.Site;
+import edu.isi.misd.scanner.network.registry.data.repository.ScannerUserRepository;
 import edu.isi.misd.scanner.network.registry.data.repository.SiteRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
+import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,9 +42,16 @@ public class SiteController extends BaseController
     public static final String BASE_PATH = "/sites";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_SITE_NAME = "siteName";
+    public static final String REQUEST_PARAM_USER_NAME = "userName";         
     
     @Autowired
     private SiteRepository siteRepository;   
+    
+    @Autowired
+    private ScannerUserRepository scannerUserRepository;       
+    
+    @Autowired
+    private RegistryService registryService;      
     
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -69,10 +83,32 @@ public class SiteController extends BaseController
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody Site createSite(
+           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,            
+           @RequestParam Map<String, String> paramMap,           
            @RequestBody Site site) 
     {
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }        
+        Map<String,String> params = 
+            validateParameterMap(paramMap, REQUEST_PARAM_USER_NAME);         
+        String userName = params.get(REQUEST_PARAM_USER_NAME);   
+        
+        ScannerUser user = null;
+        if (userName != null) {
+            user = scannerUserRepository.findByUserName(userName);
+            if (user == null) {
+                throw new BadRequestException(
+                    String.format(
+                        RegistryServiceConstants.MSG_INVALID_PARAMETER_VALUE,
+                        userName) + " " +
+                    RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
+            }              
+        }      
         try {
-            siteRepository.save(site);
+            registryService.createSite(site, user);
         } catch (DataIntegrityViolationException e) {
             log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
@@ -100,7 +136,9 @@ public class SiteController extends BaseController
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody Site updateSite(
-           @PathVariable(ID_URL_PATH_VAR) Integer id, @RequestBody Site site) 
+           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,         
+           @PathVariable(ID_URL_PATH_VAR) Integer id,
+           @RequestBody Site site) 
     {
         // find the requested resource
         Site foundSite = siteRepository.findOne(id);
@@ -118,6 +156,12 @@ public class SiteController extends BaseController
             throw new ConflictException(site.getSiteId(),foundSite.getSiteId()); 
         }
         
+        // check that the user can perform the update
+        if (!registryService.userCanManageSite(site.getSiteId(),loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);            
+        }        
         try {
             siteRepository.save(site);
         } catch (DataIntegrityViolationException e) {
@@ -131,12 +175,20 @@ public class SiteController extends BaseController
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeSite(@PathVariable(ID_URL_PATH_VAR) Integer id) 
+    public void removeSite(
+        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        if (!siteRepository.exists(id)) {
-            throw new ResourceNotFoundException(id);            
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
         }
-        siteRepository.delete(id);
+        Site site = siteRepository.findOne(id);
+        if (site == null) {
+            throw new ResourceNotFoundException(id);
+        }
+        registryService.deleteSite(site);
     } 
   
 }

@@ -13,6 +13,7 @@ public interface UserRoleRepository
     extends CrudRepository<UserRole, Integer> 
 {
    List<UserRole> findByUserUserName(String userName);  
+   List<UserRole> findByStudyRoleRoleId(Integer roleId);
    List<UserRole> findByStudyRoleStudyStudyId(Integer studyId);       
    List<UserRole> findByUserUserNameAndStudyRoleStudyStudyId(
        String userName, Integer studyId);     

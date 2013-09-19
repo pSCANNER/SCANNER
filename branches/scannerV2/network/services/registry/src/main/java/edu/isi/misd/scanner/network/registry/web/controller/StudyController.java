@@ -6,6 +6,7 @@ import edu.isi.misd.scanner.network.registry.data.repository.ScannerUserReposito
 import edu.isi.misd.scanner.network.registry.data.repository.StudyRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
+import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
 import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
@@ -173,14 +174,31 @@ public class StudyController extends BaseController
             throw new ConflictException(
                 study.getStudyId(),foundStudy.getStudyId()); 
         }
-
         // check that the user can perform the update
         if (!registryService.userCanManageStudy(study.getStudyId(),loginName)) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);            
+        }        
+        // ensure that the studyOwner is populated correctly. If it is absent
+        // in the update request, use the value of the existing study. Otherwise
+        // look up the the specified studyOwner to see if it is a valid user
+        if (study.getStudyOwner() == null) {
+            study.setStudyOwner(foundStudy.getStudyOwner());
+        } else {
+            ScannerUser owner = 
+                scannerUserRepository.findOne(
+                    study.getStudyOwner().getUserId());
+            if (owner != null) {
+                study.setStudyOwner(owner);
+            } else {
+                throw new BadRequestException(
+                    String.format(
+                        RegistryServiceConstants.MSG_INVALID_PARAMETER_VALUE,
+                        study.getStudyOwner().getUserId()) + " " +
+                    RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);                
+            }
         }
-        
         // perform the update
         try {
             registryService.updateStudy(study);

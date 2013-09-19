@@ -59,12 +59,8 @@ public class SitePolicyController extends BaseController
         String studyRoleId = params.get(REQUEST_PARAM_STUDY_ROLE_ID);
         List<SitePolicy> sitePolicy = new ArrayList<SitePolicy>();        
         if (siteName != null) {
-            SitePolicy site = 
+            return
                 sitePolicyRepository.findBySiteSiteName(siteName);
-            if (site == null) {
-                throw new ResourceNotFoundException(siteName);
-            }
-            sitePolicy.add(site);
         } else if (studyId != null) {
             return 
                 sitePolicyRepository.findByStudyRoleStudyStudyId(
@@ -78,8 +74,8 @@ public class SitePolicyController extends BaseController
         } else {
             Iterator iter = sitePolicyRepository.findAll().iterator();
             CollectionUtils.addAll(sitePolicy, iter);      
-        }
-        return sitePolicy;           
+            return sitePolicy;            
+        }           
 	}
     
     @RequestMapping(value = BASE_PATH,

@@ -1,6 +1,8 @@
 package edu.isi.misd.scanner.network.registry.data.service;
 
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
+import edu.isi.misd.scanner.network.registry.data.domain.ScannerUser;
+import edu.isi.misd.scanner.network.registry.data.domain.Site;
 import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 
@@ -46,6 +48,32 @@ public interface RegistryService
      * @param userName
      */    
     public boolean userIsSuperuser(String userName);
+    
+    /**
+     * Creates a single Site.
+     * @param site
+     */
+    public Site createSite(Site site);
+    
+    /**
+     * Creates a single Site, assigning a user as the default site administrator.
+     * @param site
+     * @param siteAdmin the default Site Administrator
+     */
+    public Site createSite(Site site, ScannerUser siteAdmin);   
+    
+    /**
+     * Deletes a single Site.
+     * @param site
+     */
+    public void deleteSite(Site site);
+    
+    /**
+     * Checks that the user is authorized to manage a Site
+     * @param siteId
+     * @param userName
+     */    
+    public boolean userCanManageSite(Integer siteId, String userName);
     
     /**
      * Creates or updates a single ToolLibrary.
