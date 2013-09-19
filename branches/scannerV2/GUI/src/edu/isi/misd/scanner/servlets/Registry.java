@@ -345,13 +345,6 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("userRoles", clientResponse.getEntityResponse());
 				clientResponse.release();
-				clientResponse = registryClient.getStudyRoles();
-				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies roles.");
-					return;
-				}
-				responseObject.put("studiesRoles", clientResponse.getEntityResponse());
-				clientResponse.release();
 				clientResponse = registryClient.getAllStudyManagementPolicies();
 				if (clientResponse == null) {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies management policies.");
@@ -456,12 +449,6 @@ public class Registry extends HttpServlet {
 				JSONObject responseObject = new JSONObject();
 				responseObject.put("analysisPolicy", clientResponse.getEntity());
 				clientResponse.release();
-				clientResponse = registryClient.getAnalysisPolicies();
-				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analysis policies.");
-					return;
-				}
-				responseObject.put("analysisPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("createSitePolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
@@ -559,20 +546,10 @@ public class Registry extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete site policy.");
 				return;
 			}
-			try {
-				JSONObject responseObject = new JSONObject();
-				clientResponse.release();
-				clientResponse = registryClient.getAnalysisPolicies();
-				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site policies.");
-					return;
-				}
-				responseObject.put("analysisPolicies", clientResponse.getEntityResponse());
-				responseBody = responseObject.toString();
-				System.out.println("deleteSitePolicy responseBody: " + responseBody);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			JSONObject responseObject = new JSONObject();
+			clientResponse.release();
+			responseBody = responseObject.toString();
+			System.out.println("deleteSitePolicy responseBody: " + responseBody);
 		} else if (action.equals("updateStudy")) {
 			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, studyOwner, studyStatusType,
 					description, protocol, startDate, endDate, clinicalTrialsId, analysisPlan);
@@ -597,13 +574,6 @@ public class Registry extends HttpServlet {
 					return;
 				}
 				responseObject.put("userRoles", clientResponse.getEntityResponse());
-				clientResponse.release();
-				clientResponse = registryClient.getStudyRoles();
-				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies roles.");
-					return;
-				}
-				responseObject.put("studiesRoles", clientResponse.getEntityResponse());
 				clientResponse.release();
 				clientResponse = registryClient.getAllStudyManagementPolicies();
 				if (clientResponse == null) {

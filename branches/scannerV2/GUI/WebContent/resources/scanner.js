@@ -63,12 +63,8 @@ var selInvestigators = null;
 var scannerUsersDict = null;
 var scannerUsersList = null;
 
-var analysisPolicies = null;
-
-var datasetInstancesDict = null;
 var datasetInstancesList = null;
 
-var toolsDict = null;
 var toolList = null;
 
 var librariesDict = null;
@@ -76,17 +72,12 @@ var librariesDict = null;
 var datasetDefinitionList = null;
 var datasetDefinitionDict = null;
 
-var userRolesDict = null;
 var userRolesList = null;
-
-var studyRolesDict = null;
-var studyRolesList = null;
 
 var studyPoliciesList = null;
 var studyPoliciesDict = null;
 
 var accessModeList = null;
-var accessModeDict = null;
 
 var lastActiveStudy = null;
 
@@ -94,14 +85,7 @@ var myStudies = null;
 var allStudies = null;
 var allStudiesDict = null;
 
-var sitesList = null;
-var sitesDict = null;
-
 var nodesList = null;
-var nodesDict = null;
-
-var standardRolesList = null;
-var standardRolesDict = null;
 
 var studyManagementPoliciesList = null;
 var studyManagementPoliciesDict = null;
@@ -3115,7 +3099,6 @@ function postCreateStudy(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitStudies(data['allStudies'], null, null, false);
 	postInitUserRoles(data['userRoles'], null, null, false);
-	postInitStudyRoles(data['studiesRoles'], null, null, false);
 	postInitStudyManagementPolicies(data['studyManagementPolicies'], null, null, false);
 	data = data['study'];
 	if (data['studyId'] == null) {
@@ -3178,7 +3161,6 @@ function postUpdateStudy(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitStudies(data['allStudies'], null, null, false);
 	postInitUserRoles(data['userRoles'], null, null, false);
-	postInitStudyRoles(data['studiesRoles'], null, null, false);
 	postInitStudyManagementPolicies(data['studyManagementPolicies'], null, null, false);
 	data = data['study'];
 	if (data['studyId'] == null) {
@@ -3247,7 +3229,6 @@ function postAddSiteProtocol(data, textStatus, jqXHR, param) {
 	$('#estimateStudyProtocolSelect').val('');
 	$('#datasetInstances').val('');
 	data = $.parseJSON(data);
-	postInitAnalysisPolicies(data['analysisPolicies'], null, null, false);
 	manageStudy(false);
 }
 
@@ -3499,7 +3480,6 @@ function removeProtocol(button, policy) {
 
 function postRemoveProtocol(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
-	postInitAnalysisPolicies(data['analysisPolicies'], null, null, false);
 	manageStudy(false);
 }
 
@@ -3847,10 +3827,6 @@ function initDatasetInstances(all) {
 
 function postInitDatasetInstances(data, textStatus, jqXHR, param) {
 	datasetInstancesList = data;
-	datasetInstancesDict = {};
-	$.each(data, function(i, datasetInstance) {
-		datasetInstancesDict[datasetInstance['dataSetInstanceId']] = datasetInstance;
-	});
 	datasetInstancesList.sort(compareInstances);
 	if (param) {
 		initLibraries(param);
@@ -3883,10 +3859,6 @@ function initTools(all) {
 
 function postInitTools(data, textStatus, jqXHR, param) {
 	toolList = data;
-	toolsDict = {};
-	$.each(data, function(i, tool) {
-		toolsDict[tool['toolId']] = tool;
-	});
 	toolList.sort(compareTools);
 	if (param) {
 		initDatasets(param);
@@ -3921,30 +3893,7 @@ function initUserRoles(all) {
 
 function postInitUserRoles(data, textStatus, jqXHR, param) {
 	userRolesList = data;
-	userRolesDict = {};
-	$.each(data, function(i, userRole) {
-		userRolesDict[userRole['userRoleId']] = userRole;
-	});
 	userRolesList.sort(compareRoles);
-	if (param) {
-		initStudyRoles(param);
-	}
-}
-
-function initStudyRoles(all) {
-	var url = HOME + '/query';
-	var obj = new Object();
-	obj['action'] = 'getStudyRoles';
-	scanner.RETRIEVE(url, obj, true, postInitStudyRoles, all, null, 0);
-}
-
-function postInitStudyRoles(data, textStatus, jqXHR, param) {
-	studyRolesList = data;
-	studyRolesDict = {};
-	$.each(data, function(i, role) {
-		studyRolesDict[role['roleId']] = role;
-	});
-	studyRolesList.sort(compareStudyRoles);
 	if (param) {
 		initStudyPolicies(param);
 	}
@@ -3962,7 +3911,6 @@ function postInitStudyPolicies(data, textStatus, jqXHR, param) {
 	studyPoliciesDict = {};
 	var ids = [];
 	accessModeList = [];
-	accessModeDict = {};
 	$.each(data, function(i, policy) {
 		studyPoliciesDict[policy['studyPolicyStatementId']] = policy;
 		var accessMode = policy['accessMode'];
@@ -3970,26 +3918,10 @@ function postInitStudyPolicies(data, textStatus, jqXHR, param) {
 		if (!ids.contains(id)) {
 			ids.push(id);
 			accessModeList.push(accessMode);
-			accessModeDict[id] = accessMode;
 		}
 	});
 	studyPoliciesList.sort(compareStudyPolicy);
 	accessModeList.sort(compareAccessMode);
-	if (param) {
-		initAnalysisPolicies(param);
-	}
-}
-
-function initAnalysisPolicies(all) {
-	var url = HOME + '/query';
-	var obj = new Object();
-	obj['action'] = 'getAnalysisPolicies';
-	scanner.RETRIEVE(url, obj, true, postInitAnalysisPolicies, all, null, 0);
-}
-
-function postInitAnalysisPolicies(data, textStatus, jqXHR, param) {
-	analysisPolicies = data;
-	analysisPolicies.sort(compareAnalysisPolicies);
 	if (param) {
 		initStudies(param);
 	}
@@ -4022,30 +3954,7 @@ function initNodes(all) {
 
 function postInitNodes(data, textStatus, jqXHR, param) {
 	nodesList = data;
-	nodesDict = {};
-	$.each(nodesList, function(i, node) {
-		nodesDict[node['nodeId']] = node;
-	});
 	nodesList.sort(compareNodes);
-	if (param) {
-		initStandardRoles(param);
-	}
-}
-
-function initStandardRoles(all) {
-	var url = HOME + '/registry';
-	var obj = new Object();
-	obj['action'] = 'getAllStandardRoles';
-	scanner.RETRIEVE(url, obj, true, postInitStandardRoles, all, null, 0);
-}
-
-function postInitStandardRoles(data, textStatus, jqXHR, param) {
-	standardRolesList = data;
-	standardRolesDict = {};
-	$.each(standardRolesList, function(i, role) {
-		standardRolesDict[role['standardRoleId']] = role;
-	});
-	standardRolesList.sort(compareStandardRoles);
 	if (param) {
 		initStudyManagementPolicies(param);
 	}
@@ -4065,24 +3974,6 @@ function postInitStudyManagementPolicies(data, textStatus, jqXHR, param) {
 		studyManagementPoliciesDict[policy['studyPolicyId']] = policy;
 	});
 	studyManagementPoliciesList.sort(compareStudyManagementPolicies);
-	if (param) {
-		initSites(param);
-	}
-}
-
-function initSites(all) {
-	var url = HOME + '/registry';
-	var obj = new Object();
-	obj['action'] = 'getAllSites';
-	scanner.RETRIEVE(url, obj, true, postInitSites, all, null, 0);
-}
-
-function postInitSites(data, textStatus, jqXHR, param) {
-	sitesList = data;
-	sitesDict = {};
-	$.each(sitesList, function(i, site) {
-		sitesDict[site['siteId']] = site;
-	});
 	if (param) {
 		initSitesPolicies(param);
 	}
@@ -4258,29 +4149,6 @@ function compareNumbers(val1, val2) {
 	} else if (val1 > val2) {
 		ret = 1;
 	}
-	return ret;
-}
-
-function getStudyPolicies(study) {
-	var ret = [];
-	var policyDict = {};
-	$.each(analysisPolicies, function(i, policy) {
-		var parentStudyPolicyStatement = policy['parentStudyPolicyStatement'];
-		$.each(studyPoliciesList, function(j, studyPolicy) {
-			if (studyPolicy['studyPolicyStatementId'] == parentStudyPolicyStatement && studyPolicy['study'] == study) {
-				var obj = {};
-				obj['dataset'] = studyPolicy['dataSetDefinition'];
-				obj['tool'] = policy['analysisTool'];
-				obj['accessMode'] = policy['accessMode']['accessModeId'];
-				var key = 'tool=' + obj['tool'] + ',dataset=' + obj['dataset'] + ',accessMode=' + obj['accessMode'];
-				if (policyDict[key] == null) {
-					policyDict[key] = obj;
-					ret.push(obj);
-				}
-				return false;
-			}
-		});
-	});
 	return ret;
 }
 
