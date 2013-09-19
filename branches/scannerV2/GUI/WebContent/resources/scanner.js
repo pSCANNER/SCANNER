@@ -2956,6 +2956,7 @@ function addSite() {
 	obj['studyId'] = activeStudy['studyId'];
 	obj['siteId'] = studyRequestedSitesDict[$('#siteSelect').val()]['site']['siteId'];
 	var url =  HOME + '/registry';
+	$('#addSiteButton').attr('disabled', 'disabled');
 	scanner.POST(url, obj, true, postAddSite, null, null, 0);
 }
 
@@ -2975,6 +2976,7 @@ function addStaff() {
 	obj['userId'] = $('#staffNames').val();
 	obj['roleId'] = $('#staffRoles').val();
 	var url =  HOME + '/registry';
+	$('#addStaffButton').attr('disabled', 'disabled');
 	scanner.POST(url, obj, true, postAddStaff, null, null, 0);
 }
 
@@ -3103,6 +3105,7 @@ function createStudy() {
 			return;
 		}
 	}
+	$('#createStudyButton').attr('disabled', 'disabled');
 	obj['studyOwner'] = $('#createStudyPrincipalInvestigator').val();
 	var url =  HOME + '/registry';
 	scanner.POST(url, obj, true, postCreateStudy, null, null, 0);
@@ -3166,10 +3169,12 @@ function updateStudy() {
 	obj['analysisPlan'] = $('#projectAnalysisPlan').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	
 	var url =  HOME + '/registry';
+	$('#updateStudyButton').attr('disabled', 'disabled');
 	scanner.POST(url, obj, true, postUpdateStudy, null, null, 0);
 }
 
 function postUpdateStudy(data, textStatus, jqXHR, param) {
+	$('#updateStudyButton').removeAttr('disabled');
 	data = $.parseJSON(data);
 	postInitStudies(data['allStudies'], null, null, false);
 	postInitUserRoles(data['userRoles'], null, null, false);
@@ -3210,6 +3215,7 @@ function addStudyProtocol() {
 	obj['toolId'] = $('#modelNames').val();
 	obj['accessModeId'] = $('#studySendOptions').val();
 	var url =  HOME + '/registry';
+	$('#addStudyProtocolButton').attr('disabled', 'disabled');
 	scanner.POST(url, obj, true, postAddStudyProtocol, null, null, 0);
 }
 
@@ -3233,6 +3239,7 @@ function addSiteProtocol() {
 	obj['accessModeId'] = protocol['accessMode']['accessModeId'];
 	obj['studyPolicyStatementId'] = protocol['studyPolicyStatementId'];
 	var url =  HOME + '/registry';
+	$('#addSiteProtocolButton').attr('disabled', 'disabled');
 	scanner.POST(url, obj, true, postAddSiteProtocol, null, null, 0);
 }
 
@@ -3482,6 +3489,7 @@ function updateStaffSelectRole(studyRole) {
 }
 
 function removeProtocol(button, policy) {
+	button.attr('disabled', 'disabled');
 	var obj = {};
 	obj['action'] = 'deleteAnalyzePolicy';
 	obj['analysisPolicyStatementId'] = policy['analysisPolicyStatementId'];
@@ -3496,6 +3504,7 @@ function postRemoveProtocol(data, textStatus, jqXHR, param) {
 }
 
 function removePoliciesProtocol(button, policy) {
+	button.attr('disabled', 'disabled');
 	var obj = {};
 	obj['action'] = 'deleteStudyPolicy';
 	obj['studyPolicyStatementId'] = policy['studyPolicyStatementId'];
@@ -3769,6 +3778,7 @@ function addInstance() {
 	obj['nodeId'] = $('#nodeNames').val();
 	obj['dataSetDefinitionId'] = studyPolicy['dataSetDefinition']['dataSetDefinitionId'];
 	var url =  HOME + '/registry';
+	$('#addInstanceButton').attr('disabled', 'disabled');
 	scanner.POST(url, obj, true, postAddInstance, null, null, 0);
 }
 
