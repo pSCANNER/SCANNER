@@ -842,8 +842,75 @@ Enrollment Table Format Page</b></p>
 							<div id="networkInformationDiv"></div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Administration" onShow="hideQuery();">
-							<div id="administrationDiv"></div>
+							title="Administration" onShow="showAdministration();" onHide="hideAdministration();">
+							<div id="administrationDiv" class="wizard_layer">
+								<div id="manageUsersDiv">
+								 <p class="wizard_heading">Manage Users</p>
+								 <div class="wizard_content">
+									<table id="manageUsersTable" class="manageStudyProtocols">
+										<thead>
+											<tr>
+												<th class="protocol_border">Name</th>
+												<th class="protocol_border">User Id</th>
+												<th class="protocol_border">Email</th>
+												<th class="protocol_border">Phone</th>
+												<th class="protocol_border">Superuser</th>
+												<th></th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="manageUsersTbody"></tbody>
+									</table>
+									<br/>
+									<div id="newUserDiv">
+										<button id="newUserButton" onclick="newUser();">New user</button>
+									</div>
+									<div id="add_user_div" style="display:none;">
+										<table>
+											<tr>
+												<td>
+													<table>
+														<tr>
+															<td>
+																<table class="add_protocol">
+																	<tbody id="addUserTable">
+																		<tr>
+																			<td class="tag">First Name:</td>
+																			<td><input class="required" type="text" id="userFirstNameInput"></td>
+																			<td class="tag">Last Name:</td>
+																			<td><input class="required" type="text" id="userLastNameInput"></td>
+																		</tr>
+																		<tr>
+																			<td class="tag">User Id:</td>
+																			<td><input class="required" type="text" id="userIdInput"></td>
+																			<td class="tag">Superuser:</td>
+																			<td><input type="checkbox" id="userSuperuserInput"></td>
+																		</tr>
+																		<tr>
+																			<td class="required" class="tag">Email:</td>
+																			<td><input type="text" id="userEmailInput"></td>
+																			<td class="tag">Phone:</td>
+																			<td><input type="text" id="userPhoneInput"></td>
+																		</tr>
+																	</tbody>
+																</table>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+											<tr>
+												<td class="tag">
+													<input type="button" value="Cancel" onclick="cancelUser()">
+													<input id="addUserButton" type="button" value="Add User" onclick="addUser()">
+													<input id="updateUserButton" type="button" value="Update User" onclick="updateUser()">
+												</td>
+											</tr>
+										</table>
+									</div>
+								 </div>
+								</div>
+							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
 							title="Products" onShow="hideQuery();">

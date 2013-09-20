@@ -263,4 +263,8 @@ public interface RegistryClient {
 	public RegistryClientResponse deleteAnalyzePolicy(int analysisPolicyStatementId);
 	
 	public RegistryClientResponse createDatasetInstance(String dataSetInstanceName, String description, String dataSource, int dataSetDefinitionId, int nodeId);
+
+	public RegistryClientResponse createUser(String userName, String email, String firstName, String lastName, String phone, boolean isSuperuser);
+	public RegistryClientResponse updateUser(String userName, String email, String firstName, String lastName, String phone, boolean isSuperuser);
+	public RegistryClientResponse deleteUser(int userId);
 }

@@ -314,6 +314,12 @@ public class Registry extends HttpServlet {
 		String dataSetInstanceName = request.getParameter("dataSetInstanceName");
 		String dataSource = request.getParameter("dataSource");
 		String nodeId = request.getParameter("nodeId");
+		String userName = request.getParameter("userName");
+		String email = request.getParameter("email");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String phone = request.getParameter("phone");
+		String isSuperuser = request.getParameter("isSuperuser");
 		
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
@@ -480,6 +486,58 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("createUser")) {
+			clientResponse = registryClient.createUser(userName, email, 
+					firstName, lastName, phone, Boolean.parseBoolean(isSuperuser));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create user.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("createUser:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("user", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getUsers();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get users.");
+					return;
+				}
+				responseObject.put("users", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("createUser responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("updateUser")) {
+			clientResponse = registryClient.updateUser(userName, email, 
+					firstName, lastName, phone, Boolean.parseBoolean(isSuperuser));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update user.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("updateUser:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("user", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getUsers();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get users.");
+					return;
+				}
+				responseObject.put("users", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("updateUser responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("deleteStudyRequestedSites")) {
 			clientResponse = registryClient.deleteStudyRequestedSites(Integer.parseInt(studyRequestedSiteId));
 			if (clientResponse == null) {
@@ -537,6 +595,26 @@ public class Registry extends HttpServlet {
 				responseObject.put("studyPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("deleteStudyPolicy responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("deleteUser")) {
+			clientResponse = registryClient.deleteUser(Integer.parseInt(userId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete user.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
+				clientResponse = registryClient.getUsers();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get users.");
+					return;
+				}
+				responseObject.put("users", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("deleteUser responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

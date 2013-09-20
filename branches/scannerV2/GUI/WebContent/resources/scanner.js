@@ -1716,6 +1716,9 @@ function setContacts() {
 	var studyId = 0;
 	$.each(userRolesList, function(i, userRole) {
 		var studyRole = userRole['studyRole'];
+		if (allStudiesDict[studyRole['study']] == null) {
+			return true;
+		}
 		if (studyId != studyRole['study']) {
 			studyId = studyRole['study'];
 			var h6 = $('<h6>');
@@ -4019,6 +4022,7 @@ function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
 	studyRequestedSitesList.sort(compareStudyRequestedSites);
 	if (param) {
 		setContacts();
+		setUsers();
 	}
 }
 
@@ -4161,5 +4165,187 @@ function showPrepToResearch() {
 	$('#expandResults').hide();
 	$('#collapseResults').hide();
 	$('#replayDivContent').hide();
+}
+
+function newUser() {
+	$('#userFirstNameInput').val('');
+	$('#userLastNameInput').val('');
+	$('#userIdInput').val('');
+	$('#userSuperuserInput').removeAttr('checked');
+	$('#userEmailInput').val('');
+	$('#userPhoneInput').val('');
+	$('#add_user_div').show();
+	$('#newUserButton').hide();
+	$('#updateUserButton').hide();
+	$('#addUserButton').show();
+	$('#addUserButton').attr('disabled', 'disabled');
+	$('#manageUsersTable').hide();
+}
+
+function cancelUser() {
+	$('#add_user_div').hide();
+	$('#newUserButton').show();
+	$('#manageUsersTable').show();
+}
+
+function showAdministration() {
+	hideQuery();
+	$('#tabContainerWrapperDiv').height(600);
+	scannerTabContainer.resize();
+	$('.wizard_heading', $('#manageUsersDiv')).unbind('click');
+	$('.wizard_heading', $('#manageUsersDiv')).click(function() {
+		$(this).next(".wizard_content").toggle();
+	});
+	$('.wizard_content', $('#manageUsersDiv')).hide();
+	$('.required', $('#add_user_div')).unbind('keyup');
+	$('.required', $('#add_user_div')).keyup(function(event) {checkCreateUserButton();});
+}
+
+function checkCreateUserButton() {
+	if ($('#userIdInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#userFirstNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#userLastNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#userEmailInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
+		$('#addUserButton').removeAttr('disabled');
+		$('#updateUserButton').removeAttr('disabled');
+	} else {
+		$('#addUserButton').attr('disabled', 'disabled');
+		$('#updateUserButton').attr('disabled', 'disabled');
+	}
+}
+
+function setUsers() {
+	$('#manageUsersTable').show();
+	$('#newUserButton').show();
+	$('#add_user_div').hide();
+	$('#manageUsersTbody').html('');
+	$.each(scannerUsersList, function(i, user) {
+		addUserRow(user);
+	});
+}
+
+function addUserRow(user) {
+	var tbody = $('#manageUsersTbody');
+	var tr = $('<tr>');
+	tbody.append(tr);
+	var td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(user['firstName'] + ' ' + user['lastName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(user['userName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	var a = $('<a>');
+	a.attr('href', 'mailto:' + user['email']);
+	a.html(user['email']);
+	td.append(a);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(user['phone']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	var input = $('<input>');
+	input.attr({'type': 'checkbox'});
+	if (user['isSuperuser']) {
+		input.attr('checked', 'checked');
+	}
+	td.append(input);
+	td = $('<td>');
+	tr.append(td);
+	var button = $('<button>');
+	button.click(function(event) {removeUser($(this), user);});
+	button.html('Remove');
+	td.append(button);
+	td = $('<td>');
+	tr.append(td);
+	button = $('<button>');
+	button.click(function(event) {editUser($(this), user);});
+	button.html('Edit');
+	td.append(button);
+}
+
+function hideAdministration() {
+	$('#tabContainerWrapperDiv').height(300);
+	scannerTabContainer.resize();
+}
+
+function editUser(button, user) {
+	$('#userIdInput').val(user['userName']);
+	$('#userEmailInput').val(user['email']);
+	$('#userFirstNameInput').val(user['firstName']);
+	$('#userLastNameInput').val(user['lastName']);
+	$('#userPhoneInput').val(user['phone']);
+	$('#userIdInput').val(user['userName']);
+	if (user['isSuperuser']) {
+		$('#userSuperuserInput').attr('checked', 'checked');
+	} else {
+		$('#userSuperuserInput').removeAttr('checked');
+	}
+	$('#updateUserButton').removeAttr('disabled');
+	$('#manageUsersTable').hide();
+	$('#updateUserButton').show();
+	$('#addUserButton').hide();
+	$('#newUserButton').hide();
+	$('#add_user_div').show();
+}
+
+function addUser() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'createUser';
+	obj['userName'] = $('#userIdInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['email'] = $('#userEmailInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['firstName'] = $('#userFirstNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['lastName'] = $('#userLastNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['phone'] = $('#userPhoneInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['isSuperuser'] = ($('#userSuperuserInput').attr('checked') == 'checked');
+	$('#addUserButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postAddUser, null, null, 0);
+}
+
+function postAddUser(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitUsers(data['users'], null, null, false);
+	setUsers();
+}
+
+function updateUser() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'updateUser';
+	obj['userName'] = $('#userIdInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['email'] = $('#userEmailInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['firstName'] = $('#userFirstNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['lastName'] = $('#userLastNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['phone'] = $('#userPhoneInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['isSuperuser'] = ($('#userSuperuserInput').attr('checked') == 'checked');
+	$('#addUserButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postUpdateUser, null, null, 0);
+}
+
+function postUpdateUser(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitUsers(data['users'], null, null, false);
+	setUsers();
+}
+
+function removeUser(button, user) {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'deleteUser';
+	obj['userId'] = user['userId'];
+	scanner.POST(url, obj, true, postRemoveUser, null, null, 0);
+}
+
+function postRemoveUser(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitUsers(data['users'], null, null, false);
+	setUsers();
 }
 

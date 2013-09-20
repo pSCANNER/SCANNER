@@ -647,5 +647,61 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		}
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse createUser(String userName, String email,
+			String firstName, String lastName, String phone, boolean isSuperuser) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "users";
+		try {
+			JSONObject body = new JSONObject();
+			body.put("userName", userName);
+			body.put("email", email);
+			body.put("firstName", firstName);
+			body.put("lastName", lastName);
+			body.put("phone", phone);
+			body.put("isSuperuser", isSuperuser);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			//ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
+			ClientURLResponse rsp = postRegistry(url, body.toString(), "scanner");
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse updateUser(String userName, String email,
+			String firstName, String lastName, String phone, boolean isSuperuser) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "users";
+		try {
+			JSONObject body = new JSONObject();
+			body.put("userName", userName);
+			body.put("email", email);
+			body.put("firstName", firstName);
+			body.put("lastName", lastName);
+			body.put("phone", phone);
+			body.put("isSuperuser", isSuperuser);
+			System.out.println("PUT: " + url);
+			System.out.println("PUT Body: " + body.toString());
+			//ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
+			ClientURLResponse rsp = putRegistry(url, body.toString(), "scanner");
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteUser(int userId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "users/" + userId;
+		System.out.println("DELETE: " + url);
+		//ClientURLResponse rsp = delete(url, null, loginUser);
+		ClientURLResponse rsp = delete(url, null, "scanner");
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 	
 }

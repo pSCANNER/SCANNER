@@ -41,6 +41,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 					}
 				} catch (JSONException e1) {
 					e1.printStackTrace();
+					System.out.println("Received response: " + res);
 				}
 			}
 		}
