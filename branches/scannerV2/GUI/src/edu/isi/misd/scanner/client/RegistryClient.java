@@ -271,4 +271,8 @@ public interface RegistryClient {
 	public RegistryClientResponse createSite(String siteName, String description);
 	public RegistryClientResponse updateSite(int siteId, String siteName, String description);
 	public RegistryClientResponse deleteSite(int siteId);
+	
+	public RegistryClientResponse createNode(String nodeName, String hostUrl, int hostPort, String basePath, String description, boolean isMaster, int siteId);
+	public RegistryClientResponse updateNode(int nodeId, String nodeName, String hostUrl, int hostPort, String basePath, String description, boolean isMaster, int siteId);
+	public RegistryClientResponse deleteNode(int nodeId);
 }

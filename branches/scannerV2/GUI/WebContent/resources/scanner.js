@@ -4041,6 +4041,7 @@ function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
 		setContacts();
 		setUsers();
 		setSites();
+		setNodes();
 	}
 }
 
@@ -4231,6 +4232,14 @@ function showAdministration() {
 	$('.wizard_content', $('#manageSitesDiv')).hide();
 	$('.required', $('#add_site_div')).unbind('keyup');
 	$('.required', $('#add_site_div')).keyup(function(event) {checkCreateSiteButton();});
+	
+	$('.wizard_heading', $('#manageNodesDiv')).unbind('click');
+	$('.wizard_heading', $('#manageNodesDiv')).click(function() {
+		$(this).next(".wizard_content").toggle();
+	});
+	$('.wizard_content', $('#manageNodesDiv')).hide();
+	$('.required', $('#add_node_div')).unbind('keyup');
+	$('.required', $('#add_node_div')).keyup(function(event) {checkCreateNodeButton();});
 }
 
 function checkCreateUserButton() {
@@ -4417,6 +4426,7 @@ function setSites() {
 	$.each(sitesList, function(i, site) {
 		addSiteEntityRow(site);
 	});
+	loadSelectNodeSites();
 }
 
 function addSiteEntityRow(site) {
@@ -4504,5 +4514,212 @@ function postRemoveSite(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitSites(data['sites'], null, null, false);
 	setSites();
+}
+
+function newNode() {
+	$('#nodeNameInput').val('');
+	$('#nodeBasePathInput').val('');
+	$('#nodeHosURLInput').val('');
+	$('#nodeHostPortInput').val('');
+	$('#selectNodeSites').val('');
+	$('#nodeDescriptionInput').val('');
+	$('#nodeMasterInput').removeAttr('checked');
+	$('#add_node_div').show();
+	$('#newNodeButton').hide();
+	$('#updateNodeButton').hide();
+	$('#addNodeButton').show();
+	$('#addNodeButton').attr('disabled', 'disabled');
+	$('#manageNodesTable').hide();
+}
+
+function cancelNode() {
+	$('#add_node_div').hide();
+	$('#newNodeButton').show();
+	$('#manageNodesTable').show();
+}
+
+function loadSelectNodeSites() {
+	var select = $('#selectNodeSites');
+	select.unbind();
+	select.html('');
+	var option = $('<option>');
+	option.text('Select site...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(sitesList, function(i, site) {
+		option = $('<option>');
+		option.text(site['siteName']);
+		option.attr('value', site['siteId']);
+		select.append(option);
+	});
+	select.change(function(event) {checkCreateNodeButton();});
+}
+
+function checkCreateNodeButton() {
+	if ($('#nodeNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#nodeHosURLInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#nodeHostPortInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#nodeBasePathInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#selectNodeSites').val() != '') {
+		$('#addNodeButton').removeAttr('disabled');
+		$('#updateNodeButton').removeAttr('disabled');
+	} else {
+		$('#addNodeButton').attr('disabled', 'disabled');
+		$('#updateNodeButton').attr('disabled', 'disabled');
+	}
+}
+
+function setNodes() {
+	$('#manageNodesTable').show();
+	$('#newNodeButton').show();
+	$('#add_node_div').hide();
+	$('#manageNodesTbody').html('');
+	$.each(nodesList, function(i, node) {
+		addNodeRow(node);
+	});
+}
+
+function addNodeRow(node) {
+	var tbody = $('#manageNodesTbody');
+	var tr = $('<tr>');
+	tbody.append(tr);
+	var td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(node['nodeName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	var a = $('<a>');
+	a.attr('href', node['hostUrl']);
+	a.html(node['hostUrl']);
+	td.append(a);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(node['hostPort']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(node['basePath']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	var input = $('<input>');
+	input.attr({'type': 'checkbox'});
+	if (node['isMaster']) {
+		input.attr('checked', 'checked');
+	}
+	td.append(input);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(node['site']['siteName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(node['description']);
+	td = $('<td>');
+	tr.append(td);
+	var button = $('<button>');
+	button.click(function(event) {removeNode($(this), node);});
+	button.html('Remove');
+	td.append(button);
+	td = $('<td>');
+	tr.append(td);
+	button = $('<button>');
+	button.click(function(event) {editNode($(this), node);});
+	button.html('Edit');
+	td.append(button);
+}
+
+function editNode(button, node) {
+	$('#nodeNameInput').val(node['nodeName']);
+	$('#nodeBasePathInput').val(node['basePath']);
+	$('#nodeHosURLInput').val(node['hostUrl']);
+	$('#nodeHostPortInput').val(node['hostPort']);
+	$('#selectNodeSites').val(node['site']['siteId']);
+	$('#nodeDescriptionInput').val(node['description']);
+	if (node['isMaster']) {
+		$('#nodeMasterInput').attr('checked', 'checked');
+	} else {
+		$('#nodeMasterInput').removeAttr('checked');
+	}
+	$('#nodeIdHidden').val(node['nodeId']);
+	$('#updateNodeButton').removeAttr('disabled');
+	$('#manageNodesTable').hide();
+	$('#updateNodeButton').show();
+	$('#addNodeButton').hide();
+	$('#newNodeButton').hide();
+	$('#add_node_div').show();
+}
+
+function addNode() {
+	var obj = {};
+	var port = $('#nodeHostPortInput').val();
+	if (!isNaN(parseInt(port)) && port.length == ("" + parseInt(port)).length) {
+		obj['hostPort'] = $('#nodeHostPortInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	} else {
+		alert('Invalid integer value for Host Port: "' + port + '"');
+		return;
+	}
+	var url = HOME + '/registry';
+	obj['action'] = 'createNode';
+	obj['nodeName'] = $('#nodeNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['basePath'] = $('#nodeBasePathInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['hostUrl'] = $('#nodeHosURLInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['description'] = $('#nodeDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['siteId'] = $('#selectNodeSites').val();
+	obj['isMaster'] = ($('#nodeMasterInput').attr('checked') == 'checked');
+	$('#addNodeButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postAddNode, null, null, 0);
+}
+
+function postAddNode(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitNodes(data['nodes'], null, null, false);
+	setNodes();
+}
+
+function updateNode() {
+	var obj = {};
+	var port = $('#nodeHostPortInput').val();
+	if (!isNaN(parseInt(port)) && port.length == ("" + parseInt(port)).length) {
+		obj['hostPort'] = $('#nodeHostPortInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	} else {
+		alert('Invalid integer value for Host Port: "' + port + '"');
+		return;
+	}
+	var url = HOME + '/registry';
+	obj['action'] = 'updateNode';
+	obj['nodeId'] = $('#nodeIdHidden').val();
+	obj['nodeName'] = $('#nodeNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['basePath'] = $('#nodeBasePathInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['hostUrl'] = $('#nodeHosURLInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['description'] = $('#nodeDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['siteId'] = $('#selectNodeSites').val();
+	obj['isMaster'] = ($('#nodeMasterInput').attr('checked') == 'checked');
+	$('#updateNodeButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postUpdateNode, null, null, 0);
+}
+
+function postUpdateNode(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitNodes(data['nodes'], null, null, false);
+	setNodes();
+}
+
+function removeNode(button, node) {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'deleteNode';
+	obj['nodeId'] = node['nodeId'];
+	scanner.POST(url, obj, true, postRemoveNode, null, null, 0);
+}
+
+function postRemoveNode(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitNodes(data['nodes'], null, null, false);
+	setNodes();
 }
 

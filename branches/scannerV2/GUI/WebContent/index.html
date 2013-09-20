@@ -963,6 +963,81 @@ Enrollment Table Format Page</b></p>
 									</div>
 								 </div>
 								</div>
+								<div id="manageNodesDiv">
+								 <p class="wizard_heading">Manage Nodes</p>
+								 <div class="wizard_content">
+									<table id="manageNodesTable" class="manageStudyProtocols">
+										<thead>
+											<tr>
+												<th class="protocol_border">Name</th>
+												<th class="protocol_border">Host URL</th>
+												<th class="protocol_border">Host Port</th>
+												<th class="protocol_border">Base Path</th>
+												<th class="protocol_border">Master</th>
+												<th class="protocol_border">Site</th>
+												<th class="protocol_border">Description</th>
+												<th></th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="manageNodesTbody"></tbody>
+									</table>
+									<br/>
+									<div id="newNodeDiv">
+										<button id="newNodeButton" onclick="newNode();">New node</button>
+									</div>
+									<div id="add_node_div">
+										<table>
+											<tr>
+												<td>
+													<table>
+														<tr>
+															<td>
+																<table class="add_protocol">
+																	<tbody id="addNodeTable">
+																		<tr>
+																			<td class="tag">Node Name:</td>
+																			<td><input class="required" type="text" id="nodeNameInput"></td>
+																			<td class="tag">Master:</td>
+																			<td><input type="checkbox" id="nodeMasterInput"></td>
+																		</tr>
+																		<tr>
+																			<td class="tag">Host URL:</td>
+																			<td><input class="required" type="text" id="nodeHosURLInput" size="50"></td>
+																			<td class="tag">Host Port:</td>
+																			<td><input class="required" type="text" id="nodeHostPortInput"></td>
+																		</tr>
+																		<tr>
+																			<td class="tag">Base Path:</td>
+																			<td><input class="required" type="text" id="nodeBasePathInput"></td>
+																			<td class="tag">Site:</td>
+																			<td><select id="selectNodeSites"></select></td>
+																		</tr>
+																		<tr>
+																			<td class="tag">Description:</td>
+																			<td><input type="text" id="nodeDescriptionInput" size="30"></td>
+																			<td class="tag"></td>
+																			<td></td>
+																		</tr>
+																	</tbody>
+																</table>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+											<tr>
+												<td class="tag">
+													<input type="hidden" value="" name="nodeIdHidden" id="nodeIdHidden">
+													<input type="button" value="Cancel" onclick="cancelNode()">
+													<input id="addNodeButton" type="button" value="Add node" onclick="addNode()">
+													<input id="updateNodeButton" type="button" value="Update node" onclick="updateNode()">
+												</td>
+											</tr>
+										</table>
+									</div>
+								 </div>
+								</div>
 							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"

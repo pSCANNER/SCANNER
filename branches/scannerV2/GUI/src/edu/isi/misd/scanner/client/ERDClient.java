@@ -750,5 +750,69 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse createNode(String nodeName, String hostUrl,
+			int hostPort, String basePath, String description,
+			boolean isMaster, int siteId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "nodes";
+		try {
+			JSONObject body = new JSONObject();
+			body.put("nodeName", nodeName);
+			body.put("hostUrl", hostUrl);
+			body.put("hostPort", hostPort);
+			body.put("basePath", basePath);
+			body.put("description", description);
+			body.put("isMaster", isMaster);
+			JSONObject site = new JSONObject();
+			site.put("siteId", siteId);
+			body.put("site", site);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			//ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
+			ClientURLResponse rsp = postRegistry(url, body.toString(), "scanner");
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse updateNode(int nodeId, String nodeName,
+			String hostUrl, int hostPort, String basePath, String description,
+			boolean isMaster, int siteId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "nodes/" + nodeId;
+		try {
+			JSONObject body = new JSONObject();
+			body.put("nodeName", nodeName);
+			body.put("hostUrl", hostUrl);
+			body.put("hostPort", hostPort);
+			body.put("basePath", basePath);
+			body.put("description", description);
+			body.put("isMaster", isMaster);
+			JSONObject site = new JSONObject();
+			site.put("siteId", siteId);
+			body.put("site", site);
+			System.out.println("PUT: " + url);
+			System.out.println("PUT Body: " + body.toString());
+			//ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
+			ClientURLResponse rsp = putRegistry(url, body.toString(), "scanner");
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteNode(int nodeId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "nodes/" + nodeId;
+		System.out.println("DELETE: " + url);
+		//ClientURLResponse rsp = delete(url, null, loginUser);
+		ClientURLResponse rsp = delete(url, null, "scanner");
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 	
 }

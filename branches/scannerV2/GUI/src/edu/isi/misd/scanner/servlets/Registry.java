@@ -321,6 +321,11 @@ public class Registry extends HttpServlet {
 		String phone = request.getParameter("phone");
 		String isSuperuser = request.getParameter("isSuperuser");
 		String siteName = request.getParameter("siteName");
+		String nodeName = request.getParameter("nodeName");
+		String basePath = request.getParameter("basePath");
+		String hostUrl = request.getParameter("hostUrl");
+		String hostPort = request.getParameter("hostPort");
+		String isMaster = request.getParameter("isMaster");
 		
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
@@ -538,6 +543,31 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("createNode")) {
+			clientResponse = registryClient.createNode(nodeName, hostUrl, Integer.parseInt(hostPort), basePath, description, Boolean.parseBoolean(isMaster), Integer.parseInt(siteId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create node.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("createNode:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("node", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getAllNodes();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get nodes.");
+					return;
+				}
+				responseObject.put("nodes", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("createNode responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("updateStudy")) {
 			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, studyOwner, studyStatusType,
 					description, protocol, startDate, endDate, clinicalTrialsId, analysisPlan);
@@ -622,6 +652,31 @@ public class Registry extends HttpServlet {
 				responseObject.put("sites", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("updateSite responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("updateNode")) {
+			clientResponse = registryClient.updateNode(Integer.parseInt(nodeId), nodeName, hostUrl, Integer.parseInt(hostPort), basePath, description, Boolean.parseBoolean(isMaster), Integer.parseInt(siteId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update node.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("updateNode:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("node", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getAllNodes();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
+					return;
+				}
+				responseObject.put("nodes", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("updateNode responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -732,6 +787,26 @@ public class Registry extends HttpServlet {
 				responseObject.put("sites", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("deleteSite responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("deleteNode")) {
+			clientResponse = registryClient.deleteNode(Integer.parseInt(nodeId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete node.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
+				clientResponse = registryClient.getAllNodes();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get nodes.");
+					return;
+				}
+				responseObject.put("nodes", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("deleteNode responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
