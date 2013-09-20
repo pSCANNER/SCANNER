@@ -512,8 +512,44 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("updateStudy")) {
+			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, studyOwner, studyStatusType,
+					description, protocol, startDate, endDate, clinicalTrialsId, analysisPlan);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update study.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("study", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getAllStudies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
+					return;
+				}
+				responseObject.put("allStudies", clientResponse.getEntityResponse());
+				clientResponse.release();
+				clientResponse = registryClient.getUserRoles();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user roles.");
+					return;
+				}
+				responseObject.put("userRoles", clientResponse.getEntityResponse());
+				clientResponse.release();
+				clientResponse = registryClient.getAllStudyManagementPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies management policies.");
+					return;
+				}
+				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("updateUser")) {
-			clientResponse = registryClient.updateUser(userName, email, 
+			clientResponse = registryClient.updateUser(Integer.parseInt(userId), userName, email, 
 					firstName, lastName, phone, Boolean.parseBoolean(isSuperuser));
 			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update user.");
@@ -628,42 +664,6 @@ public class Registry extends HttpServlet {
 			clientResponse.release();
 			responseBody = responseObject.toString();
 			System.out.println("deleteSitePolicy responseBody: " + responseBody);
-		} else if (action.equals("updateStudy")) {
-			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, studyOwner, studyStatusType,
-					description, protocol, startDate, endDate, clinicalTrialsId, analysisPlan);
-			if (clientResponse == null) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update study.");
-				return;
-			}
-			try {
-				JSONObject responseObject = new JSONObject();
-				responseObject.put("study", clientResponse.getEntity());
-				clientResponse.release();
-				clientResponse = registryClient.getAllStudies();
-				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
-					return;
-				}
-				responseObject.put("allStudies", clientResponse.getEntityResponse());
-				clientResponse.release();
-				clientResponse = registryClient.getUserRoles();
-				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user roles.");
-					return;
-				}
-				responseObject.put("userRoles", clientResponse.getEntityResponse());
-				clientResponse.release();
-				clientResponse = registryClient.getAllStudyManagementPolicies();
-				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies management policies.");
-					return;
-				}
-				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
-				responseBody = responseObject.toString();
-				System.out.println("responseBody: " + responseBody);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
 		} else {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unknown action: \"" + action + "\"");
 			return;

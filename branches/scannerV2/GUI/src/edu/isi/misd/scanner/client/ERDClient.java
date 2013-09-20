@@ -671,10 +671,10 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		return ret;
 	}
 	@Override
-	public RegistryClientResponse updateUser(String userName, String email,
+	public RegistryClientResponse updateUser(int userId, String userName, String email,
 			String firstName, String lastName, String phone, boolean isSuperuser) {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "users";
+		String url = erdURL + "users/" + userId;
 		try {
 			JSONObject body = new JSONObject();
 			body.put("userName", userName);

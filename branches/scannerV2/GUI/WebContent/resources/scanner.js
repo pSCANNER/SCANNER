@@ -4287,6 +4287,7 @@ function editUser(button, user) {
 	} else {
 		$('#userSuperuserInput').removeAttr('checked');
 	}
+	$('#userIdHidden').val(user['userId']);
 	$('#updateUserButton').removeAttr('disabled');
 	$('#manageUsersTable').hide();
 	$('#updateUserButton').show();
@@ -4319,6 +4320,7 @@ function updateUser() {
 	var obj = {};
 	var url = HOME + '/registry';
 	obj['action'] = 'updateUser';
+	obj['userId'] = $('#userIdHidden').val();
 	obj['userName'] = $('#userIdInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['email'] = $('#userEmailInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['firstName'] = $('#userFirstNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");

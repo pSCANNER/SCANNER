@@ -887,8 +887,8 @@ Enrollment Table Format Page</b></p>
 																			<td><input type="checkbox" id="userSuperuserInput"></td>
 																		</tr>
 																		<tr>
-																			<td class="required" class="tag">Email:</td>
-																			<td><input type="text" id="userEmailInput"></td>
+																			<td class="tag">Email:</td>
+																			<td><input class="required" type="text" id="userEmailInput"></td>
 																			<td class="tag">Phone:</td>
 																			<td><input type="text" id="userPhoneInput"></td>
 																		</tr>
@@ -901,6 +901,7 @@ Enrollment Table Format Page</b></p>
 											</tr>
 											<tr>
 												<td class="tag">
+													<input type="hidden" value="" name="userIdHidden" id="userIdHidden">
 													<input type="button" value="Cancel" onclick="cancelUser()">
 													<input id="addUserButton" type="button" value="Add User" onclick="addUser()">
 													<input id="updateUserButton" type="button" value="Update User" onclick="updateUser()">
