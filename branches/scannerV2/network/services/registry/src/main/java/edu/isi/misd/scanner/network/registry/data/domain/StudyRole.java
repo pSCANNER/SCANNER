@@ -36,7 +36,7 @@ public class StudyRole implements Serializable
     @Basic(optional = false)
     @Column(name = "role_within_study")
     private String roleWithinStudy;       
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyId")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
     @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)

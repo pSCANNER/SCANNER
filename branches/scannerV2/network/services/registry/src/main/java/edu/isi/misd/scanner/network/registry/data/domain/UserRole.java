@@ -26,7 +26,7 @@ public class UserRole implements Serializable {
     @Basic(optional = false)
     @Column(name = "user_role_id")
     private Integer userRoleId;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
     @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @ManyToOne(optional = false)

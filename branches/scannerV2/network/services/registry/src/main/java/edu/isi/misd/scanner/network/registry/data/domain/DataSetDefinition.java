@@ -42,7 +42,7 @@ public class DataSetDefinition implements Serializable
     @JoinColumn(name = "originating_study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study originatingStudy;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
     @JsonIdentityReference(alwaysAsId=true)      
     @JoinColumn(name = "author_uid", referencedColumnName = "user_id")
     @ManyToOne

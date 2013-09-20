@@ -39,7 +39,7 @@ public class DataSetInstance implements Serializable
     @Basic(optional = false)
     @Column(name = "data_source")
     private String dataSource;
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetDefinitionId")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetName")
     @JsonIdentityReference(alwaysAsId=true)    
     @JoinColumn(name = "data_set_definition_id", referencedColumnName = "data_set_definition_id")
     @ManyToOne(optional = false)

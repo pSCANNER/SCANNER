@@ -60,7 +60,7 @@ public class Study implements Serializable
     @ManyToOne(optional = false)
     // just set studyStatusType by default to the only currently defined value (1)
     private StudyStatusType studyStatusType = new StudyStatusType(1);
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
     @JsonIdentityReference(alwaysAsId=true)        
     @JoinColumn(name = "study_owner", referencedColumnName = "user_id")
     @ManyToOne(optional = false)

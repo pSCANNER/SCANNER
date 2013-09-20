@@ -39,7 +39,7 @@ public class StudyPolicyStatement implements Serializable
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;       
-    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userId")
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="userName")
     @JsonIdentityReference(alwaysAsId=true)          
     @JoinColumn(name = "policy_originator", referencedColumnName = "user_id")
     @ManyToOne(optional = false)
