@@ -96,6 +96,8 @@ var studyRequestedSitesDict = null;
 var sitesPoliciesList = null;
 var sitesPoliciesDict = null;
 
+var sitesList = null;
+
 var activeStudy = null;
 
 
@@ -3997,6 +3999,21 @@ function postInitSitesPolicies(data, textStatus, jqXHR, param) {
 	});
 	sitesPoliciesList.sort(compareSitesPolicies);
 	if (param) {
+		initSites(param);
+	}
+}
+
+function initSites(all) {
+	var url = HOME + '/registry';
+	var obj = new Object();
+	obj['action'] = 'getAllSites';
+	scanner.RETRIEVE(url, obj, true, postInitSites, all, null, 0);
+}
+
+function postInitSites(data, textStatus, jqXHR, param) {
+	sitesList = data;
+	sitesList.sort(compareSites);
+	if (param) {
 		initStudyRequestedSites(param);
 	}
 }
@@ -4023,6 +4040,7 @@ function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
 	if (param) {
 		setContacts();
 		setUsers();
+		setSites();
 	}
 }
 
@@ -4045,6 +4063,11 @@ function compareSitesPolicies(sitePolicy1, sitePolicy2) {
 			ret = compareIgnoreCase(studyRole1['roleWithinStudy'], studyRole2['roleWithinStudy']);
 		}
 	}
+	return ret;
+}
+
+function compareSites(site1, site2) {
+	ret = compareIgnoreCase(site1['siteName'], site2['siteName']);
 	return ret;
 }
 
@@ -4192,6 +4215,7 @@ function showAdministration() {
 	hideQuery();
 	$('#tabContainerWrapperDiv').height(600);
 	scannerTabContainer.resize();
+	
 	$('.wizard_heading', $('#manageUsersDiv')).unbind('click');
 	$('.wizard_heading', $('#manageUsersDiv')).click(function() {
 		$(this).next(".wizard_content").toggle();
@@ -4199,6 +4223,14 @@ function showAdministration() {
 	$('.wizard_content', $('#manageUsersDiv')).hide();
 	$('.required', $('#add_user_div')).unbind('keyup');
 	$('.required', $('#add_user_div')).keyup(function(event) {checkCreateUserButton();});
+	
+	$('.wizard_heading', $('#manageSitesDiv')).unbind('click');
+	$('.wizard_heading', $('#manageSitesDiv')).click(function() {
+		$(this).next(".wizard_content").toggle();
+	});
+	$('.wizard_content', $('#manageSitesDiv')).hide();
+	$('.required', $('#add_site_div')).unbind('keyup');
+	$('.required', $('#add_site_div')).keyup(function(event) {checkCreateSiteButton();});
 }
 
 function checkCreateUserButton() {
@@ -4281,7 +4313,6 @@ function editUser(button, user) {
 	$('#userFirstNameInput').val(user['firstName']);
 	$('#userLastNameInput').val(user['lastName']);
 	$('#userPhoneInput').val(user['phone']);
-	$('#userIdInput').val(user['userName']);
 	if (user['isSuperuser']) {
 		$('#userSuperuserInput').attr('checked', 'checked');
 	} else {
@@ -4327,7 +4358,7 @@ function updateUser() {
 	obj['lastName'] = $('#userLastNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['phone'] = $('#userPhoneInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['isSuperuser'] = ($('#userSuperuserInput').attr('checked') == 'checked');
-	$('#addUserButton').attr('disabled', 'disabled');
+	$('#updateUserButton').attr('disabled', 'disabled');
 	scanner.POST(url, obj, true, postUpdateUser, null, null, 0);
 }
 
@@ -4349,5 +4380,129 @@ function postRemoveUser(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitUsers(data['users'], null, null, false);
 	setUsers();
+}
+
+function newSite() {
+	$('#siteNameInput').val('');
+	$('#siteDescriptionInput').val('');
+	$('#add_site_div').show();
+	$('#newSiteButton').hide();
+	$('#updateSiteButton').hide();
+	$('#addSiteEntityButton').show();
+	$('#addSiteEntityButton').attr('disabled', 'disabled');
+	$('#manageSitesTable').hide();
+}
+
+function cancelSite() {
+	$('#add_site_div').hide();
+	$('#newSiteButton').show();
+	$('#manageSitesTable').show();
+}
+
+function checkCreateSiteButton() {
+	if ($('#siteNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
+		$('#addSiteEntityButton').removeAttr('disabled');
+		$('#updateSiteButton').removeAttr('disabled');
+	} else {
+		$('#addSiteEntityButton').attr('disabled', 'disabled');
+		$('#updateSiteButton').attr('disabled', 'disabled');
+	}
+}
+
+function setSites() {
+	$('#manageSitesTable').show();
+	$('#newSiteButton').show();
+	$('#add_site_div').hide();
+	$('#manageSitesTbody').html('');
+	$.each(sitesList, function(i, site) {
+		addSiteEntityRow(site);
+	});
+}
+
+function addSiteEntityRow(site) {
+	var tbody = $('#manageSitesTbody');
+	var tr = $('<tr>');
+	tbody.append(tr);
+	var td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(site['siteName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	if (site['description'] != null) {
+		td.html(site['description']);
+	}
+	td = $('<td>');
+	tr.append(td);
+	var button = $('<button>');
+	button.click(function(event) {removeSite($(this), site);});
+	button.html('Remove');
+	td.append(button);
+	td = $('<td>');
+	tr.append(td);
+	button = $('<button>');
+	button.click(function(event) {editSite($(this), site);});
+	button.html('Edit');
+	td.append(button);
+}
+
+function editSite(button, site) {
+	$('#siteNameInput').val(site['siteName']);
+	$('#siteDescriptionInput').val(site['description']);
+	$('#siteIdHidden').val(site['siteId']);
+	$('#updateSiteButton').removeAttr('disabled');
+	$('#manageSitesTable').hide();
+	$('#updateSiteButton').show();
+	$('#addSiteEntityButton').hide();
+	$('#newSiteButton').hide();
+	$('#add_site_div').show();
+}
+
+function addSiteEntity() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'createSite';
+	obj['siteName'] = $('#siteNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['description'] = $('#siteDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	$('#addSiteEntityButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postAddSiteEntity, null, null, 0);
+}
+
+function postAddSiteEntity(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitSites(data['sites'], null, null, false);
+	setSites();
+}
+
+function updateSite() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'updateSite';
+	obj['siteId'] = $('#siteIdHidden').val();
+	obj['siteName'] = $('#siteNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['description'] = $('#siteDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	$('#updateSiteButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postUpdateSite, null, null, 0);
+}
+
+function postUpdateSite(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitSites(data['sites'], null, null, false);
+	setSites();
+}
+
+function removeSite(button, site) {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'deleteSite';
+	obj['siteId'] = site['siteId'];
+	scanner.POST(url, obj, true, postRemoveSite, null, null, 0);
+}
+
+function postRemoveSite(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitSites(data['sites'], null, null, false);
+	setSites();
 }
 

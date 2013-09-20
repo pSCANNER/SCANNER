@@ -865,7 +865,7 @@ Enrollment Table Format Page</b></p>
 									<div id="newUserDiv">
 										<button id="newUserButton" onclick="newUser();">New user</button>
 									</div>
-									<div id="add_user_div" style="display:none;">
+									<div id="add_user_div">
 										<table>
 											<tr>
 												<td>
@@ -903,8 +903,60 @@ Enrollment Table Format Page</b></p>
 												<td class="tag">
 													<input type="hidden" value="" name="userIdHidden" id="userIdHidden">
 													<input type="button" value="Cancel" onclick="cancelUser()">
-													<input id="addUserButton" type="button" value="Add User" onclick="addUser()">
-													<input id="updateUserButton" type="button" value="Update User" onclick="updateUser()">
+													<input id="addUserButton" type="button" value="Add user" onclick="addUser()">
+													<input id="updateUserButton" type="button" value="Update user" onclick="updateUser()">
+												</td>
+											</tr>
+										</table>
+									</div>
+								 </div>
+								</div>
+								<div id="manageSitesDiv">
+								 <p class="wizard_heading">Manage Sites</p>
+								 <div class="wizard_content">
+									<table id="manageSitesTable" class="manageStudyProtocols">
+										<thead>
+											<tr>
+												<th class="protocol_border">Name</th>
+												<th class="protocol_border">Description</th>
+												<th></th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="manageSitesTbody"></tbody>
+									</table>
+									<br/>
+									<div id="newSiteDiv">
+										<button id="newSiteButton" onclick="newSite();">New site</button>
+									</div>
+									<div id="add_site_div">
+										<table>
+											<tr>
+												<td>
+													<table>
+														<tr>
+															<td>
+																<table class="add_protocol">
+																	<tbody id="addSiteEntityTable">
+																		<tr>
+																			<td class="tag">Name:</td>
+																			<td><input class="required" type="text" id="siteNameInput"></td>
+																			<td class="tag">Description:</td>
+																			<td><input type="text" id="siteDescriptionInput" size="30"></td>
+																		</tr>
+																	</tbody>
+																</table>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+											<tr>
+												<td class="tag">
+													<input type="hidden" value="" name="siteIdHidden" id="siteIdHidden">
+													<input type="button" value="Cancel" onclick="cancelSite()">
+													<input id="addSiteEntityButton" type="button" value="Add site" onclick="addSiteEntity()">
+													<input id="updateSiteButton" type="button" value="Update site" onclick="updateSite()">
 												</td>
 											</tr>
 										</table>

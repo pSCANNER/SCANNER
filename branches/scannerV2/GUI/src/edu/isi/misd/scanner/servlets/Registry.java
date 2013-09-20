@@ -320,6 +320,7 @@ public class Registry extends HttpServlet {
 		String lastName = request.getParameter("lastName");
 		String phone = request.getParameter("phone");
 		String isSuperuser = request.getParameter("isSuperuser");
+		String siteName = request.getParameter("siteName");
 		
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
@@ -512,6 +513,31 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("createSite")) {
+			clientResponse = registryClient.createSite(siteName, description);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create site.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("createSite:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("site", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getAllSites();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
+					return;
+				}
+				responseObject.put("sites", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("createSite responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("updateStudy")) {
 			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, studyOwner, studyStatusType,
 					description, protocol, startDate, endDate, clinicalTrialsId, analysisPlan);
@@ -571,6 +597,31 @@ public class Registry extends HttpServlet {
 				responseObject.put("users", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("updateUser responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("updateSite")) {
+			clientResponse = registryClient.updateSite(Integer.parseInt(siteId), siteName, description);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update site.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("updateSite:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("site", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getAllSites();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
+					return;
+				}
+				responseObject.put("sites", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("updateSite responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -664,6 +715,26 @@ public class Registry extends HttpServlet {
 			clientResponse.release();
 			responseBody = responseObject.toString();
 			System.out.println("deleteSitePolicy responseBody: " + responseBody);
+		} else if (action.equals("deleteSite")) {
+			clientResponse = registryClient.deleteSite(Integer.parseInt(siteId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete site.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
+				clientResponse = registryClient.getAllSites();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
+					return;
+				}
+				responseObject.put("sites", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("deleteSite responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unknown action: \"" + action + "\"");
 			return;
