@@ -210,7 +210,7 @@ function initScanner() {
 				$.each(scannerUsersList, function(i, user) {
 					option = $('<option>');
 					option.text(user['firstName'] + ' ' + user['lastName']);
-					option.attr('value', user['userId']);
+					option.attr('value', user['userName']);
 					select.append(option);
 				});
 				select.change(function(event) {checkCreateStudyButton();});
@@ -1715,18 +1715,17 @@ function setContacts() {
 	var h4 = $('<h4>');
 	div.append(h4);
 	h4.html('Studies related information');
-	var studyId = 0;
+	var studyName = null;
 	$.each(userRolesList, function(i, userRole) {
 		var studyRole = userRole['studyRole'];
 		if (allStudiesDict[studyRole['study']] == null) {
 			return true;
 		}
-		if (studyId != studyRole['study']) {
-			studyId = studyRole['study'];
+		if (studyName != studyRole['study']) {
+			studyName = studyRole['study'];
 			var h6 = $('<h6>');
 			div.append(h6);
-			var name = allStudiesDict[studyId]['studyName'];
-			h6.html('Study ' + name);
+			h6.html('Study ' + studyName);
 		}
 		addContact(div, userRole);
 	});
@@ -2620,6 +2619,7 @@ function manageStudy(hideMode) {
 	var obj = new Object();
 	obj['action'] = 'getStudyData';
 	obj['studyId'] = activeStudy['studyId'];
+	obj['studyName'] = activeStudy['studyName'];
 	scanner.RETRIEVE(url, obj, true, postManageStudy, hideMode, null, 0);
 }
 
@@ -2668,7 +2668,7 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	$.each(scannerUsersList, function(i, user) {
 		option = $('<option>');
 		option.text(user['firstName'] + ' ' + user['lastName']);
-		option.attr('value', user['userId']);
+		option.attr('value', user['userName']);
 		select.append(option);
 	});
 	select.change(function(event) {checkUpdateStudyButton();});
@@ -2712,7 +2712,7 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	$.each(scannerUsersList, function(i, user) {
 		option = $('<option>');
 		option.text(user['firstName'] + ' ' + user['lastName']);
-		option.attr('value', user['userId']);
+		option.attr('value', user['userName']);
 		select.append(option);
 	});
 	var select = $('#staffRoles');
@@ -2962,7 +2962,7 @@ function postAddSite(data, textStatus, jqXHR, param) {
 function addStaff() {
 	var obj = {};
 	obj['action'] = 'createUserRole';
-	obj['userId'] = $('#staffNames').val();
+	obj['userId'] = scannerUsersDict[$('#staffNames').val()]['userId'];
 	obj['roleId'] = $('#staffRoles').val();
 	var url =  HOME + '/registry';
 	$('#addStaffButton').attr('disabled', 'disabled');
@@ -2978,9 +2978,9 @@ function postAddStaff(data, textStatus, jqXHR, param) {
 	manageStudy(false);
 }
 
-function addStaffRow(obj) {
-	var user = scannerUsersDict[obj['user']];
-	var studyRole = obj['studyRole'];
+function addStaffRow(userRole) {
+	var user = scannerUsersDict[userRole['user']];
+	var studyRole = userRole['studyRole'];
 	var tbody = $('#manageStudyStaffTbody');
 	var tr = $('<tr>');
 	tbody.append(tr);
@@ -3000,7 +3000,7 @@ function addStaffRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	var button = $('<button>');
-	button.click(function(event) {removeStaff($(this), obj);});
+	button.click(function(event) {removeStaff($(this), userRole);});
 	button.html('Remove Staff');
 	td.append(button);
 	$('#staffNames').val('');
@@ -3095,7 +3095,7 @@ function createStudy() {
 		}
 	}
 	$('#createStudyButton').attr('disabled', 'disabled');
-	obj['studyOwner'] = $('#createStudyPrincipalInvestigator').val();
+	obj['studyOwner'] = scannerUsersDict[$('#createStudyPrincipalInvestigator').val()]['userId'];
 	var url =  HOME + '/registry';
 	scanner.POST(url, obj, true, postCreateStudy, null, null, 0);
 }
@@ -3149,7 +3149,7 @@ function updateStudy() {
 	} else {
 		obj['clinicalTrialsId'] = '';
 	}
-	obj['studyOwner'] = $('#updateStudyPrincipalInvestigator').val();
+	obj['studyOwner'] = scannerUsersDict[$('#updateStudyPrincipalInvestigator').val()]['userId'];
 	obj['description'] = $('#projectDescription').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['protocol'] = $('#projectProtocol').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['startDate'] = $('#projectStartDate').val().replace(/^\s*/, "").replace(/\s*$/, "");
@@ -3252,7 +3252,7 @@ function addProtocolRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(datasetDefinitionDict[obj['dataSetInstance']['dataSetDefinition']]['dataSetName']);
+	td.html(obj['dataSetInstance']['dataSetDefinition']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
@@ -3302,7 +3302,7 @@ function addProtocolViewRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(datasetDefinitionDict[obj['dataSetInstance']['dataSetDefinition']]['dataSetName']);
+	td.html(obj['dataSetInstance']['dataSetDefinition']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
@@ -3815,7 +3815,7 @@ function postInitUsers(data, textStatus, jqXHR, param) {
 	scannerUsersList = data;
 	scannerUsersDict = {};
 	$.each(data, function(i, user) {
-		scannerUsersDict[user['userId']] = user;
+		scannerUsersDict[user['userName']] = user;
 	});
 	scannerUsersList.sort(compareUsers);
 	if (param) {
@@ -3881,7 +3881,7 @@ function postInitDatasets(data, textStatus, jqXHR, param) {
 	datasetDefinitionList = data;
 	datasetDefinitionDict = {};
 	$.each(data, function(i, dataset) {
-		datasetDefinitionDict[dataset['dataSetDefinitionId']] = dataset;
+		datasetDefinitionDict[dataset['dataSetName']] = dataset;
 	});
 	datasetDefinitionList.sort(compareDatasetDefinitions);
 	if (param) {
@@ -3943,7 +3943,7 @@ function postInitStudies(data, textStatus, jqXHR, param) {
 	allStudies = data;
 	allStudiesDict = {};
 	$.each(allStudies, function(i, study) {
-		allStudiesDict[study['studyId']] = study;
+		allStudiesDict[study['studyName']] = study;
 	});
 	if (param) {
 		initNodes(param);
@@ -4055,7 +4055,7 @@ function compareStudyRequestedSites(studyRequestedSite1, studyRequestedSite2) {
 function compareSitesPolicies(sitePolicy1, sitePolicy2) {
 	var studyRole1 = sitePolicy1['studyRole'];
 	var studyRole2 = sitePolicy2['studyRole'];
-	var ret = compareNumbers(studyRole1['study'], studyRole2['study']);
+	var ret = compareIgnoreCase(studyRole1['study'], studyRole2['study']);
 	if (ret == 0) {
 		var site1 = sitePolicy1['site'];
 		var site2 = sitePolicy2['site'];
@@ -4073,7 +4073,7 @@ function compareSites(site1, site2) {
 }
 
 function compareStudyManagementPolicies(policy1, policy2) {
-	return compareNumbers(policy1['study']['studyId'], policy2['study']['studyId']);
+	return compareIgnoreCase(policy1['study']['studyName'], policy2['study']['studyName']);
 }
 
 function compareStandardRoles(role1, role2) {
@@ -4115,7 +4115,7 @@ function compareDatasetDefinitions(dataset1, dataset2) {
 function compareRoles(role1, role2) {
 	var studyRole1 = role1['studyRole'];
 	var studyRole2 = role2['studyRole'];
-	var ret = compareNumbers(studyRole1['study'], studyRole2['study']);
+	var ret = compareIgnoreCase(studyRole1['study'], studyRole2['study']);
 	if (ret == 0) {
 		ret = compareNumbers(studyRole1['roleId'], studyRole2['roleId']);
 		if (ret == 0) {
@@ -4128,7 +4128,7 @@ function compareRoles(role1, role2) {
 }
 
 function compareStudyRoles(studyRole1, studyRole2) {
-	var ret = compareNumbers(studyRole1['study'], studyRole2['study']);
+	var ret = compareIgnoreCase(studyRole1['study'], studyRole2['study']);
 	if (ret == 0) {
 		ret = compareIgnoreCase(studyRole1['roleWithinStudy'], studyRole2['roleWithinStudy']);
 	}
@@ -4152,7 +4152,7 @@ function compareAnalysisPolicies(analysisPolicy1, analysisPolicy2) {
 }
 
 function compareStudyPolicy(studyPolicy1, studyPolicy2) {
-	var ret = compareNumbers(studyPolicy1['study']['studyId'], studyPolicy2['study']['studyId']);
+	var ret = compareIgnoreCase(studyPolicy1['study']['studyName'], studyPolicy2['study']['studyName']);
 	if (ret == 0) {
 		ret = compareIgnoreCase(studyPolicy1['dataSetDefinition']['dataSetName'], studyPolicy2['dataSetDefinition']['dataSetName']);
 		if (ret == 0) {

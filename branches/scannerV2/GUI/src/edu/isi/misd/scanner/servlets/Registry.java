@@ -90,6 +90,7 @@ public class Registry extends HttpServlet {
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		String res = "";
 		String studyId = request.getParameter("studyId");
+		String studyName = request.getParameter("studyName");
 		RegistryClientResponse clientResponse = null;
 		if (action.equals("getMyStudies")) {
 			clientResponse = registryClient.getMyStudies();
@@ -150,7 +151,7 @@ public class Registry extends HttpServlet {
 				for (int i=responseArray.length() - 1; i >=0; i--) {
 					JSONObject analysisPolicy = responseArray.getJSONObject(i);
 					JSONObject obj = analysisPolicy.getJSONObject("studyRole");
-					if (obj.getInt("study") != Integer.parseInt(studyId)) {
+					if (!obj.getString("study").equals(studyName)) {
 						responseArray.remove(i);
 					}
 				}
