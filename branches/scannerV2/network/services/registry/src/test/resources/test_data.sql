@@ -47,11 +47,11 @@ INSERT INTO user_role(user_id, role_id) VALUES
 (2, 8),
 (2, 9),
 (3, 7),
+(3, 10),
 (4, 6),
 (5, 6),
 (4, 7),
-(5, 7),
-(3, 10);
+(5, 7);
 
 INSERT INTO study_management_policy(study_id, role_id) VALUES
 (2,5),

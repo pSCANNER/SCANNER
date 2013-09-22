@@ -172,7 +172,7 @@ public class DataSetDefinitionController extends BaseController
         @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        // check that the user can perform the create
+        // check that the user can perform the delete
         if (!registryService.userIsSuperuser(loginName)) {
             throw new ForbiddenException(
                 loginName,

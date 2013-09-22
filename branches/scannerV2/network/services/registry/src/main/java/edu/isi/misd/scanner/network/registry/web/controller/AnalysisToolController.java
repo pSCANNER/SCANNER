@@ -174,7 +174,7 @@ public class AnalysisToolController extends BaseController
         } else if (!tool.getToolId().equals(toolLib.getToolId())) {
             throw new ConflictException(tool.getToolId(),toolLib.getToolId()); 
         }
-        // check that the user can perform the create
+        // check that the user can perform the update
         if (!registryService.userIsSuperuser(loginName)) {
             throw new ForbiddenException(
                 loginName,
@@ -197,7 +197,7 @@ public class AnalysisToolController extends BaseController
         @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        // check that the user can perform the create
+        // check that the user can perform the delete
         if (!registryService.userIsSuperuser(loginName)) {
             throw new ForbiddenException(
                 loginName,

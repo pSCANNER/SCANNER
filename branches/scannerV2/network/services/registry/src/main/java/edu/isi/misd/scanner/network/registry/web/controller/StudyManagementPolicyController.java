@@ -207,7 +207,7 @@ public class StudyManagementPolicyController extends BaseController
         if (studyManagementPolicy == null) {
             throw new ResourceNotFoundException(id);            
         }
-        // check that the user can perform the update
+        // check that the user can perform the delete
         if (!registryService.userCanManageStudy(
             loginName,studyManagementPolicy.getStudy().getStudyId())) {
             throw new ForbiddenException(
