@@ -3,8 +3,10 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
 import edu.isi.misd.scanner.network.registry.data.repository.DataSetDefinitionRepository;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,11 +41,12 @@ public class DataSetDefinitionController extends BaseController
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";
     public static final String REQUEST_PARAM_USER_NAME = "userName";
-    
-    @Autowired    
-    private RegistryService registryService;    
+     
     @Autowired
     private DataSetDefinitionRepository dataSetDefinitionRepository;   
+    
+    @Autowired    
+    private RegistryService registryService;   
     
 	@RequestMapping(value = BASE_PATH, 
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -61,7 +65,7 @@ public class DataSetDefinitionController extends BaseController
             if ((studyId != null) && (userName != null)) {
                 return
                     dataSetDefinitionRepository.
-                        findDataSetsForStudyIdAndUserName(
+                    findDataSetsForStudyIdAndUserNameFilteredByStudyPolicy(
                             validateIntegerParameter(
                                 REQUEST_PARAM_STUDY_ID,studyId),
                             userName);
@@ -69,7 +73,7 @@ public class DataSetDefinitionController extends BaseController
             if (studyId != null) {
                 return 
                     dataSetDefinitionRepository.
-                        findDataSetsForStudyId(
+                        findDataSetsForStudyIdFilteredByStudyPolicy(
                             validateIntegerParameter(
                                 REQUEST_PARAM_STUDY_ID,studyId));
             }
@@ -86,13 +90,29 @@ public class DataSetDefinitionController extends BaseController
         return dataSetDefinitions;                     
 	}
     
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    public @ResponseBody DataSetDefinition getDataSetDefinition(       
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
+    {
+        DataSetDefinition foundDataSet = 
+            dataSetDefinitionRepository.findOne(id);
+
+        if (foundDataSet == null) {
+            throw new ResourceNotFoundException(id);
+        }
+        return foundDataSet;
+    } 
+    
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody DataSetDefinition createDataSetDefinition(
-           @RequestBody DataSetDefinition dataSet) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,         
+        @RequestBody DataSetDefinition dataSet) 
     {
         try {
             registryService.saveDataSetDefinition(dataSet);
@@ -103,30 +123,16 @@ public class DataSetDefinitionController extends BaseController
         // force the re-query to ensure a complete result view if updated
         return dataSetDefinitionRepository.findOne(
             dataSet.getDataSetDefinitionId());
-    }  
-    
-    @RequestMapping(value = ENTITY_PATH,
-                    method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    public @ResponseBody DataSetDefinition getDataSetDefinition(
-           @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {
-        DataSetDefinition foundDataSet = 
-            dataSetDefinitionRepository.findOne(id);
-
-        if (foundDataSet == null) {
-            throw new ResourceNotFoundException(id);
-        }
-        return foundDataSet;
-    }  
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetDefinition updateDataSetDefinition(
-           @PathVariable(ID_URL_PATH_VAR) Integer id, 
-           @RequestBody DataSetDefinition dataSet) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @PathVariable(ID_URL_PATH_VAR) Integer id, 
+        @RequestBody DataSetDefinition dataSet) 
     {
         // find the requested resource
         DataSetDefinition foundDataSet = 
@@ -163,8 +169,15 @@ public class DataSetDefinitionController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeDataSetDefinition(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
+        // check that the user can perform the create
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }            
         if (!dataSetDefinitionRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }

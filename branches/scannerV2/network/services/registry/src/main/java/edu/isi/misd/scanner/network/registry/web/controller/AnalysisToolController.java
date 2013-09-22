@@ -2,8 +2,11 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
 import edu.isi.misd.scanner.network.registry.data.repository.AnalysisToolRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +46,9 @@ public class AnalysisToolController extends BaseController
     
     @Autowired
     private AnalysisToolRepository analysisToolRepository;   
+    
+    @Autowired 
+    private RegistryService registryService;
     
 	@RequestMapping(value = BASE_PATH, 
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -104,24 +111,6 @@ public class AnalysisToolController extends BaseController
         return toolLibraries;         
 	}
     
-    @RequestMapping(value = BASE_PATH,
-                    method = RequestMethod.POST,
-                    consumes = HEADER_JSON_MEDIA_TYPE, 
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody AnalysisTool createAnalysisTool(
-           @RequestBody AnalysisTool tool) 
-    {
-        try {
-            analysisToolRepository.save(tool);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e);
-            throw new ConflictException(e.getMostSpecificCause());
-        }
-        // force the re-query to ensure a complete result view if updated
-        return analysisToolRepository.findOne(tool.getToolId());
-    }  
-    
     @RequestMapping(value = ENTITY_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
@@ -134,14 +123,41 @@ public class AnalysisToolController extends BaseController
             throw new ResourceNotFoundException(id);
         }
         return toolLib;
-    }  
+    } 
+    
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public @ResponseBody AnalysisTool createAnalysisTool(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @RequestBody AnalysisTool tool) 
+    {
+        // check that the user can perform the create
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }            
+        try {
+            analysisToolRepository.save(tool);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(e);
+            throw new ConflictException(e.getMostSpecificCause());
+        }
+        // force the re-query to ensure a complete result view if updated
+        return analysisToolRepository.findOne(tool.getToolId());
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody AnalysisTool updateAnalysisTool(
-           @PathVariable(ID_URL_PATH_VAR) Integer id, @RequestBody AnalysisTool tool) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @PathVariable(ID_URL_PATH_VAR) Integer id, 
+        @RequestBody AnalysisTool tool) 
     {
         // find the requested resource
         AnalysisTool toolLib = analysisToolRepository.findOne(id);
@@ -158,7 +174,12 @@ public class AnalysisToolController extends BaseController
         } else if (!tool.getToolId().equals(toolLib.getToolId())) {
             throw new ConflictException(tool.getToolId(),toolLib.getToolId()); 
         }
-
+        // check that the user can perform the create
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }    
         try {
             analysisToolRepository.save(tool);
         } catch (DataIntegrityViolationException e) {
@@ -172,8 +193,16 @@ public class AnalysisToolController extends BaseController
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeAnalysisTool(@PathVariable(ID_URL_PATH_VAR) Integer id) 
+    public void removeAnalysisTool(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
+        // check that the user can perform the create
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }            
         if (!analysisToolRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }

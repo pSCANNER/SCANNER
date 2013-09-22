@@ -55,19 +55,10 @@ public class StudyController extends BaseController
     
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces=HEADER_JSON_MEDIA_TYPE)                    
-	public @ResponseBody List<Study> getStudies(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,          
+                    produces = HEADER_JSON_MEDIA_TYPE)                    
+	public @ResponseBody List<Study> getStudies(        
         @RequestParam Map<String, String> paramMap) 
-    {
-        // get the user record for the current user
-        ScannerUser loggedInUser = 
-            scannerUserRepository.findByUserName(loginName);
-        if (loggedInUser == null) {
-            throw new ForbiddenException(
-                loginName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
-        }
-        
+    {        
         Map<String,String> params = 
             validateParameterMap(
                 paramMap,
@@ -82,42 +73,47 @@ public class StudyController extends BaseController
             if (study == null) {
                 throw new ResourceNotFoundException(studyName);
             }
-            if (!registryService.userCanViewStudy(
-                study.getStudyId(), loginName)) {
-                throw new ForbiddenException(
-                    loginName,
-                    "Unable to view study. " +
-                    RegistryServiceConstants.MSG_STUDY_ROLE_REQUIRED);                   
-            }
             studies.add(study);
         } else if (userName != null) {
-            if ((!userName.equalsIgnoreCase(loggedInUser.getUserName())) && 
-                (!loggedInUser.getIsSuperuser())) {
-                throw new ForbiddenException(
-                    loginName,
-                    "Unable to view studies for another user. " +
-                    RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);                
-            }
             return 
                 studyRepository.findStudiesForUserName(userName);
         } else {
-            if (loggedInUser.getIsSuperuser()) {
-                Iterator iter = studyRepository.findAll().iterator();
-                CollectionUtils.addAll(studies, iter);              
-            } else {
-                return studyRepository.findStudiesForUserName(loginName);
-            }
+            Iterator iter = studyRepository.findAll().iterator();
+            CollectionUtils.addAll(studies, iter);              
         }  
         return studies;                 
     }
+
+    @RequestMapping(value = ENTITY_PATH, 
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    public @ResponseBody Study getStudy(          
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
+    {
+        Study foundStudy = studyRepository.findOne(id);
+        if (foundStudy == null) {
+            throw new ResourceNotFoundException(id);
+        }        
+        return foundStudy;
+    } 
     
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody Study createStudy(@RequestBody Study study) 
+    public @ResponseBody Study createStudy(
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,          
+           @RequestBody Study study) 
     {
+        // get the user record for the current user
+        ScannerUser loggedInUser = 
+            scannerUserRepository.findByUserName(loginName);
+        if (loggedInUser == null) {
+            throw new ForbiddenException(
+                loginName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
+        }        
+        study.setStudyOwner(loggedInUser);
         try {
             registryService.createStudy(study);
         } catch (DataIntegrityViolationException e) {
@@ -126,35 +122,14 @@ public class StudyController extends BaseController
         }
         // force the re-query to ensure a complete result view if updated
         return studyRepository.findOne(study.getStudyId());
-    }  
-    
-    @RequestMapping(value = ENTITY_PATH, 
-                    method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    public @ResponseBody Study getStudy(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
-        @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {
-        Study foundStudy = studyRepository.findOne(id);
-        if (foundStudy == null) {
-            throw new ResourceNotFoundException(id);
-        }        
-        if (!registryService.userCanViewStudy(
-            foundStudy.getStudyId(), loginName)) {
-            throw new ForbiddenException(
-                loginName,
-                "Unable to view study. " +
-                RegistryServiceConstants.MSG_STUDY_ROLE_REQUIRED);                   
-        }        
-        return foundStudy;
-    }  
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)                    
     public @ResponseBody Study updateStudy(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,    
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,    
         @PathVariable(ID_URL_PATH_VAR) Integer id,
         @RequestBody Study study) 
     {
@@ -175,7 +150,7 @@ public class StudyController extends BaseController
                 study.getStudyId(),foundStudy.getStudyId()); 
         }
         // check that the user can perform the update
-        if (!registryService.userCanManageStudy(study.getStudyId(),loginName)) {
+        if (!registryService.userCanManageStudy(loginName,study.getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);            
@@ -214,14 +189,14 @@ public class StudyController extends BaseController
                     method = RequestMethod.DELETE)                
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeStudy(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,     
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,     
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!studyRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }
         // check that the user can perform the delete
-        if (!registryService.userCanManageStudy(id,loginName)) {
+        if (!registryService.userCanManageStudy(loginName,id)) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);             

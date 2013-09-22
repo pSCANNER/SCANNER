@@ -83,13 +83,28 @@ public class StudyRequestedSiteController extends BaseController
         return studyRequestedSites;           
 	}
     
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    public @ResponseBody StudyRequestedSite getStudyRequestedSite(
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
+    {
+        StudyRequestedSite foundStudyRequestedSite = 
+            studyRequestedSiteRepository.findOne(id);
+
+        if (foundStudyRequestedSite == null) {
+            throw new ResourceNotFoundException(id);
+        }
+        return foundStudyRequestedSite;
+    }
+    
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody StudyRequestedSite createStudyRequestedSite(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,            
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
            @RequestBody StudyRequestedSite site) 
     {
        // first, check that the requested Study association is valid
@@ -102,7 +117,7 @@ public class StudyRequestedSiteController extends BaseController
                 Study.class.getSimpleName(),studyId);
         }              
         // check that the user can perform the create
-        if (!registryService.userCanManageStudy(study.getStudyId(),loginName)) {
+        if (!registryService.userCanManageStudy(loginName,study.getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);            
@@ -117,29 +132,14 @@ public class StudyRequestedSiteController extends BaseController
         return 
             studyRequestedSiteRepository.findOne(
                 site.getStudyRequestedSiteId());
-    }  
-    
-    @RequestMapping(value = ENTITY_PATH,
-                    method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    public @ResponseBody StudyRequestedSite getStudyRequestedSite(
-           @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {
-        StudyRequestedSite foundStudyRequestedSite = 
-            studyRequestedSiteRepository.findOne(id);
-
-        if (foundStudyRequestedSite == null) {
-            throw new ResourceNotFoundException(id);
-        }
-        return foundStudyRequestedSite;
-    }  
+    }    
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StudyRequestedSite updateStudyRequestedSite(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,            
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
            @PathVariable(ID_URL_PATH_VAR) Integer id, 
            @RequestBody StudyRequestedSite site) 
     {
@@ -164,7 +164,7 @@ public class StudyRequestedSiteController extends BaseController
         }
         // check that the user can perform the update
         if (!registryService.userCanManageStudy(
-            site.getStudy().getStudyId(),loginName)) {
+            loginName, site.getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);          
@@ -185,7 +185,7 @@ public class StudyRequestedSiteController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeStudyRequestedSite(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,    
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,    
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         // find the requested resource
@@ -196,7 +196,7 @@ public class StudyRequestedSiteController extends BaseController
         }
         // check that the user can perform the delete
         if (!registryService.userCanManageStudy(
-            site.getStudy().getStudyId(),loginName)) {
+            loginName, site.getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         

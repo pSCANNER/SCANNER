@@ -50,8 +50,8 @@ public class ScannerUserController extends BaseController
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<ScannerUser> getScannerUsers(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,          
-           @RequestParam Map<String, String> paramMap) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,          
+        @RequestParam Map<String, String> paramMap) 
     {
         Map<String,String> params = 
             validateParameterMap(paramMap, REQUEST_PARAM_USER_NAME);    
@@ -72,14 +72,27 @@ public class ScannerUserController extends BaseController
         return users;           
 	}
     
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    public @ResponseBody ScannerUser getScannerUser(        
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
+    {            
+        ScannerUser foundUser = scannerUserRepository.findOne(id);
+        if (foundUser == null) {
+            throw new ResourceNotFoundException(id);
+        }             
+        return foundUser;
+    }
+    
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody ScannerUser createScannerUser(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
-           @RequestBody ScannerUser user) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @RequestBody ScannerUser user) 
     {
         if (!registryService.userIsSuperuser(loginName)) {
             throw new ForbiddenException(
@@ -94,28 +107,14 @@ public class ScannerUserController extends BaseController
         }
         // force the re-query to ensure a complete result view if updated
         return scannerUserRepository.findOne(user.getUserId());
-    }  
-    
-    @RequestMapping(value = ENTITY_PATH,
-                    method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    public @ResponseBody ScannerUser getScannerUser(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,          
-           @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {            
-        ScannerUser foundUser = scannerUserRepository.findOne(id);
-        if (foundUser == null) {
-            throw new ResourceNotFoundException(id);
-        }             
-        return foundUser;
-    }  
+    }    
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody ScannerUser updateScannerUser(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,         
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,         
            @PathVariable(ID_URL_PATH_VAR) Integer id,
            @RequestBody ScannerUser user) 
     {
@@ -170,7 +169,7 @@ public class ScannerUserController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeScannerUser(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         // find the requested resource

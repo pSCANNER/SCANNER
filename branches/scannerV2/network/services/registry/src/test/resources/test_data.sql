@@ -27,7 +27,7 @@ INSERT INTO study (study_name, description, IRB_ID, Protocol, Study_Owner, Start
 
 INSERT INTO standard_role(standard_role_name, description, create_by_default, add_to_study_policy_by_default, add_to_user_role_by_default) VALUES
 ('Principal Investigator','Manages study roles and defines study policies',true,true,true),
-('Site PI','Controls access to local site resources by defining site policies',true,false,false),
+('Site PI','Manages access to local site resources by defining site policies',true,false,false),
 ('Investigator', 'Can execute analysis programs based on predefined study and site policies',true,false,true);
 
 INSERT INTO study_role (study_id,role_within_study) VALUES
@@ -44,10 +44,13 @@ INSERT INTO study_role (study_id,role_within_study) VALUES
 
 INSERT INTO user_role(user_id, role_id) VALUES
 (2, 5),
+(2, 8),
+(2, 9),
 (3, 7),
+(4, 6),
+(5, 6),
 (4, 7),
 (5, 7),
-(2, 8),
 (3, 10);
 
 INSERT INTO study_management_policy(study_id, role_id) VALUES
@@ -59,13 +62,16 @@ INSERT INTO study_requested_site(study_id, site_id) VALUES
 (2,2),
 (2,3),
 (2,4),
-(3,1);
+(3,1),
+(3,3);
 
 INSERT INTO site_policy(site_id, role_id) VALUES
 (1,1),
 (2,2),
 (3,3),
-(4,4);
+(4,4),
+(1,6),
+(3,9);
 
 INSERT INTO tool_library (library_name, version, description) VALUES
 ('OCEANS', '1', 'Executes Meta-Regression Across Multiple Sites'),
@@ -90,7 +96,9 @@ INSERT INTO study_policy_statement (study_id, data_set_definition_id, policy_ori
 (2, 1, 2, ' DataSetDefinition 1 will be analyzed with with OCEANS Logistic Regression in a mode with approval before transfer of aggregate/patient-level data by role Principal Investigator.  ', 5, 1, 1, 0),
 (2, 1, 2, ' DataSetDefinition 1 will be analyzed with with OCEANS Logistic Regression in a mode with approval before transfer of aggregate/patient-level data by role Investigator.  ', 7, 1, 1, 0),
 (2, 1, 2, ' DataSetDefinition 1 will be analyzed with with OCEANS Logistic Regression in a mode without approval before transfer of aggregate/patient-level data by role Principal Investigator.  ', 5, 1, 0, 0),
-(2, 1, 2, ' DataSetDefinition 1 will be analyzed with with OCEANS Logistic Regression in a mode without approval before transfer of aggregate/patient-level data by role Investigator.  ', 7, 1, 0, 0);
+(2, 1, 2, ' DataSetDefinition 1 will be analyzed with with OCEANS Logistic Regression in a mode without approval before transfer of aggregate/patient-level data by role Investigator.  ', 7, 1, 0, 0),
+(3, 2, 2, ' DataSetDefinition 2 will be analyzed with with GLORE Logistic Regression in a mode without approval before transfer of aggregate/patient-level data by role Principal Investigator.  ', 8, 2, 0, 0),
+(3, 2, 2, ' DataSetDefinition 2 will be analyzed with with GLORE Logistic Regression in a mode without approval before transfer of aggregate/patient-level data by role Investigator.  ', 10, 2, 0, 0);
 
 INSERT INTO analysis_policy_statement (data_set_instance_id, role_id, analysis_tool_id, access_mode_id, policy_status_id, parent_study_policy_statement_id) VALUES
 (1,7,1,1,0,4),

@@ -48,7 +48,111 @@ public class RegistryServiceImpl implements RegistryService
     @Autowired
     private SiteRepository siteRepository;   
     @Autowired
-    private SitePolicyRepository sitePolicyRepository;     
+    private SitePolicyRepository sitePolicyRepository;   
+    
+    /**
+     * Checks if the userName specified has the superuser flag set.
+     * @param userName
+     * @return true if the user is a superuser, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */      
+    @Override
+    public boolean userIsSuperuser(String userName) 
+        throws ForbiddenException
+    {
+        ScannerUser user = 
+            scannerUserRepository.findByUserName(userName);
+        if (user == null) {
+            throw new ForbiddenException(
+                userName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
+        }
+        return user.getIsSuperuser();
+    }
+    
+    /**
+     * Checks if the userName specified can manage the studyId specified.
+     * @param userName
+     * @param studyId
+     * @return true if the user can manage the study, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */      
+    @Override    
+    public boolean userCanManageStudy(String userName, Integer studyId)
+        throws ForbiddenException
+    {
+        if (userIsSuperuser(userName)) {
+            return true;
+        }
+        Integer count = 
+            userRoleRepository.countByUserUserNameAndStudyRoleStudyStudyId(
+                userName,studyId);
+        return (count > 0) ? true : false;       
+    }  
+    
+    /**
+     * Checks if the userName specified can manage the siteId specified.
+     * @param userName
+     * @param siteId
+     * @return true if the user can manage the site, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */      
+    @Override    
+    public boolean userCanManageSite(String userName, Integer siteId)
+        throws ForbiddenException
+    {
+        if (userIsSuperuser(userName)) {
+            return true;
+        }        
+        Integer count = 
+            userRoleRepository.
+                countByUserUserNameAndStudyRoleSitePoliciesSiteSiteId(
+                    userName,siteId);
+        return (count > 0) ? true : false;  
+    }
+    
+    /**
+     * Checks if the userName specified can manage the nodeId specified.
+     * @param userName
+     * @param nodeId
+     * @return true if the user can manage the node, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */         
+    @Override
+    public boolean userCanManageNode(String userName, Integer nodeId)
+        throws ForbiddenException 
+    {
+        if (userIsSuperuser(userName)) {
+            return true;
+        }        
+        Integer count = 
+            userRoleRepository.
+                countByUserUserNameAndStudyRoleSitePoliciesSiteNodesNodeId(
+                    userName,nodeId);
+        return (count > 0) ? true : false;          
+    }
+    
+    /**
+     * Checks if the userName specified can manage the dataSetInstanceId specified.
+     * @param userName
+     * @param dataSetInstanceId
+     * @return true if the user can manage the dataSetInstance, false otherwise
+     * @exception ForbiddenException if the userName is unknown (does not exist)
+     */     
+    @Override
+    public boolean userCanManageDataSetInstance(String userName,
+                                                Integer dataSetInstanceId) 
+        throws ForbiddenException 
+    {
+        if (userIsSuperuser(userName)) {
+            return true;
+        }        
+        Integer count = 
+            userRoleRepository.
+                countByUserUserNameAndStudyRoleSitePoliciesSiteNodesDataSetInstancesDataSetInstanceId(
+                    userName,dataSetInstanceId);
+        return (count > 0) ? true : false;          
+    }
+    
     /**
      * Creates or updates a single ToolLibrary, with optional creation of 
      * AnalysisTool child relations.
@@ -236,82 +340,7 @@ public class RegistryServiceImpl implements RegistryService
         userRoleRepository.delete(userRoles);
         
         studyRepository.delete(studyId);
-    }
-
-    /**
-     * Checks if the userName specified has the superuser flag set.
-     * @param userName
-     * @return true if the user is a superuser, false otherwise
-     * @exception ForbiddenException if the userName is unknown (does not exist)
-     */      
-    @Override
-    public boolean userIsSuperuser(String userName) 
-        throws ForbiddenException
-    {
-        ScannerUser user = 
-            scannerUserRepository.findByUserName(userName);
-        if (user == null) {
-            throw new ForbiddenException(
-                userName,RegistryServiceConstants.MSG_UNKNOWN_USER_NAME);
-        }
-        return user.getIsSuperuser();
-    }
-    
-    /**
-     * Checks if the userName specified can view the studyId specified.
-     * @param studyId
-     * @param userName
-     * @return true if the user can view the study, false otherwise
-     * @exception ForbiddenException if the userName is unknown (does not exist)
-     */      
-    @Override
-    public boolean userCanViewStudy(Integer studyId, String userName) 
-    {
-        // maybe this is too permissive and should be checked independently
-        if (userIsSuperuser(userName)) {
-            return true;
-        }
-        
-        // check that the current user has the proper role for this operation
-        // if so, one or more StudyRoles will be returned.
-        List<StudyRole> studyRoles = 
-            studyRoleRepository.findByStudyStudyIdAndScannerUsersUserName(
-                studyId, userName);
-        
-        if (studyRoles.isEmpty()) {
-            return false;
-        }        
-        return true;
-    }
-    
-    /**
-     * Checks if the userName specified can manage the studyId specified.
-     * @param studyId
-     * @param userName
-     * @return true if the user can manage the study, false otherwise
-     * @exception ForbiddenException if the userName is unknown (does not exist)
-     */      
-    @Override    
-    public boolean userCanManageStudy(Integer studyId, String userName)
-        throws ForbiddenException
-    {
-        // maybe this is too permissive and should be checked independently
-        if (userIsSuperuser(userName)) {
-            return true;
-        }
-        
-        // check that the current user has the proper role for this operation
-        // if so, one or more StudyManagementPolicies will be returned.
-        List<StudyManagementPolicy> studyManagementPolicies = 
-            studyManagementPolicyRepository.
-                findByStudyStudyIdAndStudyRoleScannerUsersUserName(
-                    studyId, userName);
-        
-        if (studyManagementPolicies.isEmpty()) {
-            return false;
-        }        
-        return true;
-    }      
+    }    
     
     /**
      * Creates a single Site with associated roles and role permissions.
@@ -405,31 +434,5 @@ public class RegistryServiceImpl implements RegistryService
             userRoleRepository.delete(userRoles);             
         }
         siteRepository.delete(site);
-    }
-    
-    /**
-     * Checks if the userName specified can manage the siteId specified.
-     * @param siteId
-     * @param userName
-     * @return true if the user can manage the study, false otherwise
-     * @exception ForbiddenException if the userName is unknown (does not exist)
-     */      
-    @Override    
-    public boolean userCanManageSite(Integer siteId, String userName)
-        throws ForbiddenException
-    {
-        // maybe this is too permissive and should be checked independently
-        if (userIsSuperuser(userName)) {
-            return true;
-        }
-        
-        // check that the current user has the proper role for this operation
-        // if so, one or more SitePolicy objects will be returned.
-        List<SitePolicy> sitePolicies = 
-            sitePolicyRepository.findBySiteIdAndUserName(siteId, userName);        
-        if (sitePolicies.isEmpty()) {
-            return false;
-        }        
-        return true;
     }        
 }

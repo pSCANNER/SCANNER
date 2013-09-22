@@ -1,8 +1,12 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
+import edu.isi.misd.scanner.network.registry.data.domain.Site;
 import edu.isi.misd.scanner.network.registry.data.domain.SitePolicy;
 import edu.isi.misd.scanner.network.registry.data.repository.SitePolicyRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,8 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,6 +47,9 @@ public class SitePolicyController extends BaseController
     
     @Autowired
     private SitePolicyRepository sitePolicyRepository;   
+    
+    @Autowired
+    private RegistryService registryService;
     
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -86,24 +95,6 @@ public class SitePolicyController extends BaseController
         }           
 	}
     
-    @RequestMapping(value = BASE_PATH,
-                    method = RequestMethod.POST,
-                    consumes = HEADER_JSON_MEDIA_TYPE, 
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody SitePolicy createSitePolicy(
-           @RequestBody SitePolicy site) 
-    {
-        try {
-            sitePolicyRepository.save(site);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e);
-            throw new ConflictException(e.getMostSpecificCause());
-        }
-        // force the re-query to ensure a complete result view if updated
-        return sitePolicyRepository.findOne(site.getSitePolicyId());
-    }  
-    
     @RequestMapping(value = ENTITY_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
@@ -116,15 +107,46 @@ public class SitePolicyController extends BaseController
             throw new ResourceNotFoundException(id);
         }
         return foundSitePolicy;
-    }  
+    } 
+    
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public @ResponseBody SitePolicy createSitePolicy(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @RequestBody SitePolicy sitePolicy) 
+    {
+        // first, check that the requested Site association is valid
+        Assert.notNull(sitePolicy.getSite(), 
+            nullVariableMsg(Site.class.getSimpleName()));  
+        
+        // check that the user can perform the create
+        if (!registryService.userCanManageSite(
+            loginName,sitePolicy.getSite().getSiteId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }          
+        try {
+            sitePolicyRepository.save(sitePolicy);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(e);
+            throw new ConflictException(e.getMostSpecificCause());
+        }
+        // force the re-query to ensure a complete result view if updated
+        return sitePolicyRepository.findOne(sitePolicy.getSitePolicyId());
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody SitePolicy updateSitePolicy(
-           @PathVariable(ID_URL_PATH_VAR) Integer id,
-           @RequestBody SitePolicy site) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @PathVariable(ID_URL_PATH_VAR) Integer id,
+        @RequestBody SitePolicy sitePolicy) 
     {
         // find the requested resource
         SitePolicy foundSitePolicy = sitePolicyRepository.findOne(id);
@@ -135,33 +157,51 @@ public class SitePolicyController extends BaseController
         // if the ID in the request body is null, use the ID parsed from the URL
         // if the ID is found in the request body but does not match the ID in 
         // the current data, then throw a ConflictException (409)
-        Integer updateID = site.getSitePolicyId();
+        Integer updateID = sitePolicy.getSitePolicyId();
         if (updateID == null) {
-            site.setSitePolicyId(id);
-        } else if (!site.getSitePolicyId().equals(
+            sitePolicy.setSitePolicyId(id);
+        } else if (!sitePolicy.getSitePolicyId().equals(
                    foundSitePolicy.getSitePolicyId())) {
             throw new ConflictException(
-                site.getSitePolicyId(), foundSitePolicy.getSitePolicyId()); 
+                sitePolicy.getSitePolicyId(), foundSitePolicy.getSitePolicyId()); 
         }
-
+        // check that the user can perform the update
+        if (!registryService.userCanManageSite(
+            loginName,sitePolicy.getSite().getSiteId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }   
         try {
-            sitePolicyRepository.save(site);
+            sitePolicyRepository.save(sitePolicy);
         } catch (DataIntegrityViolationException e) {
             log.warn(e);
             throw new ConflictException(e.getMostSpecificCause());
         }        
         // force the re-query to ensure a complete result view if updated
-        return sitePolicyRepository.findOne(site.getSitePolicyId());
+        return sitePolicyRepository.findOne(sitePolicy.getSitePolicyId());
     }     
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeSitePolicy(@PathVariable(ID_URL_PATH_VAR) Integer id) 
+    public void removeSitePolicy(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        if (!sitePolicyRepository.exists(id)) {
+        // find the requested resource
+        SitePolicy sitePolicy = sitePolicyRepository.findOne(id);
+        // if the ID is not found then throw a ResourceNotFoundException (404)
+        if (sitePolicy == null) {
             throw new ResourceNotFoundException(id);            
         }
+        // check that the user can perform the delete
+        if (!registryService.userCanManageSite(
+            loginName, sitePolicy.getSite().getSiteId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }         
         sitePolicyRepository.delete(id);
     } 
   

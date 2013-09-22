@@ -57,7 +57,7 @@ public class SiteController extends BaseController
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
 	public @ResponseBody List<Site> getSites(
-           @RequestParam Map<String, String> paramMap) 
+        @RequestParam Map<String, String> paramMap) 
     {
         Map<String,String> params = 
             validateParameterMap(paramMap, REQUEST_PARAM_SITE_NAME);    
@@ -77,15 +77,29 @@ public class SiteController extends BaseController
         return sites;           
 	}
     
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    public @ResponseBody Site getSite(
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
+    {
+        Site foundSite = siteRepository.findOne(id);
+
+        if (foundSite == null) {
+            throw new ResourceNotFoundException(id);
+        }
+        return foundSite;
+    }  
+    
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody Site createSite(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,            
-           @RequestParam Map<String, String> paramMap,           
-           @RequestBody Site site) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @RequestParam Map<String, String> paramMap,           
+        @RequestBody Site site) 
     {
         if (!registryService.userIsSuperuser(loginName)) {
             throw new ForbiddenException(
@@ -118,27 +132,13 @@ public class SiteController extends BaseController
     }  
     
     @RequestMapping(value = ENTITY_PATH,
-                    method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    public @ResponseBody Site getSite(
-           @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {
-        Site foundSite = siteRepository.findOne(id);
-
-        if (foundSite == null) {
-            throw new ResourceNotFoundException(id);
-        }
-        return foundSite;
-    }  
-    
-    @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody Site updateSite(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,         
-           @PathVariable(ID_URL_PATH_VAR) Integer id,
-           @RequestBody Site site) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,         
+        @PathVariable(ID_URL_PATH_VAR) Integer id,
+        @RequestBody Site site) 
     {
         // find the requested resource
         Site foundSite = siteRepository.findOne(id);
@@ -157,10 +157,10 @@ public class SiteController extends BaseController
         }
         
         // check that the user can perform the update
-        if (!registryService.userCanManageSite(site.getSiteId(),loginName)) {
+        if (!registryService.userCanManageSite(loginName,site.getSiteId())) {
             throw new ForbiddenException(
                 loginName,
-                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);            
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
         }        
         try {
             siteRepository.save(site);
@@ -176,7 +176,7 @@ public class SiteController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeSite(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,        
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         if (!registryService.userIsSuperuser(loginName)) {

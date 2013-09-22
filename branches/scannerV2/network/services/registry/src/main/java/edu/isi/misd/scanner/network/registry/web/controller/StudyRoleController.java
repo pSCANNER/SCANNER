@@ -88,40 +88,6 @@ public class StudyRoleController extends BaseController
         }
     }
     
-    @RequestMapping(value = BASE_PATH,
-                    method = RequestMethod.POST,
-                    consumes = HEADER_JSON_MEDIA_TYPE, 
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody StudyRole createStudyRole(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
-           @RequestBody StudyRole studyRole) 
-    {        
-        // first, check that the requested Study association is valid
-        Assert.notNull(studyRole.getStudy(), 
-            nullVariableMsg(Study.class.getSimpleName()));           
-        Integer studyId = studyRole.getStudy().getStudyId();
-        Study study = studyRepository.findOne(studyId);
-        if (study == null) {
-            throw new BadRequestException(
-                Study.class.getSimpleName(),studyId);
-        }        
-        // check that the user can perform the create
-        if (!registryService.userCanManageStudy(study.getStudyId(),loginName)) {
-            throw new ForbiddenException(
-                loginName,
-                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
-        }          
-        try {
-            studyRoleRepository.save(studyRole);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e);
-            throw new ConflictException(e.getMostSpecificCause());
-        }
-        // force the re-query to ensure a complete result view if updated
-        return studyRoleRepository.findOne(studyRole.getRoleId());
-    }  
-    
     @RequestMapping(value = ENTITY_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
@@ -134,14 +100,48 @@ public class StudyRoleController extends BaseController
             throw new ResourceNotFoundException(id);
         }
         return foundStudyRole;
-    }  
+    }
+    
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public @ResponseBody StudyRole createStudyRole(
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,        
+           @RequestBody StudyRole studyRole) 
+    {        
+        // first, check that the requested Study association is valid
+        Assert.notNull(studyRole.getStudy(), 
+            nullVariableMsg(Study.class.getSimpleName()));           
+        Integer studyId = studyRole.getStudy().getStudyId();
+        Study study = studyRepository.findOne(studyId);
+        if (study == null) {
+            throw new BadRequestException(
+                Study.class.getSimpleName(),studyId);
+        }        
+        // check that the user can perform the create
+        if (!registryService.userCanManageStudy(loginName,study.getStudyId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
+        }          
+        try {
+            studyRoleRepository.save(studyRole);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(e);
+            throw new ConflictException(e.getMostSpecificCause());
+        }
+        // force the re-query to ensure a complete result view if updated
+        return studyRoleRepository.findOne(studyRole.getRoleId());
+    }    
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StudyRole updateStudyRole(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,        
            @PathVariable(ID_URL_PATH_VAR) Integer id,
            @RequestBody StudyRole studyRole) 
     {
@@ -163,7 +163,7 @@ public class StudyRoleController extends BaseController
         }
         // check that the user can perform the update
         if (!registryService.userCanManageStudy(
-            studyRole.getStudy().getStudyId(),loginName)) {
+            loginName, studyRole.getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
@@ -182,7 +182,7 @@ public class StudyRoleController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeStudyRole(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,        
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         // find the requested resource
@@ -193,7 +193,7 @@ public class StudyRoleController extends BaseController
         }
         // check that the user can perform the delete
         if (!registryService.userCanManageStudy(
-            studyRole.getStudy().getStudyId(),loginName)) {
+            loginName, studyRole.getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         

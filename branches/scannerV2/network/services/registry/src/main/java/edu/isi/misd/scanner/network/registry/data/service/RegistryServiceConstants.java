@@ -22,4 +22,7 @@ public class RegistryServiceConstants
     
     public static final String MSG_STUDY_MANAGEMENT_ROLE_REQUIRED = 
         "The operation requires that the requesting user have a study management role in the specified study, or be a superuser.";
+    
+    public static final String MSG_SITE_MANAGEMENT_ROLE_REQUIRED = 
+        "The operation requires that the requesting user have a site management role for the specified site, or be a superuser.";    
 }

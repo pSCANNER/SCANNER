@@ -2,8 +2,11 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.AnalysisPolicyStatement;
 import edu.isi.misd.scanner.network.registry.data.repository.AnalysisPolicyStatementRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,8 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,7 +45,10 @@ public class AnalysisPolicyStatementController extends BaseController
     public static final String REQUEST_PARAM_ANALYSIS_TOOL_ID = "analysisToolId";     
     
     @Autowired
-    private AnalysisPolicyStatementRepository analysisPolicyStatementRepository;   
+    private AnalysisPolicyStatementRepository analysisPolicyStatementRepository;      
+    
+    @Autowired
+    private RegistryService registryService;   
     
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -96,14 +104,43 @@ public class AnalysisPolicyStatementController extends BaseController
         return analysisPolicyStatements;         
 	}
     
+    @RequestMapping(value = ENTITY_PATH, 
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    public @ResponseBody AnalysisPolicyStatement getAnalysisPolicyStatement(
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
+    {
+        AnalysisPolicyStatement foundAnalysisPolicyStatement = 
+            analysisPolicyStatementRepository.findOne(id);
+
+        if (foundAnalysisPolicyStatement == null) {
+            throw new ResourceNotFoundException(id);
+        }
+        return foundAnalysisPolicyStatement;
+    } 
+    
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody AnalysisPolicyStatement createAnalysisPolicyStatement(
-           @RequestBody AnalysisPolicyStatement analysisPolicyStatement) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @RequestBody AnalysisPolicyStatement analysisPolicyStatement) 
     {
+        // first, check that the requested DataSetInstance association is valid
+        Assert.notNull(analysisPolicyStatement.getDataSetInstance(), 
+            nullVariableMsg(AnalysisPolicyStatement.class.getSimpleName()));
+        
+        // check that the user can perform the create
+        Integer dataSetInstanceId = 
+            analysisPolicyStatement.getDataSetInstance().getDataSetInstanceId();
+        if (!registryService.userCanManageDataSetInstance(
+            loginName, dataSetInstanceId)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }        
         try {
             analysisPolicyStatementRepository.save(analysisPolicyStatement);
         } catch (DataIntegrityViolationException e) {
@@ -113,30 +150,16 @@ public class AnalysisPolicyStatementController extends BaseController
         // force the re-query to ensure a complete result view if updated
         return analysisPolicyStatementRepository.findOne(
             analysisPolicyStatement.getAnalysisPolicyStatementId());
-    }  
-    
-    @RequestMapping(value = ENTITY_PATH, 
-                    method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    public @ResponseBody AnalysisPolicyStatement getAnalysisPolicyStatement(
-           @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {
-        AnalysisPolicyStatement foundAnalysisPolicyStatement = 
-            analysisPolicyStatementRepository.findOne(id);
-
-        if (foundAnalysisPolicyStatement == null) {
-            throw new ResourceNotFoundException(id);
-        }
-        return foundAnalysisPolicyStatement;
-    }  
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody AnalysisPolicyStatement updateAnalysisPolicyStatement(
-           @PathVariable(ID_URL_PATH_VAR) Integer id,
-           @RequestBody AnalysisPolicyStatement analysisPolicyStatement) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @PathVariable(ID_URL_PATH_VAR) Integer id,
+        @RequestBody AnalysisPolicyStatement analysisPolicyStatement) 
     {
         // find the requested resource
         AnalysisPolicyStatement foundAnalysisPolicyStatement = 
@@ -160,7 +183,15 @@ public class AnalysisPolicyStatementController extends BaseController
                 analysisPolicyStatement.getAnalysisPolicyStatementId(),
                 foundAnalysisPolicyStatement.getAnalysisPolicyStatementId()); 
         }
-
+        // check that the user can perform the update
+        Integer dataSetInstanceId = 
+            analysisPolicyStatement.getDataSetInstance().getDataSetInstanceId();
+        if (!registryService.userCanManageDataSetInstance(
+            loginName, dataSetInstanceId)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }
         try {
             analysisPolicyStatementRepository.save(analysisPolicyStatement);
         } catch (DataIntegrityViolationException e) {
@@ -176,11 +207,25 @@ public class AnalysisPolicyStatementController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeAnalysisPolicyStatement(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        if (!analysisPolicyStatementRepository.exists(id)) {
+        // find the requested resource
+        AnalysisPolicyStatement analysisPolicyStatement = 
+            analysisPolicyStatementRepository.findOne(id);
+        // if the ID is not found then throw a ResourceNotFoundException (404)
+        if (analysisPolicyStatement == null) {
             throw new ResourceNotFoundException(id);            
         }
+        // check that the user can perform the delete
+        Integer dataSetInstanceId = 
+            analysisPolicyStatement.getDataSetInstance().getDataSetInstanceId();
+        if (!registryService.userCanManageDataSetInstance(
+            loginName, dataSetInstanceId)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }     
         analysisPolicyStatementRepository.delete(id);
     } 
   

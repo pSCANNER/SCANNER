@@ -2,10 +2,12 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.Node;
 import edu.isi.misd.scanner.network.registry.data.repository.NodeRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,53 +38,57 @@ public class NodeController extends BaseController
     public static final String BASE_PATH = "/nodes";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_NODE_TYPE = "nodeType";
+    public static final String REQUEST_PARAM_USER_NAME = "userName";    
     
     @Autowired
-    private NodeRepository nodeRepository;   
+    private NodeRepository nodeRepository;     
+        
+    @Autowired
+    private RegistryService registryService;  
     
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
-	public @ResponseBody List<Node> getNodes(
+	public @ResponseBody List<Node> getNodes(  
            @RequestParam Map<String, String> paramMap) 
     {
+        
         Map<String,String> params = 
-            validateParameterMap(paramMap, REQUEST_PARAM_NODE_TYPE);   
+            validateParameterMap(
+                paramMap, 
+                REQUEST_PARAM_NODE_TYPE, 
+                REQUEST_PARAM_USER_NAME);   
         
         String nodeType = params.get(REQUEST_PARAM_NODE_TYPE);        
-        List<Node> nodes = new ArrayList<Node>();
-        Iterator iter;        
+        String userName = params.get(REQUEST_PARAM_USER_NAME);         
+        List<Node> nodes = new ArrayList<Node>();   
+        boolean isMaster = false;
         if (nodeType != null) {
             if ("master".equalsIgnoreCase(nodeType)) {
-                iter = nodeRepository.findByIsMasterTrue().iterator();
+                isMaster = true;
+            }
+            if (userName != null) {
+                nodes = 
+                    nodeRepository.
+                        findBySiteSitePoliciesStudyRoleUserRolesUserUserNameAndIsMaster(
+                            userName, isMaster); 
             } else {
-                iter = nodeRepository.findByIsMasterFalse().iterator();                
+                CollectionUtils.addAll(
+                    nodes, nodeRepository.findByIsMaster(isMaster).iterator());                   
             }
         } else {
-            iter = nodeRepository.findAll().iterator();            
-        }
-        CollectionUtils.addAll(nodes, iter);
-        
+            if (userName != null) {            
+                nodes = 
+                    nodeRepository.
+                        findBySiteSitePoliciesStudyRoleUserRolesUserUserName(
+                            userName);          
+            } else {
+                CollectionUtils.addAll(
+                    nodes, nodeRepository.findAll().iterator());  
+            }
+        }        
         return nodes;         
 	}
-    
-    @RequestMapping(value = BASE_PATH,
-                    method = RequestMethod.POST,
-                    consumes = HEADER_JSON_MEDIA_TYPE, 
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody Node createNode(
-           @RequestBody Node node) 
-    {
-        try {
-            nodeRepository.save(node);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e);
-            throw new ConflictException(e.getMostSpecificCause());
-        }
-        // force the re-query to ensure a complete result view if updated
-        return nodeRepository.findOne(node.getNodeId());
-    }  
     
     @RequestMapping(value = ENTITY_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -95,14 +102,41 @@ public class NodeController extends BaseController
             throw new ResourceNotFoundException(id);
         }
         return foundNode;
-    }  
+    }
+    
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public @ResponseBody Node createNode(
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+           @RequestBody Node node) 
+    {
+        // check that the user can perform the create
+        if (!registryService.userCanManageNode(loginName, node.getNodeId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }          
+        try {
+            nodeRepository.save(node);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(e);
+            throw new ConflictException(e.getMostSpecificCause());
+        }
+        // force the re-query to ensure a complete result view if updated
+        return nodeRepository.findOne(node.getNodeId());
+    }    
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody Node updateNode(
-           @PathVariable(ID_URL_PATH_VAR) Integer id, @RequestBody Node node) 
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+           @PathVariable(ID_URL_PATH_VAR) Integer id, 
+           @RequestBody Node node) 
     {
         // find the requested resource
         Node foundNode = nodeRepository.findOne(id);
@@ -120,6 +154,12 @@ public class NodeController extends BaseController
             throw new ConflictException(node.getNodeId(),foundNode.getNodeId()); 
         }
 
+        // check that the user can perform the update
+        if (!registryService.userCanManageNode(loginName, node.getNodeId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }            
         try {
             nodeRepository.save(node);
         } catch (DataIntegrityViolationException e) {
@@ -133,11 +173,22 @@ public class NodeController extends BaseController
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeNode(@PathVariable(ID_URL_PATH_VAR) Integer id) 
+    public void removeNode(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        if (!nodeRepository.exists(id)) {
+        // find the requested resource
+        Node node = nodeRepository.findOne(id);
+        // if the ID is not found then throw a ResourceNotFoundException (404)
+        if (node == null) {
             throw new ResourceNotFoundException(id);            
         }
+        // check that the user can perform the delete
+        if (!registryService.userCanManageNode(loginName, node.getNodeId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }               
         nodeRepository.delete(id);
     } 
   

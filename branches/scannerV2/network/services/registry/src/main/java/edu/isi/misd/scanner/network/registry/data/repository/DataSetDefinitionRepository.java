@@ -12,12 +12,12 @@ import org.springframework.data.repository.query.Param;
  */
 public interface DataSetDefinitionRepository 
     extends CrudRepository<DataSetDefinition, Integer> 
-{   
+{    
     @Query("SELECT DISTINCT d FROM DataSetDefinition d " +  
            "JOIN d.studyPolicyStatements p JOIN p.study s " + 
            "WHERE s.studyId = :studyId " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
-    List<DataSetDefinition> findDataSetsForStudyId(
+    List<DataSetDefinition> findDataSetsForStudyIdFilteredByStudyPolicy(
         @Param("studyId")Integer studyId);
     
  
@@ -26,7 +26,8 @@ public interface DataSetDefinitionRepository
            "JOIN p.studyRole r JOIN r.userRoles ur JOIN ur.user u " +
            "WHERE s.studyId = :studyId AND u.userName = :userName " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
-    List<DataSetDefinition> findDataSetsForStudyIdAndUserName(
-        @Param("studyId")Integer studyId,
-        @Param("userName")String userName);    
+    List<DataSetDefinition> 
+        findDataSetsForStudyIdAndUserNameFilteredByStudyPolicy(
+            @Param("studyId")Integer studyId,
+            @Param("userName")String userName);    
 }

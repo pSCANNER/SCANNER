@@ -1,8 +1,12 @@
 package edu.isi.misd.scanner.network.registry.web.controller;
 
+import edu.isi.misd.scanner.network.registry.data.domain.Study;
 import edu.isi.misd.scanner.network.registry.data.domain.StudyManagementPolicy;
 import edu.isi.misd.scanner.network.registry.data.repository.StudyManagementPolicyRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,8 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,6 +46,9 @@ public class StudyManagementPolicyController extends BaseController
     
     @Autowired
     private StudyManagementPolicyRepository studyManagementPolicyRepository;   
+    
+    @Autowired
+    private RegistryService registryService;  
     
 	@RequestMapping(value = BASE_PATH, 
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -90,26 +99,6 @@ public class StudyManagementPolicyController extends BaseController
         }       
 	}
     
-    @RequestMapping(value = BASE_PATH, 
-                    method = RequestMethod.POST,
-                    consumes = HEADER_JSON_MEDIA_TYPE, 
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody StudyManagementPolicy createStudyManagementPolicy(
-           @RequestBody StudyManagementPolicy studyManagementPolicy) 
-    {
-        try {
-            studyManagementPolicyRepository.save(studyManagementPolicy);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e);
-            throw new ConflictException(e.getMostSpecificCause());
-        }
-        // force the re-query to ensure a complete result view if updated
-        return 
-            studyManagementPolicyRepository.findOne(
-                studyManagementPolicy.getStudyPolicyId());
-    }  
-    
     @RequestMapping(value = ENTITY_PATH, 
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
@@ -123,16 +112,49 @@ public class StudyManagementPolicyController extends BaseController
             throw new ResourceNotFoundException(id);
         }
         return foundStudyManagementPolicy;
-    }  
+    }
+    
+    @RequestMapping(value = BASE_PATH, 
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public @ResponseBody StudyManagementPolicy createStudyManagementPolicy(
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,             
+           @RequestBody StudyManagementPolicy studyManagementPolicy) 
+    {
+        // first, check that the requested Study association is valid
+        Assert.notNull(studyManagementPolicy.getStudy(), 
+            nullVariableMsg(Study.class.getSimpleName()));  
+        
+        // check that the user can perform the create
+        if (!registryService.userCanManageStudy(
+            loginName,studyManagementPolicy.getStudy().getStudyId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);             
+        }             
+        try {
+            studyManagementPolicyRepository.save(studyManagementPolicy);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(e);
+            throw new ConflictException(e.getMostSpecificCause());
+        }
+        // force the re-query to ensure a complete result view if updated
+        return 
+            studyManagementPolicyRepository.findOne(
+                studyManagementPolicy.getStudyPolicyId());
+    }    
     
     @RequestMapping(value = ENTITY_PATH, 
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StudyManagementPolicy updateStudyManagementPolicy(
-           @PathVariable(ID_URL_PATH_VAR) Integer id,
-           @RequestBody StudyManagementPolicy studyManagementPolicy) 
-    {
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,             
+        @PathVariable(ID_URL_PATH_VAR) Integer id,
+        @RequestBody StudyManagementPolicy studyManagementPolicy) 
+    {          
         // find the requested resource
         StudyManagementPolicy foundStudyManagementPolicy = 
             studyManagementPolicyRepository.findOne(id);
@@ -151,8 +173,14 @@ public class StudyManagementPolicyController extends BaseController
             throw new ConflictException(
                 studyManagementPolicy.getStudyPolicyId(),
                 foundStudyManagementPolicy.getStudyPolicyId()); 
-        }
-        
+        }        
+        // check that the user can perform the update
+        if (!registryService.userCanManageStudy(
+            loginName,studyManagementPolicy.getStudy().getStudyId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);             
+        }          
         try {
             studyManagementPolicyRepository.save(studyManagementPolicy);
         } catch (DataIntegrityViolationException e) {
@@ -169,11 +197,23 @@ public class StudyManagementPolicyController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeStudyManagementPolicy(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,             
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        if (!studyManagementPolicyRepository.exists(id)) {
+        // find the requested resource
+        StudyManagementPolicy studyManagementPolicy = 
+            studyManagementPolicyRepository.findOne(id);
+        // if the ID is not found then throw a ResourceNotFoundException (404)
+        if (studyManagementPolicy == null) {
             throw new ResourceNotFoundException(id);            
         }
+        // check that the user can perform the update
+        if (!registryService.userCanManageStudy(
+            loginName,studyManagementPolicy.getStudy().getStudyId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);             
+        }         
         studyManagementPolicyRepository.delete(id);
     } 
   

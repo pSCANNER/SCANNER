@@ -90,13 +90,27 @@ public class UserRoleController extends BaseController
         }
     }
     
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    public @ResponseBody UserRole getUserRole(
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
+    {
+        UserRole foundUserRole = userRoleRepository.findOne(id);
+
+        if (foundUserRole == null) {
+            throw new ResourceNotFoundException(id);
+        }
+        return foundUserRole;
+    }
+    
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody UserRole createUserRole(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,        
            @RequestBody UserRole userRole) 
     {
         // first, check that the requested StudyRole association is valid
@@ -110,7 +124,7 @@ public class UserRoleController extends BaseController
         }
         // check that the user can perform the create
         if (!registryService.userCanManageStudy(
-            studyRole.getStudy().getStudyId(),loginName)) {
+            loginName, studyRole.getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
@@ -123,28 +137,14 @@ public class UserRoleController extends BaseController
         }
         // force the re-query to ensure a complete result view if updated
         return userRoleRepository.findOne(userRole.getUserRoleId());
-    }  
-    
-    @RequestMapping(value = ENTITY_PATH,
-                    method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    public @ResponseBody UserRole getUserRole(
-           @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {
-        UserRole foundUserRole = userRoleRepository.findOne(id);
-
-        if (foundUserRole == null) {
-            throw new ResourceNotFoundException(id);
-        }
-        return foundUserRole;
-    }  
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody UserRole updateUserRole(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,        
            @PathVariable(ID_URL_PATH_VAR) Integer id,
            @RequestBody UserRole userRole) 
     {
@@ -168,7 +168,7 @@ public class UserRoleController extends BaseController
 
         // check that the user can perform the update
         if (!registryService.userCanManageStudy(
-            userRole.getStudyRole().getStudy().getStudyId(),loginName)) {
+            loginName, userRole.getStudyRole().getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
@@ -187,7 +187,7 @@ public class UserRoleController extends BaseController
                     method = RequestMethod.DELETE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeUserRole(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,        
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,        
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         // find the requested resource
@@ -198,7 +198,7 @@ public class UserRoleController extends BaseController
         }
         // check that the user can perform the delete
         if (!registryService.userCanManageStudy(
-            userRole.getStudyRole().getStudy().getStudyId(),loginName)) {
+            loginName, userRole.getStudyRole().getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         

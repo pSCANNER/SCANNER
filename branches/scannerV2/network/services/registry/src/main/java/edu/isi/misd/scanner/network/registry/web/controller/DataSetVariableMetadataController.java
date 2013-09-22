@@ -2,8 +2,10 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetVariableMetadata;
 import edu.isi.misd.scanner.network.registry.data.repository.DataSetVariableMetadataRepository;
-import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,6 +43,9 @@ public class DataSetVariableMetadataController extends BaseController
      
     @Autowired
     private DataSetVariableMetadataRepository dataSetVariableMetadataRepository;   
+    
+    @Autowired
+    private RegistryService registryService;
     
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -67,25 +73,6 @@ public class DataSetVariableMetadataController extends BaseController
         return dataSetVariableMetadata;                     
 	}
     
-    @RequestMapping(value = BASE_PATH,
-                    method = RequestMethod.POST,
-                    consumes = HEADER_JSON_MEDIA_TYPE, 
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody DataSetVariableMetadata createDataSetVariableMetadata(
-           @RequestBody DataSetVariableMetadata dataSetVariableMetadata) 
-    {
-        try {
-            dataSetVariableMetadataRepository.save(dataSetVariableMetadata);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e);
-            throw new ConflictException(e.getMostSpecificCause());
-        }
-        // force the re-query to ensure a complete result view if updated
-        return dataSetVariableMetadataRepository.findOne(
-            dataSetVariableMetadata.getDataSetVariableMetadataId());
-    }  
-    
     @RequestMapping(value = ENTITY_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
@@ -99,15 +86,36 @@ public class DataSetVariableMetadataController extends BaseController
             throw new ResourceNotFoundException(id);
         }
         return foundDataSetVariableMetadata;
-    }  
+    } 
+    
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public @ResponseBody DataSetVariableMetadata createDataSetVariableMetadata(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @RequestBody DataSetVariableMetadata dataSetVariableMetadata) 
+    {
+        try {
+            dataSetVariableMetadataRepository.save(dataSetVariableMetadata);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(e);
+            throw new ConflictException(e.getMostSpecificCause());
+        }
+        // force the re-query to ensure a complete result view if updated
+        return dataSetVariableMetadataRepository.findOne(
+            dataSetVariableMetadata.getDataSetVariableMetadataId());
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetVariableMetadata updateDataSetVariableMetadata(
-           @PathVariable(ID_URL_PATH_VAR) Integer id, 
-           @RequestBody DataSetVariableMetadata dataSetVariableMetadata) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
+        @PathVariable(ID_URL_PATH_VAR) Integer id, 
+        @RequestBody DataSetVariableMetadata dataSetVariableMetadata) 
     {
         // find the requested resource
         DataSetVariableMetadata foundDataSetVariableMetadata = 
@@ -131,7 +139,7 @@ public class DataSetVariableMetadataController extends BaseController
                 dataSetVariableMetadata.getDataSetVariableMetadataId(),
                 foundDataSetVariableMetadata.getDataSetVariableMetadataId()); 
         }
-
+  
         try {
             dataSetVariableMetadataRepository.save(dataSetVariableMetadata);
         } catch (DataIntegrityViolationException e) {
@@ -147,8 +155,15 @@ public class DataSetVariableMetadataController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeDataSetVariableMetadata(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
+        // check that the user can perform the create
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }            
         if (!dataSetVariableMetadataRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }

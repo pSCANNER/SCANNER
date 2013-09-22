@@ -2,8 +2,11 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetInstance;
 import edu.isi.misd.scanner.network.registry.data.repository.DataSetInstanceRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.BadRequestException;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,7 +43,10 @@ public class DataSetInstanceController extends BaseController
     public static final String REQUEST_PARAM_USER_NAME = "userName";
      
     @Autowired
-    private DataSetInstanceRepository dataSetInstanceRepository;   
+    private DataSetInstanceRepository dataSetInstanceRepository;      
+    
+    @Autowired
+    private RegistryService registryService;
     
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -57,13 +64,21 @@ public class DataSetInstanceController extends BaseController
         {
             String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);         
             String userName = params.get(REQUEST_PARAM_USER_NAME);
-            if ((dataSetId != null) && (userName != null)) {              
-                return
-                    dataSetInstanceRepository.
-                        findDataSetInstancesForDataSetIdAndUserName(
-                            validateIntegerParameter(
-                                REQUEST_PARAM_DATASET_ID, dataSetId),
-                            userName);
+            if (userName != null) 
+            {
+                if (dataSetId != null) {                 
+                    return
+                        dataSetInstanceRepository.
+                            findByDataSetIdAndUserNameFilteredByAnalysisPolicy(
+                                validateIntegerParameter(
+                                    REQUEST_PARAM_DATASET_ID, dataSetId),
+                                userName);
+                } else {
+                    return 
+                        dataSetInstanceRepository.
+                            findByNodeSiteSitePoliciesStudyRoleUserRolesUserUserName(
+                                userName);
+                }
             }           
             if (dataSetId == null) {
                 throw new BadRequestException(
@@ -82,25 +97,6 @@ public class DataSetInstanceController extends BaseController
         return dataSetInstances;                     
 	}
     
-    @RequestMapping(value = BASE_PATH,
-                    method = RequestMethod.POST,
-                    consumes = HEADER_JSON_MEDIA_TYPE, 
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody DataSetInstance createDataSetInstance(
-           @RequestBody DataSetInstance dataSetInstance) 
-    {
-        try {
-            dataSetInstanceRepository.save(dataSetInstance);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e);
-            throw new ConflictException(e.getMostSpecificCause());
-        }
-        // force the re-query to ensure a complete result view if updated
-        return dataSetInstanceRepository.findOne(
-            dataSetInstance.getDataSetInstanceId());
-    }  
-    
     @RequestMapping(value = ENTITY_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
@@ -114,15 +110,43 @@ public class DataSetInstanceController extends BaseController
             throw new ResourceNotFoundException(id);
         }
         return foundDataSet;
-    }  
+    } 
+    
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public @ResponseBody DataSetInstance createDataSetInstance(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @RequestBody DataSetInstance dataSetInstance) 
+    {       
+        // check that the user can perform the create
+        if (!registryService.userCanManageDataSetInstance(
+            loginName, dataSetInstance.getDataSetInstanceId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }         
+        try {
+            dataSetInstanceRepository.save(dataSetInstance);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(e);
+            throw new ConflictException(e.getMostSpecificCause());
+        }
+        // force the re-query to ensure a complete result view if updated
+        return dataSetInstanceRepository.findOne(
+            dataSetInstance.getDataSetInstanceId());
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody DataSetInstance updateDataSetInstance(
-           @PathVariable(ID_URL_PATH_VAR) Integer id, 
-           @RequestBody DataSetInstance dataSetInstance) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,         
+        @PathVariable(ID_URL_PATH_VAR) Integer id, 
+        @RequestBody DataSetInstance dataSetInstance) 
     {
         // find the requested resource
         DataSetInstance foundDataSetInstance = 
@@ -143,7 +167,13 @@ public class DataSetInstanceController extends BaseController
                 dataSetInstance.getDataSetInstanceId(),
                 foundDataSetInstance.getDataSetInstanceId()); 
         }
-
+        // check that the user can perform the update
+        if (!registryService.userCanManageDataSetInstance(
+            loginName, dataSetInstance.getDataSetInstanceId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }   
         try {
             dataSetInstanceRepository.save(dataSetInstance);
         } catch (DataIntegrityViolationException e) {
@@ -159,11 +189,23 @@ public class DataSetInstanceController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeDataSetInstance(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,         
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
-        if (!dataSetInstanceRepository.exists(id)) {
+        // find the requested resource
+        DataSetInstance dataSetInstance = 
+            dataSetInstanceRepository.findOne(id);
+        // if the ID is not found then throw a ResourceNotFoundException (404)
+        if (dataSetInstance == null) {
             throw new ResourceNotFoundException(id);            
         }
+        // check that the user can perform the delete
+        if (!registryService.userCanManageDataSetInstance(
+            loginName, dataSetInstance.getDataSetInstanceId())) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SITE_MANAGEMENT_ROLE_REQUIRED);            
+        }          
         dataSetInstanceRepository.delete(id);
     } 
   

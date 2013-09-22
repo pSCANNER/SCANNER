@@ -12,6 +12,41 @@ import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 public interface RegistryService 
 {
     /**
+     * Checks if the user is a superuser
+     * @param userName
+     */    
+    public boolean userIsSuperuser(String userName);
+    
+     /**
+     * Checks that the user is authorized to manage a Study
+     * @param userName
+     * @param studyId
+     */    
+    public boolean userCanManageStudy(String userName, Integer studyId);
+    
+    /**
+     * Checks that the user is authorized to manage a Site
+     * @param userName
+     * @param siteId
+     */    
+    public boolean userCanManageSite(String userName, Integer siteId);
+
+    /**
+     * Checks that the user is authorized to manage a Node
+     * @param userName
+     * @param nodeId
+     */    
+    public boolean userCanManageNode(String userName, Integer nodeId);
+    
+    /**
+     * Checks that the user is authorized to manage a DataSetInstance
+     * @param userName
+     * @param dataSetInstanceId
+     */    
+    public boolean userCanManageDataSetInstance(
+        String userName, Integer dataSetInstanceId);
+    
+    /**
      * Creates a single Study.
      * @param Study
      */
@@ -28,26 +63,6 @@ public interface RegistryService
      * @param studyId
      */
     public void deleteStudy(Integer studyId);
-
-    /**
-     * Checks that the user is authorized to view a Study
-     * @param studyId
-     * @param userName
-     */    
-    public boolean userCanViewStudy(Integer studyId, String userName);
-    
-    /**
-     * Checks that the user is authorized to manage a Study
-     * @param studyId
-     * @param userName
-     */    
-    public boolean userCanManageStudy(Integer studyId, String userName);
-    
-    /**
-     * Checks if the user is a superuser
-     * @param userName
-     */    
-    public boolean userIsSuperuser(String userName);
     
     /**
      * Creates a single Site.
@@ -67,13 +82,6 @@ public interface RegistryService
      * @param site
      */
     public void deleteSite(Site site);
-    
-    /**
-     * Checks that the user is authorized to manage a Site
-     * @param siteId
-     * @param userName
-     */    
-    public boolean userCanManageSite(Integer siteId, String userName);
     
     /**
      * Creates or updates a single ToolLibrary.

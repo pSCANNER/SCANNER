@@ -2,7 +2,10 @@ package edu.isi.misd.scanner.network.registry.web.controller;
 
 import edu.isi.misd.scanner.network.registry.data.domain.StandardRole;
 import edu.isi.misd.scanner.network.registry.data.repository.StandardRoleRepository;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
+import edu.isi.misd.scanner.network.registry.data.service.RegistryServiceConstants;
 import edu.isi.misd.scanner.network.registry.web.errors.ConflictException;
+import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,6 +42,9 @@ public class StandardRoleController extends BaseController
     
     @Autowired
     private StandardRoleRepository standardRoleRepository;   
+    
+    @Autowired 
+    private RegistryService registryService;
     
 	@RequestMapping(value = BASE_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
@@ -64,24 +71,6 @@ public class StandardRoleController extends BaseController
         return standardRoles;           
 	}
     
-    @RequestMapping(value = BASE_PATH,
-                    method = RequestMethod.POST,
-                    consumes = HEADER_JSON_MEDIA_TYPE, 
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody StandardRole createStandardRole(
-           @RequestBody StandardRole standardRole) 
-    {
-        try {
-            standardRoleRepository.save(standardRole);
-        } catch (DataIntegrityViolationException e) {
-            log.warn(e);
-            throw new ConflictException(e.getMostSpecificCause());
-        }
-        // force the re-query to ensure a complete result view if updated
-        return standardRoleRepository.findOne(standardRole.getStandardRoleId());
-    }  
-    
     @RequestMapping(value = ENTITY_PATH,
                     method = {RequestMethod.GET, RequestMethod.HEAD},
                     produces = HEADER_JSON_MEDIA_TYPE)
@@ -96,13 +85,39 @@ public class StandardRoleController extends BaseController
         return foundStandardRole;
     }  
     
+    @RequestMapping(value = BASE_PATH,
+                    method = RequestMethod.POST,
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public @ResponseBody StandardRole createStandardRole(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @RequestBody StandardRole standardRole) 
+    {
+        // check that the user can perform the create
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }            
+        try {
+            standardRoleRepository.save(standardRole);
+        } catch (DataIntegrityViolationException e) {
+            log.warn(e);
+            throw new ConflictException(e.getMostSpecificCause());
+        }
+        // force the re-query to ensure a complete result view if updated
+        return standardRoleRepository.findOne(standardRole.getStandardRoleId());
+    }  
+    
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StandardRole updateStandardRole(
-           @PathVariable(ID_URL_PATH_VAR) Integer id, 
-           @RequestBody StandardRole standardRole) 
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @PathVariable(ID_URL_PATH_VAR) Integer id, 
+        @RequestBody StandardRole standardRole) 
     {
         // find the requested resource
         StandardRole foundStandardRole = standardRoleRepository.findOne(id);
@@ -122,7 +137,12 @@ public class StandardRoleController extends BaseController
                 standardRole.getStandardRoleId(),
                 foundStandardRole.getStandardRoleId()); 
         }
-
+        // check that the user can perform the update
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }    
         try {
             standardRoleRepository.save(standardRole);
         } catch (DataIntegrityViolationException e) {
@@ -136,8 +156,16 @@ public class StandardRoleController extends BaseController
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void removeStandardRole(@PathVariable(ID_URL_PATH_VAR) Integer id) 
+    public void removeStandardRole(
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,            
+        @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
+        // check that the user can perform the delete
+        if (!registryService.userIsSuperuser(loginName)) {
+            throw new ForbiddenException(
+                loginName,
+                RegistryServiceConstants.MSG_SUPERUSER_ROLE_REQUIRED);
+        }            
         if (!standardRoleRepository.exists(id)) {
             throw new ResourceNotFoundException(id);            
         }

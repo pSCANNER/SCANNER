@@ -43,6 +43,7 @@ public class StudyPolicyStatementController extends BaseController
     
     public static final String BASE_PATH = "/studyPolicies";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;     
+    public static final String REQUEST_PARAM_USER_NAME = "userName";      
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";   
     public static final String REQUEST_PARAM_DATASET_ID = "dataSetId"; 
     public static final String REQUEST_PARAM_ANALYSIS_TOOL_ID = "analysisToolId";     
@@ -68,12 +69,18 @@ public class StudyPolicyStatementController extends BaseController
         Map<String,String> params = 
             validateParameterMap(
                 paramMap,
+                REQUEST_PARAM_USER_NAME,
                 REQUEST_PARAM_STUDY_ID,
                 REQUEST_PARAM_DATASET_ID,
                 REQUEST_PARAM_ANALYSIS_TOOL_ID);   
         
         if (!params.isEmpty()) 
         {
+            String userName = params.get(REQUEST_PARAM_USER_NAME);
+            if (userName != null) {
+                return 
+                    studyPolicyStatementRepository.findByUserName(userName);
+            }
             ArrayList<String> missingParams = new ArrayList<String>();            
             String studyId = params.get(REQUEST_PARAM_STUDY_ID);  
             if (studyId == null) {
@@ -113,13 +120,28 @@ public class StudyPolicyStatementController extends BaseController
         return studyPolicyStatements;         
 	}
     
+    @RequestMapping(value = ENTITY_PATH,
+                    method = {RequestMethod.GET, RequestMethod.HEAD},
+                    produces = HEADER_JSON_MEDIA_TYPE)
+    public @ResponseBody StudyPolicyStatement getStudyPolicyStatement(
+           @PathVariable(ID_URL_PATH_VAR) Integer id) 
+    {
+        StudyPolicyStatement foundStudyPolicyStatement = 
+            studyPolicyStatementRepository.findOne(id);
+
+        if (foundStudyPolicyStatement == null) {
+            throw new ResourceNotFoundException(id);
+        }
+        return foundStudyPolicyStatement;
+    } 
+    
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public @ResponseBody StudyPolicyStatement createStudyPolicyStatement(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
            @RequestBody StudyPolicyStatement studyPolicyStatement) 
     {
        // first, check that the requested Study association is valid
@@ -133,7 +155,7 @@ public class StudyPolicyStatementController extends BaseController
                 Study.class.getSimpleName(),studyId);
         }           
         // check that the user can perform the create
-        if (!registryService.userCanManageStudy(study.getStudyId(),loginName)) {
+        if (!registryService.userCanManageStudy(loginName,study.getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
@@ -149,29 +171,14 @@ public class StudyPolicyStatementController extends BaseController
         // force the re-query to ensure a complete result view if updated
         return studyPolicyStatementRepository.findOne(
             studyPolicyStatement.getStudyPolicyStatementId());
-    }  
-    
-    @RequestMapping(value = ENTITY_PATH,
-                    method = {RequestMethod.GET, RequestMethod.HEAD},
-                    produces = HEADER_JSON_MEDIA_TYPE)
-    public @ResponseBody StudyPolicyStatement getStudyPolicyStatement(
-           @PathVariable(ID_URL_PATH_VAR) Integer id) 
-    {
-        StudyPolicyStatement foundStudyPolicyStatement = 
-            studyPolicyStatementRepository.findOne(id);
-
-        if (foundStudyPolicyStatement == null) {
-            throw new ResourceNotFoundException(id);
-        }
-        return foundStudyPolicyStatement;
-    }  
+    }   
     
     @RequestMapping(value = ENTITY_PATH,
                     method = RequestMethod.PUT,
                     consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     public @ResponseBody StudyPolicyStatement updateStudyPolicyStatement(
-           @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
+           @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
            @PathVariable(ID_URL_PATH_VAR) Integer id,
            @RequestBody StudyPolicyStatement studyPolicyStatement) 
     {
@@ -198,7 +205,7 @@ public class StudyPolicyStatementController extends BaseController
         }
         // check that the user can perform the update
         if (!registryService.userCanManageStudy(
-            studyPolicyStatement.getStudy().getStudyId(),loginName)) {
+            loginName,studyPolicyStatement.getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         
@@ -219,7 +226,7 @@ public class StudyPolicyStatementController extends BaseController
                     method = RequestMethod.DELETE) 
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void removeStudyPolicyStatement(
-        @RequestHeader(value=HEADER_LOGIN_NAME) String loginName,           
+        @RequestHeader(HEADER_LOGIN_NAME) String loginName,           
         @PathVariable(ID_URL_PATH_VAR) Integer id) 
     {
         // find the requested resource
@@ -231,7 +238,7 @@ public class StudyPolicyStatementController extends BaseController
         }
         // check that the user can perform the delete
         if (!registryService.userCanManageStudy(
-            studyPolicyStatement.getStudy().getStudyId(),loginName)) {
+            loginName,studyPolicyStatement.getStudy().getStudyId())) {
             throw new ForbiddenException(
                 loginName,
                 RegistryServiceConstants.MSG_STUDY_MANAGEMENT_ROLE_REQUIRED);         

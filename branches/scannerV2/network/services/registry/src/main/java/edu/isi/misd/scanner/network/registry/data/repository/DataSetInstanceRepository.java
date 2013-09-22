@@ -13,6 +13,10 @@ import org.springframework.data.repository.query.Param;
 public interface DataSetInstanceRepository 
     extends CrudRepository<DataSetInstance, Integer> 
 {    
+    List<DataSetInstance> 
+        findByNodeSiteSitePoliciesStudyRoleUserRolesUserUserName(
+            String userName);    
+    
     @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
            "JOIN i.dataSetDefinition d " + 
            "JOIN i.analysisPolicyStatements p " + 
@@ -20,8 +24,8 @@ public interface DataSetInstanceRepository
            "WHERE d.dataSetDefinitionId = :dataSetId " + 
            "AND u.userName = :userName " +
            "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
-    List<DataSetInstance> findDataSetInstancesForDataSetIdAndUserName(
+    List<DataSetInstance> findByDataSetIdAndUserNameFilteredByAnalysisPolicy(
         @Param("dataSetId")Integer dataSetId,
-        @Param("userName")String userName); 
+        @Param("userName")String userName);    
  
 }
