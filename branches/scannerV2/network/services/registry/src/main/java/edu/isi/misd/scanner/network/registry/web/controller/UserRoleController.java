@@ -44,6 +44,10 @@ public class UserRoleController extends BaseController
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH; 
     public static final String REQUEST_PARAM_USER_NAME = "userName";      
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";  
+    public static final String REQUEST_PARAM_SITE_ID = "siteId";  
+    public static final String REQUEST_PARAM_NODE_ID = "nodeId";  
+    public static final String REQUEST_PARAM_DATASET_INSTANCE_ID = 
+        "dataSetInstanceId";      
     
     @Autowired
     private UserRoleRepository userRoleRepository;   
@@ -62,26 +66,64 @@ public class UserRoleController extends BaseController
     {
         Map<String,String> params = 
             validateParameterMap(
-                paramMap, REQUEST_PARAM_USER_NAME, REQUEST_PARAM_STUDY_ID); 
+                paramMap,
+                REQUEST_PARAM_USER_NAME,
+                REQUEST_PARAM_STUDY_ID,
+                REQUEST_PARAM_SITE_ID,
+                REQUEST_PARAM_NODE_ID,
+                REQUEST_PARAM_DATASET_INSTANCE_ID); 
         
         String userName = params.get(REQUEST_PARAM_USER_NAME);        
         String studyId = params.get(REQUEST_PARAM_STUDY_ID);        
-        if ((userName != null) && (studyId != null)) 
+        String siteId = params.get(REQUEST_PARAM_SITE_ID);   
+        String nodeId = params.get(REQUEST_PARAM_NODE_ID);   
+        String dataSetInstanceId = params.get(REQUEST_PARAM_DATASET_INSTANCE_ID);  
+        
+        if (userName != null)
         {
-            return 
-                userRoleRepository.findByUserUserNameAndStudyRoleStudyStudyId(
-                    userName, 
-                    validateIntegerParameter(
-                        REQUEST_PARAM_STUDY_ID, studyId)
-                );
-        } else if (userName != null) {
-            return 
-                userRoleRepository.findByUserUserName(userName);
+            if (studyId != null) {
+                return 
+                    userRoleRepository.
+                        findByUserUserNameAndStudyRoleStudyStudyId(
+                            userName, 
+                            validateIntegerParameter(
+                                REQUEST_PARAM_STUDY_ID, studyId));
+            } else if  (siteId != null) {
+                return 
+                    userRoleRepository.
+                        findByUserUserNameAndStudyRoleSitePoliciesSiteSiteId(
+                            userName, 
+                            validateIntegerParameter(
+                                REQUEST_PARAM_SITE_ID, siteId));                    
+            } else if  (nodeId != null) {
+                return 
+                    userRoleRepository.
+                        findByUserUserNameAndStudyRoleSitePoliciesSiteNodesNodeId(
+                            userName, 
+                            validateIntegerParameter(
+                                REQUEST_PARAM_NODE_ID, nodeId));                  
+            } else if  (dataSetInstanceId != null) {
+                return 
+                    userRoleRepository.
+                        findByUserUserNameAndStudyRoleSitePoliciesSiteNodesDataSetInstancesDataSetInstanceId(
+                            userName, 
+                            validateIntegerParameter(
+                                REQUEST_PARAM_DATASET_INSTANCE_ID,
+                                dataSetInstanceId));                    
+            } else {
+                return 
+                    userRoleRepository.findByUserUserName(userName);                
+            }
         } else if (studyId != null) {         
             return
                 userRoleRepository.findByStudyRoleStudyStudyId(
                     validateIntegerParameter(
                         REQUEST_PARAM_STUDY_ID, studyId));
+        } else if (siteId != null || 
+                   nodeId != null || 
+                   dataSetInstanceId != null) {
+            throw new BadRequestException(
+                "Required parameter missing: " + REQUEST_PARAM_USER_NAME);                    
         } else {
             List<UserRole> roles = new ArrayList<UserRole>();             
             Iterator iter = userRoleRepository.findAll().iterator();
