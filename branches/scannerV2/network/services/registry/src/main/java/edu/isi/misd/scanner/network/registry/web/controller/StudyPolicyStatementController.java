@@ -77,27 +77,41 @@ public class StudyPolicyStatementController extends BaseController
         if (!params.isEmpty()) 
         {
             String userName = params.get(REQUEST_PARAM_USER_NAME);
-            if (userName != null) {
-                return 
-                    studyPolicyStatementRepository.findByUserName(userName);
-            }
-            ArrayList<String> missingParams = new ArrayList<String>();            
             String studyId = params.get(REQUEST_PARAM_STUDY_ID);  
+            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);  
+            String toolId = params.get(REQUEST_PARAM_ANALYSIS_TOOL_ID);            
+
+            ArrayList<String> missingParams = new ArrayList<String>();            
             if (studyId == null) {
                 missingParams.add(REQUEST_PARAM_STUDY_ID);
             }              
-            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);
             if (dataSetId == null) {
                 missingParams.add(REQUEST_PARAM_DATASET_ID);
             }
-            String toolId = params.get(REQUEST_PARAM_ANALYSIS_TOOL_ID);
             if (toolId == null) {
                 missingParams.add(REQUEST_PARAM_ANALYSIS_TOOL_ID);
-            }               
-            if ((studyId == null) || 
-                (dataSetId == null) ||                
-                (toolId == null)) 
-            {
+            }   
+            if (userName != null) {
+                if (studyId != null) {
+                    return 
+                        studyPolicyStatementRepository.findByUserNameAndStudyId(
+                            userName, 
+                            validateIntegerParameter(
+                                REQUEST_PARAM_STUDY_ID, studyId));                            
+                } else {
+                    return 
+                        studyPolicyStatementRepository.findByUserName(userName);
+                }
+            }
+            if ((studyId != null) && 
+                ((dataSetId == null) && 
+                 (toolId == null))) {
+                return 
+                    studyPolicyStatementRepository.findByStudyId(
+                        validateIntegerParameter(
+                            REQUEST_PARAM_STUDY_ID, studyId));                       
+            }
+            if (!missingParams.isEmpty()){
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
             }                           

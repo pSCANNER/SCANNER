@@ -83,11 +83,7 @@ public class AnalysisToolController extends BaseController
             if (libraryId == null) {
                 missingParams.add(REQUEST_PARAM_LIBRARY_ID);
             }               
-            if ((userName == null) || 
-                (studyId == null) ||                
-                (dataSetId == null) ||
-                (libraryId == null)) 
-            {
+            if (!missingParams.isEmpty()) {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
             }                          

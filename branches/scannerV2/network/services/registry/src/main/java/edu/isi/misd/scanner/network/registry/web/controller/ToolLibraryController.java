@@ -78,10 +78,7 @@ public class ToolLibraryController extends BaseController
             if (dataSetId == null) {
                 missingParams.add(REQUEST_PARAM_DATASET_ID);
             }            
-            if ((userName == null) || 
-                (studyId == null) || 
-                (dataSetId == null)) 
-            {
+            if (!missingParams.isEmpty()) {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
             }            

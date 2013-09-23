@@ -78,10 +78,7 @@ public class AnalysisPolicyStatementController extends BaseController
             if (toolId == null) {
                 missingParams.add(REQUEST_PARAM_ANALYSIS_TOOL_ID);
             }                     
-            if ((userName == null) || 
-                (instanceId == null) ||                
-                (toolId == null)) 
-            {
+            if (!missingParams.isEmpty()) {
                 throw new BadRequestException(
                     "Required parameter(s) missing: " + missingParams);                
             }             
