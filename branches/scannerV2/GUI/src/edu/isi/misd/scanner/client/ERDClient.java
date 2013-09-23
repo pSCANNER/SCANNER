@@ -814,5 +814,42 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse updateDatasetInstance(int dataSetInstanceId,
+			String dataSetInstanceName, String description, String dataSource,
+			int dataSetDefinitionId, int nodeId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "instances/" + dataSetInstanceId;
+		try {
+			JSONObject body = new JSONObject();
+			body.put("dataSetInstanceName", dataSetInstanceName);
+			if (description.length() > 0) {
+				body.put("description", description);
+			}
+			body.put("dataSource", dataSource);
+			JSONObject dataSetDefinition = new JSONObject();
+			dataSetDefinition.put("dataSetDefinitionId", dataSetDefinitionId);
+			body.put("dataSetDefinition", dataSetDefinition);
+			JSONObject node = new JSONObject();
+			node.put("nodeId", nodeId);
+			body.put("node", node);
+			System.out.println("PUT: " + url);
+			System.out.println("PUT Body: " + body.toString());
+			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteInstance(int dataSetInstanceId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "instances/" + dataSetInstanceId;
+		System.out.println("DELETE: " + url);
+		ClientURLResponse rsp = delete(url, null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 	
 }

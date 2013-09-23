@@ -70,6 +70,7 @@ var toolList = null;
 var librariesDict = null;
 
 var datasetDefinitionList = null;
+var datasetDefinitionDict = null;
 
 var userRolesList = null;
 
@@ -3878,6 +3879,10 @@ function initDatasets(all) {
 
 function postInitDatasets(data, textStatus, jqXHR, param) {
 	datasetDefinitionList = data;
+	datasetDefinitionDict = {};
+	$.each(datasetDefinitionList, function(i, dataset) {
+		datasetDefinitionDict[dataset['dataSetName']] = dataset;
+	});
 	datasetDefinitionList.sort(compareDatasetDefinitions);
 	if (param) {
 		initUserRoles(param);
@@ -4037,6 +4042,7 @@ function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
 		setUsers();
 		setSites();
 		setNodes();
+		setInstances();
 	}
 }
 
@@ -4235,6 +4241,14 @@ function showAdministration() {
 	$('.wizard_content', $('#manageNodesDiv')).hide();
 	$('.required', $('#add_node_div')).unbind('keyup');
 	$('.required', $('#add_node_div')).keyup(function(event) {checkCreateNodeButton();});
+	
+	$('.wizard_heading', $('#manageInstancesDiv')).unbind('click');
+	$('.wizard_heading', $('#manageInstancesDiv')).click(function() {
+		$(this).next(".wizard_content").toggle();
+	});
+	$('.wizard_content', $('#manageInstancesDiv')).hide();
+	$('.required', $('#add_instance_entity_div')).unbind('keyup');
+	$('.required', $('#add_instance_entity_div')).keyup(function(event) {checkCreateInstanceButton();});
 }
 
 function checkCreateUserButton() {
@@ -4716,5 +4730,198 @@ function postRemoveNode(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitNodes(data['nodes'], null, null, false);
 	setNodes();
+}
+
+function newInstance() {
+	$('#instanceNameInput').val('');
+	$('#instanceDataSourceInput').val('');
+	$('#selectInstanceDataset').val('');
+	$('#selectInstanceNode').val('');
+	$('#instanceDescriptionInput').val('');
+	$('#add_instance_entity_div').show();
+	$('#newInstanceButton').hide();
+	$('#updateInstanceButton').hide();
+	$('#addInstanceEntityButton').show();
+	$('#addInstanceEntityButton').attr('disabled', 'disabled');
+	$('#manageInstancesTable').hide();
+}
+
+function cancelInstanceEntity() {
+	$('#add_instance_entity_div').hide();
+	$('#newInstanceButton').show();
+	$('#manageInstancesTable').show();
+}
+
+function loadSelectNodes() {
+	var select = $('#selectInstanceNode');
+	select.unbind();
+	select.html('');
+	var option = $('<option>');
+	option.text('Select node...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(nodesList, function(i, node) {
+		if (!node['isMaster']) {
+			option = $('<option>');
+			option.text(node['nodeName']);
+			option.attr('value', node['nodeId']);
+			select.append(option);
+		}
+	});
+	select.change(function(event) {checkCreateInstanceButton();});
+}
+
+function loadSelectDataSets() {
+	var select = $('#selectInstanceDataset');
+	select.unbind();
+	select.html('');
+	var option = $('<option>');
+	option.text('Select data set...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(datasetDefinitionList, function(i, dataset) {
+		option = $('<option>');
+		option.text(dataset['dataSetName']);
+		option.attr('value', dataset['dataSetDefinitionId']);
+		select.append(option);
+	});
+	select.change(function(event) {checkCreateInstanceButton();});
+}
+
+function checkCreateInstanceButton() {
+	if ($('#instanceNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#selectInstanceDataset').val().length > 0 &&
+			$('#selectInstanceNode').val().length > 0 &&
+			$('#instanceDataSourceInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
+		$('#addInstanceEntityButton').removeAttr('disabled');
+		$('#updateInstanceButton').removeAttr('disabled');
+	} else {
+		$('#addInstanceEntityButton').attr('disabled', 'disabled');
+		$('#updateInstanceButton').attr('disabled', 'disabled');
+	}
+}
+
+function setInstances() {
+	$('#manageInstancesTable').show();
+	$('#newInstanceButton').show();
+	$('#add_instance_entity_div').hide();
+	$('#manageInstancesTbody').html('');
+	$.each(datasetInstancesList, function(i, instance) {
+		addInstanceRow(instance);
+	});
+	loadSelectNodes();
+	loadSelectDataSets();
+}
+
+function addInstanceRow(instance) {
+	var node = instance['node'];
+	var tbody = $('#manageInstancesTbody');
+	var tr = $('<tr>');
+	tbody.append(tr);
+	var td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(instance['dataSetInstanceName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(instance['dataSetDefinition']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(instance['dataSource']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(node['site']['siteName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(node['nodeName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(instance['description']);
+	td = $('<td>');
+	tr.append(td);
+	var button = $('<button>');
+	button.click(function(event) {removeInstance($(this), instance);});
+	button.html('Remove');
+	td.append(button);
+	td = $('<td>');
+	tr.append(td);
+	button = $('<button>');
+	button.click(function(event) {editInstance($(this), instance);});
+	button.html('Edit');
+	td.append(button);
+}
+
+function editInstance(button, instance) {
+	var node = instance['node'];
+	$('#instanceNameInput').val(instance['dataSetInstanceName']);
+	$('#instanceDataSourceInput').val(instance['dataSource']);
+	$('#selectInstanceDataset').val(datasetDefinitionDict[instance['dataSetDefinition']]['dataSetDefinitionId']);
+	$('#selectInstanceNode').val(node['nodeId']);
+	$('#instanceDescriptionInput').val(instance['description']);
+	$('#instanceIdHidden').val(instance['dataSetInstanceId']);
+	$('#updateInstanceButton').removeAttr('disabled');
+	$('#manageInstancesTable').hide();
+	$('#updateInstanceButton').show();
+	$('#addInstanceEntityButton').hide();
+	$('#newInstanceButton').hide();
+	$('#add_instance_entity_div').show();
+}
+
+function addInstanceEntity() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'createDatasetInstance';
+	obj['dataSetInstanceName'] = $('#instanceNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['dataSource'] = $('#instanceDataSourceInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['nodeId'] = $('#selectInstanceNode').val();
+	obj['dataSetDefinitionId'] = $('#selectInstanceDataset').val();
+	obj['description'] = $('#instanceDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	$('#addInstanceEntityButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postAddInstanceEntity, null, null, 0);
+}
+
+function postAddInstanceEntity(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitDatasetInstances(data['instances'], null, null, false);
+	setInstances();
+}
+
+function updateInstance() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'updateInstance';
+	obj['dataSetInstanceName'] = $('#instanceNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['dataSource'] = $('#instanceDataSourceInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['nodeId'] = $('#selectInstanceNode').val();
+	obj['dataSetDefinitionId'] = $('#selectInstanceDataset').val();
+	obj['description'] = $('#instanceDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['dataSetInstanceId'] = $('#instanceIdHidden').val();
+	$('#updateInstanceButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postUpdateInstance, null, null, 0);
+}
+
+function postUpdateInstance(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitDatasetInstances(data['instances'], null, null, false);
+	setInstances();
+}
+
+function removeInstance(button, instance) {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'deleteInstance';
+	obj['dataSetInstanceId'] = instance['dataSetInstanceId'];
+	scanner.POST(url, obj, true, postRemoveInstance, null, null, 0);
+}
+
+function postRemoveInstance(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitDatasetInstances(data['instances'], null, null, false);
+	setInstances();
 }
 

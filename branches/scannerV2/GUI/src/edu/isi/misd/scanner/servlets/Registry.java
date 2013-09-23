@@ -484,7 +484,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getDatasetInstances();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analysis policies.");
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset instances.");
 					return;
 				}
 				responseObject.put("instances", clientResponse.getEntityResponse());
@@ -681,6 +681,32 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("updateInstance")) {
+			clientResponse = registryClient.updateDatasetInstance(Integer.parseInt(dataSetInstanceId), dataSetInstanceName, description, 
+					dataSource, Integer.parseInt(dataSetDefinitionId), Integer.parseInt(nodeId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update dataset instance.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("updateDatasetInstance:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("instance", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getDatasetInstances();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset instances.");
+					return;
+				}
+				responseObject.put("instances", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("updateDatasetInstance responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("deleteStudyRequestedSites")) {
 			clientResponse = registryClient.deleteStudyRequestedSites(Integer.parseInt(studyRequestedSiteId));
 			if (clientResponse == null) {
@@ -808,6 +834,26 @@ public class Registry extends HttpServlet {
 				responseObject.put("nodes", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				System.out.println("deleteNode responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("deleteInstance")) {
+			clientResponse = registryClient.deleteInstance(Integer.parseInt(dataSetInstanceId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete instance.");
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
+				clientResponse = registryClient.getDatasetInstances();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get instances.");
+					return;
+				}
+				responseObject.put("instances", clientResponse.getEntityResponse());
+				responseBody = responseObject.toString();
+				System.out.println("deleteInstance responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
