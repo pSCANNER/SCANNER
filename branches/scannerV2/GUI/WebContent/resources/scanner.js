@@ -70,7 +70,6 @@ var toolList = null;
 var librariesDict = null;
 
 var datasetDefinitionList = null;
-var datasetDefinitionDict = null;
 
 var userRolesList = null;
 
@@ -3879,10 +3878,6 @@ function initDatasets(all) {
 
 function postInitDatasets(data, textStatus, jqXHR, param) {
 	datasetDefinitionList = data;
-	datasetDefinitionDict = {};
-	$.each(data, function(i, dataset) {
-		datasetDefinitionDict[dataset['dataSetName']] = dataset;
-	});
 	datasetDefinitionList.sort(compareDatasetDefinitions);
 	if (param) {
 		initUserRoles(param);
