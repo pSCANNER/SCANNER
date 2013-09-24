@@ -21,6 +21,8 @@
  * 
  */
 
+var debug = false;
+
 var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
 var HOME;
@@ -484,7 +486,7 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 	$.each(data, function(name, value) {
 		names.push(name);
 	});
-	if (names.length == 0) {
+	if (names.length == 0 && loggedInUser['isSuperuser']) {
 		names.push(emptyValue);
 	}
 	if (names.length > 0) {
@@ -1682,7 +1684,9 @@ var scanner = {
 function submitLogin() {
 	var url = HOME + '/login';
 	var obj = new Object();
-	obj['scannerUser'] = prompt('User: ', '');
+	if (debug) {
+		obj['scannerUser'] = prompt('User: ', '');
+	}
 	scanner.POST(url, obj, true, postSubmitLogin, null, null, 0);
 }
 
@@ -4426,6 +4430,10 @@ function postUpdateUser(data, textStatus, jqXHR, param) {
 }
 
 function removeUser(button, user) {
+	var answer = confirm('Are you sure you want to remove the user "' + user['userName'] + '"?');
+	if (!answer) {
+		return;
+	}
 	var obj = {};
 	var url = HOME + '/registry';
 	obj['action'] = 'deleteUser';
@@ -4551,6 +4559,10 @@ function postUpdateSite(data, textStatus, jqXHR, param) {
 }
 
 function removeSite(button, site) {
+	var answer = confirm('Are you sure you want to remove the site "' + site['siteName'] + '"?');
+	if (!answer) {
+		return;
+	}
 	var obj = {};
 	var url = HOME + '/registry';
 	obj['action'] = 'deleteSite';
@@ -4759,6 +4771,10 @@ function postUpdateNode(data, textStatus, jqXHR, param) {
 }
 
 function removeNode(button, node) {
+	var answer = confirm('Are you sure you want to remove the node "' + node['site']['siteName'] + ' - ' + node['nodeName'] + '"?');
+	if (!answer) {
+		return;
+	}
 	var obj = {};
 	var url = HOME + '/registry';
 	obj['action'] = 'deleteNode';
@@ -4952,6 +4968,10 @@ function postUpdateInstance(data, textStatus, jqXHR, param) {
 }
 
 function removeInstance(button, instance) {
+	var answer = confirm('Are you sure you want to remove the data set instance "' + instance['dataSetInstanceName'] + '"?');
+	if (!answer) {
+		return;
+	}
 	var obj = {};
 	var url = HOME + '/registry';
 	obj['action'] = 'deleteInstance';
