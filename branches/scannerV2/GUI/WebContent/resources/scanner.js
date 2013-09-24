@@ -99,6 +99,7 @@ var sitesPoliciesDict = null;
 var sitesList = null;
 
 var activeStudy = null;
+var loggedInUser = null;
 
 
 var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
@@ -1684,6 +1685,7 @@ function postSubmitLogin(data, textStatus, jqXHR, param) {
 	var loginDiv = $('#loginForm');
 	$('#errorDiv').remove();
 	if (res['status'] == 'success') {
+		loggedInUser = res['user'];
 		$('#profileIdentity').html(res['mail']);
 		$('#profileIdentityDescription').html(res['description'][0]);
 		$('#profileRole').html(res['role']);
@@ -1767,6 +1769,8 @@ function analyzeStudy() {
 	$('#ui').css('visibility', 'visible');
 	$('#ui').css('display', '');
 	$('#logoutButton').show();
+	$('#welcomeLink').html('Welcome ' + loggedInUser + '!');
+	$('#welcomeLink').show();
 	$('#studyName').html('Study: ' + getSelectedStudyName());
 	var description = availableStudies[getSelectedStudyName()];
 	$('#studyName').hover(
@@ -2516,6 +2520,7 @@ function submitLogout() {
 function postSubmitLogout(data, textStatus, jqXHR, param) {
 	alert('Please close your browser to logoff.');
 	$('#logoutButton').hide();
+	$('#welcomeLink').hide();
 	window.location = HOME;
 }
 
