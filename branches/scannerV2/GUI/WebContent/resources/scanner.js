@@ -497,7 +497,7 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 		loadSites(emptyValue, false);
 		loadStudies(names);
 		intervalVariable = setInterval(function(){checkStudiesRendering(names.length);},1);
-	} else {
+	} else if (!checkSuperUser()){
 		$('#ui').hide();
 		$('#authorizationWrapperDiv').show();
 	}
@@ -2454,6 +2454,9 @@ function copyObject(obj) {
 function enableScanner() {
 	if ($('#acceptConditions').attr('checked') == 'checked') {
 		$('#selectStudies').removeAttr('disabled');
+		if (checkSuperUser()) {
+			$('#continueButton').removeAttr('disabled');
+		}
 	} else {
 		studiesMultiSelect.set('value', '');
 		$('#continueButton').attr('disabled', 'disabled');
