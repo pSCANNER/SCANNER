@@ -99,7 +99,13 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getDatasets")) {
 			String study = request.getParameter("study");
-			RegistryClientResponse clientResponse = registryClient.getDatasets(getStudyId(study));
+			RegistryClientResponse clientResponse = null;
+			if (getStudyId(study) == -1) {
+				clientResponse = registryClient.getStudies();
+				retrievedStudies = clientResponse.getEntityResponse();
+				clientResponse.release();
+			}
+			clientResponse = registryClient.getDatasets(getStudyId(study));
 			retrievedDatasets = clientResponse.getEntityResponse();
 			String ret = clientResponse.toDatasets();
 			clientResponse.release();
@@ -171,14 +177,14 @@ public class Analyze extends HttpServlet {
 			RegistryClientResponse clientResponse = registryClient.getDatasetInstances();
 			String ret = clientResponse.toDatasetInstances().toString();
 			clientResponse.release();
-			System.out.println("Analyze Get Tools: "+ret);
+			System.out.println("Analyze Get Dataset Instances: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getDatasetDefinitions")) {
 			RegistryClientResponse clientResponse = registryClient.getDatasetDefinitions();
 			String ret = clientResponse.toDatasetDefinitions().toString();
 			clientResponse.release();
-			System.out.println("Analyze Get Tools: "+ret);
+			System.out.println("Analyze Get Datasets: "+ret);
 			PrintWriter out = response.getWriter();
 			out.print(ret);
 		} else if (action.equals("getUserRoles")) {

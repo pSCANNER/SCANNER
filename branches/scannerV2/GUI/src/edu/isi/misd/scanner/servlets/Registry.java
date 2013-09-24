@@ -46,6 +46,7 @@ public class Registry extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ServletConfig servletConfig;
 	private String erdURL;
+	private boolean debug = false;
        
     /**
      * Default constructor. 
@@ -158,7 +159,7 @@ public class Registry extends HttpServlet {
 				responseObject.put("analysisPolicies", responseArray);
 				clientResponse.release();
 				res = responseObject.toString();
-				System.out.println("getStudyData responseBody: " + res);
+				if (debug) System.out.println("getStudyData responseBody: " + res);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -365,7 +366,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("responseBody: " + responseBody);
+				if (debug) System.out.println("responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -386,7 +387,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("allSites", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("createStudyRequestedSites responseBody: " + responseBody);
+				if (debug) System.out.println("createStudyRequestedSites responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -417,7 +418,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("createStudyRequestedSites responseBody: " + responseBody);
+				if (debug) System.out.println("createStudyRequestedSites responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -443,7 +444,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("studyPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("createStudyPolicy responseBody: " + responseBody);
+				if (debug) System.out.println("createStudyPolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -463,7 +464,7 @@ public class Registry extends HttpServlet {
 				responseObject.put("analysisPolicy", clientResponse.getEntity());
 				clientResponse.release();
 				responseBody = responseObject.toString();
-				System.out.println("createSitePolicy responseBody: " + responseBody);
+				if (debug) System.out.println("createSitePolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -489,7 +490,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("instances", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("createDatasetInstance responseBody: " + responseBody);
+				if (debug) System.out.println("createDatasetInstance responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -515,7 +516,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("users", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("createUser responseBody: " + responseBody);
+				if (debug) System.out.println("createUser responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -540,7 +541,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("sites", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("createSite responseBody: " + responseBody);
+				if (debug) System.out.println("createSite responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -565,7 +566,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("nodes", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("createNode responseBody: " + responseBody);
+				if (debug) System.out.println("createNode responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -601,7 +602,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("responseBody: " + responseBody);
+				if (debug) System.out.println("responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -627,7 +628,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("users", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("updateUser responseBody: " + responseBody);
+				if (debug) System.out.println("updateUser responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -677,7 +678,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("nodes", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("updateNode responseBody: " + responseBody);
+				if (debug) System.out.println("updateNode responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -703,7 +704,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("instances", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("updateDatasetInstance responseBody: " + responseBody);
+				if (debug) System.out.println("updateDatasetInstance responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -723,7 +724,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("allSites", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("deleteStudyRequestedSites responseBody: " + responseBody);
+				if (debug) System.out.println("deleteStudyRequestedSites responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -743,7 +744,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("userRoles", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("deleteUserRole responseBody: " + responseBody);
+				if (debug) System.out.println("deleteUserRole responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -763,7 +764,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("studyPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("deleteStudyPolicy responseBody: " + responseBody);
+				if (debug) System.out.println("deleteStudyPolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -783,7 +784,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("users", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("deleteUser responseBody: " + responseBody);
+				if (debug) System.out.println("deleteUser responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -796,7 +797,7 @@ public class Registry extends HttpServlet {
 			JSONObject responseObject = new JSONObject();
 			clientResponse.release();
 			responseBody = responseObject.toString();
-			System.out.println("deleteSitePolicy responseBody: " + responseBody);
+			if (debug) System.out.println("deleteSitePolicy responseBody: " + responseBody);
 		} else if (action.equals("deleteSite")) {
 			clientResponse = registryClient.deleteSite(Integer.parseInt(siteId));
 			if (clientResponse == null) {
@@ -813,7 +814,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("sites", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("deleteSite responseBody: " + responseBody);
+				if (debug) System.out.println("deleteSite responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -833,7 +834,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("nodes", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("deleteNode responseBody: " + responseBody);
+				if (debug) System.out.println("deleteNode responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -853,7 +854,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("instances", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				System.out.println("deleteInstance responseBody: " + responseBody);
+				if (debug) System.out.println("deleteInstance responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
