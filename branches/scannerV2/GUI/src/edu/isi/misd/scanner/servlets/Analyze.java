@@ -238,11 +238,20 @@ public class Analyze extends HttpServlet {
 				} else {
 					// to handle error case "user not found"
 				}
+				rsp = registryClient.getUserRoles((String) session.getAttribute("user"));
+				JSONArray userRoles = rsp.getEntityResponse();
+				if (user != null) {
+					session.setAttribute("userId", user.getJSONObject(0).getInt("userId"));
+				} else {
+					// to handle error case "user not found"
+				}
 				scannerClient = new ScannerClient(4, 8192, 300000,
 						trustStoreType, trustStorePassword, trustStoreResource,
 						keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
 				session.setAttribute("scannerClient", scannerClient);
 				obj.put("status", "success");
+				obj.put("user", user);
+				obj.put("userRoles", userRoles);
 			} else if (action.equals("logout")) {
 				System.out.println("Logout successfully");
 				obj.put("status", "success");

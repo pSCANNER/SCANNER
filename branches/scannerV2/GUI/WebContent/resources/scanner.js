@@ -99,7 +99,9 @@ var sitesPoliciesDict = null;
 var sitesList = null;
 
 var activeStudy = null;
+var loggedInUserName = null;
 var loggedInUser = null;
+var loggedInUserRoles = null;
 
 
 var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
@@ -482,6 +484,9 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 	$.each(data, function(name, value) {
 		names.push(name);
 	});
+	if (names.length == 0) {
+		names.push(emptyValue);
+	}
 	if (names.length > 0) {
 		names.sort(compareIgnoreCase);
 		loadDatasets(emptyValue);
@@ -1677,6 +1682,7 @@ var scanner = {
 function submitLogin() {
 	var url = HOME + '/login';
 	var obj = new Object();
+	obj['scannerUser'] = prompt('User: ', '');
 	scanner.POST(url, obj, true, postSubmitLogin, null, null, 0);
 }
 
@@ -1685,7 +1691,7 @@ function postSubmitLogin(data, textStatus, jqXHR, param) {
 	var loginDiv = $('#loginForm');
 	$('#errorDiv').remove();
 	if (res['status'] == 'success') {
-		loggedInUser = res['user'];
+		loggedInUserName = res['user'];
 		$('#profileIdentity').html(res['mail']);
 		$('#profileIdentityDescription').html(res['description'][0]);
 		$('#profileRole').html(res['role']);
@@ -1756,6 +1762,8 @@ function loginRegistry() {
 function postLoginRegistry(data, textStatus, jqXHR, param) {
 	var res = $.parseJSON(data);
 	if (res['status'] == 'success') {
+		loggedInUser = res['user'][0];
+		loggedInUserRoles = res['userRoles'];
 		renderAvailableStudies();
 		renderSitesStatus();
 		initUsers(true);
@@ -1769,7 +1777,7 @@ function analyzeStudy() {
 	$('#ui').css('visibility', 'visible');
 	$('#ui').css('display', '');
 	$('#logoutButton').show();
-	$('#welcomeLink').html('Welcome ' + loggedInUser + '!');
+	$('#welcomeLink').html('Welcome ' + loggedInUserName + '!');
 	$('#welcomeLink').show();
 	$('#studyName').html('Study: ' + getSelectedStudyName());
 	var description = availableStudies[getSelectedStudyName()];
@@ -4214,7 +4222,11 @@ function newUser() {
 
 function cancelUser() {
 	$('#add_user_div').hide();
-	$('#newUserButton').show();
+	if (checkSuperUser()) {
+		$('#newUserButton').show();
+	} else {
+		$('#newUserButton').hide();
+	}
 	$('#manageUsersTable').show();
 }
 
@@ -4271,7 +4283,11 @@ function checkCreateUserButton() {
 
 function setUsers() {
 	$('#manageUsersTable').show();
-	$('#newUserButton').show();
+	if (checkSuperUser()) {
+		$('#newUserButton').show();
+	} else {
+		$('#newUserButton').hide();
+	}
 	$('#add_user_div').hide();
 	$('#manageUsersTbody').html('');
 	$.each(scannerUsersList, function(i, user) {
@@ -4306,23 +4322,30 @@ function addUserRow(user) {
 	td.addClass('protocol_border');
 	tr.append(td);
 	var input = $('<input>');
-	input.attr({'type': 'checkbox'});
+	input.attr({'type': 'checkbox',
+		'disabled': 'disabled'});
 	if (user['isSuperuser']) {
 		input.attr('checked', 'checked');
 	}
 	td.append(input);
 	td = $('<td>');
 	tr.append(td);
-	var button = $('<button>');
-	button.click(function(event) {removeUser($(this), user);});
-	button.html('Remove');
-	td.append(button);
-	td = $('<td>');
-	tr.append(td);
 	button = $('<button>');
 	button.click(function(event) {editUser($(this), user);});
 	button.html('Edit');
 	td.append(button);
+	if (!checkEditUser(user)) {
+		button.hide();
+	}
+	td = $('<td>');
+	tr.append(td);
+	var button = $('<button>');
+	button.click(function(event) {removeUser($(this), user);});
+	button.html('Remove');
+	td.append(button);
+	if (!checkRemoveUser(user)) {
+		button.hide();
+	}
 }
 
 function hideAdministration() {
@@ -4340,6 +4363,11 @@ function editUser(button, user) {
 		$('#userSuperuserInput').attr('checked', 'checked');
 	} else {
 		$('#userSuperuserInput').removeAttr('checked');
+		if (!checkSuperUser()) {
+			$('#userSuperuserInput').attr('disabled', 'disabled');
+		} else {
+			$('#userSuperuserInput').removeAttr('disabled');
+		}
 	}
 	$('#userIdHidden').val(user['userId']);
 	$('#updateUserButton').removeAttr('disabled');
@@ -4387,6 +4415,12 @@ function updateUser() {
 
 function postUpdateUser(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
+	var user = data['user'];
+	if (user['userId'] == $('#userIdHidden').val()) {
+		loggedInUser = user;
+		loggedInUserName = user['userName'];
+		$('#welcomeLink').html('Welcome ' + loggedInUserName + '!');
+	}
 	postInitUsers(data['users'], null, null, false);
 	setUsers();
 }
@@ -4620,7 +4654,8 @@ function addNodeRow(node) {
 	td.addClass('protocol_border');
 	tr.append(td);
 	var input = $('<input>');
-	input.attr({'type': 'checkbox'});
+	input.attr({'type': 'checkbox',
+		'disabled': 'disabled'});
 	if (node['isMaster']) {
 		input.attr('checked', 'checked');
 	}
@@ -4928,5 +4963,17 @@ function postRemoveInstance(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitDatasetInstances(data['instances'], null, null, false);
 	setInstances();
+}
+
+function checkRemoveUser(user) {
+	return loggedInUser['isSuperuser'] && loggedInUserName != user['userName'];
+}
+
+function checkEditUser(user) {
+	return loggedInUser['isSuperuser'] || loggedInUserName == user['userName'];
+}
+
+function checkSuperUser() {
+	return loggedInUser['isSuperuser'];
 }
 

@@ -245,6 +245,7 @@ public interface RegistryClient {
 	public RegistryClientResponse getAnalysisPolicies();
 	public RegistryClientResponse getUserRoles();
 	public RegistryClientResponse getUserRoles(int studyId);
+	public RegistryClientResponse getUserRoles(String userName);
 	public RegistryClientResponse getStudyPolicies();
 	public RegistryClientResponse getStudyRoles();
 	public RegistryClientResponse getStudyRoles(int studyId);
