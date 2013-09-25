@@ -278,4 +278,6 @@ public interface RegistryClient {
 	public RegistryClientResponse createNode(String nodeName, String hostUrl, int hostPort, String basePath, String description, boolean isMaster, int siteId);
 	public RegistryClientResponse updateNode(int nodeId, String nodeName, String hostUrl, int hostPort, String basePath, String description, boolean isMaster, int siteId);
 	public RegistryClientResponse deleteNode(int nodeId);
+
+	public RegistryClientResponse getStudyManagementPolicies(int studyId, String userName);
 }

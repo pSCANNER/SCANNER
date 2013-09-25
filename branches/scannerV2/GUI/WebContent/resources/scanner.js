@@ -2640,6 +2640,7 @@ function manageStudy(hideMode) {
 	obj['action'] = 'getStudyData';
 	obj['studyId'] = activeStudy['studyId'];
 	obj['studyName'] = activeStudy['studyName'];
+	obj['userName'] = loggedInUserName;
 	scanner.RETRIEVE(url, obj, true, postManageStudy, hideMode, null, 0);
 }
 
@@ -2655,6 +2656,7 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	activeStudy['studyPolicies'].sort(compareStudyPolicy);
 	activeStudy['analysisPolicies'] = data['analysisPolicies'];
 	activeStudy['analysisPolicies'].sort(compareAnalysisPolicies);
+	activeStudy['userStudyRoles'] = data['userStudyRoles'];
 	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['studyId'] + ': ' + activeStudy['studyName']);
 	if (activeStudy['description'] != null) {
 		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + activeStudy['description']);
@@ -2878,6 +2880,21 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	checkAddSiteButton();
 	checkAddSiteProtocolButton();
 	appendStudyContent(activeStudy);
+	if (!checkUserStudyRoles()) {
+		$('input', $('#studyUpdateTable')).attr('disabled', 'disabled');
+		$('select', $('#studyUpdateTable')).attr('disabled', 'disabled');
+		$('#updateStudyButton').hide();
+		$('#addStudyRequestedSitesTable').hide();
+		$('#addStaffWrapperTable').hide();
+		$('#add_study_protocol_div').hide();
+	} else {
+		$('input', $('#studyUpdateTable')).removeAttr('disabled');
+		$('select', $('#studyUpdateTable')).removeAttr('disabled');
+		$('#updateStudyButton').show();
+		$('#addStudyRequestedSitesTable').show();
+		$('#addStaffWrapperTable').show();
+		$('#add_study_protocol_div').show();
+	}
 }
 
 function checkAddRoleButton() {
@@ -3023,6 +3040,9 @@ function addStaffRow(userRole) {
 	button.click(function(event) {removeStaff($(this), userRole);});
 	button.html('Remove Staff');
 	td.append(button);
+	if (!checkUserStudyRoles()) {
+		button.hide();
+	}
 	$('#staffNames').val('');
 	$('#staffRoles').val('');
 	$('#studySites').val('');
@@ -3030,6 +3050,10 @@ function addStaffRow(userRole) {
 }
 
 function removeStaff(button, userRoles) {
+	var answer = confirm('Are you sure you want to remove the user "' + userRoles['user'] + '"?');
+	if (!answer) {
+		return;
+	}
 	button.parent().parent().remove();
 	var obj = {};
 	obj['action'] = 'deleteUserRole';
@@ -3347,36 +3371,39 @@ function addProtocolViewRow(obj) {
 	$('#viewSitesProtocols').show();
 }
 
-function addProtocolPoliciesRow(obj) {
+function addProtocolPoliciesRow(policy) {
 	var tbody = $('#manageStudyProtocolsTbody');
 	var tr = $('<tr>');
 	tbody.append(tr);
 	var td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var lib = librariesDict[obj['analysisTool']['toolParentLibrary']];
-	var method = lib['libraryName'] + ' - ' + obj['analysisTool']['toolName'];
+	var lib = librariesDict[policy['analysisTool']['toolParentLibrary']];
+	var method = lib['libraryName'] + ' - ' + policy['analysisTool']['toolName'];
 	td.html(method);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['dataSetDefinition']['dataSetName']);
+	td.html(policy['dataSetDefinition']['dataSetName']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['accessMode']['description']);
+	td.html(policy['accessMode']['description']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var studyRole = obj['studyRole'];
+	var studyRole = policy['studyRole'];
 	td.html(studyRole['roleWithinStudy']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
 	var button = $('<button>');
-	button.click(function(event) {removePoliciesProtocol($(this), obj);});
+	button.click(function(event) {removePoliciesProtocol($(this), policy);});
 	button.html('Remove');
 	td.append(button);
+	if (!checkUserStudyRoles()) {
+		button.hide();
+	}
 	//$('.wizard_content_protocol', div).width(div.width());
 	$('#modelNames').val('');
 	$('#datasetNames').val('');
@@ -3461,9 +3488,16 @@ function addSiteRow(site) {
 	button.click(function(event) {removeStudySite($(this), site);});
 	button.html('Remove Site');
 	td.append(button);
+	if (!checkUserStudyRoles()) {
+		button.hide();
+	}
 }
 
 function removeStudySite(button, site) {
+	var answer = confirm('Are you sure you want to remove the study requested site "' + site['site']['siteName'] + '"?');
+	if (!answer) {
+		return;
+	}
 	button.parent().parent().remove();
 	$.each($('option', $('#siteSelect')), function(i, option) {
 		if ($(option).attr('value') != '' && studyRequestedSitesDict[$(option).attr('value')]['site']['siteName'] == site['site']['siteName']) {
@@ -3509,6 +3543,16 @@ function postRemoveProtocol(data, textStatus, jqXHR, param) {
 }
 
 function removePoliciesProtocol(button, policy) {
+	var studyPolicy = '';
+	var lib = librariesDict[policy['analysisTool']['toolParentLibrary']];
+	var method = lib['libraryName'] + ' - ' + policy['analysisTool']['toolName'];
+	var dataset = policy['dataSetDefinition']['dataSetName'];
+	var accessMode = policy['accessMode']['description'];
+	var role = policy['studyRole']['roleWithinStudy'];
+	var answer = confirm('Are you sure you want to remove the policy "' + method + ' as ' + role + ' on dataset ' + dataset + ' with ' + accessMode + ' result transfer"?');
+	if (!answer) {
+		return;
+	}
 	button.attr('disabled', 'disabled');
 	var obj = {};
 	obj['action'] = 'deleteStudyPolicy';
@@ -4998,5 +5042,9 @@ function checkEditUser(user) {
 
 function checkSuperUser() {
 	return loggedInUser['isSuperuser'];
+}
+
+function checkUserStudyRoles() {
+	return loggedInUser['isSuperuser'] || activeStudy['userStudyRoles'].length > 0;
 }
 

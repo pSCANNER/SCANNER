@@ -92,6 +92,7 @@ public class Registry extends HttpServlet {
 		String res = "";
 		String studyId = request.getParameter("studyId");
 		String studyName = request.getParameter("studyName");
+		String userName = request.getParameter("userName");
 		RegistryClientResponse clientResponse = null;
 		if (action.equals("getMyStudies")) {
 			clientResponse = registryClient.getMyStudies();
@@ -157,6 +158,14 @@ public class Registry extends HttpServlet {
 					}
 				}
 				responseObject.put("analysisPolicies", responseArray);
+				clientResponse.release();
+				clientResponse = registryClient.getStudyManagementPolicies(Integer.parseInt(studyId), userName);
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies for study: " + studyId);
+					return;
+				}
+				responseArray = clientResponse.getEntityResponse();
+				responseObject.put("userStudyRoles", responseArray);
 				clientResponse.release();
 				res = responseObject.toString();
 				if (debug) System.out.println("getStudyData responseBody: " + res);

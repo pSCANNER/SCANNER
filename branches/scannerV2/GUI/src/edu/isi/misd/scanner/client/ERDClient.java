@@ -851,7 +851,20 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getStudyManagementPolicies(int studyId,
+			String userName) {
+		RegistryClientResponse ret = null;
+		try {
+			String url = erdURL + "studyManagementPolicies?userName=" + Utils.urlEncode(userName) + "&studyId=" + studyId;
+			System.out.println("GET: " + url);
+			ClientURLResponse rsp = get(url, (String) null, loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return ret;
