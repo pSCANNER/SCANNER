@@ -18,6 +18,7 @@ import edu.isi.misd.scanner.network.types.regression.LogisticRegressionOutput;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionResponse;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.commons.lang.ArrayUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,36 +140,35 @@ public class GloreAggregateProcessor implements Processor
             if (log.isDebugEnabled()) {            
                 log.debug("SD Matrix: " + GloreUtils.matrixToString(SD, 8, 6));
             }
-
-            // before claiming complete, compute the M and STD from local components
-//            ArrayList<double[]> D_values = new ArrayList<double[][]>();
-
+            
             int totalRows = 0;
-            double[] M = new double[features]           ;
+            double[] M = new double[features];
             double[] STD = new double[features];
 
             for (GloreLogisticRegressionRequest gloreRequest : gloreRequestList)
             {
-                double[] tempM = gloreRequest.getGloreData().getM();
-                double[] tempSTD = gloreRequest.getGloreData().getSTD();
-                int tempRows =   GloreUtils.convertMatrixTypeToMatrix(
-                        gloreRequest.getGloreData().getRows());
-
+                double[] tempM = 
+                    ArrayUtils.toPrimitive(
+                        gloreRequest.getGloreData().getM().toArray(
+                            new Double[0]));
+                double[] tempSTD = 
+                    ArrayUtils.toPrimitive(
+                        gloreRequest.getGloreData().getSTD().toArray(
+                            new Double[0]));
+                int tempRows = gloreRequest.getGloreData().getRows();
                 for (int i=0; i<features; i++)
                 {
                     M[i] = M[i] + tempM[i];
                     STD[i] = STD[i] + tempSTD[i];
                     totalRows = totalRows + tempRows;
                 }
-
-//                D_values.add(D.getArray());
             }
 
             for (int i=0; i<features; i++)
             {
                 M[i] = M[i] /totalRows;
                 STD[i] = Math.sqrt(STD[i]/totalRows);
-        }
+            }
 
             gloreData.setState("complete");
 

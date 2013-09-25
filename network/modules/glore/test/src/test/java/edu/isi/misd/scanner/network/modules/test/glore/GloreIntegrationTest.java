@@ -55,7 +55,7 @@ public class GloreIntegrationTest extends BaseIntegrationTest
         return targets;
     }  
     
-    @Test
+    //@Test
     public void testGloreLogisticRegressionXML() throws Exception 
     {
         doPost("application/xml",
