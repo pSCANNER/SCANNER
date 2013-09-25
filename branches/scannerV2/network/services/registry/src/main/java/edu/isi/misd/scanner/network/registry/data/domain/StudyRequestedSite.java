@@ -1,5 +1,8 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -24,6 +27,8 @@ public class StudyRequestedSite implements Serializable
     @Basic(optional = false)
     @Column(name = "study_requested_site_id")
     private Integer studyRequestedSiteId;   
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityReference(alwaysAsId=true)       
     @JoinColumn(name = "study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study study;    

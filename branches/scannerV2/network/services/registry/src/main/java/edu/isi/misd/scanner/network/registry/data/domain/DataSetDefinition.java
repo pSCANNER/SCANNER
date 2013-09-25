@@ -39,6 +39,8 @@ public class DataSetDefinition implements Serializable
     private String description;
     @Column(name = "data_processing_program")
     private String dataProcessingProgram;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
+    @JsonIdentityReference(alwaysAsId=true)     
     @JoinColumn(name = "originating_study_id", referencedColumnName = "study_id")
     @ManyToOne(optional = false)
     private Study originatingStudy;
