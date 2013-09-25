@@ -149,12 +149,8 @@ public class GloreAggregateProcessor implements Processor
 
             for (GloreLogisticRegressionRequest gloreRequest : gloreRequestList)
             {
-                double[] tempM =
-                        GloreUtils.convertMatrixTypeToMatrix(
-                                gloreRequest.getGloreData().getM());
-                double[] tempSTD =
-                        GloreUtils.convertMatrixTypeToMatrix(
-                                gloreRequest.getGloreData().getSTD());
+                double[] tempM = gloreRequest.getGloreData().getM();
+                double[] tempSTD = gloreRequest.getGloreData().getSTD();
                 int tempRows =   GloreUtils.convertMatrixTypeToMatrix(
                         gloreRequest.getGloreData().getRows());
 
