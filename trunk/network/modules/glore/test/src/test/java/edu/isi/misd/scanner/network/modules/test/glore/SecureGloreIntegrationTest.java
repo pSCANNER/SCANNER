@@ -55,7 +55,7 @@ public class SecureGloreIntegrationTest extends BaseIntegrationTest
         return targets;
     }  
     
-    @Test
+    //@Test
     public void testSecureGloreLogisticRegressionXML() throws Exception 
     {
         doPost("application/xml",

@@ -4,7 +4,6 @@ import Jama.Matrix;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ConfigUtils;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
-import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
@@ -15,13 +14,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +96,10 @@ public class GloreProcessor implements Processor
                 state.X = new Matrix(state.Xa);
                 state.Y = new Matrix(state.Ya, state.Ya.length);
 
-                state.dataLoaded = true;            
+                data.setColumns(state.columns);
+                data.setRows(state.rows);
+                
+                state.dataLoaded = true;                  
             }
         }
         
@@ -137,8 +139,15 @@ public class GloreProcessor implements Processor
                 state.SD.set(0, i, Math.sqrt(state.cov_matrix.get(i,i)));
             }
 
-             //    computer the M and STD since SD matrix is only computed when model converges, and therefore, only once
+            // compute the M and STD since SD matrix is only computed 
+            // when model converges, and therefore, only once
             calMandSTD(state);
+            data.getM().addAll(
+                Arrays.asList(ArrayUtils.toObject(state.Ma)));
+            log.info("M: " + data.getM());              
+            data.getSTD().addAll(
+                Arrays.asList(ArrayUtils.toObject(state.STDa)));
+            log.info("STD: " + data.getSTD());              
 
             log.info("SD matrix:" + GloreUtils.matrixToString(state.SD, 8, 6));            
             data.setSDMatrix(GloreUtils.convertMatrixToMatrixType(state.SD));
@@ -387,7 +396,7 @@ public class GloreProcessor implements Processor
         state.Ma = row_sums(state.Xa, state.columns, state.rows);
 
         // get the STD vector
-        state.STDa =    row_sum_squareDiff(state.Xa, state.Ma, state.columns, state.rows);
+        state.STDa = row_sum_squareDiff(state.Xa, state.Ma, state.columns, state.rows);
 
     }
     
