@@ -368,7 +368,7 @@ public class GloreProcessor implements Processor
 
     /* Return a one dimensional array that is the sum of square difference
         one dimensional vectors. */
-    private static double[] row_sum_squareDiff(double[][] E, double[] M, int m, int n) {
+    private static double[] row_squared_sum(double[][] E, double[] M, int m, int n) {
 
         int i, j;
         double sums[] = new double[m];
@@ -379,7 +379,7 @@ public class GloreProcessor implements Processor
         // Add each elements in a column to sums
         for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
-                sums[j] = sums[j]+ Math.pow((M[j] - E[i][j]),2);
+                sums[j] = sums[j]+ Math.pow( E[i][j],2);
             }
         }
         return sums;
@@ -396,7 +396,7 @@ public class GloreProcessor implements Processor
         state.Ma = row_sums(state.Xa, state.columns, state.rows);
 
         // get the STD vector
-        state.STDa = row_sum_squareDiff(state.Xa, state.Ma, state.columns, state.rows);
+        state.STDa = row_squared_sum(state.Xa, state.Ma, state.columns, state.rows);
 
     }
     

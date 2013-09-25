@@ -156,7 +156,8 @@ public class GloreAggregateProcessor implements Processor
                         gloreRequest.getGloreData().getSTD().toArray(
                             new Double[0]));
                 int tempRows = gloreRequest.getGloreData().getRows();
-                for (int i=0; i<features; i++)
+                M[0]=0; STD[0] =0;
+                for (int i=1; i<features; i++)
                 {
                     M[i] = M[i] + tempM[i];
                     STD[i] = STD[i] + tempSTD[i];
@@ -167,7 +168,7 @@ public class GloreAggregateProcessor implements Processor
             for (int i=0; i<features; i++)
             {
                 M[i] = M[i] /totalRows;
-                STD[i] = Math.sqrt(STD[i]/totalRows);
+                STD[i] = Math.sqrt(STD[i]/totalRows - Math.pow(M[i],2));
             }
 
             gloreData.setState("complete");
