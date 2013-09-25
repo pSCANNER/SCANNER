@@ -2657,6 +2657,14 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	activeStudy['analysisPolicies'] = data['analysisPolicies'];
 	activeStudy['analysisPolicies'].sort(compareAnalysisPolicies);
 	activeStudy['userStudyRoles'] = data['userStudyRoles'];
+	activeStudy['instancesDict'] = {};
+	$.each(data['instances'], function(i, instance) {
+		activeStudy['instancesDict'][instance['dataSetInstanceId']] = instance;
+	});
+	activeStudy['nodesDict'] = {};
+	$.each(data['nodes'], function(i, node) {
+		activeStudy['nodesDict'][node['nodeId']] = node;
+	});
 	$('#manageStudyH2').html('Manage Research Study ' + activeStudy['studyId'] + ': ' + activeStudy['studyName']);
 	if (activeStudy['description'] != null) {
 		$('#manageStudyH2').html($('#manageStudyH2').html() + ' - ' + activeStudy['description']);
@@ -2798,10 +2806,12 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	option.attr('value', '');
 	select.append(option);
 	$.each(datasetInstancesList, function(i, datasetInstance) {
-		option = $('<option>');
-		option.text(datasetInstance['dataSetInstanceName']);
-		option.attr('value', datasetInstance['dataSetInstanceId']);
-		select.append(option);
+		if (checkUserInstanceRoles(datasetInstance)) {
+			option = $('<option>');
+			option.text(datasetInstance['dataSetInstanceName']);
+			option.attr('value', datasetInstance['dataSetInstanceId']);
+			select.append(option);
+		}
 	});
 	option = $('<option>');
 	option.text('Add new...');
@@ -2854,7 +2864,7 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	option.attr('value', '');
 	select.append(option);
 	$.each(nodesList, function(i, node) {
-		if (!node['isMaster']) {
+		if (!node['isMaster'] && checkUserNodeRoles(node)) {
 			option = $('<option>');
 			option.text(node['site']['siteName'] + ' - ' + node['nodeName']);
 			option.attr('value', node['nodeId']);
@@ -3281,8 +3291,8 @@ function postAddSiteProtocol(data, textStatus, jqXHR, param) {
 	manageStudy(false);
 }
 
-function addProtocolRow(obj) {
-	var node = obj['dataSetInstance']['node'];
+function addProtocolRow(policy) {
+	var node = policy['dataSetInstance']['node'];
 	var site = node['site'];
 	var tbody = $('#manageSitesProtocolsTbody');
 	var tr = $('<tr>');
@@ -3290,17 +3300,17 @@ function addProtocolRow(obj) {
 	var td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var lib = librariesDict[obj['analysisTool']['toolParentLibrary']];
-	var method = lib['libraryName'] + ' - ' + obj['analysisTool']['toolName'];
+	var lib = librariesDict[policy['analysisTool']['toolParentLibrary']];
+	var method = lib['libraryName'] + ' - ' + policy['analysisTool']['toolName'];
 	td.html(method);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['dataSetInstance']['dataSetDefinition']);
+	td.html(policy['dataSetInstance']['dataSetDefinition']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['dataSetInstance']['dataSource']);
+	td.html(policy['dataSetInstance']['dataSource']);
 	td = $('<td>');
 	td.addClass('protocol_border');
 	tr.append(td);
@@ -3312,18 +3322,21 @@ function addProtocolRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['accessMode']['description']);
+	td.html(policy['accessMode']['description']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['studyRole']['roleWithinStudy']);
+	td.html(policy['studyRole']['roleWithinStudy']);
 	td = $('<td>');
 	td.addClass('protocol_valign');
 	tr.append(td);
 	var button = $('<button>');
-	button.click(function(event) {removeProtocol($(this), obj);});
+	button.click(function(event) {removeProtocol($(this), policy);});
 	button.html('Remove');
 	td.append(button);
+	if (!checkUserInstanceRoles(policy['dataSetInstance'])) {
+		button.hide();
+	}
 	$('#estimateStudyProtocolSelect').val('');
 	$('#datasetInstances').val('');
 	$('#studyInvestigatorSelect').val('');
@@ -3331,8 +3344,8 @@ function addProtocolRow(obj) {
 	$('#manageSitesProtocols').show();
 }
 
-function addProtocolViewRow(obj) {
-	var node = obj['dataSetInstance']['node'];
+function addProtocolViewRow(policy) {
+	var node = policy['dataSetInstance']['node'];
 	var site = node['site'];
 	var tbody = $('#viewSitesProtocolsTbody');
 	var tr = $('<tr>');
@@ -3340,17 +3353,17 @@ function addProtocolViewRow(obj) {
 	var td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	var lib = librariesDict[obj['analysisTool']['toolParentLibrary']];
-	var method = lib['libraryName'] + ' - ' + obj['analysisTool']['toolName'];
+	var lib = librariesDict[policy['analysisTool']['toolParentLibrary']];
+	var method = lib['libraryName'] + ' - ' + policy['analysisTool']['toolName'];
 	td.html(method);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['dataSetInstance']['dataSetDefinition']);
+	td.html(policy['dataSetInstance']['dataSetDefinition']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['dataSetInstance']['dataSource']);
+	td.html(policy['dataSetInstance']['dataSource']);
 	td = $('<td>');
 	td = $('<td>');
 	td.addClass('protocol_border');
@@ -3363,11 +3376,11 @@ function addProtocolViewRow(obj) {
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['accessMode']['description']);
+	td.html(policy['accessMode']['description']);
 	td = $('<td>');
 	tr.append(td);
 	td.addClass('protocol_border');
-	td.html(obj['studyRole']['roleWithinStudy']);
+	td.html(policy['studyRole']['roleWithinStudy']);
 	$('#viewSitesProtocols').show();
 }
 
@@ -3529,6 +3542,17 @@ function updateStaffSelectRole(studyRole) {
 }
 
 function removeProtocol(button, policy) {
+	var role = policy['studyRole']['roleWithinStudy'];
+	var node = policy['dataSetInstance']['node'];
+	var site = node['site'];
+	var lib = librariesDict[policy['analysisTool']['toolParentLibrary']];
+	var method = lib['libraryName'] + ' - ' + policy['analysisTool']['toolName'];
+	var dataset = policy['dataSetInstance']['dataSetDefinition'];
+	var accessMode = policy['accessMode']['description'];
+	var answer = confirm('Are you sure you want to remove the policy "' + method + ' on site ' + site['siteName'] + ' and node ' + node['nodeName'] + ' with data source ' + policy['dataSetInstance']['dataSource'] + ' as ' + role + ' on dataset ' + dataset + ' with ' + accessMode + ' result transfer"?');
+	if (!answer) {
+		return;
+	}
 	button.attr('disabled', 'disabled');
 	var obj = {};
 	obj['action'] = 'deleteAnalyzePolicy';
@@ -5046,5 +5070,13 @@ function checkSuperUser() {
 
 function checkUserStudyRoles() {
 	return loggedInUser['isSuperuser'] || activeStudy['userStudyRoles'].length > 0;
+}
+
+function checkUserNodeRoles(node) {
+	return loggedInUser['isSuperuser'] || activeStudy['nodesDict'][node['nodeId']] != null;
+}
+
+function checkUserInstanceRoles(instance) {
+	return loggedInUser['isSuperuser'] || activeStudy['instancesDict'][instance['dataSetInstanceId']] != null;
 }
 

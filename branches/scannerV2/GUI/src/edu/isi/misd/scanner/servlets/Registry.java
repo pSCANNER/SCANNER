@@ -167,6 +167,20 @@ public class Registry extends HttpServlet {
 				responseArray = clientResponse.getEntityResponse();
 				responseObject.put("userStudyRoles", responseArray);
 				clientResponse.release();
+				clientResponse = registryClient.getDatasetInstances(userName);
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset instances.");
+					return;
+				}
+				responseObject.put("instances", clientResponse.getEntityResponse());
+				clientResponse.release();
+				clientResponse = registryClient.getNodes(userName);
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get nodes.");
+					return;
+				}
+				responseObject.put("nodes", clientResponse.getEntityResponse());
+				clientResponse.release();
 				res = responseObject.toString();
 				if (debug) System.out.println("getStudyData responseBody: " + res);
 			} catch (JSONException e) {

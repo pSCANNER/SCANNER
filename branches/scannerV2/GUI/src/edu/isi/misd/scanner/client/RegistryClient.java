@@ -280,4 +280,6 @@ public interface RegistryClient {
 	public RegistryClientResponse deleteNode(int nodeId);
 
 	public RegistryClientResponse getStudyManagementPolicies(int studyId, String userName);
+	public RegistryClientResponse getDatasetInstances(String userName);
+	public RegistryClientResponse getNodes(String userName);
 }
