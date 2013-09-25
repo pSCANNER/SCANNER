@@ -139,6 +139,41 @@ public class GloreAggregateProcessor implements Processor
             if (log.isDebugEnabled()) {            
                 log.debug("SD Matrix: " + GloreUtils.matrixToString(SD, 8, 6));
             }
+
+            // before claiming complete, compute the M and STD from local components
+//            ArrayList<double[]> D_values = new ArrayList<double[][]>();
+
+            int totalRows = 0;
+            double[] M = new double[features]           ;
+            double[] STD = new double[features];
+
+            for (GloreLogisticRegressionRequest gloreRequest : gloreRequestList)
+            {
+                double[] tempM =
+                        GloreUtils.convertMatrixTypeToMatrix(
+                                gloreRequest.getGloreData().getM());
+                double[] tempSTD =
+                        GloreUtils.convertMatrixTypeToMatrix(
+                                gloreRequest.getGloreData().getSTD());
+                int tempRows =   GloreUtils.convertMatrixTypeToMatrix(
+                        gloreRequest.getGloreData().getRows());
+
+                for (int i=0; i<features; i++)
+                {
+                    M[i] = M[i] + tempM[i];
+                    STD[i] = STD[i] + tempSTD[i];
+                    totalRows = totalRows + tempRows;
+                }
+
+//                D_values.add(D.getArray());
+            }
+
+            for (int i=0; i<features; i++)
+            {
+                M[i] = M[i] /totalRows;
+                STD[i] = Math.sqrt(STD[i]/totalRows);
+        }
+
             gloreData.setState("complete");
 
             // prepare GLORE outputs
@@ -164,6 +199,10 @@ public class GloreAggregateProcessor implements Processor
             coefficient.setDegreeOfFreedom(1);
             coefficient.setPValue(GloreUtils.df(ztest(fBeta.get(0,0)/SD.get(0,0))));
             coefficient.setName("Intercept");
+            //add two more attributes
+            coefficient.setM(GloreUtils.df(M[0]));
+            coefficient.setSTD(GloreUtils.df(STD[0]));
+
             target.add(coefficient);
 
             //set the rest of the attributes
@@ -176,6 +215,11 @@ public class GloreAggregateProcessor implements Processor
                 coefficient.setDegreeOfFreedom(1);
                 coefficient.setPValue(GloreUtils.df(ztest(fBeta.get(i,0)/SD.get(0,i))));
                 coefficient.setName(independentVariables.get(i-1));
+
+                //add two more attributes
+                coefficient.setM(GloreUtils.df(M[i-1]));
+                coefficient.setSTD(GloreUtils.df(STD[i-1]));
+
                 target.add(coefficient);
             }
             gloreResponse.setLogisticRegressionResponse(response);
