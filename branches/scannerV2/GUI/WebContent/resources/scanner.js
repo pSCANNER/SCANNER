@@ -101,6 +101,7 @@ var sitesPoliciesDict = null;
 var sitesList = null;
 
 var activeStudy = null;
+var activeUser = null;
 var loggedInUserName = null;
 var loggedInUser = null;
 var loggedInUserRoles = null;
@@ -4127,10 +4128,6 @@ function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
 	studyRequestedSitesList.sort(compareStudyRequestedSites);
 	if (param) {
 		setContacts();
-		setUsers();
-		setSites();
-		setNodes();
-		setInstances();
 	}
 }
 
@@ -4341,6 +4338,37 @@ function showAdministration() {
 	$('.wizard_content', $('#manageInstancesDiv')).hide();
 	$('.required', $('#add_instance_entity_div')).unbind('keyup');
 	$('.required', $('#add_instance_entity_div')).keyup(function(event) {checkCreateInstanceButton();});
+
+	manageAdministration();
+}
+
+function manageAdministration() {
+	var obj = new Object();
+	obj['action'] = 'getUserAdminRoles';
+	obj['userName'] = loggedInUserName;
+	var url = HOME + '/registry';
+	scanner.RETRIEVE(url, obj, true, postManageAdministration, null, null, 0);
+}
+
+function postManageAdministration(data, textStatus, jqXHR, param) {
+	activeUser = {};
+	activeUser['sitesDict'] = {};
+	activeUser['nodesDict'] = {};
+	activeUser['instancesDict'] = {};
+	$.each(data['sitePolicies'], function(i, sitePolicy) {
+		activeUser['sitesDict'][sitePolicy['site']['siteName']] = sitePolicy['site'];
+	});
+	$.each(data['nodes'], function(i, node) {
+		activeUser['nodesDict'][node['nodeId']] = node;
+	});
+	$.each(data['instances'], function(i, instance) {
+		activeUser['instancesDict'][instance['dataSetInstanceId']] = instance;
+	});
+	
+	setUsers();
+	setSites();
+	setNodes();
+	setInstances();
 }
 
 function checkCreateUserButton() {
@@ -4470,7 +4498,7 @@ function addUser() {
 function postAddUser(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitUsers(data['users'], null, null, false);
-	setUsers();
+	manageAdministration();
 }
 
 function updateUser() {
@@ -4497,7 +4525,7 @@ function postUpdateUser(data, textStatus, jqXHR, param) {
 		$('#welcomeLink').html('Welcome ' + loggedInUserName + '!');
 	}
 	postInitUsers(data['users'], null, null, false);
-	setUsers();
+	manageAdministration();
 }
 
 function removeUser(button, user) {
@@ -4515,7 +4543,7 @@ function removeUser(button, user) {
 function postRemoveUser(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitUsers(data['users'], null, null, false);
-	setUsers();
+	manageAdministration();
 }
 
 function newSite() {
@@ -4554,6 +4582,11 @@ function setSites() {
 		addSiteEntityRow(site);
 	});
 	loadSelectNodeSites();
+	if (checkAddSite()) {
+		$('#newSiteDiv').show();
+	} else {
+		$('#newSiteDiv').hide();
+	}
 }
 
 function addSiteEntityRow(site) {
@@ -4576,12 +4609,18 @@ function addSiteEntityRow(site) {
 	button.click(function(event) {removeSite($(this), site);});
 	button.html('Remove');
 	td.append(button);
+	if (!checkEditSite(site)) {
+		button.hide();
+	}
 	td = $('<td>');
 	tr.append(td);
 	button = $('<button>');
 	button.click(function(event) {editSite($(this), site);});
 	button.html('Edit');
 	td.append(button);
+	if (!checkEditSite(site)) {
+		button.hide();
+	}
 }
 
 function editSite(button, site) {
@@ -4609,7 +4648,7 @@ function addSiteEntity() {
 function postAddSiteEntity(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitSites(data['sites'], null, null, false);
-	setSites();
+	manageAdministration();
 }
 
 function updateSite() {
@@ -4626,7 +4665,7 @@ function updateSite() {
 function postUpdateSite(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitSites(data['sites'], null, null, false);
-	setSites();
+	manageAdministration();
 }
 
 function removeSite(button, site) {
@@ -4644,7 +4683,7 @@ function removeSite(button, site) {
 function postRemoveSite(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitSites(data['sites'], null, null, false);
-	setSites();
+	manageAdministration();
 }
 
 function newNode() {
@@ -4678,10 +4717,12 @@ function loadSelectNodeSites() {
 	option.attr('value', '');
 	select.append(option);
 	$.each(sitesList, function(i, site) {
-		option = $('<option>');
-		option.text(site['siteName']);
-		option.attr('value', site['siteId']);
-		select.append(option);
+		if (checkEditSite(site)) {
+			option = $('<option>');
+			option.text(site['siteName']);
+			option.attr('value', site['siteId']);
+			select.append(option);
+		}
 	});
 	select.change(function(event) {checkCreateNodeButton();});
 }
@@ -4708,6 +4749,11 @@ function setNodes() {
 	$.each(nodesList, function(i, node) {
 		addNodeRow(node);
 	});
+	if (checkAddNode()) {
+		$('#newNodeButton').show();
+	} else {
+		$('#newNodeButton').hide();
+	}
 }
 
 function addNodeRow(node) {
@@ -4757,12 +4803,18 @@ function addNodeRow(node) {
 	button.click(function(event) {removeNode($(this), node);});
 	button.html('Remove');
 	td.append(button);
+	if (!checkEditNode(node)) {
+		button.hide();
+	}
 	td = $('<td>');
 	tr.append(td);
 	button = $('<button>');
 	button.click(function(event) {editNode($(this), node);});
 	button.html('Edit');
 	td.append(button);
+	if (!checkEditNode(node)) {
+		button.hide();
+	}
 }
 
 function editNode(button, node) {
@@ -4810,7 +4862,7 @@ function addNode() {
 function postAddNode(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitNodes(data['nodes'], null, null, false);
-	setNodes();
+	manageAdministration();
 }
 
 function updateNode() {
@@ -4838,7 +4890,7 @@ function updateNode() {
 function postUpdateNode(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitNodes(data['nodes'], null, null, false);
-	setNodes();
+	manageAdministration();
 }
 
 function removeNode(button, node) {
@@ -4856,7 +4908,7 @@ function removeNode(button, node) {
 function postRemoveNode(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitNodes(data['nodes'], null, null, false);
-	setNodes();
+	manageAdministration();
 }
 
 function newInstance() {
@@ -4888,7 +4940,7 @@ function loadSelectNodes() {
 	option.attr('value', '');
 	select.append(option);
 	$.each(nodesList, function(i, node) {
-		if (!node['isMaster']) {
+		if (!node['isMaster'] && checkEditNode(node)) {
 			option = $('<option>');
 			option.text(node['nodeName']);
 			option.attr('value', node['nodeId']);
@@ -4938,6 +4990,11 @@ function setInstances() {
 	});
 	loadSelectNodes();
 	loadSelectDataSets();
+	if (!checkAddInstance()) {
+		$('#newInstanceButton').hide();
+	} else {
+		$('#newInstanceButton').show();
+	}
 }
 
 function addInstanceRow(instance) {
@@ -4975,12 +5032,18 @@ function addInstanceRow(instance) {
 	button.click(function(event) {removeInstance($(this), instance);});
 	button.html('Remove');
 	td.append(button);
+	if (!checkEditInstance(instance)) {
+		button.hide();
+	}
 	td = $('<td>');
 	tr.append(td);
 	button = $('<button>');
 	button.click(function(event) {editInstance($(this), instance);});
 	button.html('Edit');
 	td.append(button);
+	if (!checkEditInstance(instance)) {
+		button.hide();
+	}
 }
 
 function editInstance(button, instance) {
@@ -5015,7 +5078,7 @@ function addInstanceEntity() {
 function postAddInstanceEntity(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitDatasetInstances(data['instances'], null, null, false);
-	setInstances();
+	manageAdministration();
 }
 
 function updateInstance() {
@@ -5035,7 +5098,7 @@ function updateInstance() {
 function postUpdateInstance(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitDatasetInstances(data['instances'], null, null, false);
-	setInstances();
+	manageAdministration();
 }
 
 function removeInstance(button, instance) {
@@ -5053,7 +5116,7 @@ function removeInstance(button, instance) {
 function postRemoveInstance(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitDatasetInstances(data['instances'], null, null, false);
-	setInstances();
+	manageAdministration();
 }
 
 function checkRemoveUser(user) {
@@ -5078,5 +5141,29 @@ function checkUserNodeRoles(node) {
 
 function checkUserInstanceRoles(instance) {
 	return loggedInUser['isSuperuser'] || activeStudy['instancesDict'][instance['dataSetInstanceId']] != null;
+}
+
+function checkAddSite() {
+	return loggedInUser['isSuperuser'];
+}
+
+function checkEditSite(site) {
+	return loggedInUser['isSuperuser'] || activeUser['sitesDict'][site['siteName']] != null;
+}
+
+function checkAddNode() {
+	return loggedInUser['isSuperuser'] || !$.isEmptyObject(activeUser['sitesDict']);
+}
+
+function checkEditNode(node) {
+	return loggedInUser['isSuperuser'] || activeUser['nodesDict'][node['nodeId']] != null;
+}
+
+function checkAddInstance() {
+	return loggedInUser['isSuperuser'] || !$.isEmptyObject(activeUser['nodesDict']);
+}
+
+function checkEditInstance(instance) {
+	return loggedInUser['isSuperuser'] || activeUser['instancesDict'][instance['dataSetInstanceId']] != null;
 }
 

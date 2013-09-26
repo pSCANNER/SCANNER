@@ -194,6 +194,34 @@ public class Registry extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
 				return;
 			}
+		} else if (action.equals("getUserAdminRoles")) {
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse = registryClient.getDatasetInstances(userName);
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset instances.");
+					return;
+				}
+				responseObject.put("instances", clientResponse.getEntityResponse());
+				clientResponse.release();
+				clientResponse = registryClient.getNodes(userName);
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get nodes.");
+					return;
+				}
+				responseObject.put("nodes", clientResponse.getEntityResponse());
+				clientResponse.release();
+				clientResponse = registryClient.getSitesPolicies(userName);
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site policies.");
+					return;
+				}
+				responseObject.put("sitePolicies", clientResponse.getEntityResponse());
+				clientResponse.release();
+				res = responseObject.toString();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("getAllLibraries")) {
 			clientResponse = registryClient.getAllLibraries();
 			if (clientResponse != null) {
