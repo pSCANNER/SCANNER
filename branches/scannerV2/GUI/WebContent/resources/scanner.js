@@ -1205,6 +1205,7 @@ function buildDataTable(tab) {
 	resultDiv = dict['resultDiv'];
 	tableId = dict['tableId'];
 	var columns = ['name', 'B', 'SE', 'p-value', 't-statistics', 'degreeOfFreedom', 'M', 'STD'];
+	var columnsDisplay = ['name', 'B', 'SE', 'p-value', 't-statistics', 'DOF', 'M', 'STD'];
 	//var columns = [];
 	//getColumnsNames(res, columns);
 	var datasets = [];
@@ -1242,7 +1243,7 @@ function buildDataTable(tab) {
 	for (var i=0; i < columns.length; i++) {
 		var th = $('<th>');
 		tr.append(th);
-		th.html(columns[i]);
+		th.html(columnsDisplay[i]);
 	}
 	var tbody = $('<tbody>');
 	table.append(tbody);
