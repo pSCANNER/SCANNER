@@ -365,7 +365,15 @@ Matrix values:
                 <xsd:element name="degreeOfFreedom" 
                              type="xsd:int"
                              minOccurs="0"
-                             maxOccurs="1"/>                                                                 
+                             maxOccurs="1"/>  
+                <xsd:element name="M" 
+                             type="xsd:double"
+                             minOccurs="1"
+                             maxOccurs="1"/>
+                <xsd:element name="STD" 
+                             type="xsd:double"
+                             minOccurs="1"
+                             maxOccurs="1"/>                                                                                  
             </xsd:sequence>           
         </xsd:complexType> 
     </xsd:element>       
@@ -471,7 +479,7 @@ Matrix values:
                 <xsd:element name="Output" 
                              type="tns:LogisticRegressionOutput"
                              minOccurs="1"
-                             maxOccurs="1"/>                     
+                             maxOccurs="unbounded"/>                     
             </xsd:sequence>
         </xsd:complexType> 
     </xsd:element>

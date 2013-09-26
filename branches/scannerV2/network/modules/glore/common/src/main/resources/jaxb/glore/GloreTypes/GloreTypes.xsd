@@ -14,7 +14,7 @@
     <xsd:import 
         schemaLocation="../../../../../../../../../base/common/src/main/resources/jaxb/regression/RegressionTypes/RegressionTypes.xsd" 
         namespace="http://scanner.misd.isi.edu/network/types/regression"/>
-        
+     
     <xsd:element name="GloreLogisticRegressionRequest">
         <xsd:complexType>
             <xsd:annotation>
@@ -38,39 +38,49 @@
     <xsd:element name="GloreData">
         <xsd:complexType>
             <xsd:annotation>
-               <xsd:documentation>
+                <xsd:documentation>
 
-               </xsd:documentation>
+                </xsd:documentation>
             </xsd:annotation>             
-            <xsd:sequence>  
-               
-            <xsd:element name="Beta"
-                         type="base:MatrixType"/>                 
+            <xsd:sequence>
 
-            <xsd:element name="D"
-                         type="base:MatrixType"/>   
-
-            <xsd:element name="E"
-                         type="base:MatrixType"/>                                                                          
-
-            <xsd:element name="CovarianceMatrix"
-                         type="base:MatrixType"/>  
-
-            <xsd:element name="SDMatrix"
-                         type="base:MatrixType"/>                              
-
-            <xsd:element name="iteration" 
-                         type="xsd:int"/>
-
-            <xsd:element name="state" 
-                         type="xsd:string"/>                        
+                <xsd:element name="Beta"
+                           type="base:MatrixType"/>                 
               
-            <xsd:element name="AttributeMean"
-                         type="base:MatrixType"/>
+                <xsd:element name="D"
+                             type="base:MatrixType"/>   
 
-            <xsd:element name="AttributeMedian"
-                         type="base:MatrixType"/>
-                              
+                <xsd:element name="E"
+                             type="base:MatrixType"/>                                                                          
+
+                <xsd:element name="CovarianceMatrix"
+                             type="base:MatrixType"/>  
+
+                <xsd:element name="SDMatrix"
+                             type="base:MatrixType"/>                              
+
+                <xsd:element name="M" 
+                             type="xsd:double" 
+                             minOccurs="1"
+                             maxOccurs="unbounded"/>
+                
+                <xsd:element name="STD" 
+                             type="xsd:double"
+                             minOccurs="1"
+                             maxOccurs="unbounded"/>                          
+                                                              
+                <xsd:element name="iteration" 
+                             type="xsd:int"/>
+                                         
+                <xsd:element name="columns" 
+                             type="xsd:int"/>
+
+                <xsd:element name="rows" 
+                             type="xsd:int"/>
+                                
+                <xsd:element name="state" 
+                             type="xsd:string"/>
+                                       
             </xsd:sequence>
         </xsd:complexType> 
     </xsd:element>  
@@ -92,8 +102,8 @@
                              type="base:MatrixType"/>  
 
                 <xsd:element name="SDMatrix"
-                             type="base:MatrixType"/>                              
-                                   
+                             type="base:MatrixType"/>
+
             </xsd:sequence>
         </xsd:complexType> 
     </xsd:element>    

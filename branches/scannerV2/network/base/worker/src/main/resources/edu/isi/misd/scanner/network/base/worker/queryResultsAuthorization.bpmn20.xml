@@ -36,7 +36,7 @@
           <activiti:field name="to" 
                           expression="${mailRecipients}" />
           <activiti:field name="subject" 
-                          expression="You have a new release authorization request to authorize: ${id}" />
+                          expression="You have a new document release request to authorize: ${id}" />
           <activiti:field name="html">
             <activiti:expression>
               <![CDATA[

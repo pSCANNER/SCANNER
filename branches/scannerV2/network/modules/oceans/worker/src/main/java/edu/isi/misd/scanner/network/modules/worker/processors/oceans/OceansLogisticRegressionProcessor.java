@@ -146,7 +146,7 @@ public class OceansLogisticRegressionProcessor implements Processor
             this.formatCoefficientResultsObjects(
                 lrAnalysis.getLRCoefficients(),
                 output.getCoefficient());         
-            lrResponse.setOutput(output); 
+            lrResponse.getOutput().add(output); 
             
             response.setServiceResponseMetadata(
                 MessageUtils.createServiceResponseMetadata(

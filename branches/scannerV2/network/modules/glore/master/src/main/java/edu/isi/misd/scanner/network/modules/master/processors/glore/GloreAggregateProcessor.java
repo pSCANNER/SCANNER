@@ -22,6 +22,7 @@ import edu.isi.misd.scanner.network.types.regression.LogisticRegressionOutput;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionResponse;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.commons.lang.ArrayUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +67,7 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
             
             // signal complete
             exchange.setProperty("status", "complete");           
-            return;            
-            
+            return;
         }
         
         List<GloreLogisticRegressionRequest> gloreRequestList = 
@@ -144,6 +144,37 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
             if (log.isDebugEnabled()) {            
                 log.debug("SD Matrix: " + GloreUtils.matrixToString(SD, 8, 6));
             }
+            
+            int totalRows = 0;
+            double[] M = new double[features];
+            double[] STD = new double[features];
+
+            for (GloreLogisticRegressionRequest gloreRequest : gloreRequestList)
+            {
+                double[] tempM = 
+                    ArrayUtils.toPrimitive(
+                        gloreRequest.getGloreData().getM().toArray(
+                            new Double[0]));
+                double[] tempSTD = 
+                    ArrayUtils.toPrimitive(
+                        gloreRequest.getGloreData().getSTD().toArray(
+                            new Double[0]));
+                int tempRows = gloreRequest.getGloreData().getRows();
+                M[0]=0; STD[0] =0;
+                for (int i=1; i<features; i++)
+                {
+                    M[i] = M[i] + tempM[i];
+                    STD[i] = STD[i] + tempSTD[i];
+                    totalRows = totalRows + tempRows;
+                }
+            }
+
+            for (int i=0; i<features; i++)
+            {
+                M[i] = M[i] /totalRows;
+                STD[i] = Math.sqrt(STD[i]/totalRows - Math.pow(M[i],2));
+            }
+
             gloreData.setState("complete");
 
             // prepare GLORE outputs            
@@ -151,13 +182,12 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
                 new GloreLogisticRegressionResponse();
             LogisticRegressionResponse lrResponse =
                 new LogisticRegressionResponse();
+            LogisticRegressionOutput output = new LogisticRegressionOutput();
             // need to decide how best to handle the DataSetID
             //response.setDataSetID("GLORE server");  
-            lrResponse.setInput(request.getLogisticRegressionInput());
-            lrResponse.setOutput(new LogisticRegressionOutput());
-
-            List<Coefficient> target = 
-                lrResponse.getOutput().getCoefficient();
+            lrResponse.setInput(request.getLogisticRegressionInput());            
+            lrResponse.getOutput().add(output);
+            List<Coefficient> target = output.getCoefficient();
             Matrix fBeta = 
                 GloreUtils.convertMatrixTypeToMatrix(gloreData.getBeta());
 
@@ -169,6 +199,10 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
             coefficient.setDegreeOfFreedom(1);
             coefficient.setPValue(GloreUtils.df(ztest(fBeta.get(0,0)/SD.get(0,0))));
             coefficient.setName("Intercept");
+            //add two more attributes
+            coefficient.setM(GloreUtils.df(M[0]));
+            coefficient.setSTD(GloreUtils.df(STD[0]));
+
             target.add(coefficient);
 
             //set the rest of the attributes
@@ -181,6 +215,11 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
                 coefficient.setDegreeOfFreedom(1);
                 coefficient.setPValue(GloreUtils.df(ztest(fBeta.get(i,0)/SD.get(0,i))));
                 coefficient.setName(independentVariables.get(i-1));
+
+                //add two more attributes
+                coefficient.setM(GloreUtils.df(M[i-1]));
+                coefficient.setSTD(GloreUtils.df(STD[i-1]));
+
                 target.add(coefficient);
             }         
             gloreResponse.setLogisticRegressionResponse(lrResponse);
@@ -259,7 +298,7 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
             }
 
             gloreData.setBeta(
-                GloreUtils.convertMatrixToMatrixType(beta1));             
+                GloreUtils.convertMatrixToMatrixType(beta1));
             if (log.isDebugEnabled()) {
                 log.debug("Iteration " + iter + " value: " + 
                     GloreUtils.max_abs((beta1.minus(beta0)).getArray()));
@@ -278,7 +317,7 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
                     if (log.isDebugEnabled()) {
                         log.debug("Iteration final value: " + 
                             GloreUtils.max_abs((beta1.minus(beta0)).getArray()));    
-                    }
+                    }                  
                     gloreData.setState("computeCovarianceMatrix");        
                 }                                 
             }
@@ -457,5 +496,5 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
     {
         return 2*(1-getCDF(Math.abs(v)));
     }
-
+    
 }

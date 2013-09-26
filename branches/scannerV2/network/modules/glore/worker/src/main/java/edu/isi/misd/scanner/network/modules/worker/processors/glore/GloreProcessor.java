@@ -3,7 +3,6 @@ package edu.isi.misd.scanner.network.modules.worker.processors.glore;
 import Jama.Matrix;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ConfigUtils;
-import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
 import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
@@ -19,13 +18,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +101,10 @@ public class GloreProcessor implements Processor
                     state.X = new Matrix(state.Xa);
                     state.Y = new Matrix(state.Ya, state.Ya.length);  
 
-                    state.dataLoaded = true;            
+                    data.setColumns(state.columns);
+                    data.setRows(state.rows);
+
+                    state.dataLoaded = true;                  
                 }
             }
 
@@ -145,6 +147,16 @@ public class GloreProcessor implements Processor
                     state.SD.set(0, i, Math.sqrt(state.cov_matrix.get(i,i)));
                 }
 
+                // compute the M and STD since SD matrix is only computed 
+                // when model converges, and therefore, only once
+                calMandSTD(state);
+                data.getM().addAll(
+                    Arrays.asList(ArrayUtils.toObject(state.Ma)));
+                log.info("M: " + data.getM());              
+                data.getSTD().addAll(
+                    Arrays.asList(ArrayUtils.toObject(state.STDa)));
+                log.info("STD: " + data.getSTD()); 
+                
                 log.info("SD matrix:" + GloreUtils.matrixToString(state.SD, 8, 6));            
                 data.setSDMatrix(GloreUtils.convertMatrixToMatrixType(state.SD));
                 removeState(exchange);
@@ -154,7 +166,7 @@ public class GloreProcessor implements Processor
                 responseMetadata.setRequestStateDetail(
                     "GLORE computation completed successfully at iteration: " + 
                     data.getIteration());
-            }            
+            }                       
             else 
             {
                 if (data.getBeta() != null) {
@@ -192,7 +204,7 @@ public class GloreProcessor implements Processor
                 responseMetadata.setRequestStateDetail(
                     "The GLORE computational request is in process." + 
                     "  Current state: " + data.getState() + 
-                    " " + data.getIteration());                
+                    " " + data.getIteration());                   
             }
 
             
@@ -370,6 +382,61 @@ public class GloreProcessor implements Processor
             (String)exchange.getIn().getHeader(BaseConstants.ID);
             return (GloreStateData)dataStore.remove(key);
     }
+
+
+    /* Return a one dimensional array that is the sum of the E.length
+        one dimensional vectors. */
+    private static double[] row_sums(double[][] E, int m, int n) {
+
+        int i, j;
+        double sums[] = new double[m];
+        // init sums
+        for (i = 0; i < m; i++) {
+            sums[i] = 0.0;
+        }
+        // Add each elements in a column to sums
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < m; j++) {
+                sums[j] = sums[j] + E[i][j];
+            }
+        }
+        return sums;
+    }
+
+
+    /* Return a one dimensional array that is the sum of square difference
+        one dimensional vectors. */
+    private static double[] row_squared_sum(double[][] E, double[] M, int m, int n) {
+
+        int i, j;
+        double sums[] = new double[m];
+        // init sums
+        for (i = 0; i < m; i++) {
+            sums[i] = 0.0;
+        }
+        // Add each elements in a column to sums
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < m; j++) {
+                sums[j] = sums[j]+ Math.pow( E[i][j],2);
+            }
+        }
+        return sums;
+    }
+
+
+    /**
+     * This function calculate the mean and std of attributes.
+     */
+
+    protected static void calMandSTD(GloreStateData state)
+    {
+        // get the M vector
+        state.Ma = row_sums(state.Xa, state.columns, state.rows);
+
+        // get the STD vector
+        state.STDa = row_squared_sum(state.Xa, state.Ma, state.columns, state.rows);
+
+    }
     
     /**
      * This class contains all of the runtime variables used during the GLORE
@@ -396,6 +463,12 @@ public class GloreProcessor implements Processor
         public int columns = -1;
         public int rows;
         // is the data loaded?
-        public boolean dataLoaded = false;        
+        public boolean dataLoaded = false;
+
+        // attribute mean, attribute variance
+        public double[] Ma;
+        public double[] STDa;
+
+
     }
 }
