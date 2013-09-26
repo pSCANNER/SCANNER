@@ -4458,12 +4458,22 @@ function hideAdministration() {
 
 function editUser(button, user) {
 	$('#userIdInput').val(user['userName']);
+	if (user['userName'] == 'scanner') {
+		$('#userIdInput').attr('disabled', 'disabled');
+	} else {
+		$('#userIdInput').removeAttr('disabled');
+	}
 	$('#userEmailInput').val(user['email']);
 	$('#userFirstNameInput').val(user['firstName']);
 	$('#userLastNameInput').val(user['lastName']);
 	$('#userPhoneInput').val(user['phone']);
 	if (user['isSuperuser']) {
 		$('#userSuperuserInput').attr('checked', 'checked');
+		if (user['userName'] == 'scanner') {
+			$('#userSuperuserInput').attr('disabled', 'disabled');
+		} else {
+			$('#userSuperuserInput').removeAttr('disabled');
+		}
 	} else {
 		$('#userSuperuserInput').removeAttr('checked');
 		if (!checkSuperUser()) {
@@ -5120,7 +5130,7 @@ function postRemoveInstance(data, textStatus, jqXHR, param) {
 }
 
 function checkRemoveUser(user) {
-	return loggedInUser['isSuperuser'] && loggedInUserName != user['userName'];
+	return user['userName'] != 'scanner' && loggedInUser['isSuperuser'] && loggedInUserName != user['userName'];
 }
 
 function checkEditUser(user) {
