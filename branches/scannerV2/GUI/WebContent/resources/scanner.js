@@ -4613,6 +4613,11 @@ function setSites() {
 	} else {
 		$('#newSiteDiv').hide();
 	}
+	if (checkManageSites()) {
+		$('#manageSitesParagraph').html('Manage Sites');
+	} else {
+		$('#manageSitesParagraph').html('View Sites');
+	}
 }
 
 function addSiteEntityRow(site) {
@@ -4637,6 +4642,7 @@ function addSiteEntityRow(site) {
 	td.append(button);
 	if (!checkEditSite(site)) {
 		button.hide();
+		button.addClass('hiddenButton');
 	}
 	td = $('<td>');
 	tr.append(td);
@@ -4646,6 +4652,7 @@ function addSiteEntityRow(site) {
 	td.append(button);
 	if (!checkEditSite(site)) {
 		button.hide();
+		button.addClass('hiddenButton');
 	}
 }
 
@@ -4780,6 +4787,11 @@ function setNodes() {
 	} else {
 		$('#newNodeButton').hide();
 	}
+	if (checkManageNodes()) {
+		$('#manageNodesP').html('Manage Nodes');
+	} else {
+		$('#manageNodesP').html('View Nodes');
+	}
 }
 
 function addNodeRow(node) {
@@ -4831,6 +4843,7 @@ function addNodeRow(node) {
 	td.append(button);
 	if (!checkEditNode(node)) {
 		button.hide();
+		button.addClass('hiddenButton');
 	}
 	td = $('<td>');
 	tr.append(td);
@@ -4840,6 +4853,7 @@ function addNodeRow(node) {
 	td.append(button);
 	if (!checkRemoveNode(node)) {
 		button.hide();
+		button.addClass('hiddenButton');
 	}
 }
 
@@ -5021,6 +5035,11 @@ function setInstances() {
 	} else {
 		$('#newInstanceButton').show();
 	}
+	if (checkManageDatasetInstances()) {
+		$('#manageDataSetInstancesP').html('Manage Data Set Instances');
+	} else {
+		$('#manageDataSetInstancesP').html('View Data Set Instances');
+	}
 }
 
 function addInstanceRow(instance) {
@@ -5060,6 +5079,7 @@ function addInstanceRow(instance) {
 	td.append(button);
 	if (!checkEditInstance(instance)) {
 		button.hide();
+		button.addClass('hiddenButton');
 	}
 	td = $('<td>');
 	tr.append(td);
@@ -5069,6 +5089,7 @@ function addInstanceRow(instance) {
 	td.append(button);
 	if (!checkEditInstance(instance)) {
 		button.hide();
+		button.addClass('hiddenButton');
 	}
 }
 
@@ -5199,5 +5220,17 @@ function checkAddInstance() {
 
 function checkEditInstance(instance) {
 	return loggedInUser['isSuperuser'] || activeUser['instancesDict'][instance['dataSetInstanceId']] != null;
+}
+
+function checkManageSites() {
+	return loggedInUser['isSuperuser'] || $('button', $('#manageSitesTbody')).length > $('.hiddenButton', $('#manageSitesTbody')).length;
+}
+
+function checkManageNodes() {
+	return loggedInUser['isSuperuser'] || $('button', $('#manageNodesTbody')).length > $('.hiddenButton', $('#manageNodesTbody')).length;
+}
+
+function checkManageDatasetInstances() {
+	return loggedInUser['isSuperuser'] || $('button', $('#manageInstancesTbody')).length > $('.hiddenButton', $('#manageInstancesTbody')).length;
 }
 
