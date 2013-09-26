@@ -218,6 +218,27 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("sitePolicies", clientResponse.getEntityResponse());
 				clientResponse.release();
+				clientResponse = registryClient.getAllSites();
+				JSONArray allSites = null;
+				JSONObject sitesAdmin = new JSONObject();
+				if (clientResponse != null) {
+					allSites = clientResponse.getEntityResponse();
+				} else {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
+					return;
+				}
+				clientResponse.release();
+				for (int i=0; i < allSites.length(); i++) {
+					JSONObject site = allSites.getJSONObject(i);
+					int siteId = site.getInt("siteId");
+					clientResponse = registryClient.getUserRoles(siteId, 1);
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not user role for siteId ." + siteId);
+						return;
+					}
+					sitesAdmin.put("" + siteId, clientResponse.getEntityResponse());
+				}
+				responseObject.put("sitesAdmin", sitesAdmin);
 				res = responseObject.toString();
 			} catch (JSONException e) {
 				e.printStackTrace();

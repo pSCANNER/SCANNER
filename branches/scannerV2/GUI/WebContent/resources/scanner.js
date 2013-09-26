@@ -4372,6 +4372,7 @@ function postManageAdministration(data, textStatus, jqXHR, param) {
 	activeUser['sitesDict'] = {};
 	activeUser['nodesDict'] = {};
 	activeUser['instancesDict'] = {};
+	activeUser['sitesAdminDict'] = {};
 	$.each(data['sitePolicies'], function(i, sitePolicy) {
 		activeUser['sitesDict'][sitePolicy['site']['siteName']] = sitePolicy['site'];
 	});
@@ -4381,7 +4382,9 @@ function postManageAdministration(data, textStatus, jqXHR, param) {
 	$.each(data['instances'], function(i, instance) {
 		activeUser['instancesDict'][instance['dataSetInstanceId']] = instance;
 	});
-	
+	$.each(data['sitesAdmin'], function(siteId, userRole) {
+		activeUser['sitesAdminDict'][parseInt(siteId)] = userRole;
+	});
 	setUsers();
 	setSites();
 	setNodes();
@@ -4634,6 +4637,14 @@ function addSiteEntityRow(site) {
 	tr.append(td);
 	if (site['description'] != null) {
 		td.html(site['description']);
+	}
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	var userRole = activeUser['sitesAdminDict'][site['siteId']];
+	if (userRole.length > 0) {
+		var user = scannerUsersDict[userRole[0]['user']];
+		td.html(user['firstName'] + ' ' + user['lastName']);
 	}
 	td = $('<td>');
 	tr.append(td);

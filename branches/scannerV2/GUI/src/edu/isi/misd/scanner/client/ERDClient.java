@@ -908,5 +908,14 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		}
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse getUserRoles(int siteId, int studyId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "userRoles?studyId=" + studyId + "&siteId=" + siteId;
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 	
 }
