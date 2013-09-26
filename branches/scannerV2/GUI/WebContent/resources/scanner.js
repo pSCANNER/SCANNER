@@ -3774,7 +3774,7 @@ function appendStudyContent(study) {
 	var models = [];
 	var sites = [];
 	$.each(datasetDefinitionList, function(i, dataset) {
-		if (dataset['originatingStudy']['studyId'] == study['studyId']) {
+		if (dataset['originatingStudy'] == study['studyName']) {
 			datasets.push(dataset['dataSetName']);
 		}
 	});
@@ -4159,7 +4159,7 @@ function compareSites(site1, site2) {
 }
 
 function compareStudyManagementPolicies(policy1, policy2) {
-	return compareIgnoreCase(policy1['study']['studyName'], policy2['study']['studyName']);
+	return compareIgnoreCase(policy1['study'], policy2['study']);
 }
 
 function compareStandardRoles(role1, role2) {
