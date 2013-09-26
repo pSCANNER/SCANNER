@@ -4800,8 +4800,8 @@ function addNodeRow(node) {
 	td = $('<td>');
 	tr.append(td);
 	var button = $('<button>');
-	button.click(function(event) {removeNode($(this), node);});
-	button.html('Remove');
+	button.click(function(event) {editNode($(this), node);});
+	button.html('Edit');
 	td.append(button);
 	if (!checkEditNode(node)) {
 		button.hide();
@@ -4809,10 +4809,10 @@ function addNodeRow(node) {
 	td = $('<td>');
 	tr.append(td);
 	button = $('<button>');
-	button.click(function(event) {editNode($(this), node);});
-	button.html('Edit');
+	button.click(function(event) {removeNode($(this), node);});
+	button.html('Remove');
 	td.append(button);
-	if (!checkEditNode(node)) {
+	if (!checkRemoveNode(node)) {
 		button.hide();
 	}
 }
@@ -5157,6 +5157,10 @@ function checkAddNode() {
 
 function checkEditNode(node) {
 	return loggedInUser['isSuperuser'] || activeUser['nodesDict'][node['nodeId']] != null;
+}
+
+function checkRemoveNode(node) {
+	return !node['isMaster'] && (loggedInUser['isSuperuser'] || activeUser['nodesDict'][node['nodeId']] != null);
 }
 
 function checkAddInstance() {
