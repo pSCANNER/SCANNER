@@ -1067,7 +1067,7 @@ function buildBoxPlot(tab) {
 		sitesCoeficients.push(coeficient);
 	});
 	//var allColumns = ['p-value', 't-statistics', 'B', 'SE', 'degreeOfFreedom'];
-	var allColumns = ['p-value'];
+	var allColumns = ['M', 'STD'];
 	//var allColumns = ['t-statistics'];
 	$.each(allColumns, function(i, col) {
 		resultDiv.append($('<br>'));
@@ -1201,7 +1201,7 @@ function buildDataTable(tab) {
 	res = dict['data'];
 	resultDiv = dict['resultDiv'];
 	tableId = dict['tableId'];
-	var columns = ['name', 'B', 'SE', 'p-value', 't-statistics', 'degreeOfFreedom'];
+	var columns = ['name', 'B', 'SE', 'p-value', 't-statistics', 'degreeOfFreedom', 'M', 'STD'];
 	//var columns = [];
 	//getColumnsNames(res, columns);
 	var datasets = [];
@@ -2544,7 +2544,7 @@ function drawBox(csv, column, boxDiv) {
 	var boxChart = boxDiv.get(0);
 	var margin = {top: 10, right: 50, bottom: 20, left: 50},
 	    width = 120 - margin.left - margin.right,
-	    height = 500 - margin.top - margin.bottom;
+	    height = 250 - margin.top - margin.bottom;
 
 	var min = Infinity,
 	    max = -Infinity;
