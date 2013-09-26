@@ -103,7 +103,7 @@
 					I understand and agree the <a target='_newtab2' href="http://www.hhs.gov/ocr/privacy/index.html" >Terms and Conditions</a> of using this site.
 				</div>
 				<br /><br />
-				<table><tr><td valign="top">Select study to analize:</td><td> <select id="selectStudies"></select></td></tr>
+				<table id="selectStudyToAnalizeTable"><tr><td valign="top">Select study to analize:</td><td> <select id="selectStudies"></select></td></tr>
 				</table>
 				<br/><br />
 				<div><input type="button" id="continueButton" value="Continue" onclick="analyzeStudy();" disabled="disabled" ></div>
@@ -164,7 +164,7 @@
 								<div id="manageStudiesDiv" class="wizard_layer">
 									<h2 id="manageStudyH2">Manage Research Study</h2>
 									<div id="updateStudyDiv">
-										<p class="wizard_heading">Enter Basic Information</p>
+										<p class="wizard_heading">Basic Information</p>
 										<div class="wizard_content">
 											<table>
 												<tr>
@@ -216,7 +216,7 @@
 												</tr>
 											</table>
 										</div>
-										<p class="wizard_heading">Manage Study Sites</p>
+										<p id="manageStudyRequestedSitesP" class="wizard_heading">Manage Study Requested Sites</p>
 										<div class="wizard_content">
 											<table class="manageStudyRolesTable">
 												<tbody id="manageStudySitesTbody"></tbody>
@@ -239,7 +239,7 @@
 												</tr>
 											</table>
 										</div>
-										<p class="wizard_heading">Manage Study Staff</p>
+										<p id="manageStudyStaffP" class="wizard_heading">Manage Study Staff</p>
 										<div class="wizard_content">
 											<table class="manageStudyStaffTable">
 												<tbody id="manageStudyStaffTbody"></tbody>
@@ -271,7 +271,7 @@
 												</tr>
 											</table>
 										</div>
-										<p class="wizard_heading">Manage Study Protocols</p>
+										<p id="manageStudyProtocolsP" class="wizard_heading">Manage Study Protocols</p>
 										<div class="wizard_content">
 											<table id="manageStudyProtocols" class="manageStudyProtocols">
 												<thead>
@@ -320,7 +320,7 @@
 												</table>
 											</div>
 										</div>
-										<p class="wizard_heading">Manage Sites Protocols</p>
+										<p id="manageSitesProtocolsP" class="wizard_heading">Manage Sites Protocols</p>
 										<div class="wizard_content">
 											<table id="manageSitesProtocols" class="manageStudyProtocols">
 												<thead>
@@ -400,7 +400,7 @@
 												</table>
 											</div>
 										</div>
-										<p class="wizard_heading">View Sites Protocols</p>
+										<p id="viewSitesProtocolsP" class="wizard_heading">View Sites Protocols</p>
 										<div class="wizard_content">
 											<table id="viewSitesProtocols" class="manageStudyProtocols">
 												<thead>

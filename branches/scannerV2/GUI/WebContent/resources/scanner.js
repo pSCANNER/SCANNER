@@ -489,6 +489,9 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 	});
 	if (names.length == 0 && loggedInUser['isSuperuser']) {
 		names.push(emptyValue);
+		$('#selectStudyToAnalizeTable').hide();
+	} else {
+		$('#selectStudyToAnalizeTable').show();
 	}
 	if (names.length > 0) {
 		names.sort(compareIgnoreCase);
@@ -2898,6 +2901,9 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 		$('#addStudyRequestedSitesTable').hide();
 		$('#addStaffWrapperTable').hide();
 		$('#add_study_protocol_div').hide();
+		$('#manageStudyRequestedSitesP').html('View Study Requested Sites');
+		$('#manageStudyStaffP').html('View Study Staff');
+		$('#manageStudyProtocolsP').html('View Study Protocols');
 	} else {
 		$('input', $('#studyUpdateTable')).removeAttr('disabled');
 		$('select', $('#studyUpdateTable')).removeAttr('disabled');
@@ -2905,6 +2911,16 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 		$('#addStudyRequestedSitesTable').show();
 		$('#addStaffWrapperTable').show();
 		$('#add_study_protocol_div').show();
+		$('#manageStudyRequestedSitesP').html('Manage Study Requested Sites');
+		$('#manageStudyStaffP').html('Manage Study Staff');
+		$('#manageStudyProtocolsP').html('Manage Study Protocols');
+	}
+	if (!checkUserSiteRoles()) {
+		$('#manageSitesProtocolsP').hide();
+		$('#viewSitesProtocolsP').show();
+	} else {
+		$('#manageSitesProtocolsP').show();
+		$('#viewSitesProtocolsP').hide();
 	}
 }
 
@@ -5143,6 +5159,10 @@ function checkSuperUser() {
 
 function checkUserStudyRoles() {
 	return loggedInUser['isSuperuser'] || activeStudy['userStudyRoles'].length > 0;
+}
+
+function checkUserSiteRoles() {
+	return loggedInUser['isSuperuser'] || $('option', $('#datasetInstances')).length > 2 || $('option', $('#nodeNames')).length > 1;
 }
 
 function checkUserNodeRoles(node) {
