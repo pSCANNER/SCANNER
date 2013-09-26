@@ -43,6 +43,7 @@ public class StudyRoleController extends BaseController
     public static final String BASE_PATH = "/studyRoles";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;     
     public static final String REQUEST_PARAM_STUDY_ID = "studyId";
+    public static final String REQUEST_PARAM_SITE_ID = "siteId";
     public static final String REQUEST_PARAM_USER_NAME = "userName";    
     
     @Autowired
@@ -62,9 +63,13 @@ public class StudyRoleController extends BaseController
     {
         Map<String,String> params = 
             validateParameterMap(
-                paramMap, REQUEST_PARAM_STUDY_ID, REQUEST_PARAM_USER_NAME);  
+                paramMap,
+                REQUEST_PARAM_STUDY_ID,
+                REQUEST_PARAM_SITE_ID,
+                REQUEST_PARAM_USER_NAME);  
         
         String studyId = params.get(REQUEST_PARAM_STUDY_ID);
+        String siteId = params.get(REQUEST_PARAM_SITE_ID);
         String userName = params.get(REQUEST_PARAM_USER_NAME);           
         if ((studyId != null) && (userName != null)) 
         {
@@ -77,6 +82,11 @@ public class StudyRoleController extends BaseController
                 studyRoleRepository.findByStudyStudyId(
                     validateIntegerParameter(
                         REQUEST_PARAM_STUDY_ID, studyId));
+        } else if (siteId != null) {
+            return
+                studyRoleRepository.findByStudyStudyRequestedSitesSiteSiteId(
+                    validateIntegerParameter(
+                        REQUEST_PARAM_SITE_ID, siteId));
         } else if (userName != null) {
             return 
                 studyRoleRepository.findByScannerUsersUserName(userName);

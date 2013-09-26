@@ -15,4 +15,5 @@ public interface StudyRoleRepository
    List<StudyRole> findByScannerUsersUserName(String userName); 
    List<StudyRole> findByStudyStudyIdAndScannerUsersUserName(
        Integer studyId, String userName);   
+   List<StudyRole> findByStudyStudyRequestedSitesSiteSiteId(Integer siteId);
 }

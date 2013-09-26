@@ -114,11 +114,21 @@ public class UserRoleController extends BaseController
                 return 
                     userRoleRepository.findByUserUserName(userName);                
             }
-        } else if (studyId != null) {         
-            return
-                userRoleRepository.findByStudyRoleStudyStudyId(
-                    validateIntegerParameter(
-                        REQUEST_PARAM_STUDY_ID, studyId));
+        } else if (studyId != null) {
+            if (siteId != null) {
+                return
+                    userRoleRepository.
+                        findByStudyRoleStudyStudyIdAndStudyRoleSitePoliciesSiteSiteId(
+                            validateIntegerParameter(
+                                REQUEST_PARAM_STUDY_ID, studyId),
+                            validateIntegerParameter(
+                                REQUEST_PARAM_SITE_ID, siteId));                
+            } else {
+                return
+                    userRoleRepository.findByStudyRoleStudyStudyId(
+                        validateIntegerParameter(
+                            REQUEST_PARAM_STUDY_ID, studyId));
+            }
         } else if (siteId != null || 
                    nodeId != null || 
                    dataSetInstanceId != null) {

@@ -13,11 +13,13 @@ public interface UserRoleRepository
 {
    List<UserRole> findByUserUserName(String userName);  
    List<UserRole> findByStudyRoleRoleId(Integer roleId);
-   List<UserRole> findByStudyRoleStudyStudyId(Integer studyId);       
+   List<UserRole> findByStudyRoleStudyStudyId(Integer studyId);        
    List<UserRole> findByUserUserNameAndStudyRoleStudyStudyId(
        String userName, Integer studyId); 
    List<UserRole> findByUserUserNameAndStudyRoleSitePoliciesSiteSiteId(
        String userName, Integer siteId);    
+   List<UserRole> findByStudyRoleStudyStudyIdAndStudyRoleSitePoliciesSiteSiteId(
+       Integer studyId, Integer siteId);    
    List<UserRole> findByUserUserNameAndStudyRoleSitePoliciesSiteNodesNodeId(
        String userName, Integer nodeId); 
    List<UserRole> findByUserUserNameAndStudyRoleSitePoliciesSiteNodesDataSetInstancesDataSetInstanceId(
