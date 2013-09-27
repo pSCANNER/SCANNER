@@ -11,10 +11,9 @@
   
 	<properties>
 		<spring.version>3.1.4.RELEASE</spring.version>
-		<spring.data.jpa.version>1.4.0.M1</spring.data.jpa.version>            
-		<jpa.version>2.0.0</jpa.version>
+		<spring.data.jpa.version>1.4.1.RELEASE</spring.data.jpa.version>            
 		<hibernate.version>4.2.2.Final</hibernate.version>        
-        <jackson.version>2.2.0</jackson.version>
+        <jackson.version>2.2.3</jackson.version>
 		<junit.version>4.11</junit.version>
 		<slf4j.version>1.7.5</slf4j.version>        
 		<aspectj.version>1.6.12</aspectj.version>
@@ -115,13 +114,6 @@
 			<artifactId>spring-data-jpa</artifactId>
 			<version>${spring.data.jpa.version}</version>
 		</dependency> 
-
-		<dependency>
-			<groupId>cglib</groupId>
-			<artifactId>cglib</artifactId>
-			<version>2.2.2</version>
-			<scope>runtime</scope>
-		</dependency>
         
         <!-- testing -->
 		<dependency>
@@ -200,12 +192,6 @@
 			<version>${jodatime.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>${aspectj.version}</version>
-		</dependency>
-        
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>

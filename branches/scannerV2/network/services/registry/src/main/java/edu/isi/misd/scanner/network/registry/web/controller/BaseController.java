@@ -113,8 +113,8 @@ public class BaseController
                 RegistryServiceConstants.MSG_NULL_VARIABLE, variableName);
     }
     
-    public static Map validateParameterMap(Map<String,String> paramMap,
-                                           String ... paramNames)
+    public static Map<String,String> validateParameterMap(
+        Map<String,String> paramMap, String ... paramNames)
         throws BadRequestException
     {
         HashMap<String,String> validParams = new HashMap<String,String>();        
