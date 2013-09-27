@@ -973,6 +973,58 @@ Enrollment Table Format Page</b></p>
 									</div>
 								 </div>
 								</div>
+								<div id="manageSitesAdminRolesDiv">
+								 <p id="manageSitesAdminRolesP" class="wizard_heading">Manage Site Administration Roles</p>
+								 <div class="wizard_content">
+									<table id="manageSitesAdminRolesTable" class="manageStudyProtocols">
+										<thead>
+											<tr>
+												<th class="protocol_border">Site</th>
+												<th class="protocol_border">Study</th>
+												<th class="protocol_border">Role within Study</th>
+												<th></th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="manageSitesAdminRolesTbody"></tbody>
+									</table>
+									<br/>
+									<div id="newSitePolicyDiv">
+										<button id="newSitePolicyButton" onclick="newSitePolicy();">New Protocol</button>
+									</div>
+									<div id="add_site_policy_div">
+										<table>
+											<tr>
+												<td>
+													<table>
+														<tr>
+															<td>
+																<table class="add_protocol">
+																	<tbody id="addSitePolicyTable">
+																		<tr>
+																			<td class="tag">Site:</td>
+																			<td><select id="selectSitePolicy"></select></td>
+																			<td class="tag">Study Role:</td>
+																			<td><select id="selectStudyRole"></select></td>
+																		</tr>
+																	</tbody>
+																</table>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+											<tr>
+												<td class="tag">
+													<input type="hidden" value="" name="sitePolicyIdHidden" id="sitePolicyIdHidden">
+													<input type="button" value="Cancel" onclick="cancelPolicySite()">
+													<input id="addSitePolicyButton" type="button" value="Add protocol" onclick="addSitePolicy()">
+												</td>
+											</tr>
+										</table>
+									</div>
+								 </div>
+								</div>
 								<div id="manageNodesDiv">
 								 <p id="manageNodesP" class="wizard_heading">Manage Nodes</p>
 								 <div class="wizard_content">

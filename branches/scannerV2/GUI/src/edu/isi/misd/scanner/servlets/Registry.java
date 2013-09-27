@@ -265,6 +265,7 @@ public class Registry extends HttpServlet {
 				clientResponse = registryClient.getAllSites();
 				JSONArray allSites = null;
 				JSONObject sitesAdmin = new JSONObject();
+				JSONObject studyRoles = new JSONObject();
 				if (clientResponse != null) {
 					allSites = clientResponse.getEntityResponse();
 				} else {
@@ -285,8 +286,20 @@ public class Registry extends HttpServlet {
 						return;
 					}
 					sitesAdmin.put("" + siteId, clientResponse.getEntityResponse());
+					
+					clientResponse = registryClient.getSiteStudyRoles(siteId);
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not study roles for siteId ." + siteId);
+						return;
+					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+						System.out.println("Result:\n" + clientResponse.getEntity());
+						response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+						return;
+					}
+					studyRoles.put("" + siteId, clientResponse.getEntityResponse());
 				}
 				responseObject.put("sitesAdmin", sitesAdmin);
+				responseObject.put("studyRoles", studyRoles);
 				res = responseObject.toString();
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -448,6 +461,7 @@ public class Registry extends HttpServlet {
 		String hostUrl = request.getParameter("hostUrl");
 		String hostPort = request.getParameter("hostPort");
 		String isMaster = request.getParameter("isMaster");
+		String sitePolicyId = request.getParameter("sitePolicyId");
 		
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
@@ -735,6 +749,36 @@ public class Registry extends HttpServlet {
 				responseObject.put("nodes", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("createNode responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("createSiteAdministrationRole")) {
+			clientResponse = registryClient.createSiteAdministrationRole(Integer.parseInt(siteId), Integer.parseInt(roleId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create site administration role.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("createSiteAdministrationRole:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("sitePolicy", clientResponse.getEntity());
+				clientResponse.release();
+				clientResponse = registryClient.getAllSitesPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site policies.");
+					return;
+				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + clientResponse.getEntity());
+					response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+					return;
+				}
+				responseObject.put("sitePolicies", clientResponse.getEntityResponse());
+				clientResponse.release();
+				responseBody = responseObject.toString();
+				if (debug) System.out.println("createSiteAdministrationRole responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -1115,6 +1159,35 @@ public class Registry extends HttpServlet {
 				responseObject.put("instances", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("deleteInstance responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("deleteSiteAdministrationRole")) {
+			clientResponse = registryClient.deleteSiteAdministrationRole(Integer.parseInt(sitePolicyId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete instance.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				clientResponse.release();
+				clientResponse = registryClient.getAllSitesPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site policies.");
+					return;
+				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + clientResponse.getEntity());
+					response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+					return;
+				}
+				responseObject.put("sitePolicies", clientResponse.getEntityResponse());
+				clientResponse.release();
+				responseBody = responseObject.toString();
+				if (debug) System.out.println("deleteSiteAdministrationRole responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

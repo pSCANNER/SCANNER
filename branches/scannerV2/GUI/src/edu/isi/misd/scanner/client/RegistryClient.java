@@ -250,6 +250,7 @@ public interface RegistryClient {
 	public RegistryClientResponse getStudyPolicies();
 	public RegistryClientResponse getStudyRoles();
 	public RegistryClientResponse getStudyRoles(int studyId);
+	public RegistryClientResponse getSiteStudyRoles(int siteId);
 	
 	public RegistryClientResponse createStudyRequestedSites(Integer studyId, Integer siteId);
 	public RegistryClientResponse deleteStudyRequestedSites(Integer studyRequestedSiteId);
@@ -279,6 +280,9 @@ public interface RegistryClient {
 	public RegistryClientResponse createNode(String nodeName, String hostUrl, int hostPort, String basePath, String description, boolean isMaster, int siteId);
 	public RegistryClientResponse updateNode(int nodeId, String nodeName, String hostUrl, int hostPort, String basePath, String description, boolean isMaster, int siteId);
 	public RegistryClientResponse deleteNode(int nodeId);
+
+	public RegistryClientResponse createSiteAdministrationRole(int siteId, int roleId);
+	public RegistryClientResponse deleteSiteAdministrationRole(int sitePolicyId);
 
 	public RegistryClientResponse getStudyManagementPolicies(int studyId, String userName);
 	public RegistryClientResponse getDatasetInstances(String userName);

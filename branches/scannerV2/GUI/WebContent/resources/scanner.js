@@ -79,6 +79,8 @@ var userRolesList = null;
 var studyPoliciesList = null;
 var studyPoliciesDict = null;
 
+var studyRolesList = null;
+
 var accessModeList = null;
 
 var lastActiveStudy = null;
@@ -4132,6 +4134,21 @@ function postInitSites(data, textStatus, jqXHR, param) {
 	sitesList = data;
 	sitesList.sort(compareSites);
 	if (param) {
+		initStudyRoles(param);
+	}
+}
+
+function initStudyRoles(all) {
+	var url = HOME + '/query';
+	var obj = new Object();
+	obj['action'] = 'getStudyRoles';
+	scanner.RETRIEVE(url, obj, true, postInitStudyRoles, all, null, 0);
+}
+
+function postInitStudyRoles(data, textStatus, jqXHR, param) {
+	studyRolesList = data;
+	studyRolesList.sort(compareStudyRoles);
+	if (param) {
 		initStudyRequestedSites(param);
 	}
 }
@@ -4168,13 +4185,13 @@ function compareStudyRequestedSites(studyRequestedSite1, studyRequestedSite2) {
 }
 
 function compareSitesPolicies(sitePolicy1, sitePolicy2) {
-	var studyRole1 = sitePolicy1['studyRole'];
-	var studyRole2 = sitePolicy2['studyRole'];
-	var ret = compareIgnoreCase(studyRole1['study'], studyRole2['study']);
+	var site1 = sitePolicy1['site'];
+	var site2 = sitePolicy2['site'];
+	ret = compareIgnoreCase(site1['siteName'], site2['siteName']);
 	if (ret == 0) {
-		var site1 = sitePolicy1['site'];
-		var site2 = sitePolicy2['site'];
-		ret = compareIgnoreCase(site1['siteName'], site2['siteName']);
+		var studyRole1 = sitePolicy1['studyRole'];
+		var studyRole2 = sitePolicy2['studyRole'];
+		var ret = compareIgnoreCase(studyRole1['study'], studyRole2['study']);
 		if (ret == 0) {
 			ret = compareIgnoreCase(studyRole1['roleWithinStudy'], studyRole2['roleWithinStudy']);
 		}
@@ -4352,6 +4369,12 @@ function showAdministration() {
 	$('.required', $('#add_site_div')).unbind('keyup');
 	$('.required', $('#add_site_div')).keyup(function(event) {checkCreateSiteButton();});
 	
+	$('.wizard_heading', $('#manageSitesAdminRolesDiv')).unbind('click');
+	$('.wizard_heading', $('#manageSitesAdminRolesDiv')).click(function() {
+		$(this).next(".wizard_content").toggle();
+	});
+	$('.wizard_content', $('#manageSitesAdminRolesDiv')).hide();
+
 	$('.wizard_heading', $('#manageNodesDiv')).unbind('click');
 	$('.wizard_heading', $('#manageNodesDiv')).click(function() {
 		$(this).next(".wizard_content").toggle();
@@ -4385,6 +4408,7 @@ function postManageAdministration(data, textStatus, jqXHR, param) {
 	activeUser['nodesDict'] = {};
 	activeUser['instancesDict'] = {};
 	activeUser['sitesAdminDict'] = {};
+	activeUser['studyRolesDict'] = {};
 	$.each(data['sitePolicies'], function(i, sitePolicy) {
 		activeUser['sitesDict'][sitePolicy['site']['siteName']] = sitePolicy['site'];
 	});
@@ -4397,8 +4421,12 @@ function postManageAdministration(data, textStatus, jqXHR, param) {
 	$.each(data['sitesAdmin'], function(siteId, userRole) {
 		activeUser['sitesAdminDict'][parseInt(siteId)] = userRole;
 	});
+	$.each(data['studyRoles'], function(siteId, studyRole) {
+		activeUser['studyRolesDict'][parseInt(siteId)] = studyRole;
+	});
 	setUsers();
 	setSites();
+	setSitePolicies();
 	setNodes();
 	setInstances();
 }
@@ -5252,12 +5280,20 @@ function checkAddSite() {
 	return loggedInUser['isSuperuser'];
 }
 
+function checkAddSitePolicy() {
+	return loggedInUser['isSuperuser'] || !$.isEmptyObject(activeUser['sitesDict']);
+}
+
 function checkEditSite(site) {
 	return loggedInUser['isSuperuser'] || activeUser['sitesDict'][site['siteName']] != null;
 }
 
 function checkRemoveSite(site) {
 	return loggedInUser['isSuperuser'];
+}
+
+function checkRemovePolicySite(site) {
+	return loggedInUser['isSuperuser'] || activeUser['sitesDict'][site['siteName']] != null;
 }
 
 function checkAddNode() {
@@ -5284,11 +5320,166 @@ function checkManageSites() {
 	return loggedInUser['isSuperuser'] || $('button', $('#manageSitesTbody')).length > $('.hiddenButton', $('#manageSitesTbody')).length;
 }
 
+function checkManageSitePolicies() {
+	return loggedInUser['isSuperuser'] || $('button', $('#manageSitesAdminRolesTbody')).length > $('.hiddenButton', $('#manageSitesAdminRolesTbody')).length;
+}
+
 function checkManageNodes() {
 	return loggedInUser['isSuperuser'] || $('button', $('#manageNodesTbody')).length > $('.hiddenButton', $('#manageNodesTbody')).length;
 }
 
 function checkManageDatasetInstances() {
 	return loggedInUser['isSuperuser'] || $('button', $('#manageInstancesTbody')).length > $('.hiddenButton', $('#manageInstancesTbody')).length;
+}
+
+function newSitePolicy() {
+	$('#selectSitePolicy').val('');
+	$('#selectStudyRole').val('');
+	$('#add_site_policy_div').show();
+	$('#newSitePolicyButton').hide();
+	$('#addSitePolicyButton').show();
+	$('#addSitePolicyButton').attr('disabled', 'disabled');
+	$('#manageSitesAdminRolesTable').hide();
+}
+
+function cancelPolicySite() {
+	$('#add_site_policy_div').hide();
+	$('#newSitePolicyButton').show();
+	$('#manageSitesAdminRolesTable').show();
+}
+
+function loadSelectSites() {
+	var select = $('#selectSitePolicy');
+	select.unbind();
+	select.html('');
+	var option = $('<option>');
+	option.text('Select site...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(sitesList, function(i, site) {
+		if (checkEditSite(site)) {
+			option = $('<option>');
+			option.text(site['siteName']);
+			option.attr('value', site['siteId']);
+			select.append(option);
+		}
+	});
+	select.change(function(event) {loadSelectStudyRoles();});
+	loadSelectStudyRoles();
+}
+
+function loadSelectStudyRoles() {
+	var select = $('#selectStudyRole');
+	select.unbind();
+	select.html('');
+	var option = $('<option>');
+	option.text('Select study role...');
+	option.attr('value', '');
+	select.append(option);
+	if ($('#selectSitePolicy').val() != '') {
+		var siteId = $('#selectSitePolicy').val();
+		$.each(activeUser['studyRolesDict'][siteId], function(i, studyRole) {
+			option = $('<option>');
+			option.text(studyRole['study'] + ' ' + studyRole['roleWithinStudy']);
+			option.attr('value', studyRole['roleId']);
+			select.append(option);
+		});
+		select.change(function(event) {checkCreateSitePolicyButton();});
+	}
+	checkCreateSitePolicyButton();
+}
+
+function checkCreateSitePolicyButton() {
+	if ($('#selectSitePolicy').val() != '' && $('#selectStudyRole').val() != '') {
+		$('#addSitePolicyButton').removeAttr('disabled');
+	} else {
+		$('#addSitePolicyButton').attr('disabled', 'disabled');
+	}
+}
+
+function setSitePolicies() {
+	$('#manageSitesAdminRolesTable').show();
+	$('#newSitePolicyButton').show();
+	$('#add_site_policy_div').hide();
+	$('#manageSitesAdminRolesTbody').html('');
+	$.each(sitesPoliciesList, function(i, sitePolicy) {
+		addSitePolicyRow(sitePolicy);
+	});
+	loadSelectSites();
+	if (checkAddSitePolicy()) {
+		$('#newSitePolicyDiv').show();
+	} else {
+		$('#newSitePolicyDiv').hide();
+	}
+	if (checkManageSitePolicies()) {
+		$('#manageSitesAdminRolesP').html('Manage Site Administration Roles');
+	} else {
+		$('#manageSitesAdminRolesP').html('View Site Administration Roles');
+	}
+}
+
+function addSitePolicyRow(sitePolicy) {
+	var tbody = $('#manageSitesAdminRolesTbody');
+	var tr = $('<tr>');
+	tbody.append(tr);
+	var td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(sitePolicy['site']['siteName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(sitePolicy['studyRole']['study']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(sitePolicy['studyRole']['roleWithinStudy']);
+	td = $('<td>');
+	tr.append(td);
+	var button = $('<button>');
+	button.click(function(event) {removeSitePolicy($(this), sitePolicy);});
+	button.html('Remove');
+	td.append(button);
+	if (!checkRemovePolicySite(sitePolicy['site'])) {
+		button.hide();
+		button.addClass('hiddenButton');
+	}
+}
+
+function addSitePolicy() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'createSiteAdministrationRole';
+	obj['userName'] = loggedInUserName;
+	obj['siteId'] = $('#selectSitePolicy').val();
+	obj['roleId'] = $('#selectStudyRole').val();
+	$('#addSitePolicyButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postAddSitePolicy, null, null, 0);
+}
+
+function postAddSitePolicy(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitSitesPolicies(data['sitePolicies'], null, null, false);
+	manageAdministration();
+}
+
+function removeSitePolicy(button, sitePolicy) {
+	var answer = confirm('Are you sure you want to remove the policy for "site ' + sitePolicy['site']['siteName'] + ' and study ' + 
+			sitePolicy['studyRole']['study'] + ' with role within study ' + sitePolicy['studyRole']['roleWithinStudy'] + '"?');
+	if (!answer) {
+		return;
+	}
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'deleteSiteAdministrationRole';
+	obj['userName'] = loggedInUserName;
+	obj['sitePolicyId'] = sitePolicy['sitePolicyId'];
+	scanner.POST(url, obj, true, postRemoveSitePolicy, null, null, 0);
+}
+
+function postRemoveSitePolicy(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitSitesPolicies(data['sitePolicies'], null, null, false);
+	manageAdministration();
 }
 

@@ -923,4 +923,44 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		return ret;
 	}
 	
+	@Override
+	public RegistryClientResponse getSiteStudyRoles(int siteId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "studyRoles?siteId=" + siteId;
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse createSiteAdministrationRole(int siteId,
+			int roleId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "sitePolicies";
+		try {
+			JSONObject body = new JSONObject();
+			JSONObject site = new JSONObject();
+			site.put("siteId", siteId);
+			body.put("site", site);
+			JSONObject studyRole = new JSONObject();
+			studyRole.put("roleId", roleId);
+			body.put("studyRole", studyRole);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteSiteAdministrationRole(int sitePolicyId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "sitePolicies/" + sitePolicyId;
+		System.out.println("DELETE: " + url);
+		ClientURLResponse rsp = delete(url, null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 }
