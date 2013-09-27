@@ -272,8 +272,8 @@ public interface RegistryClient {
 	public RegistryClientResponse updateUser(int userId, String userName, String email, String firstName, String lastName, String phone, boolean isSuperuser);
 	public RegistryClientResponse deleteUser(int userId);
 	
-	public RegistryClientResponse createSite(String siteName, String description);
-	public RegistryClientResponse updateSite(int siteId, String siteName, String description);
+	public RegistryClientResponse createSite(String siteName, String description, String userName);
+	public RegistryClientResponse updateSite(int siteId, String siteName, String description, String userName);
 	public RegistryClientResponse deleteSite(int siteId);
 	
 	public RegistryClientResponse createNode(String nodeName, String hostUrl, int hostPort, String basePath, String description, boolean isMaster, int siteId);

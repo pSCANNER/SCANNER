@@ -237,6 +237,8 @@ function getSelectedStudyName() {
 	var ret = studiesMultiSelect.get('value')[0];
 	if (activeStudy != null) {
 		ret = activeStudy['studyName'];
+	} else if (ret == null) {
+		ret = emptyValue;
 	}
 	return ret;
 }
@@ -1789,6 +1791,11 @@ function analyzeStudy() {
 	$('#welcomeLink').html('Welcome ' + loggedInUserName + '!');
 	$('#welcomeLink').show();
 	$('#studyName').html('Study: ' + getSelectedStudyName());
+	if (getSelectedStudyName() == emptyValue) {
+		$('#studyName').hide();
+	} else {
+		$('#studyName').show();
+	}
 	var description = availableStudies[getSelectedStudyName()];
 	$('#studyName').hover(
 			function(event) {DisplayTipBox(event, description);}, 
@@ -3627,6 +3634,11 @@ function showAvailableStudies() {
 	$('#statusQueryWrapperDiv').css('display', 'none');
 	$('#queryDiv').css('display', 'none');
 	$('#studyName').html('Study: ' + getSelectedStudyName());
+	if (getSelectedStudyName() == emptyValue) {
+		$('#studyName').hide();
+	} else {
+		$('#studyName').show();
+	}
 	renderAvailableDatasets();
 }
 
@@ -4416,6 +4428,7 @@ function setUsers() {
 	$.each(scannerUsersList, function(i, user) {
 		addUserRow(user);
 	});
+	loadSelectSitesAdministrator();
 }
 
 function addUserRow(user) {
@@ -4579,6 +4592,8 @@ function postRemoveUser(data, textStatus, jqXHR, param) {
 function newSite() {
 	$('#siteNameInput').val('');
 	$('#siteDescriptionInput').val('');
+	$('#selectSiteAdministrator').val('');
+	$('#selectSiteAdministrator').removeAttr('disabled');
 	$('#add_site_div').show();
 	$('#newSiteButton').hide();
 	$('#updateSiteButton').hide();
@@ -4594,7 +4609,7 @@ function cancelSite() {
 }
 
 function checkCreateSiteButton() {
-	if ($('#siteNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0) {
+	if ($('#siteNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 && $('#selectSiteAdministrator').val() != '') {
 		$('#addSiteEntityButton').removeAttr('disabled');
 		$('#updateSiteButton').removeAttr('disabled');
 	} else {
@@ -4649,8 +4664,8 @@ function addSiteEntityRow(site) {
 	td = $('<td>');
 	tr.append(td);
 	var button = $('<button>');
-	button.click(function(event) {removeSite($(this), site);});
-	button.html('Remove');
+	button.click(function(event) {editSite($(this), site);});
+	button.html('Edit');
 	td.append(button);
 	if (!checkEditSite(site)) {
 		button.hide();
@@ -4659,10 +4674,10 @@ function addSiteEntityRow(site) {
 	td = $('<td>');
 	tr.append(td);
 	button = $('<button>');
-	button.click(function(event) {editSite($(this), site);});
-	button.html('Edit');
+	button.click(function(event) {removeSite($(this), site);});
+	button.html('Remove');
 	td.append(button);
-	if (!checkEditSite(site)) {
+	if (!checkRemoveSite(site)) {
 		button.hide();
 		button.addClass('hiddenButton');
 	}
@@ -4672,6 +4687,14 @@ function editSite(button, site) {
 	$('#siteNameInput').val(site['siteName']);
 	$('#siteDescriptionInput').val(site['description']);
 	$('#siteIdHidden').val(site['siteId']);
+	var userRole = activeUser['sitesAdminDict'][site['siteId']];
+	if (userRole.length > 0) {
+		var user = scannerUsersDict[userRole[0]['user']];
+		$('#selectSiteAdministrator').val(user['userName']);
+	} else {
+		$('#selectSiteAdministrator').val('');
+	}
+	$('#selectSiteAdministrator').attr('disabled', 'disabled');
 	$('#updateSiteButton').removeAttr('disabled');
 	$('#manageSitesTable').hide();
 	$('#updateSiteButton').show();
@@ -4684,6 +4707,7 @@ function addSiteEntity() {
 	var obj = {};
 	var url = HOME + '/registry';
 	obj['action'] = 'createSite';
+	obj['userName'] = $('#selectSiteAdministrator').val();
 	obj['siteName'] = $('#siteNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['description'] = $('#siteDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	$('#addSiteEntityButton').attr('disabled', 'disabled');
@@ -4700,6 +4724,7 @@ function updateSite() {
 	var obj = {};
 	var url = HOME + '/registry';
 	obj['action'] = 'updateSite';
+	obj['userName'] = $('#selectSiteAdministrator').val();
 	obj['siteId'] = $('#siteIdHidden').val();
 	obj['siteName'] = $('#siteNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['description'] = $('#siteDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
@@ -4770,6 +4795,23 @@ function loadSelectNodeSites() {
 		}
 	});
 	select.change(function(event) {checkCreateNodeButton();});
+}
+
+function loadSelectSitesAdministrator() {
+	var select = $('#selectSiteAdministrator');
+	select.unbind();
+	select.html('');
+	var option = $('<option>');
+	option.text('Select user...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(scannerUsersList, function(i, user) {
+		option = $('<option>');
+		option.text(user['firstName'] + ' ' + user['lastName']);
+		option.attr('value', user['userName']);
+		select.append(option);
+	});
+	select.change(function(event) {checkCreateSiteButton();});
 }
 
 function checkCreateNodeButton() {
@@ -5212,6 +5254,10 @@ function checkAddSite() {
 
 function checkEditSite(site) {
 	return loggedInUser['isSuperuser'] || activeUser['sitesDict'][site['siteName']] != null;
+}
+
+function checkRemoveSite(site) {
+	return loggedInUser['isSuperuser'];
 }
 
 function checkAddNode() {

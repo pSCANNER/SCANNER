@@ -701,10 +701,10 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		return ret;
 	}
 	@Override
-	public RegistryClientResponse createSite(String siteName, String description) {
+	public RegistryClientResponse createSite(String siteName, String description, String userName) {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "sites";
 		try {
+			String url = erdURL + "sites?userName=" + Utils.urlEncode(userName);
 			JSONObject body = new JSONObject();
 			body.put("siteName", siteName);
 			body.put("description", description);
@@ -714,15 +714,18 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
 			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
 		return ret;
 	}
 	@Override
 	public RegistryClientResponse updateSite(int siteId, String siteName,
-			String description) {
+			String description, String userName) {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "sites/" + siteId;
 		try {
+			String url = erdURL + "sites/" + siteId;
+			//+ "?userName=" + Utils.urlEncode(userName);
 			JSONObject body = new JSONObject();
 			body.put("siteName", siteName);
 			body.put("description", description);
@@ -732,7 +735,9 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		}
+		} //catch (UnsupportedEncodingException e) {
+			//e.printStackTrace();
+		//}
 		return ret;
 	}
 	@Override
