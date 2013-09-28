@@ -833,8 +833,77 @@ Enrollment Table Format Page</b></p>
 							<div id="analyzeGridDiv"></div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Data Sets" onShow="hideQuery();">
-							<div id="dataSetsDiv"></div>
+							title="Data Sets" onShow="showAdministration();" onHide="hideAdministration();">
+							<div id="dataSetsDiv" class="wizard_layer">
+								<div id="manageInstancesDiv">
+								 <p id="manageDataSetInstancesP" class="wizard_heading">Manage Data Set Instances</p>
+								 <div class="wizard_content">
+									<table id="manageInstancesTable" class="manageStudyProtocols">
+										<thead>
+											<tr>
+												<th class="protocol_border">Name</th>
+												<th class="protocol_border">Data Set</th>
+												<th class="protocol_border">Data Source</th>
+												<th class="protocol_border">Site</th>
+												<th class="protocol_border">Node</th>
+												<th class="protocol_border">Description</th>
+												<th></th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="manageInstancesTbody"></tbody>
+									</table>
+									<br/>
+									<div id="newInstanceDiv">
+										<button id="newInstanceButton" onclick="newInstance();">New instance</button>
+									</div>
+									<div id="add_instance_entity_div">
+										<table>
+											<tr>
+												<td>
+													<table>
+														<tr>
+															<td>
+																<table class="add_protocol">
+																	<tbody id="addInstanceEntityTable">
+																		<tr>
+																			<td class="tag">Instance Name:</td>
+																			<td><input class="required" type="text" id="instanceNameInput"></td>
+																			<td class="tag">Data Source:</td>
+																			<td><input class="required" type="text" id="instanceDataSourceInput"></td>
+																		</tr>
+																		<tr>
+																			<td class="tag">Data Set:</td>
+																			<td><select id="selectInstanceDataset"></select></td>
+																			<td class="tag">Node:</td>
+																			<td><select id="selectInstanceNode"></select></td>
+																		</tr>
+																		<tr>
+																			<td class="tag">Description:</td>
+																			<td><input type="text" id="instanceDescriptionInput" size="30"></td>
+																			<td class="tag"></td>
+																			<td></td>
+																		</tr>
+																	</tbody>
+																</table>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+											<tr>
+												<td class="tag">
+													<input type="hidden" value="" name="instanceIdHidden" id="instanceIdHidden">
+													<input type="button" value="Cancel" onclick="cancelInstanceEntity()">
+													<input id="addInstanceEntityButton" type="button" value="Add instance" onclick="addInstanceEntity()">
+													<input id="updateInstanceButton" type="button" value="Update instance" onclick="updateInstance()">
+												</td>
+											</tr>
+										</table>
+									</div>
+								 </div>
+								</div>
+							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
 							title="Tasks and Notifications" onShow="hideQuery();">
@@ -1094,74 +1163,6 @@ Enrollment Table Format Page</b></p>
 													<input type="button" value="Cancel" onclick="cancelNode()">
 													<input id="addNodeButton" type="button" value="Add node" onclick="addNode()">
 													<input id="updateNodeButton" type="button" value="Update node" onclick="updateNode()">
-												</td>
-											</tr>
-										</table>
-									</div>
-								 </div>
-								</div>
-								<div id="manageInstancesDiv">
-								 <p id="manageDataSetInstancesP" class="wizard_heading">Manage Data Set Instances</p>
-								 <div class="wizard_content">
-									<table id="manageInstancesTable" class="manageStudyProtocols">
-										<thead>
-											<tr>
-												<th class="protocol_border">Name</th>
-												<th class="protocol_border">Data Set</th>
-												<th class="protocol_border">Data Source</th>
-												<th class="protocol_border">Site</th>
-												<th class="protocol_border">Node</th>
-												<th class="protocol_border">Description</th>
-												<th></th>
-												<th></th>
-											</tr>
-										</thead>
-										<tbody id="manageInstancesTbody"></tbody>
-									</table>
-									<br/>
-									<div id="newInstanceDiv">
-										<button id="newInstanceButton" onclick="newInstance();">New instance</button>
-									</div>
-									<div id="add_instance_entity_div">
-										<table>
-											<tr>
-												<td>
-													<table>
-														<tr>
-															<td>
-																<table class="add_protocol">
-																	<tbody id="addInstanceEntityTable">
-																		<tr>
-																			<td class="tag">Instance Name:</td>
-																			<td><input class="required" type="text" id="instanceNameInput"></td>
-																			<td class="tag">Data Source:</td>
-																			<td><input class="required" type="text" id="instanceDataSourceInput"></td>
-																		</tr>
-																		<tr>
-																			<td class="tag">Data Set:</td>
-																			<td><select id="selectInstanceDataset"></select></td>
-																			<td class="tag">Node:</td>
-																			<td><select id="selectInstanceNode"></select></td>
-																		</tr>
-																		<tr>
-																			<td class="tag">Description:</td>
-																			<td><input type="text" id="instanceDescriptionInput" size="30"></td>
-																			<td class="tag"></td>
-																			<td></td>
-																		</tr>
-																	</tbody>
-																</table>
-															</td>
-														</tr>
-													</table>
-												</td>
-											</tr>
-											<tr>
-												<td class="tag">
-													<input type="hidden" value="" name="instanceIdHidden" id="instanceIdHidden">
-													<input type="button" value="Cancel" onclick="cancelInstanceEntity()">
-													<input id="addInstanceEntityButton" type="button" value="Add instance" onclick="addInstanceEntity()">
-													<input id="updateInstanceButton" type="button" value="Update instance" onclick="updateInstance()">
 												</td>
 											</tr>
 										</table>
