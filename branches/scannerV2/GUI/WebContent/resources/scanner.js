@@ -4327,6 +4327,7 @@ function newUser() {
 	$('#userFirstNameInput').val('');
 	$('#userLastNameInput').val('');
 	$('#userIdInput').val('');
+	$('#userIdInput').removeAttr('disabled');
 	$('#userSuperuserInput').removeAttr('checked');
 	$('#userEmailInput').val('');
 	$('#userPhoneInput').val('');
