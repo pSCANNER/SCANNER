@@ -2911,7 +2911,7 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 		$('#addStudyRequestedSitesTable').hide();
 		$('#addStaffWrapperTable').hide();
 		$('#add_study_protocol_div').hide();
-		$('#manageStudyRequestedSitesP').html('View Study Requested Sites');
+		$('#manageStudyRequestedSitesP').html('View Requested Sites for Study');
 		$('#manageStudyStaffP').html('View Study Staff');
 		$('#manageStudyProtocolsP').html('View Study Protocols');
 	} else {
@@ -2921,7 +2921,7 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 		$('#addStudyRequestedSitesTable').show();
 		$('#addStaffWrapperTable').show();
 		$('#add_study_protocol_div').show();
-		$('#manageStudyRequestedSitesP').html('Manage Study Requested Sites');
+		$('#manageStudyRequestedSitesP').html('Manage Requested Sites for Study');
 		$('#manageStudyStaffP').html('Manage Study Staff');
 		$('#manageStudyProtocolsP').html('Manage Study Protocols');
 	}
