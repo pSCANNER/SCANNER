@@ -45,6 +45,7 @@ INSERT INTO study_role (study_id,role_within_study) VALUES
 INSERT INTO user_role(user_id, role_id) VALUES
 (2, 3),
 (2, 5),
+(2, 7),
 (2, 8),
 (3, 7),
 (3, 10),
