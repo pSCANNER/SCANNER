@@ -1791,6 +1791,12 @@ function analyzeStudy() {
 	$('#ui').css('display', '');
 	$('#logoutButton').show();
 	$('#welcomeLink').html('Welcome ' + loggedInUserName + '!');
+	var description1 = getLoggedInUserRoles(); 
+	if (description1 != null) {
+		$('#welcomeLink').hover(
+				function(event) {DisplayTipBox(event, description1);}, 
+				function(){HideTipBox();});
+	}
 	$('#welcomeLink').show();
 	$('#studyName').html('Study: ' + getSelectedStudyName());
 	if (getSelectedStudyName() == emptyValue) {
@@ -4595,6 +4601,12 @@ function postUpdateUser(data, textStatus, jqXHR, param) {
 		loggedInUser = user;
 		loggedInUserName = user['userName'];
 		$('#welcomeLink').html('Welcome ' + loggedInUserName + '!');
+		var description = getLoggedInUserRoles(); 
+		if (description != null) {
+			$('#welcomeLink').hover(
+					function(event) {DisplayTipBox(event, description);}, 
+					function(){HideTipBox();});
+		}
 	}
 	postInitUsers(data['users'], null, null, false);
 	manageAdministration();
@@ -5482,5 +5494,20 @@ function postRemoveSitePolicy(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitSitesPolicies(data['sitePolicies'], null, null, false);
 	manageAdministration();
+}
+
+function getLoggedInUserRoles() {
+	var ret = null;
+	$.each(userRolesList, function(i, userRole) {
+		if (userRole['user'] == loggedInUserName) {
+			if (ret == null) {
+				ret = '';
+			} else {
+				ret += '<br/>';
+			}
+			ret += userRole['studyRole']['roleWithinStudy'] + ' in study ' + userRole['studyRole']['study'];
+		}
+	});
+	return ret;
 }
 
