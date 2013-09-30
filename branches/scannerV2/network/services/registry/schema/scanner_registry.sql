@@ -19,12 +19,12 @@ CREATE TABLE IF NOT EXISTS study (
   study_id serial NOT NULL primary key,
   study_name text NOT NULL unique,
   description text,
-  irb_id integer NOT NULL,
+  irb_id text NOT NULL,
   protocol text,
   study_owner integer NOT NULL references scanner_user(user_id),
   start_date date,
   end_date date,
-  clinical_trials_id integer,
+  clinical_trials_id text,
   analysis_plan text,
   study_status_type_id integer not null references study_status_type(study_status_type_id)
 );

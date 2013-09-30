@@ -21,9 +21,9 @@ INSERT INTO scanner_user (user_name, email, HSPC_documents, Phone, Reports_To, A
 ('serban', 'serban@isi.edu', null, null, 0, true, 'Serban', NULL, 'Voinea', NULL, false);
 
 INSERT INTO study (study_name, description, IRB_ID, Protocol, Study_Owner, Start_Date, End_Date, Clinical_Trials_ID, Analysis_Plan, study_status_type_id) VALUES
-('SCANNER', 'SCANNER Network', 0, 'Administrative study used to manage global SCANNER Network configuration', 1, null, null, null, null,1),
-('MTM', 'Medication Therapy Management', 1, 'Analyze MTM data on multiple sites with both OCEANS and GLORE', 2, '2013-08-15', '2013-08-15', 0, 'Very Important Analysis on Multiple Sites',1),
-('BEARI', 'Behavioral Economics for Acute Respitory Infections', 2, 'Analyze BEARI data on multiple ISI VMs with both OCEANS and GLORE', 2, '2013-08-15', '2013-08-15', 0, 'Determine if performance is contingent on principal diagnosis',1);
+('SCANNER', 'SCANNER Network', '', 'Administrative study used to manage global SCANNER Network configuration', 1, null, null, null, null,1),
+('MTM', 'Medication Therapy Management', '', 'Analyze MTM data on multiple sites with both OCEANS and GLORE', 2, '2013-08-15', '2013-08-15', null, 'Very Important Analysis on Multiple Sites',1),
+('BEARI', 'Behavioral Economics for Acute Respitory Infections', '', 'Analyze BEARI data on multiple ISI VMs with both OCEANS and GLORE', 2, '2013-08-15', '2013-08-15', null, 'Determine if performance is contingent on principal diagnosis',1);
 
 INSERT INTO standard_role(standard_role_name, description, create_by_default, add_to_study_policy_by_default, add_to_user_role_by_default) VALUES
 ('Principal Investigator','Manages study roles and defines study policies',true,true,true),

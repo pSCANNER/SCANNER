@@ -41,7 +41,7 @@ public class Study implements Serializable
     private String description;    
     @Basic(optional = false)
     @Column(name = "irb_id")
-    private Integer irbId;
+    private String irbId;
     @Column(name = "protocol")
     private String protocol;
     @Column(name = "start_date")
@@ -51,7 +51,7 @@ public class Study implements Serializable
     @Temporal(TemporalType.DATE)
     private Date endDate;
     @Column(name = "clinical_trials_id")
-    private Integer clinicalTrialsId;
+    private String clinicalTrialsId;
     @Column(name = "analysis_plan")
     private String analysisPlan; 
     // JsonIgnore studyStatusType since it is not being used right now 
@@ -88,7 +88,7 @@ public class Study implements Serializable
         this.studyId = studyId;
     }
 
-    public Study(Integer studyId, String studyName, Integer irbId) {
+    public Study(Integer studyId, String studyName, String irbId) {
         this.studyId = studyId;
         this.studyName = studyName;
         this.irbId = irbId;
@@ -118,11 +118,11 @@ public class Study implements Serializable
         this.description = description;
     }
     
-    public Integer getIrbId() {
+    public String getIrbId() {
         return irbId;
     }
 
-    public void setIrbId(Integer irbId) {
+    public void setIrbId(String irbId) {
         this.irbId = irbId;
     }
 
@@ -150,11 +150,11 @@ public class Study implements Serializable
         this.endDate = endDate;
     }
 
-    public Integer getClinicalTrialsId() {
+    public String getClinicalTrialsId() {
         return clinicalTrialsId;
     }
 
-    public void setClinicalTrialsId(Integer clinicalTrialsId) {
+    public void setClinicalTrialsId(String clinicalTrialsId) {
         this.clinicalTrialsId = clinicalTrialsId;
     }
 
