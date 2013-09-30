@@ -73,7 +73,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			body.put("protocol", protocol.length() == 0 ? JSONObject.NULL : protocol);
 			body.put("startDate", startDate.length() == 0 ? JSONObject.NULL : startDate);
 			body.put("endDate", endDate.length() == 0 ? JSONObject.NULL : endDate);
-			body.put("clinicalTrialsId", clinicalTrialsId.length() == 0 ? JSONObject.NULL : Integer.parseInt(clinicalTrialsId));
+			body.put("clinicalTrialsId", clinicalTrialsId.length() == 0 ? JSONObject.NULL : clinicalTrialsId);
 			body.put("analysisPlan", analysisPlan.length() == 0 ? JSONObject.NULL : analysisPlan);
 			System.out.println("PUT: " + url);
 			System.out.println("PUT Body:\n" + body.toString(2));

@@ -3210,16 +3210,7 @@ function updateStudy() {
 	var irb = $('#updateStudyIRBInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['irbId'] = irb;
 	var clinicalTrialsId = $('#projectClinicalTrialsId').val().replace(/^\s*/, "").replace(/\s*$/, "");
-	if (clinicalTrialsId.length > 0) {
-		if (isNaN(parseInt(clinicalTrialsId)) || clinicalTrialsId.length != ("" + parseInt(clinicalTrialsId)).length) {
-			alert('Invalid integer value for the Clinical Trials Id: "' + $('#projectClinicalTrialsId').val() + '"');
-			return;
-		} else {
-			obj['clinicalTrialsId'] = parseInt(clinicalTrialsId);
-		}
-	} else {
-		obj['clinicalTrialsId'] = '';
-	}
+	obj['clinicalTrialsId'] = clinicalTrialsId;
 	obj['studyOwner'] = scannerUsersDict[$('#updateStudyPrincipalInvestigator').val()]['userId'];
 	obj['description'] = $('#projectDescription').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	obj['protocol'] = $('#projectProtocol').val().replace(/^\s*/, "").replace(/\s*$/, "");
