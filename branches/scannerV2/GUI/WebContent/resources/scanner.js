@@ -3173,14 +3173,7 @@ function createStudy() {
 	obj['action'] = 'createStudy';
 	obj['studyName'] = $('#studyTitleInput').val();
 	var irb = $('#createStudyIRBInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
-	if (irb.length > 0) {
-		if (!isNaN(parseInt(irb)) && irb.length == ("" + parseInt(irb)).length) {
-			obj['irbId'] = parseInt(irb);
-		} else {
-			alert('Invalid integer value for IRB: "' + $('#createStudyIRBInput').val() + '"');
-			return;
-		}
-	}
+	obj['irbId'] = irb;
 	$('#createStudyButton').attr('disabled', 'disabled');
 	obj['studyOwner'] = scannerUsersDict[$('#createStudyPrincipalInvestigator').val()]['userId'];
 	var url =  HOME + '/registry';
@@ -3214,17 +3207,8 @@ function updateStudy() {
 	obj['action'] = 'updateStudy';
 	obj['studyName'] = $('#projectTitle').val();
 	obj['studyId'] = activeStudy['studyId'];
-
 	var irb = $('#updateStudyIRBInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
-	if (irb.length > 0) {
-		if (!isNaN(parseInt(irb)) && irb.length == ("" + parseInt(irb)).length) {
-			obj['irbId'] = parseInt(irb);
-		} else {
-			alert('Invalid integer value for IRB: "' + $('#updateStudyIRBInput').val() + '"');
-			return;
-		}
-	}
-
+	obj['irbId'] = irb;
 	var clinicalTrialsId = $('#projectClinicalTrialsId').val().replace(/^\s*/, "").replace(/\s*$/, "");
 	if (clinicalTrialsId.length > 0) {
 		if (isNaN(parseInt(clinicalTrialsId)) || clinicalTrialsId.length != ("" + parseInt(clinicalTrialsId)).length) {

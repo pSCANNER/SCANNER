@@ -39,7 +39,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		try {
 			JSONObject body = new JSONObject();
 			body.put("studyName", studyName);
-			body.put("irbId", irbId != null ? Integer.parseInt(irbId) : 0);
+			body.put("irbId", irbId != null ? irbId : "");
 			JSONObject investigator = new JSONObject();
 			investigator.put("userId", Integer.parseInt(studyOwner));
 			body.put("studyOwner", investigator);
@@ -65,7 +65,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		try {
 			JSONObject body = new JSONObject();
 			body.put("studyName", studyName);
-			body.put("irbId", irbId != null ? Integer.parseInt(irbId) : 0);
+			body.put("irbId", irbId != null ? irbId : "");
 			JSONObject investigator = new JSONObject();
 			investigator.put("userId", Integer.parseInt(studyOwner));
 			body.put("studyOwner", investigator);
