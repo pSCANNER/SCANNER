@@ -32,16 +32,8 @@
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
   <context-param>
-    <param-name>tagfilerURL</param-name>
-    <param-value>https://portal.scanner-net.org/tagfiler</param-value>
-  </context-param>
-  <context-param>
-    <param-name>tagfilerUser</param-name>
-    <param-value>guest</param-value>
-  </context-param>
-  <context-param>
-    <param-name>tagfilerPassword</param-name>
-    <param-value>*******</param-value>
+    <param-name>registryURL</param-name>
+    <param-value>http://aspc.isi.edu:8088/scannerV2/registry/</param-value>
   </context-param>
   <context-param>
     <param-name>trustStoreType</param-name>
@@ -89,7 +81,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>Query</servlet-name>
-    <servlet-class>edu.isi.misd.scanner.servlets.Query</servlet-class>
+    <servlet-class>edu.isi.misd.scanner.servlets.Analyze</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>Query</servlet-name>
