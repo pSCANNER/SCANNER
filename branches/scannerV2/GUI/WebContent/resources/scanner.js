@@ -4385,6 +4385,7 @@ function manageAdministration() {
 }
 
 function postManageAdministration(data, textStatus, jqXHR, param) {
+	postInitSitesPolicies(data['allSitePolicies'], null, null, false);
 	activeUser = {};
 	activeUser['sitesDict'] = {};
 	activeUser['nodesDict'] = {};

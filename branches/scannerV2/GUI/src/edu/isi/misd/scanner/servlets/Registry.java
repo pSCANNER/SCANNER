@@ -262,6 +262,17 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("sitePolicies", clientResponse.getEntityResponse());
 				clientResponse.release();
+				clientResponse = registryClient.getAllSitesPolicies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all site policies.");
+					return;
+				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + clientResponse.getEntity());
+					response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+					return;
+				}
+				responseObject.put("allSitePolicies", clientResponse.getEntityResponse());
+				clientResponse.release();
 				clientResponse = registryClient.getAllSites();
 				JSONArray allSites = null;
 				JSONObject sitesAdmin = new JSONObject();
