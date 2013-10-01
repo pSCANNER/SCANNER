@@ -294,6 +294,84 @@ public class JakartaClient {
     }
     
     /**
+     * Execute a Registry request.
+     * 
+     * @param url
+     *            the query URL.
+     * @param body
+     *            the request body.
+     * @return The HTTP response.
+     */
+    public ClientURLResponse postRegistry(String url, String body, String user) {
+        HttpPost httppost = new HttpPost(url);
+        httppost.setHeader("loginName", user);
+        httppost.setHeader("Accept", "application/json");
+        httppost.setHeader("Content-Type", "application/json; charset=UTF-8");
+        if (body != null) {
+			try {
+				StringEntity entity = new StringEntity(body, "UTF-8");
+	    		httppost.setEntity(entity);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+        }
+        retries = 0;
+        ClientURLResponse rsp = execute(httppost, null);
+        retries = 10;
+		return rsp;
+    }
+    
+    /**
+     * Execute a Registry request.
+     * 
+     * @param url
+     *            the query URL.
+     * @param body
+     *            the request body.
+     * @return The HTTP response.
+     */
+    public ClientURLResponse putRegistry(String url, String body, String user) {
+        HttpPut httpput = new HttpPut(url);
+        httpput.setHeader("loginName", user);
+        httpput.setHeader("Accept", "application/json");
+        httpput.setHeader("Content-Type", "application/json; charset=UTF-8");
+        if (body != null) {
+			try {
+				StringEntity entity = new StringEntity(body, "UTF-8");
+				httpput.setEntity(entity);
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+        }
+        retries = 0;
+        ClientURLResponse rsp = execute(httpput, null);
+        retries = 10;
+		return rsp;
+    }
+    
+    /**
+     * Execute a SCANNER network request.
+     * 
+     * @param url
+     *            the query URL.
+     * @param targets
+     *            the targets in the request header. 
+     * @param body
+     *            the request body.
+     * @return The HTTP response.
+     */
+    public ClientURLResponse get(String url, StringBuffer targets) {
+    	HttpGet httpget = new HttpGet(url);
+    	httpget.setHeader("Accept", "application/json");
+    	httpget.setHeader("Content-Type", "application/json; charset=UTF-8");
+    	httpget.setHeader("targets", targets.toString());
+        retries = 0;
+        ClientURLResponse rsp = execute(httpget, null);
+        retries = 10;
+		return rsp;
+    }
+    
+    /**
      * Delete a resource.
      * 
      * @param url
@@ -302,8 +380,9 @@ public class JakartaClient {
      *            the cookie to be set in the request.
      * @return The HTTP response.
      */
-    public ClientURLResponse delete(String url, String cookie) {
+    public ClientURLResponse delete(String url, String cookie, String user) {
 		HttpDelete httpdelete = new HttpDelete(url);
+		httpdelete.setHeader("loginName", user);
 		return execute(httpdelete, cookie);
 	}
     
@@ -318,6 +397,22 @@ public class JakartaClient {
      */
     public ClientURLResponse get(String url, String cookie) {
 		HttpGet httpget = new HttpGet(url);
+    	httpget.setHeader("Accept", "application/json");
+		return execute(httpget, cookie);
+	}
+    
+    /**
+     * Execute a GET request.
+     * 
+     * @param url
+     *            the query URL.
+     * @param cookie
+     *            the cookie to be set in the request.
+     * @return The HTTP response.
+     */
+    public ClientURLResponse get(String url, String cookie, String user) {
+		HttpGet httpget = new HttpGet(url);
+		httpget.setHeader("loginName", user);
     	httpget.setHeader("Accept", "application/json");
 		return execute(httpget, cookie);
 	}
@@ -346,7 +441,9 @@ public class JakartaClient {
      * @return the HTTP Response
      */
     private ClientURLResponse execute(HttpUriRequest request, String cookie) {
-    	setCookie(cookie, request);
+    	if (cookie != null) {
+        	setCookie(cookie, request);
+    	}
     	request.setHeader("X-Machine-Generated", "true");
     	ClientURLResponse response = null;
     	int count = 0;
@@ -355,10 +452,12 @@ public class JakartaClient {
     	while (true) {
     		try {
     			response = new ClientURLResponse(httpclient.execute(request));
-				setCookieValue(response.getCookieValue());
-				if (getCookieValue() != null) {
-	        		System.out.println("Response cookie: "+ getCookieValue());
-				}
+    			if (cookie != null) {
+    				setCookieValue(response.getCookieValue());
+    				if (getCookieValue() != null) {
+    	        		System.out.println("Response cookie: "+ getCookieValue());
+    				}
+    			}
     			break;
     		} catch (ConnectException e) {
     			// Can not connect and send the request
