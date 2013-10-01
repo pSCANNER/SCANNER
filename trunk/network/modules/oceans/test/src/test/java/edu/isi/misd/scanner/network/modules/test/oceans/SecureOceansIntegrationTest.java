@@ -56,7 +56,7 @@ public class SecureOceansIntegrationTest extends BaseIntegrationTest
         return targets;
     }  
     
-    //@Test
+    @Test
     public void testSecureOceansLogisticRegressionXML() throws Exception 
     {
         doPost("application/xml",
