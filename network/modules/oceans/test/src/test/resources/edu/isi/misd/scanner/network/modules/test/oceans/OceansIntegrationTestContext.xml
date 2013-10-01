@@ -7,9 +7,6 @@
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
    
     <import resource="classpath:edu/isi/misd/scanner/network/base/test/TestCamelContext.xml"/>
-
-    <bean id="OceansLogisticRegressionAggregateProcessor"
-          class="edu.isi.misd.scanner.network.modules.master.processors.oceans.OceansLogisticRegressionAggregateProcessor"/>
         
     <bean id="OceansLogisticRegressionProcessor"
           class="edu.isi.misd.scanner.network.modules.worker.processors.oceans.OceansLogisticRegressionProcessor"/>  

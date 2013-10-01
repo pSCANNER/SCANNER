@@ -8,11 +8,11 @@
             
     <bean id="OceansLogisticRegressionProcessor"
           class="edu.isi.misd.scanner.network.modules.worker.processors.oceans.OceansLogisticRegressionProcessor"/>   
-                   
+                       
     <camel:routeContext id="OceansRouteContext"> 
                        
         <camel:route>
-            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>
+            <camel:from uri="jetty:http://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?sessionSupport=false&amp;matchOnUriPrefix=true"/>        
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                       
         </camel:route>    
         
@@ -21,7 +21,7 @@
     <camel:routeContext id="OceansSecureRouteContext">
         
         <camel:route>
-            <camel:from uri="jetty:https://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?handlers=securityHandler&amp;sslContextParametersRef=sslContextParameters&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>
+            <camel:from uri="jetty:https://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/oceans/lr?handlers=securityHandler&amp;sslContextParametersRef=sslContextParameters&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/> 
             <camel:to uri="direct:edu.isi.misd.scanner.network.modules.worker.routes.oceans.OceansLogisticRegressionRoute"/>                       
         </camel:route>         
            

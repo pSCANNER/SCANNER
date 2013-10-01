@@ -8,6 +8,9 @@ import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.types.base.DataSetMetadata;
 import edu.isi.misd.scanner.network.types.base.FileDataSource;
+import edu.isi.misd.scanner.network.types.base.ServiceResponse;
+import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseData;
 import edu.isi.misd.scanner.network.types.regression.Coefficient;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionOutput;
 import edu.isi.misd.scanner.network.types.oceans.OceansLogisticRegressionRequest;
@@ -18,6 +21,7 @@ import edu.isi.misd.scanner.network.types.regression.LogisticRegressionVariable;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionVariableType;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionVariables;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionDataSetMetadata;
+import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInput;
 import edu.vanderbilt.oceans.core.InstanceBuilder;
 import edu.vanderbilt.oceans.statistics.analysis.LogisticRegressionAnalysis;
 import edu.vanderbilt.oceans.statistics.analysis.LogisticRegressionAnalysis.LogisticRegressionCoefficient;
@@ -67,59 +71,100 @@ public class OceansLogisticRegressionProcessor implements Processor
      * @return The formatted response.
      * @throws Exception 
      */    
-    private OceansLogisticRegressionResponse executeAnalysis(Exchange exchange) 
+    private ServiceResponse executeAnalysis(Exchange exchange) 
         throws Exception
     {
-        OceansLogisticRegressionRequest request = 
-            (OceansLogisticRegressionRequest)
-                exchange.getIn().getBody(
-                    OceansLogisticRegressionRequest.class); 
+        // Create the service response object
+        ServiceResponse response = 
+            new ServiceResponse(); 
         
-        // locate the specified input file
-        String fileName = 
-            (String)exchange.getIn().getHeader(BaseConstants.DATASOURCE);
-        if (fileName == null) {
-            FileNotFoundException fnf = 
-                new FileNotFoundException("A null file name was specified");
-            throw fnf;
-        }        
-        String baseInputDir = 
-            ConfigUtils.getBaseInputDir(
-                exchange, BaseConstants.WORKER_INPUT_DIR_PROPERTY);   
-        File file = new File(baseInputDir,fileName);
+        // Create the service response data object
+        ServiceResponseData responseData = 
+            new ServiceResponseData();         
+            
+        // Create the LogisticRegressionResponse object
+        LogisticRegressionResponse lrResponse = 
+            new LogisticRegressionResponse();                 
         
-        // setup and run the oceans lr analysis
-        String uniqueID = MessageUtils.getID(exchange);
-        LogisticRegressionInputParameters params = 
-            request.getLogisticRegressionInput().getInputParameters();
-        String dependentVariableName = params.getDependentVariableName();
-        ArrayList<String> independentVariables = 
-            new ArrayList(params.getIndependentVariableName());    
-
-        InstanceBuilder instBuilder = 
-            new InstanceBuilder(file, dependentVariableName);
-
-        LogisticRegressionAnalysis lrAnalysis = 
-            new LogisticRegressionAnalysis(
-                instBuilder.getInstances(), dependentVariableName);
-
-        lrAnalysis.setUniqueID(uniqueID);
-        lrAnalysis.setIndependentVariableNames(independentVariables);
-        lrAnalysis.Analyze();
-        
-        // create, initialize and return the response object
+        // Create the OCEANS specific response object, and then set the default 
+        // response to the new LogisticRegressionResponse object declared above
         OceansLogisticRegressionResponse oceansResponse = 
             new OceansLogisticRegressionResponse();
-        LogisticRegressionResponse response = new LogisticRegressionResponse();
-        response.setInput(request.getLogisticRegressionInput());
-        LogisticRegressionOutput output = new LogisticRegressionOutput();
-        output.setSiteInfo(MessageUtils.getSiteInfo(exchange));
-        this.formatCoefficientResultsObjects(
-            lrAnalysis.getLRCoefficients(),
-            output.getCoefficient());
-        response.getOutput().add(output);        
-        oceansResponse.setLogisticRegressionResponse(response);
-        return oceansResponse;
+        oceansResponse.setLogisticRegressionResponse(lrResponse);                
+      
+        String uniqueID = MessageUtils.getID(exchange);        
+        try 
+        {             
+            OceansLogisticRegressionRequest request = 
+                (OceansLogisticRegressionRequest)
+                    exchange.getIn().getBody(
+                        OceansLogisticRegressionRequest.class); 
+                               
+            // locate the specified input file
+            String fileName = 
+                (String)exchange.getIn().getHeader(BaseConstants.DATASOURCE);
+            if (fileName == null) {
+                FileNotFoundException fnf = 
+                    new FileNotFoundException("A null file name was specified");
+                throw fnf;
+            }        
+            String baseInputDir = 
+                ConfigUtils.getBaseInputDir(
+                    exchange, BaseConstants.WORKER_INPUT_DIR_PROPERTY);   
+            File file = new File(baseInputDir,fileName);
+
+            // get the input parameters for the oceans lr analysis   
+            LogisticRegressionInput input = 
+                request.getLogisticRegressionInput();          
+            LogisticRegressionInputParameters params = 
+                input.getInputParameters();
+            // copy the input parameters as part of the response            
+            lrResponse.setInput(input);                          
+            // assemble the dependent and independent variables
+            String dependentVariableName = params.getDependentVariableName();
+            ArrayList<String> independentVariables = 
+                new ArrayList(params.getIndependentVariableName());    
+            
+            // complete the response up until the analysis execution point, 
+            // from here it will be returned regardless of any exception caught
+            responseData.setAny(oceansResponse);
+            
+            // load the file and run the analysis            
+            InstanceBuilder instBuilder = 
+                new InstanceBuilder(file, dependentVariableName);
+
+            LogisticRegressionAnalysis lrAnalysis = 
+                new LogisticRegressionAnalysis(
+                    instBuilder.getInstances(), dependentVariableName);
+
+            lrAnalysis.setUniqueID(uniqueID);
+            lrAnalysis.setIndependentVariableNames(independentVariables);
+            lrAnalysis.Analyze();
+
+            // populate the output results if successful       
+            LogisticRegressionOutput output = new LogisticRegressionOutput();             
+            this.formatCoefficientResultsObjects(
+                lrAnalysis.getLRCoefficients(),
+                output.getCoefficient());         
+            lrResponse.getOutput().add(output); 
+            
+            response.setServiceResponseMetadata(
+                MessageUtils.createServiceResponseMetadata(
+                    exchange, 
+                    ServiceRequestStateType.COMPLETE,
+                    BaseConstants.STATUS_COMPLETE)); 
+            response.setServiceResponseData(responseData);                  
+        }
+        catch (Exception e) 
+        {    
+            response.setServiceResponseMetadata(
+                MessageUtils.createServiceResponseMetadata(
+                    exchange, 
+                    ServiceRequestStateType.ERROR,
+                    "Unhandled exception during OCEANS processing. Caused by [" 
+                        + e.toString() + "]"));                            
+        }      
+        return response;    
     }
     
     private void formatCoefficientResultsObjects(

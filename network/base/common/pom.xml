@@ -6,21 +6,18 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <name>SCANNER Network Prototype - Base - Common</name>
   <groupId>edu.isi.misd.scanner.network.base</groupId>
   <artifactId>base-common</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
-
-  <name>SCANNER Network Prototype - Base - Common</name>
-  <url>http://scanner.misd.isi.edu</url>
-
-  <properties>
-    <project.camel.version>2.11.0</project.camel.version>           
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
-
   
+  <parent>
+    <relativePath>../../</relativePath>
+    <groupId>edu.isi.misd.scanner.network</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+      
   <dependencies>
   
     <!-- logging -->
@@ -61,13 +58,7 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-plus</artifactId>
       <version>7.6.8.v20121106</version>
-    </dependency> 
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <type>jar</type>
-    </dependency>    
+    </dependency>  
   </dependencies>
 
   <build>

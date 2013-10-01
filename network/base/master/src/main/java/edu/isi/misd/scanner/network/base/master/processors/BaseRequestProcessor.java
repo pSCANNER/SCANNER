@@ -33,6 +33,9 @@ public class BaseRequestProcessor implements Processor
         Object body = exchange.getIn().getBody();
         MessageUtils.setTimestamp(exchange);
         
+        String requestURL = MessageUtils.getRequestURL(exchange.getIn());
+        exchange.setProperty(BaseConstants.REQUEST_URL, requestURL);  
+        
         String httpMethod = 
                 (String)exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         
@@ -60,7 +63,8 @@ public class BaseRequestProcessor implements Processor
         else if ("GET".equalsIgnoreCase(httpMethod)) 
         {                       
             if (id == null) { 
-                id = MessageUtils.parseIdFromMessageURL(exchange.getIn());
+                id = MessageUtils.parseIdFromUrlPath(
+                    (String)exchange.getProperty(BaseConstants.REQUEST_URL));
                 if (id.isEmpty()) {
                     IllegalArgumentException iae = 
                         new IllegalArgumentException("ID cannot be null");
@@ -79,7 +83,7 @@ public class BaseRequestProcessor implements Processor
             exchange.getIn().setHeader(
                 Exchange.CONTENT_TYPE, "application/xml"); 
         }
-        
+      
     }
     
     private static boolean checkTargets(Exchange exchange, boolean mustExist) 

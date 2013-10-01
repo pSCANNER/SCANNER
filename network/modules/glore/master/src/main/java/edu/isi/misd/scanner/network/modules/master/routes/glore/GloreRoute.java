@@ -1,6 +1,7 @@
 package edu.isi.misd.scanner.network.modules.master.routes.glore;
 
 import edu.isi.misd.scanner.network.base.master.routes.DefaultRoute;
+import java.util.Map;
 import org.apache.camel.builder.ValueBuilder;
 
 import org.slf4j.Logger;
@@ -24,13 +25,22 @@ public class GloreRoute extends DefaultRoute
     
     @Override
     public String getJAXBContext() {
-        return "edu.isi.misd.scanner.network.types.glore";
-    }
+        return super.getJAXBContext() + ":" + 
+            "edu.isi.misd.scanner.network.types.glore";
+    }    
 
     @Override
     public String getJSONUnmarshallType() {
         return "edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest";
     }    
+    
+    @Override
+    public Map<String,String> getXmlNamespacePrefixMap()
+    {
+        this.xmlNamespacePrefixMap.put(
+            "http://scanner.misd.isi.edu/network/types/glore", "glore");
+        return this.xmlNamespacePrefixMap;
+    }  
     
     @Override    
     public ValueBuilder getDynamicRouter() {

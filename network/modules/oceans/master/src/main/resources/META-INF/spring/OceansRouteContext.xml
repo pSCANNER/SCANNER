@@ -5,9 +5,6 @@
        xsi:schemaLocation="
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd    
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
-
-    <bean id="OceansLogisticRegressionAggregateProcessor"
-          class="edu.isi.misd.scanner.network.modules.master.processors.oceans.OceansLogisticRegressionAggregateProcessor"/>
                       
     <camel:routeContext id="OceansRouteContext">
                 

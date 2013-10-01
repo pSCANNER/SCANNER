@@ -8,11 +8,14 @@ import org.apache.camel.Processor;
 /**
  *  This class writes the results of a processing pipeline to a local file.
  */
-public  class BaseCacheWriteProcessor implements Processor
-{
+public class BaseCacheWriteProcessor implements Processor
+{    
     @Override
     public void process(Exchange exchange) throws Exception 
-    { 
-        FileUtils.writeFile(exchange, BaseConstants.WORKER_OUTPUT_DIR_PROPERTY);                
+    {
+        String dirName = 
+            FileUtils.getDirPathForRequest(
+                exchange,BaseConstants.WORKER_OUTPUT_DIR_PROPERTY);            
+        FileUtils.writeFile(exchange, dirName);                   
     }  
 }

@@ -60,4 +60,29 @@ public class ConfigUtils
         }
         return baseOutputDir;        
     }       
+    
+    /**
+     * Gets the configured base output holding directory, or simply {@code data/holding} relative to the current working directory.
+     * 
+     * @param exchange The current exchange
+     * @param baseOutputDirPropName The property name to resolve the directory path from
+     */
+    public static String getBaseHoldingDir(Exchange exchange, 
+                                          String baseHoldingDirPropName)
+    {
+        String baseOutputDir = null;
+        try {
+            baseOutputDir = 
+                exchange.getContext().resolvePropertyPlaceholders(
+                    baseHoldingDirPropName); 
+        } catch (Exception e) {
+            log.debug("Unable to resolve property: " + baseHoldingDirPropName,e);
+        } finally {
+            if (baseOutputDir == null) {
+                baseOutputDir = "data/holding";
+            }
+        }
+        return baseOutputDir;        
+    }  
+    
 }

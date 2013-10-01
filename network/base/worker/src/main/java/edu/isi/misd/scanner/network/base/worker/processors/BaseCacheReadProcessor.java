@@ -21,8 +21,10 @@ public class BaseCacheReadProcessor implements Processor
         
     @Override
     public void process(Exchange exchange) throws Exception 
-    {
-        MessageUtils.setTimestamp(exchange);          
-        FileUtils.readFile(exchange, BaseConstants.WORKER_OUTPUT_DIR_PROPERTY);
+    {   
+        MessageUtils.setTimestamp(exchange); 
+        String dirName = FileUtils.getDirPathForRequest(
+            exchange, BaseConstants.WORKER_OUTPUT_DIR_PROPERTY);            
+        FileUtils.readFile(exchange, dirName);
     }              
 }
