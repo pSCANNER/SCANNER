@@ -19,7 +19,7 @@ public class GloreVariableTest extends GloreIntegrationTest
         return targets;
     }  
     
-    //@Test
+    @Test
     @Override
     public void testGloreLogisticRegressionXML() throws Exception 
     {
@@ -39,7 +39,7 @@ public class GloreVariableTest extends GloreIntegrationTest
         assertMockEndpointsSatisfied(120, TimeUnit.SECONDS);   
     }     
     
-    //@Test
+    @Test
     public void testGloreVariablesXML() throws Exception 
     {
         doPost("application/xml",
