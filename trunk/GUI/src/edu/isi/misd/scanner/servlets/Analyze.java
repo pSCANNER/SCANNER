@@ -88,6 +88,9 @@ public class Analyze extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String action = request.getParameter("action");
 		HttpSession session = request.getSession(false);
+		if (session == null) {
+			return;
+		}
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		if (action.equals("getStudies")) {
 			RegistryClientResponse clientResponse = registryClient.getStudies();
@@ -226,6 +229,9 @@ public class Analyze extends HttpServlet {
 		try {
 			String action = request.getParameter("action");
 			HttpSession session = request.getSession(false);
+			if (session == null) {
+				return;
+			}
 			ScannerClient scannerClient = (ScannerClient) session.getAttribute("scannerClient");
 			if (action.equals("loginRegistry")) {
 				obj.put("status", "login error");
