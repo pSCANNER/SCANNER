@@ -431,7 +431,13 @@ public class RegistryServiceImpl implements RegistryService
             StudyRole studyRole = sitePolicy.getStudyRole();
             List<UserRole> userRoles = 
                 userRoleRepository.findByStudyRoleRoleId(studyRole.getRoleId());
-            userRoleRepository.delete(userRoles);             
+            userRoleRepository.delete(userRoles);
+            // this is hacky but it is the only way to remove the built-in Site
+            // Administrator role without deleting other delegated study roles
+            // which could still be valid in the context of the related study
+            if (studyRole.getRoleWithinStudy().endsWith("Site Administrator")) {
+                studyRoleRepository.delete(studyRole);
+            }
         }
         siteRepository.delete(site);
     }        
