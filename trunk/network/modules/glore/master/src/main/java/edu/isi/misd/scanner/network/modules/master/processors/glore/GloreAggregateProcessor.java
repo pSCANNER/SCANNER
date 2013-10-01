@@ -1,11 +1,15 @@
 package edu.isi.misd.scanner.network.modules.master.processors.glore;
 
 import Jama.Matrix;
-import java.text.DecimalFormat;
+import edu.isi.misd.scanner.network.base.master.processors.BaseAggregateProcessor;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
-import edu.isi.misd.scanner.network.types.base.ErrorDetails;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseMetadata;
+import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
+import edu.isi.misd.scanner.network.types.base.ServiceResponse;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseData;
+import edu.isi.misd.scanner.network.types.base.ServiceResponses;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionResponse;
@@ -32,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * computation is collated in to a single response message and returned to the 
  * client.
  */
-public class GloreAggregateProcessor implements Processor 
+public class GloreAggregateProcessor extends BaseAggregateProcessor 
 {
     private static final transient Logger log = 
         LoggerFactory.getLogger(GloreAggregateProcessor.class);
@@ -47,18 +51,19 @@ public class GloreAggregateProcessor implements Processor
     @Override
     public void process(Exchange exchange) throws Exception
     {
+        // creates the aggregate ServiceResponses object
+        super.process(exchange);
+        
         // fail fast - treating GLORE as transactional for now,
         // so if any part of the request fails, the entire request fails.
-        List<ErrorDetails> errors = getGloreErrorList(exchange);
-        if (!errors.isEmpty()) 
+        List<ServiceResponse> errorResponses = getGloreErrorList(exchange);
+        if (!errorResponses.isEmpty()) 
         {
-            GloreLogisticRegressionResponse gloreResponse =
-                new GloreLogisticRegressionResponse();
-            LogisticRegressionResponse response =
-                new LogisticRegressionResponse();
-            response.getError().addAll(errors);
-            gloreResponse.setLogisticRegressionResponse(response);
-            exchange.getIn().setBody(gloreResponse);  
+            ServiceResponses responses = new ServiceResponses();                     
+            for (ServiceResponse errorResponse : errorResponses) {      
+                responses.getServiceResponse().add(errorResponse);
+            }
+            exchange.getIn().setBody(responses);  
             
             // signal complete
             exchange.setProperty("status", "complete");           
@@ -70,7 +75,7 @@ public class GloreAggregateProcessor implements Processor
         if (gloreRequestList.isEmpty()) {
             ErrorUtils.setHttpError(
                 exchange, 
-                new NullPointerException("Null Glore aggregate results"), 500); 
+                new NullPointerException("Null Glore aggregate results"), 500);
             return;
         }
         
@@ -79,7 +84,7 @@ public class GloreAggregateProcessor implements Processor
         if (gloreData == null) {
             ErrorUtils.setHttpError(
                 exchange, 
-                new NullPointerException("Null Glore state data"), 500); 
+                new NullPointerException("Null Glore state data"), 500);
             return;
         }
 
@@ -117,7 +122,6 @@ public class GloreAggregateProcessor implements Processor
                     GloreUtils.matrixToString(cov_matrix, 8, 6));
             }
             
-            // format the covariance matrix
             gloreData.setCovarianceMatrix(
                 GloreUtils.convertMatrixToMatrixType(cov_matrix));
             gloreData.setState("computeSDMatrix"); 
@@ -173,18 +177,17 @@ public class GloreAggregateProcessor implements Processor
 
             gloreData.setState("complete");
 
-            // prepare GLORE outputs
+            // prepare GLORE outputs            
             GloreLogisticRegressionResponse gloreResponse =
                 new GloreLogisticRegressionResponse();
-            LogisticRegressionResponse response =
+            LogisticRegressionResponse lrResponse =
                 new LogisticRegressionResponse();
+            LogisticRegressionOutput output = new LogisticRegressionOutput();
             // need to decide how best to handle the DataSetID
             //response.setDataSetID("GLORE server");  
-            response.setInput(request.getLogisticRegressionInput());
-            response.getOutput().add(new LogisticRegressionOutput());
-
-            List<Coefficient> target = 
-                response.getOutput().get(0).getCoefficient();
+            lrResponse.setInput(request.getLogisticRegressionInput());            
+            lrResponse.getOutput().add(output);
+            List<Coefficient> target = output.getCoefficient();
             Matrix fBeta = 
                 GloreUtils.convertMatrixTypeToMatrix(gloreData.getBeta());
 
@@ -218,9 +221,22 @@ public class GloreAggregateProcessor implements Processor
                 coefficient.setSTD(GloreUtils.df(STD[i-1]));
 
                 target.add(coefficient);
-            }
-            gloreResponse.setLogisticRegressionResponse(response);
-            exchange.getIn().setBody(gloreResponse);   
+            }         
+            gloreResponse.setLogisticRegressionResponse(lrResponse);
+            
+            // format the service response objects and set as the result body
+            ServiceResponseData responseData = new ServiceResponseData();           
+            responseData.setAny(gloreResponse);            
+            ServiceResponse response = new ServiceResponse();
+            response.setServiceResponseData(responseData); 
+            ServiceResponseMetadata responseMetadata = 
+                MessageUtils.createServiceResponseMetadata(
+                    exchange, ServiceRequestStateType.COMPLETE,
+                    "The distributed GLORE analysis completed successfully.");
+            response.setServiceResponseMetadata(responseMetadata);
+            ServiceResponses responses = new ServiceResponses();              
+            responses.getServiceResponse().add(response);
+            exchange.getIn().setBody(responses);   
             
             // signal complete
             exchange.setProperty("status", "complete");           
@@ -281,7 +297,8 @@ public class GloreAggregateProcessor implements Processor
                 log.debug("beta1:" + GloreUtils.matrixToString(beta1, 10, 12));
             }
 
-            gloreData.setBeta(GloreUtils.convertMatrixToMatrixType(beta1));
+            gloreData.setBeta(
+                GloreUtils.convertMatrixToMatrixType(beta1));
             if (log.isDebugEnabled()) {
                 log.debug("Iteration " + iter + " value: " + 
                     GloreUtils.max_abs((beta1.minus(beta0)).getArray()));
@@ -315,35 +332,56 @@ public class GloreAggregateProcessor implements Processor
         getGloreRequestList(Exchange exchange)
         throws Exception
     {
-        ArrayList resultsInput = 
-            exchange.getIn().getBody(ArrayList.class);
-        ArrayList<GloreLogisticRegressionRequest> resultsOutput = 
-            new ArrayList<GloreLogisticRegressionRequest>();
+        ServiceResponses serviceResponses = 
+            exchange.getIn().getBody(ServiceResponses.class);   
+        if (serviceResponses == null) {
+            throw new NullPointerException(
+                "ServiceResponses aggregate structure was null");
+        }        
+        List<ServiceResponse> resultsInput = 
+            serviceResponses.getServiceResponse();     
         
-        for (Object result : resultsInput) 
+        ArrayList<GloreLogisticRegressionRequest> resultsOutput = 
+            new ArrayList<GloreLogisticRegressionRequest>();        
+        for (ServiceResponse result : resultsInput) 
         {
-            if (result instanceof ErrorDetails) {
-                continue;
+            ServiceResponseData responseData = result.getServiceResponseData();
+            if (responseData != null) {
+                GloreLogisticRegressionRequest request = 
+                        (GloreLogisticRegressionRequest)MessageUtils.convertTo(
+                            GloreLogisticRegressionRequest.class,              
+                            responseData.getAny(),
+                            exchange);
+                resultsOutput.add(request);
+            } else {
+                log.warn("A ServiceResponse was missing the expected ServiceResponseData");
             }
-            GloreLogisticRegressionRequest request = 
-                (GloreLogisticRegressionRequest)MessageUtils.convertTo(
-                    GloreLogisticRegressionRequest.class, result, exchange);
-            resultsOutput.add(request);
-        }
+        }        
         return resultsOutput; 
     }
 
-    private List<ErrorDetails> getGloreErrorList(Exchange exchange)
+    private List<ServiceResponse> getGloreErrorList(Exchange exchange)
+        throws Exception
     {
-        ArrayList resultsInput = 
-            exchange.getIn().getBody(ArrayList.class);        
-        ArrayList<ErrorDetails> errors = new ArrayList<ErrorDetails>(); 
+        ServiceResponses serviceResponses = 
+            exchange.getIn().getBody(ServiceResponses.class);   
+        if (serviceResponses == null) {
+            throw new NullPointerException(
+                "ServiceResponses aggregate structure was null");
+        }        
+        List<ServiceResponse> resultsInput = 
+            serviceResponses.getServiceResponse(); 
         
-        for (Object result : resultsInput) 
+        ArrayList<ServiceResponse> errors = 
+            new ArrayList<ServiceResponse>();         
+        for (ServiceResponse result : resultsInput) 
         {
-            if (result instanceof ErrorDetails) {
-                errors.add((ErrorDetails)result);                
-            }
+                ServiceResponseMetadata status = 
+                    result.getServiceResponseMetadata();
+                if (ServiceRequestStateType.ERROR.equals(
+                    status.getRequestState())) {
+                        errors.add(result);
+                }
         }
         return errors;         
     }

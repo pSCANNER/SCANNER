@@ -62,14 +62,12 @@
                 <xsd:element name="M" 
                              type="xsd:double" 
                              minOccurs="1"
-                             maxOccurs="unbounded">
-                </xsd:element>
+                             maxOccurs="unbounded"/>
                 
                 <xsd:element name="STD" 
                              type="xsd:double"
                              minOccurs="1"
-                             maxOccurs="unbounded"> 
-                </xsd:element>                         
+                             maxOccurs="unbounded"/>                          
                                                               
                 <xsd:element name="iteration" 
                              type="xsd:int"/>
@@ -106,7 +104,6 @@
                 <xsd:element name="SDMatrix"
                              type="base:MatrixType"/>
 
-
             </xsd:sequence>
         </xsd:complexType> 
     </xsd:element>    
@@ -120,8 +117,7 @@
                </xsd:documentation>
             </xsd:annotation>
             <xsd:sequence>                                        
-                <xsd:element name="LogisticRegressionResponse"
-                             type="regr:LogisticRegressionResponse"
+                <xsd:element ref="regr:LogisticRegressionResponse"
                              minOccurs="1"
                              maxOccurs="1"/>
             </xsd:sequence>                     

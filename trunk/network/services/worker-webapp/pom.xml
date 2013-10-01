@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<name>SCANNER Network Prototype - Services - Worker - Webapp</name>
+	<artifactId>worker-webapp</artifactId>
+    <groupId>edu.isi.misd.scanner.network.services</groupId>  
+	<packaging>war</packaging>  
+  
+    <parent>
+      <relativePath>../../</relativePath>
+      <groupId>edu.isi.misd.scanner.network</groupId>
+      <artifactId>parent</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </parent>
+
+	<dependencies>
+        <dependency>
+          <groupId>edu.isi.misd.scanner.network.base</groupId>
+          <artifactId>base-common</artifactId>
+          <version>${project.version}</version>
+        </dependency>  
+              
+		<!-- Activiti -->
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-engine</artifactId>
+            <version>${project.activity.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-spring</artifactId>
+            <version>${project.activity.version}</version>            
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-explorer</artifactId>
+            <version>${project.activity.version}</version>            
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-modeler</artifactId>
+            <version>${project.activity.version}</version>            
+			<exclusions>
+			 <exclusion>
+			     <groupId>xalan</groupId>
+			     <artifactId>xalan</artifactId>
+			 </exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-diagram-rest</artifactId>
+            <version>${project.activity.version}</version>            
+		</dependency>
+		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-simple-workflow</artifactId>
+            <version>${project.activity.version}</version>            
+		</dependency>
+    
+        <!-- camel -->          
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>${project.camel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring</artifactId>
+            <version>${project.camel.version}</version>
+        </dependency>
+                
+		<!-- Database -->
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>1.3.170</version>
+        </dependency>
+        <dependency>
+          <groupId>commons-dbcp</groupId>
+          <artifactId>commons-dbcp</artifactId>
+          <version>1.4</version>
+        </dependency>
+
+		<!-- Running example processes -->
+        <dependency>
+          <groupId>org.codehaus.groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+          <version>2.1.3</version>
+        </dependency>
+
+        <!-- other -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+    
+		<!-- Testing -->
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.11</version>
+        </dependency>
+		
+        <dependency>
+          <groupId>com.google.gwt</groupId>
+          <artifactId>gwt-servlet</artifactId>
+          <version>2.3.0</version>
+        </dependency>
+		
+		<!-- Vaadin addons -->
+		<!-- Must be defined both in activiti-explorer and activiti-webapp-explorer, as otherwise the gwt compiler won't find it -->
+ 		<dependency>
+            <groupId>org.vaadin.addons</groupId>
+            <artifactId>dcharts-widget</artifactId>
+            <version>0.10.0</version>
+        </dependency>
+
+	</dependencies>
+    
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.zeroturnaround</groupId>
+				<artifactId>jrebel-maven-plugin</artifactId>
+                <version>1.1.5</version>
+				<executions>
+					<execution>
+						<id>generate-rebel-xml</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/ui-jar.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+
+			<!-- A simple Jetty server at http://localhost:8080/worker-webapp
+				 can be launched with the Maven goal jetty:run-war -->
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>7.6.8.v20121106</version>
+				<configuration>
+                    <connectors>
+                      <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+                        <port>8080</port>
+                        <!--<maxIdleTime>60000</maxIdleTime>-->
+                      </connector>
+                    </connectors>
+					<!-- Redeploy every x seconds if changes are detected, 0 for no automatic 
+						redeployment -->
+					<scanIntervalSeconds>0</scanIntervalSeconds>
+				</configuration>
+			</plugin>  
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>compile-widgetset</id>
+			<build>
+				<plugins>
+					<!-- Compile custom GWT components or widget dependencies with the GWT compiler -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>gwt-maven-plugin</artifactId>
+						<version>2.3.0</version>
+						<configuration>
+							<webappDirectory>src/main/webapp/VAADIN/widgetsets</webappDirectory>
+							<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+							<runTarget>clean</runTarget>
+							<soyc>false</soyc>
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+						      <goal>resources</goal>
+									<goal>compile</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.vaadin</groupId>
+						<artifactId>vaadin-maven-plugin</artifactId>
+						<version>1.0.2</version>
+						<executions>
+							<execution>
+							    <phase>prepare-package</phase>
+								<goals>
+									<goal>update-widgetset</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>

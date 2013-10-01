@@ -1,8 +1,8 @@
 package edu.isi.misd.scanner.network.base.utils;
 
 import edu.isi.misd.scanner.network.base.BaseConstants;
-import edu.isi.misd.scanner.network.types.base.SiteInfo;
-import java.net.URL;
+import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseMetadata;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -153,7 +153,6 @@ public class MessageUtils
     public static Object convertTo(Class<?> toType,
                                    Object fromType,                                 
                                    Exchange exchange)
-        throws Exception
     {
         // avoid the overhead of type conversion if already same type
         if (toType.isInstance(fromType)) {
@@ -161,7 +160,7 @@ public class MessageUtils
         }
 
         TypeConverter converter = exchange.getContext().getTypeConverter();
-        return converter.mandatoryConvertTo(toType, exchange, fromType);
+        return converter.tryConvertTo(toType, exchange, fromType);
     }    
     
     /**
@@ -180,87 +179,93 @@ public class MessageUtils
             ((idIndex > 0) ? 
             path.substring(idIndex + BaseConstants.ID.length()+2) : "");
     }
-   
-    /**
-     * @see MessageUtils#parseIdFromUrlPath(String path) 
-     * @param message The inbound Camel message.
-     * @return The parsed ID.
-     * @throws Exception 
-     */
-    public static String parseIdFromMessageURL(Message message) throws Exception
-    {
-        return parseIdFromUrlPath(getPathFromMessageURL(message));
-    }
     
     /**
-     * Gets the host name from the URL of the request message.
+     * Gets the request URL from the HTTPServletRequest.
      * @param message The inbound Camel message.
-     * @return The host name.
+     * @return The request URL.
      * @throws Exception
      */
-    public static String getHostFromMessageURL(Message message) 
-        throws Exception
-    {      
-        HttpServletRequest req = message.getBody(HttpServletRequest.class);  
-        return req.getLocalName();
-    }
-    
-    /**
-     * Gets the port from the URL of the request message.
-     * @param message The inbound Camel message.
-     * @return The port number.
-     * @throws Exception
-     */
-    public static int getPortFromMessageURL(Message message) 
+    public static String getRequestURL(Message message) 
         throws Exception
     {
         HttpServletRequest req = message.getBody(HttpServletRequest.class);  
-        return req.getLocalPort();        
+        return req.getRequestURL().toString();         
     }
     
-    /**
-     * Gets the path component from the URL of the request message.
-     * @param message The inbound Camel message.
-     * @return The path component of the URL.
-     * @throws Exception
-     */
-    public static String getPathFromMessageURL(Message message) 
+    public static String getResultURL(Exchange exchange) 
         throws Exception
     {
-        HttpServletRequest req = message.getBody(HttpServletRequest.class);  
-        return req.getPathInfo();         
+        String resultURL = 
+            (String)exchange.getProperty(BaseConstants.REQUEST_URL);
+        String id = (String)exchange.getIn().getHeader(BaseConstants.ID);
+        if ((resultURL == null) || (id == null)) {
+            throw new Exception(
+                "Unable to create result URL from header values");            
+        }
+        resultURL += 
+            "/id/" + (String)exchange.getIn().getHeader(BaseConstants.ID);
+        return resultURL;
     }
     
     /**
-     * Populates a {@link edu.isi.misd.scanner.network.types.base.SiteInfo}
-     * object with values resolved from the properties of the current 
-     * {@link org.apache.camel.CamelContext}.
-     * 
+     * Returns the site name of the node with a value resolved from the 
+     * properties of the current {@link org.apache.camel.CamelContext}.
      * 
      * @param exchange The current exchange.
-     * @return The populated SiteInfo.
-     * @throws Exception 
+     * @return The site name, or null.
      */
-    public static SiteInfo getSiteInfo(Exchange exchange) 
-        throws Exception
+    public static String getSiteName(Exchange exchange) 
     {
         CamelContext context = exchange.getContext();
-        
-        String siteID =
-            context.resolvePropertyPlaceholders(
-                BaseConstants.SITE_ID_PROPERTY);
-        String siteName = 
-            context.resolvePropertyPlaceholders(
+        String siteName = null;
+        try {
+            siteName = context.resolvePropertyPlaceholders(
                 BaseConstants.SITE_NAME_PROPERTY); 
-        String siteDesc = 
-            context.resolvePropertyPlaceholders(
-                BaseConstants.SITE_DESC_PROPERTY);
-        
-        SiteInfo siteInfo = new SiteInfo();
-        siteInfo.setSiteID(siteID);
-        siteInfo.setSiteName(siteName);
-        siteInfo.setSiteDescription(siteDesc);
-        
-        return siteInfo;
+        } catch (Exception e) {
+            log.warn("Exception trying to resolve property " + 
+                      BaseConstants.SITE_NAME_PROPERTY + " - " + e);
+        }
+        return siteName;
+    }
+    
+    /**
+     * Returns the external name of the node with a value resolved from the 
+     * properties of the current {@link org.apache.camel.CamelContext}.
+     * 
+     * @param exchange The current exchange.
+     * @return The site name, or null.
+     */
+    public static String getNodeName(Exchange exchange) 
+    {
+        CamelContext context = exchange.getContext();
+        String siteName = null;
+        try {
+            siteName = context.resolvePropertyPlaceholders(
+                BaseConstants.NODE_NAME_PROPERTY); 
+        } catch (Exception e) {
+            log.warn("Exception trying to resolve property " + 
+                      BaseConstants.NODE_NAME_PROPERTY + " - " + e);
+        }
+        return siteName;
+    }
+    
+    public static ServiceResponseMetadata createServiceResponseMetadata(
+        Exchange exchange,
+        ServiceRequestStateType state,
+        String stateDetail)
+    {
+        ServiceResponseMetadata serviceResponseMetadata = 
+            new ServiceResponseMetadata();
+        serviceResponseMetadata.setRequestID(MessageUtils.getID(exchange));  
+        serviceResponseMetadata.setRequestURL(
+            exchange.getProperty(BaseConstants.REQUEST_URL,String.class));             
+        serviceResponseMetadata.setRequestState(state);
+        serviceResponseMetadata.setRequestStateDetail(stateDetail);  
+        serviceResponseMetadata.setRequestSiteName(
+            MessageUtils.getSiteName(exchange));        
+        serviceResponseMetadata.setRequestNodeName(
+            MessageUtils.getNodeName(exchange));
+        return serviceResponseMetadata;
     }
 }

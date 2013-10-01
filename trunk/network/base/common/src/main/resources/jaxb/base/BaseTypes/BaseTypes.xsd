@@ -6,79 +6,100 @@
             xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
             xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
             jaxb:version="2.0" jaxb:extensionBindingPrefixes="xjc"            
-            elementFormDefault="qualified">                   
-
-    <xsd:complexType name="SiteInfo">
+            elementFormDefault="qualified">                                                      
+   
+    <xsd:simpleType name="ServiceRequestStateType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Processing"/>            
+            <xsd:enumeration value="Complete"/>          
+            <xsd:enumeration value="Held"/>
+            <xsd:enumeration value="Rejected"/>            
+            <xsd:enumeration value="Error"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+       
+    <xsd:element name="ServiceResponseMetadata">
         <xsd:annotation>
             <xsd:documentation>
-                A structure describing a remote site information
+                A response metadata structure common to all services
             </xsd:documentation>
-        </xsd:annotation>          
-        <xsd:sequence>
-            <xsd:element name="SiteID" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>            
-            <xsd:element name="SiteName" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>
-            <xsd:element name="SiteDescription" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>                          
-        </xsd:sequence>
-    </xsd:complexType>  
-        
-    <xsd:complexType name="ErrorDetails">
+        </xsd:annotation> 
+        <xsd:complexType> 
+            <xsd:sequence>  
+                <xsd:element name="RequestID" 
+                             type="xsd:string"
+                             minOccurs="1"
+                             maxOccurs="1"/>  
+                <xsd:element name="RequestURL" 
+                             type="xsd:string"
+                             minOccurs="1"
+                             maxOccurs="1"/>                                         
+                <xsd:element name="RequestState" 
+                             type="tns:ServiceRequestStateType"
+                             minOccurs="1"
+                             maxOccurs="1"/>
+                <xsd:element name="RequestStateDetail" 
+                             type="xsd:string"
+                             minOccurs="0"
+                             maxOccurs="1"/>                                   
+                <xsd:element name="RequestSiteName" 
+                             type="xsd:string"
+                             minOccurs="0"
+                             maxOccurs="1"/>       
+                <xsd:element name="RequestNodeName" 
+                             type="xsd:string"
+                             minOccurs="0"
+                             maxOccurs="1"/>                           
+            </xsd:sequence>               
+        </xsd:complexType>
+    </xsd:element>    
+       
+    <xsd:element name="ServiceResponseData">
         <xsd:annotation>
             <xsd:documentation>
-                A structure describing error details
-            </xsd:documentation>
-        </xsd:annotation>          
-        <xsd:sequence>
-            <xsd:element name="ErrorSource" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>            
-            <xsd:element name="ErrorType" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>
-            <xsd:element name="ErrorCode" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>            
-            <xsd:element name="ErrorDescription" 
-                         type="xsd:string"
-                         minOccurs="1"
-                         maxOccurs="1"/>    
-            <xsd:element name="SiteInfo" 
-                         type="tns:SiteInfo"
-                         minOccurs="1"
-                         maxOccurs="1"/>                               
-        </xsd:sequence>
-    </xsd:complexType>        
-            
-    <xsd:element name="SimpleMap">
-        <xsd:annotation>
-            <xsd:documentation>
-                A simple list of key-value pairs for storing arbitrary data.  An optional SiteInfo structure may be present which describes the original source of the data.
+                The data output of a service invocation.  
             </xsd:documentation>
         </xsd:annotation>          
         <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element name="SiteInfo" 
-                             type="tns:SiteInfo"
-                             minOccurs="0"
-                             maxOccurs="1"/>                  
-                <xsd:element ref="tns:SimpleMapData" 
-                             minOccurs="0" 
-                             maxOccurs="unbounded"/>
+            <xsd:sequence>                   
+                <xsd:any namespace="##any"/>                                         
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
        
+    <xsd:element name="ServiceResponse">
+        <xsd:annotation>
+            <xsd:documentation>
+                A generic structure which combines the output data of a service invocation along with basic metadata about the generated response.  It may or may not include the actual input data, depending on the underlying implementation.
+            </xsd:documentation>
+        </xsd:annotation>          
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="tns:ServiceResponseMetadata" 
+                             minOccurs="1"
+                             maxOccurs="1"/>                      
+                <xsd:element ref="tns:ServiceResponseData" 
+                             minOccurs="1"
+                             maxOccurs="1"/>                                             
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+                                             
+    <xsd:element name="ServiceResponses">
+        <xsd:annotation>
+            <xsd:documentation>
+                An object which encapuslates an aggregate of ServiceResponse objects
+            </xsd:documentation>
+        </xsd:annotation>          
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="tns:ServiceResponse" 
+                             minOccurs="0" 
+                             maxOccurs="unbounded"/>                                           
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+            
     <xsd:element name="SimpleMapData">
         <xsd:annotation>
             <xsd:documentation>
@@ -92,26 +113,22 @@
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element> 
-
-    <xsd:element name="BaseResponse">
+                                          
+    <xsd:element name="SimpleMap">
         <xsd:annotation>
             <xsd:documentation>
-                An object which encapuslates an aggregate response of either SimpleMaps or ErrorDetails
+                A simple list of key-value pairs for storing arbitrary data.
             </xsd:documentation>
         </xsd:annotation>          
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="tns:SimpleMap" 
+        <xsd:complexType> 
+            <xsd:sequence>                       
+                <xsd:element ref="tns:SimpleMapData" 
                              minOccurs="0" 
-                             maxOccurs="unbounded"/>
-                <xsd:element name="Error" 
-                             type="tns:ErrorDetails"
-                             minOccurs="0"
-                             maxOccurs="unbounded"/>                    
+                             maxOccurs="unbounded"/>                  
             </xsd:sequence>
         </xsd:complexType>
-    </xsd:element>
-                          
+    </xsd:element>   
+                                                                    
     <xsd:complexType name="IntegerType">
         <xsd:annotation>
             <xsd:documentation>

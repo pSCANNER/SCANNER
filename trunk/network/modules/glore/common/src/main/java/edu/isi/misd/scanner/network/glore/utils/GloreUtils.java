@@ -48,7 +48,7 @@ public class GloreUtils
     {
         return convertMatrixToMatrixType(matrix, false);
     }
-
+    
     /**
      * Converts a {@link Jama.Matrix} to a
      * {@link edu.isi.misd.scanner.network.types.base.MatrixType} 
@@ -80,6 +80,7 @@ public class GloreUtils
         matrixType.getMatrixRow().addAll(matrixRowsList);
         return matrixType;
     }
+    
     /**
      * Converts a {@link edu.isi.misd.scanner.network.types.base.MatrixType} 
      * to a{@link Jama.Matrix}.
@@ -220,7 +221,7 @@ public class GloreUtils
             M.set(i,i,A[i]);
         }
         return M;
-    }  
+    }
     
     /**
      * Formats a double to a fixed (currently three) number of decimal places.
@@ -236,5 +237,5 @@ public class GloreUtils
             return input.doubleValue();
         }
         return Double.parseDouble(f.format(input));
-    }    
+    }        
 }

@@ -365,7 +365,7 @@ Matrix values:
                 <xsd:element name="degreeOfFreedom" 
                              type="xsd:int"
                              minOccurs="0"
-                             maxOccurs="1"/>   
+                             maxOccurs="1"/>  
                 <xsd:element name="M" 
                              type="xsd:double"
                              minOccurs="1"
@@ -373,7 +373,7 @@ Matrix values:
                 <xsd:element name="STD" 
                              type="xsd:double"
                              minOccurs="1"
-                             maxOccurs="1"/>                                                                              
+                             maxOccurs="1"/>                                                                                  
             </xsd:sequence>           
         </xsd:complexType> 
     </xsd:element>       
@@ -410,11 +410,7 @@ Matrix values:
                 Defines the output of a logistic regression calculation
             </xsd:documentation>
         </xsd:annotation>     
-        <xsd:sequence>
-            <xsd:element name="SiteInfo"
-                         type="base:SiteInfo"
-                         minOccurs="0"
-                         maxOccurs="1"/>               
+        <xsd:sequence>                                                                        
             <xsd:element ref="tns:N"
                          minOccurs="0"
                          maxOccurs="1"/>
@@ -456,38 +452,36 @@ Matrix values:
                          maxOccurs="1"/>
             <xsd:element ref="tns:cov.unscaled"
                          minOccurs="0"
-                         maxOccurs="1"/>         
-        </xsd:sequence>
+                         maxOccurs="1"/> 
+        </xsd:sequence>                    
     </xsd:complexType>
 
-    <xsd:complexType name="LogisticRegressionResponse">
+    <xsd:element name="LogisticRegressionResponse">
         <xsd:annotation>
             <xsd:documentation>
-                Defines a structure representing a complete regression response, including the input request and dataset ID
+                Defines a structure representing a single regression response, including the input request and optional dataset ID
             </xsd:documentation>
-        </xsd:annotation>     
-        <xsd:sequence> 
-            <xsd:element name="DataSetID" 
-                         type="xsd:string"
-                         minOccurs="0"
-                         maxOccurs="1"/>    
-            <xsd:element name="DataSetVariables" 
-                         type="tns:LogisticRegressionVariables"
-                         minOccurs="1"
-                         maxOccurs="1"/>                                            
-            <xsd:element name="Input" 
-                         type="tns:LogisticRegressionInput"
-                         minOccurs="1"
-                         maxOccurs="1"/>                 
-            <xsd:element name="Output" 
-                         type="tns:LogisticRegressionOutput"
-                         minOccurs="1"
-                         maxOccurs="unbounded"/>                                            
-            <xsd:element name="Error" 
-                         type="base:ErrorDetails"
-                         minOccurs="0"
-                         maxOccurs="unbounded"/>                 
-        </xsd:sequence>
-    </xsd:complexType> 
+        </xsd:annotation>    
+        <xsd:complexType> 
+            <xsd:sequence>         
+                <xsd:element name="DataSetID" 
+                             type="xsd:string"
+                             minOccurs="0"
+                             maxOccurs="1"/>    
+                <xsd:element name="DataSetVariables" 
+                             type="tns:LogisticRegressionVariables"
+                             minOccurs="1"
+                             maxOccurs="1"/>                                            
+                <xsd:element name="Input" 
+                             type="tns:LogisticRegressionInput"
+                             minOccurs="1"
+                             maxOccurs="1"/>                 
+                <xsd:element name="Output" 
+                             type="tns:LogisticRegressionOutput"
+                             minOccurs="1"
+                             maxOccurs="unbounded"/>                     
+            </xsd:sequence>
+        </xsd:complexType> 
+    </xsd:element>
                 
 </xsd:schema>

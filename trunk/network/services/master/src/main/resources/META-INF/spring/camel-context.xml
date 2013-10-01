@@ -5,28 +5,7 @@
        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-    <import resource="file:etc/camel-context.xml"/>     
-           
-    <bean id="BaseRecipientList" 
-          class="edu.isi.misd.scanner.network.base.master.beans.BaseRecipientList"/>  
-        
-    <bean id="BaseResultsAggregator" 
-          class="edu.isi.misd.scanner.network.base.master.aggregators.BaseResultsAggregator"/> 
-        
-    <bean id="BaseRequestProcessor" 
-          class="edu.isi.misd.scanner.network.base.master.processors.BaseRequestProcessor"/>        
-        
-    <bean id="BaseCacheReadProcessor" 
-          class="edu.isi.misd.scanner.network.base.master.processors.BaseCacheReadProcessor"/>        
-    
-    <bean id="BaseCacheWriteProcessor" 
-          class="edu.isi.misd.scanner.network.base.master.processors.BaseCacheWriteProcessor"/>                        
-        
-    <bean id="BaseAggregateProcessor" 
-          class="edu.isi.misd.scanner.network.base.master.processors.BaseAggregateProcessor"/>                     
-
-    <bean id="BaseNoOpProcessor" 
-          class="edu.isi.misd.scanner.network.base.processors.BaseNoOpProcessor"/>      
+    <import resource="file:etc/camel-context.xml"/>                
                    
 </beans>
 

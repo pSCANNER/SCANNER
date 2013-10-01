@@ -3,8 +3,12 @@ package edu.isi.misd.scanner.network.modules.worker.processors.glore;
 import Jama.Matrix;
 import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.utils.ConfigUtils;
-import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
+import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import edu.isi.misd.scanner.network.glore.utils.GloreUtils;
+import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
+import edu.isi.misd.scanner.network.types.base.ServiceResponse;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseData;
+import edu.isi.misd.scanner.network.types.base.ServiceResponseMetadata;
 import edu.isi.misd.scanner.network.types.glore.GloreData;
 import edu.isi.misd.scanner.network.types.glore.GloreLogisticRegressionRequest;
 import java.io.BufferedReader;
@@ -46,149 +50,183 @@ public class GloreProcessor implements Processor
      */
     @Override
     public void process(Exchange exchange) throws Exception 
-    {   
-        try {    
-            exchange.getIn().setBody(this.executeAnalysis(exchange)); 
-        }
-        catch (Exception e) {
-            RuntimeException rtex = 
-                new RuntimeException(
-                    "Unhandled exception during GLORE processing. Caused by [" + 
-                    e.toString() + "]");
-            ErrorUtils.setHttpError(exchange, rtex, 500);
-            removeState(exchange);
-        }                
+    {    
+        exchange.getIn().setBody(this.executeAnalysis(exchange));        
     }
     /**
      * Performs the statistical analysis (logistic regression) using GLORE.
      * 
      * @param exchange The current exchange.
      * @return The formatted response.
-     * @throws Exception 
      */
-    protected GloreLogisticRegressionRequest executeAnalysis(Exchange exchange) 
-        throws Exception
+    protected ServiceResponse executeAnalysis(Exchange exchange) 
     {
-        GloreLogisticRegressionRequest request = 
-            (GloreLogisticRegressionRequest)exchange.getIn().getBody(
-                GloreLogisticRegressionRequest.class);
+        // Create the service response object
+        ServiceResponse response = 
+            new ServiceResponse();           
         
-        GloreData data = request.getGloreData();
-        if (data == null) {
-            data = new GloreData();
-            request.setGloreData(data);
-        }
+        try
+        {            
+            GloreLogisticRegressionRequest request = 
+                (GloreLogisticRegressionRequest)exchange.getIn().getBody(
+                    GloreLogisticRegressionRequest.class);
+
+            GloreData data = request.getGloreData();
+            if (data == null) {
+                data = new GloreData();
+                request.setGloreData(data);
+            }
         
-        GloreStateData state = getState(exchange);        
-        synchronized(this)
-        {
-            if (!state.dataLoaded) 
+            // Create the service response metadata object
+            ServiceResponseMetadata responseMetadata = 
+                MessageUtils.createServiceResponseMetadata(
+                    exchange, 
+                    ServiceRequestStateType.PROCESSING,
+                    "The GLORE computational request is in process."); 
+            
+            GloreStateData state = getState(exchange);        
+            synchronized(this)
             {
-                readDataFile(exchange);
-                state.beta = new Matrix(state.columns, 1, 0.0);
-                state.cov_matrix = new Matrix(state.columns, state.columns);
+                if (!state.dataLoaded) 
+                {
+                    readDataFile(exchange);
+                    state.beta = new Matrix(state.columns, 1, 0.0);
+                    state.cov_matrix = new Matrix(state.columns, state.columns);
 
-                // convert data into arrays to be passed to Matrix's constructor
-                state.Xa = GloreUtils.two_dim_list_to_arr(state.Xv);
-                state.Ya = GloreUtils.one_dim_list_to_arr(state.Yv);
+                    // convert data into arrays to be passed to Matrix's constructor
+                    state.Xa = GloreUtils.two_dim_list_to_arr(state.Xv);
+                    state.Ya = GloreUtils.one_dim_list_to_arr(state.Yv);
 
-                // create X and Y matrices
-                state.X = new Matrix(state.Xa);
-                state.Y = new Matrix(state.Ya, state.Ya.length);
+                    // create X and Y matrices
+                    state.X = new Matrix(state.Xa);
+                    state.Y = new Matrix(state.Ya, state.Ya.length);  
 
-                data.setColumns(state.columns);
-                data.setRows(state.rows);
-                
-                state.dataLoaded = true;                  
-            }
-        }
-        
-        if ("computeCovarianceMatrix".equalsIgnoreCase(data.getState()))
-        {
-            log.info("Compute covariance matrix");
-            state.beta = 
-                GloreUtils.convertMatrixTypeToMatrix(data.getBeta());            
-            state.hat_beta = state.beta.copy();
+                    data.setColumns(state.columns);
+                    data.setRows(state.rows);
 
-            state.P = (state.X.times(-1)).times(state.hat_beta);
-            GloreUtils.exp(state.P.getArray());
-            GloreUtils.add_one(state.P.getArray());
-            GloreUtils.div_one(state.P.getArray());
-
-            state.W = state.P.copy();
-            state.W.timesEquals(-1.0);
-            GloreUtils.add_one(state.W.getArray());
-            state.W.arrayTimesEquals(state.P);
-            state.W = state.W.transpose();
-            state.W = GloreUtils.diag(state.W.getArray()[0]);
-
-            state.D = ((state.X.transpose()).times(state.W)).times(state.X); 
-            data.setD(GloreUtils.convertMatrixToMatrixType(state.D));
-        } 
-        else if ("computeSDMatrix".equalsIgnoreCase(data.getState()))
-        {
-            state.cov_matrix = 
-                GloreUtils.convertMatrixTypeToMatrix(
-                    data.getCovarianceMatrix());
-            log.info("Covariance matrix: " +
-                GloreUtils.matrixToString(state.cov_matrix, 8, 6));
-            
-            log.info("Compute SD matrix");            
-            state.SD = new Matrix(1, state.columns);
-            for (int i = 0; i < state.columns; i++) {
-                state.SD.set(0, i, Math.sqrt(state.cov_matrix.get(i,i)));
+                    state.dataLoaded = true;                  
+                }
             }
 
-            // compute the M and STD since SD matrix is only computed 
-            // when model converges, and therefore, only once
-            calMandSTD(state);
-            data.getM().addAll(
-                Arrays.asList(ArrayUtils.toObject(state.Ma)));
-            log.info("M: " + data.getM());              
-            data.getSTD().addAll(
-                Arrays.asList(ArrayUtils.toObject(state.STDa)));
-            log.info("STD: " + data.getSTD());              
-
-            log.info("SD matrix:" + GloreUtils.matrixToString(state.SD, 8, 6));            
-            data.setSDMatrix(GloreUtils.convertMatrixToMatrixType(state.SD));
-            removeState(exchange);
-        }            
-        else 
-        {
-            if (data.getBeta() != null) {
+            if ("computeCovarianceMatrix".equalsIgnoreCase(data.getState()))
+            {
+                log.info("Compute covariance matrix");
                 state.beta = 
-                    GloreUtils.convertMatrixTypeToMatrix(data.getBeta());
+                    GloreUtils.convertMatrixTypeToMatrix(data.getBeta());            
+                state.hat_beta = state.beta.copy();
+
+                state.P = (state.X.times(-1)).times(state.hat_beta);
+                GloreUtils.exp(state.P.getArray());
+                GloreUtils.add_one(state.P.getArray());
+                GloreUtils.div_one(state.P.getArray());
+
+                state.W = state.P.copy();
+                state.W.timesEquals(-1.0);
+                GloreUtils.add_one(state.W.getArray());
+                state.W.arrayTimesEquals(state.P);
+                state.W = state.W.transpose();
+                state.W = GloreUtils.diag(state.W.getArray()[0]);
+
+                state.D = ((state.X.transpose()).times(state.W)).times(state.X); 
+                data.setD(GloreUtils.convertMatrixToMatrixType(state.D));
+                responseMetadata.setRequestStateDetail(
+                    "The GLORE computational request is in process." + 
+                    "  Current state: " + data.getState());
+            } 
+            else if ("computeSDMatrix".equalsIgnoreCase(data.getState()))
+            {
+                state.cov_matrix = 
+                    GloreUtils.convertMatrixTypeToMatrix(
+                        data.getCovarianceMatrix());
+                log.info("Covariance matrix: " +
+                    GloreUtils.matrixToString(state.cov_matrix, 8, 6));
+
+                log.info("Compute SD matrix");            
+                state.SD = new Matrix(1, state.columns);
+                for (int i = 0; i < state.columns; i++) {
+                    state.SD.set(0, i, Math.sqrt(state.cov_matrix.get(i,i)));
+                }
+
+                // compute the M and STD since SD matrix is only computed 
+                // when model converges, and therefore, only once
+                calMandSTD(state);
+                data.getM().addAll(
+                    Arrays.asList(ArrayUtils.toObject(state.Ma)));
+                log.info("M: " + data.getM());              
+                data.getSTD().addAll(
+                    Arrays.asList(ArrayUtils.toObject(state.STDa)));
+                log.info("STD: " + data.getSTD()); 
+                
+                log.info("SD matrix:" + GloreUtils.matrixToString(state.SD, 8, 6));            
+                data.setSDMatrix(GloreUtils.convertMatrixToMatrixType(state.SD));
+                removeState(exchange);
+                
+                responseMetadata.setRequestState(
+                    ServiceRequestStateType.COMPLETE);
+                responseMetadata.setRequestStateDetail(
+                    "GLORE computation completed successfully at iteration: " + 
+                    data.getIteration());
+            }                       
+            else 
+            {
+                if (data.getBeta() != null) {
+                    state.beta = 
+                        GloreUtils.convertMatrixTypeToMatrix(data.getBeta());
+                }
+                // P <- 1 + exp(-x%*%beta1)
+                state.P = (state.X.times(-1)).times(state.beta);
+                GloreUtils.exp(state.P.getArray());
+                GloreUtils.add_one(state.P.getArray());
+                GloreUtils.div_one(state.P.getArray());
+
+                // w = diag(c(p*(1-p)))
+                state.W = state.P.copy();
+                state.W.timesEquals(-1.0);
+                GloreUtils.add_one(state.W.getArray());
+                state.W.arrayTimesEquals(state.P);
+                state.W = state.W.transpose();
+                state.W = GloreUtils.diag(state.W.getArray()[0]);
+
+                // d <- t(x)%*%w%*%x
+                state.D = ((state.X.transpose()).times(state.W)).times(state.X);
+                // e <- t(x)%*%(y-p)
+                state.E = 
+                    (state.X.transpose()).times(state.Y.plus(state.P.uminus()));
+
+                // D.print(10,3);
+                // E.print(10,3);
+
+                data.setD(GloreUtils.convertMatrixToMatrixType(state.D));
+                data.setE(GloreUtils.convertMatrixToMatrixType(state.E));
+
+                // print beta for this iteration
+                log.info("Beta: " + GloreUtils.matrixToString(state.beta, 8, 8));     
+                responseMetadata.setRequestStateDetail(
+                    "The GLORE computational request is in process." + 
+                    "  Current state: " + data.getState() + 
+                    " " + data.getIteration());                   
             }
-            // P <- 1 + exp(-x%*%beta1)
-            state.P = (state.X.times(-1)).times(state.beta);
-            GloreUtils.exp(state.P.getArray());
-            GloreUtils.add_one(state.P.getArray());
-            GloreUtils.div_one(state.P.getArray());
 
-            // w = diag(c(p*(1-p)))
-            state.W = state.P.copy();
-            state.W.timesEquals(-1.0);
-            GloreUtils.add_one(state.W.getArray());
-            state.W.arrayTimesEquals(state.P);
-            state.W = state.W.transpose();
-            state.W = GloreUtils.diag(state.W.getArray()[0]);
-
-            // d <- t(x)%*%w%*%x
-            state.D = ((state.X.transpose()).times(state.W)).times(state.X);
-            // e <- t(x)%*%(y-p)
-            state.E = 
-                (state.X.transpose()).times(state.Y.plus(state.P.uminus()));
-
-            // D.print(10,3);
-            // E.print(10,3);
-
-            data.setD(GloreUtils.convertMatrixToMatrixType(state.D));
-            data.setE(GloreUtils.convertMatrixToMatrixType(state.E));
             
-            // print beta for this iteration
-            log.info("Beta: " + GloreUtils.matrixToString(state.beta, 8, 8));         
+            // Create the service response data object
+            ServiceResponseData responseData = 
+                new ServiceResponseData();  
+            responseData.setAny(request);
+            // Initialize the service response with response data and response metadata
+            response.setServiceResponseData(responseData);
+            response.setServiceResponseMetadata(responseMetadata);
         }
-        return request;
+        catch (Exception e) 
+        {    
+            response.setServiceResponseMetadata(
+                MessageUtils.createServiceResponseMetadata(
+                    exchange, 
+                    ServiceRequestStateType.ERROR,
+                    "Unhandled exception during GLORE processing. Caused by [" + 
+                    e.toString() + "]"));    
+            removeState(exchange);            
+        }
+        return response;         
     }
 
     /**

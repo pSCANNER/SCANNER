@@ -3,23 +3,24 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>edu.isi.misd.scanner.network.services</groupId>
-  <artifactId>all</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
-
   <name>SCANNER Network Prototype - Services</name>
-  <url>http://scanner.misd.isi.edu</url>
+  <groupId>edu.isi.misd.scanner.network.services</groupId>
+  <artifactId>services</artifactId>
+  <packaging>pom</packaging>
 
   <modules>    
     <module>master</module>   
     <module>worker</module>            
+    <module>worker-webapp</module>    
+    <module>registry</module>     
   </modules>
   
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>     
+  <parent>
+    <relativePath>../</relativePath>
+    <groupId>edu.isi.misd.scanner.network</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>  
 
   <build>
     <defaultGoal>install</defaultGoal>                

@@ -1,0 +1,38 @@
+﻿<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<title>SCANNER Registry</title>
+	<link rel="stylesheet" href="css/jquery-ui-1.8.19.css" type="text/css" media="all"/>
+</head>
+<body>
+<script src="js/jquery-1.7.2.min.js"></script>
+<script src="js/jquery-ui-1.8.19.min.js"></script>
+<script src="js/jshashtable-2.1.js"></script>
+<script src="js/jquery.numberformatter-1.2.3.min.js"></script>
+<script>
+	$(document).ready(function () {
+		$.getJSON('registry/libraries', function (libraries) {
+			var table_obj = $('#librariesTable');
+			$.each(libraries, function (index, library) {
+				table_obj.append($('<tr><td>' + library.libraryId + '</td><td>' 
+                    + library.libraryName + '</td><td>' + library.description 
+                    + '</td><td>' + library.version  + '</td></tr>'));
+			})
+		})
+	});
+</script>
+<form>
+	<br/>
+	<br/>
+	<table id="librariesTable" border="1">
+		<tr>
+			<th>Library ID</th>
+			<th>Library Name</th>
+			<th>Library Description</th>            
+			<th>Library Version</th>            
+		</tr>
+	</table>
+</form>
+</body>
+</html>

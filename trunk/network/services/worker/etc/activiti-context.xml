@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"     
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"       
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+ 
+    <!-- 
+        This class controls if Activiti is enabled/disabled at the system level.
+        If disabled, it does nothing and returns immediately from the init() method.  
+        If enabled, it tries to start Activiti based on the ProcessEngineConfiguration 
+        configured below, and optionally create schema and populate some initial data.
+    -->
+    <bean id="activitiSupport" 
+          class="edu.isi.misd.scanner.network.base.worker.workflow.ActivitiSupport" 
+          init-method="init">
+        <property name="activitiSupportEnabled" value="${worker.activiti.enabled}" />        
+        <property name="databaseURL" value="${worker.activiti.jdbc.url}"/>
+        <property name="createDefaultUsersAndGroups" value="true" />
+        <property name="createDefaultProcessDefinitions" value="true" />
+    </bean>   
+        
+    <bean id="h2Server"
+          class="org.h2.tools.Server"
+          factory-method="createTcpServer"
+          init-method="start"
+          destroy-method="stop"
+          lazy-init="true">
+        <constructor-arg value="-tcp,-tcpAllowOthers,-tcpPort,9101,-baseDir,data/activiti" />
+    </bean>
+        
+    <!-- Activiti BPMN configuration beans -->                  
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" lazy-init="true">
+      <property name="driverClassName" value="${worker.activiti.jdbc.driver}" />
+      <property name="url" value="${worker.activiti.jdbc.url}" />
+      <property name="username" value="${worker.activiti.jdbc.username}" />
+      <property name="password" value="${worker.activiti.jdbc.password}" />      
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+      <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration" lazy-init="true">
+      <property name="dataSource" ref="dataSource" />
+      <property name="transactionManager" ref="transactionManager" />
+      <property name="databaseSchemaUpdate" value="${worker.activiti.databaseSchemaUpdate}" />
+      <property name="jobExecutorActivate" value="true" />
+      <property name="mailServerHost" value="${worker.activiti.mail.mailServerHost}" /> 
+      <property name="mailServerPort" value="${worker.activiti.mail.mailServerPort}"  /> 
+      <property name="history" value="${worker.activiti.historyLevel}" />           
+    </bean>
+
+
+    <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean" lazy-init="true">
+      <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+    </bean>
+    
+    <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" lazy-init="true"/>
+    <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" lazy-init="true"/>
+    <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" lazy-init="true"/>
+    <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" lazy-init="true"/>
+    <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" lazy-init="true"/>    
+                               
+</beans>
