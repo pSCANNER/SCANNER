@@ -2,18 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-
+  
+  <name>SCANNER Network Prototype - Modules - Glore - Integration Test</name>
   <groupId>edu.isi.misd.scanner.network.modules.glore</groupId>
   <artifactId>glore-test</artifactId>
-  <version>1.0-SNAPSHOT</version>
 
-  <name>SCANNER Network Prototype - Modules - Glore - Integration Test</name>
-  <url>http://scanner.misd.isi.edu</url>
-
-  <properties>      
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
+  <parent>
+    <relativePath>../../../</relativePath>
+    <groupId>edu.isi.misd.scanner.network</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
     
   <dependencies>  
       

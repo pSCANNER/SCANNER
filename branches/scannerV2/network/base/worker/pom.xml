@@ -3,28 +3,17 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <name>SCANNER Network Prototype - Base - Worker</name>
   <groupId>edu.isi.misd.scanner.network.base</groupId>
   <artifactId>base-worker</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
 
-  <name>SCANNER Network Prototype - Base - Worker</name>
-  <url>http://scanner.misd.isi.edu</url>
-
-  <properties>
-    <project.camel.version>2.11.0</project.camel.version>           
-    <project.spring.version>3.1.4.RELEASE</project.spring.version>      
-    <project.activity.version>5.13</project.activity.version>      
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
-    
-  <repositories>
-    <repository>
-        <id>Alfresco Maven Repository</id>
-        <url>https://maven.alfresco.com/nexus/content/groups/public/</url>
-    </repository>
-  </repositories>
+  <parent>
+    <relativePath>../../</relativePath>
+    <groupId>edu.isi.misd.scanner.network</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
     
   <dependencies>   
          

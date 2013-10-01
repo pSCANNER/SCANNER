@@ -2,13 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+    
 	<name>SCANNER Network Prototype - Services - Registry</name>
 	<artifactId>registry</artifactId>
-    <groupId>edu.isi.misd.scanner.network.services</groupId>
-    <version>1.0-SNAPSHOT</version>    
+    <groupId>edu.isi.misd.scanner.network.services</groupId>  
 	<packaging>war</packaging>  
   
+    <parent>
+      <relativePath>../../</relativePath>
+      <groupId>edu.isi.misd.scanner.network</groupId>
+      <artifactId>parent</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </parent>
+      
 	<properties>
 		<spring.version>3.1.4.RELEASE</spring.version>
 		<spring.data.jpa.version>1.4.1.RELEASE</spring.data.jpa.version>            
@@ -20,31 +26,9 @@
 		<jodatime.version>2.2</jodatime.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>            
 	</properties>
-
-	<repositories>
-		<repository>
-			<id>spring-libs-milestone</id>
-			<name>Spring Framework Maven Release Repository</name>
-			<url>http://repo.springsource.org/libs-milestone</url>
-		</repository>
-        <repository>
-            <url>http://download.eclipse.org/rt/eclipselink/maven.repo/</url>
-            <id>jpa20-persistence</id>
-            <layout>default</layout>
-            <name>Repository for library Persistence (JPA 2.0)</name>
-        </repository>
-	</repositories>
-	
-	<pluginRepositories>
-		<pluginRepository>
-			<id>repository.plugin.springsource.release</id>
-			<name>SpringSource Maven Repository</name>
-			<url>http://repo.springsource.org/plugins-release</url>
-		</pluginRepository>
-	</pluginRepositories>  
-    
-	<dependencies>
-		                                 
+           
+	<dependencies>		    
+                                            
 		<!-- Jackson JSON Mapper -->    
         <dependency>
            <groupId>com.fasterxml.jackson.core</groupId>
@@ -204,13 +188,7 @@
          <version>1.0</version>
          <scope>provided</scope>
         </dependency>
-<!--                
-        <dependency>
-          <groupId>edu.isi.misd.scanner.network.base</groupId>
-          <artifactId>base-common</artifactId>
-          <version>${project.version}</version>
-        </dependency>
--->           
+        
 	</dependencies>
 
 	<build>
