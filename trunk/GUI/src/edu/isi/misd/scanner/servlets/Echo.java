@@ -19,11 +19,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.isi.misd.scanner.client.ERDClient;
 import edu.isi.misd.scanner.client.JakartaClient;
 import edu.isi.misd.scanner.client.RegistryClient;
 import edu.isi.misd.scanner.client.RegistryClientResponse;
 import edu.isi.misd.scanner.client.ScannerClient;
-import edu.isi.misd.scanner.client.TagfilerClient;
 import edu.isi.misd.scanner.client.JakartaClient.ClientURLResponse;
 
 /**
@@ -36,9 +36,6 @@ public class Echo extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ServletContext servletContext;
 	private ServletConfig servletConfig;
-	private String tagfilerURL;
-	private String tagfilerUser;
-	private String tagfilerPassword;
 	
 	private String trustStoreType;
 	private String trustStorePassword;
@@ -53,6 +50,7 @@ public class Echo extends HttpServlet {
 	 * The client to execute the network requests.
 	 */
 	ScannerClient scannerClient;
+	private String erdURL;
        
     /**
      * Default constructor. 
@@ -74,9 +72,6 @@ public class Echo extends HttpServlet {
 		super.init(config);
 		System.out.println("Echo is initialized");
 		servletConfig = config;
-		tagfilerURL = servletConfig.getServletContext().getInitParameter("tagfilerURL");
-		tagfilerUser = servletConfig.getServletContext().getInitParameter("tagfilerUser");
-		tagfilerPassword = servletConfig.getServletContext().getInitParameter("tagfilerPassword");
 		trustStoreType = servletConfig.getServletContext().getInitParameter("trustStoreType");
 		trustStorePassword = servletConfig.getServletContext().getInitParameter("trustStorePassword");
 		trustStoreResource = servletConfig.getServletContext().getInitParameter("trustStoreResource");
@@ -92,15 +87,12 @@ public class Echo extends HttpServlet {
 		System.out.println("trustStoreResource: " + trustStoreResource);
 		System.out.println("keyStoreResource: " + keyStoreResource);
 		servletContext = config.getServletContext();
-		JakartaClient client = new JakartaClient(4, 8192, 120000);
-		ClientURLResponse rsp = client.login(tagfilerURL + "/session", tagfilerUser, tagfilerPassword);
-		if (rsp != null) {
-			registryClient = new TagfilerClient(client, tagfilerURL, client.getCookieValue());
-			scannerClient = new ScannerClient(4, 8192, 300000,
-					trustStoreType, trustStorePassword, trustStoreResource,
-					keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
-			(new EchoThread()).start();
-		}
+		erdURL = "http://aspc.isi.edu:8088/scannerV2/registry/";
+		registryClient = new ERDClient(erdURL, "user");
+		scannerClient = new ScannerClient(4, 8192, 300000,
+				trustStoreType, trustStorePassword, trustStoreResource,
+				keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
+		(new EchoThread()).start();
 		
 	}
 	
@@ -123,20 +115,24 @@ public class Echo extends HttpServlet {
 				JSONObject ret = new JSONObject();
 				try {
 					if (count != 0) {
+						//ready = true;
 						Thread.sleep(5*60*1000);
+						//continue;
 					}
 					count++;
 					RegistryClientResponse clientResponse = registryClient.getSitesMap();
 					JSONObject sites = clientResponse.toSitesMap();
+					clientResponse.release();
 					JSONObject sitesMap = sites.getJSONObject("map");
 					JSONObject targets = sites.getJSONObject("targets");
 					ret.put("sitesMap", sitesMap);
 					clientResponse = registryClient.getMasterObject();
 					String res = clientResponse.toMasterString();
+					clientResponse.release();
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
-					String masterURL = temp.getString("rURL");
-					String url = masterURL + "/query/example/echo";
+					String masterURL = temp.getString("hostUrl") + ":" + temp.getString("hostPort") + temp.getString("basePath");
+					String url = masterURL + "example/echo";
 					StringBuffer buff = new StringBuffer();
 					JSONArray names = targets.names();
 					for (int i=0; i < names.length(); i++) {
@@ -144,7 +140,7 @@ public class Echo extends HttpServlet {
 						if (i != 0) {
 							buff.append(",");
 						}
-						buff.append(key + "/dataset/example/echo");
+						buff.append(key + "example/echo");
 					}
 					String targetsURLs = buff.toString();
 					JSONObject body = new JSONObject();
@@ -163,22 +159,26 @@ public class Echo extends HttpServlet {
 					System.out.println("contentType received: " + contentType);
 					res = rsp.getEntityString();
 					System.out.println("Response Body: \n"+res);
+					System.out.println("Ret: \n"+ret);
 					ret.put("timestamp", (new Date()).toString());
 					if (contentType != null && contentType.indexOf("application/json") != -1) {
 						JSONObject echoResult = new JSONObject(res);
 						ret.put("echo", echoResult);
-						if (echoResult.has("Error")) {
+						JSONArray serviceResponse = echoResult.getJSONObject("ServiceResponses").getJSONArray("ServiceResponse");
+						JSONArray errors = new JSONArray();
+						for (int i=0; i < serviceResponse.length(); i++) {
+							JSONObject serviceResponseMetadata = serviceResponse.getJSONObject(i).getJSONObject("ServiceResponseMetadata");
+							if (!serviceResponseMetadata.getString("RequestState").equals("Complete")) {
+								errors.put(serviceResponseMetadata);
+							}
+						}
+						if (errors.length() > 0) {
 							JSONObject errorsStatistics = new JSONObject();
 							ret.put("errorsStatistics", errorsStatistics);
 							errorsStatistics.put("total", count);
-							JSONArray errors = echoResult.optJSONArray("Error");
-							if (errors == null) {
-								errors = new JSONArray();
-								errors.put(echoResult.getJSONObject("Error"));
-							}
 							for (int i=0; i < errors.length(); i++) {
 								JSONObject obj = errors.getJSONObject(i);
-								URI error_url = new URI(obj.getString("ErrorSource"));
+								URI error_url = new URI(obj.getString("RequestURL"));
 								String host = error_url.getHost();
 								int port = error_url.getPort();
 								String key = host + (port == -1 ? "" : ":" + port);
