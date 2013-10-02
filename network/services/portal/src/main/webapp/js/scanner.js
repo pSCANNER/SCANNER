@@ -412,7 +412,7 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 		var img = $('<img>');
 		img.attr({'alt': 'Up',
 			'title': 'Status Up',
-			'src': 'resources/images/green_circle.png',
+			'src': 'images/green_circle.png',
 			'height': '10'
 			});
 		td.append(img);
@@ -433,7 +433,7 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 		var img = $('<img>');
 		img.attr({'alt': 'Down',
 			'title': 'Status Down',
-			'src': 'resources/images/red_circle.png',
+			'src': 'images/red_circle.png',
 			'height': '10'
 			});
 		td.append(img);

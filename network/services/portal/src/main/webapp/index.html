@@ -35,23 +35,23 @@
 	height: 20em;
 }
 </style>
-<link rel="stylesheet" type="text/css" href="resources/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
 <link rel="stylesheet" type="text/css"
 	href="css/demo_page.css">
 <link rel="stylesheet" type="text/css"
 	href="css/demo_table.css">
 <link rel="stylesheet" type="text/css"
-	href="resources/jquery.treeview.css">
+	href="css/jquery.treeview.css">
 <link rel="stylesheet" type="text/css" href="css/scanner.css">
 <link rel="stylesheet" type="text/css"
 	href="js/dojo-1.8.3/dojo/../dijit/themes/claro/claro.css">
-<script type="text/javascript" src="resources/jquery.js"></script>
-<script type="text/javascript" src="resources/jquery-ui.js"></script>
-<script type="text/javascript" src="resources/jquery.dataTables.js"></script>
-<script type="text/javascript" src="resources/jquery.treeview.js"></script>
-<script type="text/javascript" src="resources/d3.v3.js"></script>
-<script type="text/javascript" src="resources/box.js"></script>
-  <script type="text/javascript" src="resources/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery-ui.js"></script>
+<script type="text/javascript" src="js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="js/jquery.treeview.js"></script>
+<script type="text/javascript" src="js/d3.v3.js"></script>
+<script type="text/javascript" src="js/box.js"></script>
+  <script type="text/javascript" src="js/jquery-ui-timepicker-addon.js"></script>
 <script type="text/javascript">
 	dojoConfig = {
 		async : true,
@@ -64,7 +64,7 @@
 	require([ "dojo/parser", "dijit/layout/TabContainer",
 			"dijit/layout/ContentPane" ]);
 </script>
-<script type="text/javascript" src="resources/scanner.js"></script>
+<script type="text/javascript" src="js/scanner.js"></script>
 </head>
 
 <body>
@@ -1226,7 +1226,7 @@ Enrollment Table Format Page</b></p>
 									<div id="paramsDiv" class="method_border" style="display: none;">
 										<div id="paramsDivContent" class="method_margin"></div>
 										<div id="ajaxSpinnerContainer">
-											<img src="resources/images/ajax-loader.gif" id="ajaxSpinnerImage"
+											<img src="images/ajax-loader.gif" id="ajaxSpinnerImage"
 												title="Processing..." alt="Spinner" />
 										</div>
 										<p style="display:none;">
@@ -1248,9 +1248,9 @@ Enrollment Table Format Page</b></p>
 									</div>
 									<div id="queryDiv" style="display: none;" >
 										<h2 id="queryTitle">Analyze Results</h2>
-										<img src="resources/images/expand.jpg" id="expandQueryResultsArrow"
+										<img src="images/expand.jpg" id="expandQueryResultsArrow"
 											alt="Expand" onclick="expandQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');"/>
-										<img src="resources/images/collapse.jpg" id="collapseQueryResultsArrow"
+										<img src="images/collapse.jpg" id="collapseQueryResultsArrow"
 											alt="Collapse"  onclick="collapseQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');" style="display: none;"/>
 										<div id="queryDivContent">
 										</div>
@@ -1285,14 +1285,14 @@ Enrollment Table Format Page</b></p>
 		<div id="replayDivWrapper">
 			<br style="clear: left;" />
 			<div id="ajaxAnalyzeSpinnerContainer">
-				<img src="resources/images/ajax-loader.gif" id="ajaxAnalyzeSpinnerImage"
+				<img src="images/ajax-loader.gif" id="ajaxAnalyzeSpinnerImage"
 					title="Processing..." alt="Spinner" />
 			</div>
 			<div id="replayDiv" style="display: none;" >
 				<h2 id="replayTitle">Analyze Results</h2>
-				<img src="resources/images/expand.jpg" id="expandResults"
+				<img src="images/expand.jpg" id="expandResults"
 					alt="Expand" onclick="expandQueryResults('replayDivContent', 'expandResults', 'collapseResults');"/>
-				<img src="resources/images/collapse.jpg" id="collapseResults"
+				<img src="images/collapse.jpg" id="collapseResults"
 					alt="Collapse"  onclick="collapseQueryResults('replayDivContent', 'expandResults', 'collapseResults');" style="display: none;"/>
 				<div id="replayDivContent">
 				</div>
