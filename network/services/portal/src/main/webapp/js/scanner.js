@@ -101,6 +101,7 @@ var sitesPoliciesList = null;
 var sitesPoliciesDict = null;
 
 var sitesList = null;
+var sitesDict = null;
 
 var activeStudy = null;
 var activeUser = null;
@@ -2791,10 +2792,10 @@ function postManageStudy(data, textStatus, jqXHR, param) {
 	option.text('Select Site...');
 	option.attr('value', '');
 	select.append(option);
-	$.each(studyRequestedSitesList, function(i, studyRequestedSite) {
+	$.each(sitesList, function(i, site) {
 		option = $('<option>');
-		option.text(studyRequestedSite['site']['siteName']);
-		option.attr('value', studyRequestedSite['studyRequestedSiteId']);
+		option.text(site['siteName']);
+		option.attr('value', site['siteId']);
 		select.append(option);
 	});
 	var select = $('#modelNames');
@@ -3029,7 +3030,7 @@ function addSite() {
 	var obj = {};
 	obj['action'] = 'createStudyRequestedSites';
 	obj['studyId'] = activeStudy['studyId'];
-	obj['siteId'] = studyRequestedSitesDict[$('#siteSelect').val()]['site']['siteId'];
+	obj['siteId'] = $('#siteSelect').val();
 	var url =  HOME + '/registry';
 	$('#addSiteButton').attr('disabled', 'disabled');
 	scanner.POST(url, obj, true, postAddSite, null, null, 0);
@@ -3495,7 +3496,7 @@ function addStudyRoleRow(studyRole) {
 
 function addSiteRow(site) {
 	$.each($('option', $('#siteSelect')), function(i, option) {
-		if ($(option).attr('value') != '' && studyRequestedSitesDict[$(option).attr('value')]['site']['siteName'] == site['site']['siteName']) {
+		if ($(option).attr('value') != '' && sitesDict[$(option).attr('value')]['siteName'] == site['site']['siteName']) {
 			$(option).hide();
 			return false;
 		}
@@ -3527,7 +3528,7 @@ function removeStudySite(button, site) {
 	}
 	button.parent().parent().remove();
 	$.each($('option', $('#siteSelect')), function(i, option) {
-		if ($(option).attr('value') != '' && studyRequestedSitesDict[$(option).attr('value')]['site']['siteName'] == site['site']['siteName']) {
+		if ($(option).attr('value') != '' && sitesDict[$(option).attr('value')]['siteName'] == site['site']['siteName']) {
 			$(option).show();
 			return false;
 		}
@@ -4119,6 +4120,10 @@ function initSites(all) {
 
 function postInitSites(data, textStatus, jqXHR, param) {
 	sitesList = data;
+	sitesDict = {};
+	$.each(sitesList, function(i, site) {
+		sitesDict[site['siteId']] = site;
+	});
 	sitesList.sort(compareSites);
 	if (param) {
 		initStudyRoles(param);
