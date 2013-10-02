@@ -109,7 +109,8 @@ var loggedInUser = null;
 var loggedInUserRoles = null;
 
 
-var emptyValue = ['&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'];
+var emptySelectionString = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+var emptyValue = [emptySelectionString];
 
 var analyzeLayout = [[
                       {'name': 'Date', 'field': 'date', 'width': '15%'},
@@ -2133,7 +2134,11 @@ function loadDatasets(values) {
 				var selValues = datasetsMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
-						renderAvailableSites();
+						if (selValues[0] == emptySelectionString) {
+							datasetsMultiSelect.set('value', '');
+						} else {
+							renderAvailableSites();
+						}
 					} else if (selValues.length > 1) {
 						datasetsMultiSelect.set('value', '');
 					}
@@ -2172,7 +2177,11 @@ function loadLibraries(values) {
 				var selValues = librariesMultiSelect.get('value');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
-						renderAvailableMethods();
+						if (selValues[0] == emptySelectionString) {
+							librariesMultiSelect.set('value', '');
+						} else {
+							renderAvailableMethods();
+						}
 					} else if (selValues.length > 1) {
 						librariesMultiSelect.set('value', '');
 					}
@@ -2210,7 +2219,11 @@ function loadMethods(values) {
 				$('#queryDiv').css('display', 'none');
 				if (selValues != null) { 
 					if (selValues.length == 1) {
-						renderAvailableParameters();
+						if (selValues[0] == emptySelectionString) {
+							methodsMultiSelect.set('value', '');
+						} else {
+							renderAvailableParameters();
+						}
 					} else if (selValues.length > 1) {
 						methodsMultiSelect.set('value', '');
 					}
@@ -2249,7 +2262,9 @@ function loadSites(values, selectAll) {
 				$('#statusQueryWrapperDiv').css('display', 'none');
 				$('#queryDiv').css('display', 'none');
 				if (selValues != null) { 
-					if (selValues.length >= 1) {
+					if (selValues.length == 1 && selValues[0] == emptySelectionString) {
+						sitesMultiSelect.set('value', '');
+					} else if (selValues.length >= 1) {
 						renderAvailableLibraries();
 					}
 				} 
