@@ -178,5 +178,5 @@ public class DataSetDefinition implements Serializable
     public String toString() {
         return "edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition[ dataSetDefinitionId=" + dataSetDefinitionId + " ]";
     }
-    
+
 }

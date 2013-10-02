@@ -159,5 +159,5 @@ public class DrugsCodeSet implements Serializable
     public String toString() {
         return "edu.isi.misd.scanner.network.registry.data.domain.DrugsCodeSet[ conceptId=" + conceptId + " ]";
     }
-    
+
 }

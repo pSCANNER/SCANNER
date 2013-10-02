@@ -159,5 +159,5 @@ public class ConditionsCodeSet implements Serializable
     public String toString() {
         return "edu.isi.misd.scanner.network.registry.data.domain.ConditionsCodeSet[ conceptId=" + conceptId + " ]";
     }
-    
+
 }

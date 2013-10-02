@@ -40,6 +40,7 @@ public class DataSetInstanceController extends BaseController
     public static final String BASE_PATH = "/instances";
     public static final String ENTITY_PATH = BASE_PATH + ID_URL_PATH;       
     public static final String REQUEST_PARAM_DATASET_ID = "dataSetId";    
+    public static final String REQUEST_PARAM_STUDY_ID = "studyId";       
     public static final String REQUEST_PARAM_USER_NAME = "userName";
      
     @Autowired
@@ -58,36 +59,46 @@ public class DataSetInstanceController extends BaseController
             validateParameterMap(
                 paramMap,
                 REQUEST_PARAM_DATASET_ID,
+                REQUEST_PARAM_STUDY_ID,                
                 REQUEST_PARAM_USER_NAME);
         
         if (!params.isEmpty()) 
         {
-            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);         
-            String userName = params.get(REQUEST_PARAM_USER_NAME);
+            ArrayList<String> missingParams = new ArrayList<String>();            
+            String dataSetId = params.get(REQUEST_PARAM_DATASET_ID);  
+            if (dataSetId == null) {
+                missingParams.add(REQUEST_PARAM_DATASET_ID);
+            }              
+            String studyId = params.get(REQUEST_PARAM_STUDY_ID);
+            if (studyId == null) {
+                missingParams.add(REQUEST_PARAM_STUDY_ID);
+            }
+            String userName = params.get(REQUEST_PARAM_USER_NAME);                              
             if (userName != null) 
             {
-                if (dataSetId != null) {                 
+                
+                if ((dataSetId != null) && (studyId != null)) {                 
                     return
                         dataSetInstanceRepository.
-                            findByDataSetIdAndUserNameFilteredByAnalysisPolicy(
+                            findByDataSetIdAndStudyIdAndUserNameFilteredByAnalysisPolicy(
                                 validateIntegerParameter(
                                     REQUEST_PARAM_DATASET_ID, dataSetId),
+                                validateIntegerParameter(
+                                    REQUEST_PARAM_STUDY_ID, studyId),                                
                                 userName);
-                } else {
+                } else if ((dataSetId == null) && (studyId == null)) {   
                     return 
                         dataSetInstanceRepository.
                             findByNodeSiteSitePoliciesStudyRoleUserRolesUserUserName(
                                 userName);
+                } else {
+                    throw new BadRequestException(
+                        "Required parameter(s) missing: " + missingParams);                            
                 }
+            } else {
+                throw new BadRequestException(
+                    "Required parameter missing: " + REQUEST_PARAM_USER_NAME);                       
             }           
-            if (dataSetId == null) {
-                throw new BadRequestException(
-                    "Required parameter missing: " + REQUEST_PARAM_DATASET_ID);                
-            }
-            if (userName == null) {
-                throw new BadRequestException(
-                    "Required parameter missing: " + REQUEST_PARAM_USER_NAME);                
-            }            
         }
 
         List<DataSetInstance> dataSetInstances = 
