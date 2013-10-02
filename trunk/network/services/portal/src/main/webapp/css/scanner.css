@@ -1,0 +1,1278 @@
+body {
+    background: url("../images/headerbg.png") repeat-x scroll 0% 0% rgb(255, 255, 255);
+    font-family: Tahoma,Verdana,Arial,sans-serif;
+    margin: 0px;
+    padding: 0px;
+    font-size: 11px;
+    color: rgb(66, 66, 66);
+    text-align: center;
+    line-height: 1.4;
+}
+
+
+div#wrapper {
+    padding: 0px;
+    width: 940px;
+    margin: 0px auto;
+    text-align: left;
+}
+
+#tophead {
+    background-color: rgb(247, 246, 244);
+    clear: both;
+    text-align: left;
+    line-height: normal;
+    background-image: url("../images/header_ban.png");
+    background-repeat: repeat-x;
+    position: relative;
+    height: 100px;
+}
+
+#content {
+    border-top: 2px solid rgb(244,244,244);
+}
+
+#footer {
+    margin: 0px auto;
+    height: 70px;
+    text-align: left;
+    line-height: 20px;
+    color: rgb(0, 0, 0);
+    font-size: 10px;
+    background: rgb(244, 244, 244);
+    padding-top: 10px;
+    padding-left: 165px;
+}
+
+.double_bottom_border {
+	border-bottom: 3px double;
+}
+
+.method_border {
+	border: 1px solid gray;
+}
+
+.method_margin {
+	margin: 5px;
+}
+
+#ajaxSpinnerContainer, #ajaxAnalyzeSpinnerContainer {
+	height:11px;
+	margin: 25px;
+	display:none;
+}
+
+#ajaxSpinnerImage, #ajaxAnalyzeSpinnerImage {
+	display:none;
+}
+
+#profileTable td.nowrap {
+	white-space:nowrap;
+}
+
+#profileTable {
+	border-spacing: 5px 10px;
+}
+
+#profileTable td {
+	background-color: white;
+	border: none;
+	vertical-align:text-top;
+}
+
+#paramsHelpDiv {
+	margin: 25px;
+}
+
+.contactsTable {
+	border-spacing: 5px 0px;
+}
+
+table.sitesStatus {
+	border-collapse:collapse;
+	width:85%;
+}
+
+table.sitesStatus td, table.sitesStatus th {
+	border:1px solid black;
+	padding:5px;
+}
+
+a.banner-text {
+	font-size: 0.88em !important;
+	font-weight: bold;
+	font-family: georgia, trebichet ms, serif;
+}
+a.mailto {
+	text-decoration:none;
+	color: #800000;
+}
+
+div.topMenu {
+	float: right;
+}
+
+a.link-style:link {
+	text-decoration:none;
+	color: #024A68;
+}
+
+a.link-style:visited {
+	text-decoration:none;
+	color: #800000;
+}
+
+a.link-style:hover {
+	/*text-decoration:underline;*/
+	color: #800000;
+}
+
+.box {
+  font: 10px sans-serif;
+}
+
+.box line,
+.box rect,
+.box circle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.box .center {
+  stroke-dasharray: 3,3;
+}
+
+.box .outlier {
+  fill: none;
+  stroke: #ccc;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.x.axis path {
+  display: none;
+}
+
+div.results_border {
+	border: 1px solid black;
+}
+
+table.attributes_list {
+  border-collapse: collapse;
+}
+
+tr.attribute_heading {
+  background-color: #990000;
+  color: #ffcc00;
+  /* white-space:nowrap; */
+}
+
+th.attribute_value {
+  border: 1px solid black;
+  text-align: center;
+  /* white-space:nowrap; */
+}
+
+.attribute {
+  border: 1px solid black;
+  /* white-space:nowrap; */
+}
+
+tr.uneven {
+  background-color: #cccccc;
+}
+
+label.wizard_label {
+	font-weight: bold;
+}
+
+label.wizard_field_required {
+	font-weight: bold;
+	color: red;
+}
+
+div.wizard_layer {
+	/*overflow:auto;*/
+	width: 95%;
+}
+
+p.wizard_heading {
+	width: 100%;
+	/*margin: 1px;*/
+	padding: 3px 10px;
+	cursor: pointer;
+	/*position: relative;*/
+	border-radius: 10px;
+	background-color: rgb(247, 247, 247);
+}
+
+div.wizard_content {
+	width: 95%;
+}
+
+table.add_staff, table.add_protocol, table.add_instance {
+	background-color: #CCEEFF;
+}
+
+table.update_study {
+	background-color: #CCEEFF;
+	border-spacing: 5px 0px;
+}
+
+table.manageStudyStaffTable {
+	white-space:nowrap;
+	border-spacing: 5px 10px;
+	width: 100%;
+}
+
+td.role_name {
+	font-weight: bold;
+    text-align: right;
+}
+
+td.tag {
+    text-align: right;
+}
+
+div.placeHolder {
+    text-align: center;
+    width: 100%;
+    background: rgb(244, 244, 244);
+}
+
+table.manageStudyProtocols {
+	border-collapse:collapse;
+	border-spacing: 0px 0px;
+}
+
+td.protocol_border {
+	border:1px solid black;
+	vertical-align: top;
+}
+
+td.protocol_valign, span.protocol_valign {
+	vertical-align: top;
+}
+
+th.protocol_border {
+	border:1px solid black;
+    text-align: center;
+}
+
+span.wizard_heading_protocol {
+	cursor: pointer;
+	/*position: relative;*/
+	border-radius: 10px;
+	background-color: rgb(247, 247, 247);
+}
+
+div.wizard_content_protocol {
+}
+
+span.active {
+    display: block;
+    text-align: right;
+}
+
+ol.blank {
+	list-style-type: none;
+}
+
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoHeading7, li.MsoHeading7, div.MsoHeading7
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";}
+p.MsoHeading8, li.MsoHeading8, div.MsoHeading8
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:"Times New Roman","serif";
+	font-style:italic;}
+p.MsoHeading9, li.MsoHeading9, div.MsoHeading9
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:11.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex1, li.MsoIndex1, div.MsoIndex1
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:10.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex2, li.MsoIndex2, div.MsoIndex2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:20.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex3, li.MsoIndex3, div.MsoIndex3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:30.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex4, li.MsoIndex4, div.MsoIndex4
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:40.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex5, li.MsoIndex5, div.MsoIndex5
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:50.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex6, li.MsoIndex6, div.MsoIndex6
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:60.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex7, li.MsoIndex7, div.MsoIndex7
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:70.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex8, li.MsoIndex8, div.MsoIndex8
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:80.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndex9, li.MsoIndex9, div.MsoIndex9
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:1.25in;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc1, li.MsoToc1, div.MsoToc1
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc2, li.MsoToc2, div.MsoToc2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:10.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc3, li.MsoToc3, div.MsoToc3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:20.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc4, li.MsoToc4, div.MsoToc4
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:30.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc5, li.MsoToc5, div.MsoToc5
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:40.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc6, li.MsoToc6, div.MsoToc6
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:50.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc7, li.MsoToc7, div.MsoToc7
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:60.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc8, li.MsoToc8, div.MsoToc8
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:70.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToc9, li.MsoToc9, div.MsoToc9
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:80.0pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoNormalIndent, li.MsoNormalIndent, div.MsoNormalIndent
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoFootnoteText, li.MsoFootnoteText, div.MsoFootnoteText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoCommentText, li.MsoCommentText, div.MsoCommentText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoHeader, li.MsoHeader, div.MsoHeader
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoFooter, li.MsoFooter, div.MsoFooter
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoIndexHeading, li.MsoIndexHeading, div.MsoIndexHeading
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+p.MsoCaption, li.MsoCaption, div.MsoCaption
+	{margin-top:6.0pt;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+p.MsoTof, li.MsoTof, div.MsoTof
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:20.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-20.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoEnvelopeAddress, li.MsoEnvelopeAddress, div.MsoEnvelopeAddress
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:2.0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoEnvelopeReturn, li.MsoEnvelopeReturn, div.MsoEnvelopeReturn
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+span.MsoPageNumber
+	{font-family:"Arial","sans-serif";
+	text-decoration:underline;}
+p.MsoEndnoteText, li.MsoEndnoteText, div.MsoEndnoteText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoToa, li.MsoToa, div.MsoToa
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:10.0pt;
+	margin-bottom:.0001pt;
+	text-indent:-10.0pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoMacroText, li.MsoMacroText, div.MsoMacroText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Courier New";}
+p.MsoToaHeading, li.MsoToaHeading, div.MsoToaHeading
+	{margin-top:6.0pt;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+p.MsoList, li.MsoList, div.MsoList
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.25in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoListBullet, li.MsoListBullet, div.MsoListBullet
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.25in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoListNumber, li.MsoListNumber, div.MsoListNumber
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.25in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoList2, li.MsoList2, div.MsoList2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoList3, li.MsoList3, div.MsoList3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.75in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoList4, li.MsoList4, div.MsoList4
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:1.0in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoList5, li.MsoList5, div.MsoList5
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:1.25in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoListBullet2, li.MsoListBullet2, div.MsoListBullet2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoListBullet3, li.MsoListBullet3, div.MsoListBullet3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.75in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoListBullet4, li.MsoListBullet4, div.MsoListBullet4
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:1.0in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoListBullet5, li.MsoListBullet5, div.MsoListBullet5
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:1.25in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoListNumber2, li.MsoListNumber2, div.MsoListNumber2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoListNumber3, li.MsoListNumber3, div.MsoListNumber3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.75in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoListNumber4, li.MsoListNumber4, div.MsoListNumber4
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:1.0in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoListNumber5, li.MsoListNumber5, div.MsoListNumber5
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:1.25in;
+	margin-bottom:.0001pt;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Times","serif";}
+p.MsoTitle, li.MsoTitle, div.MsoTitle
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-align:center;
+	text-autospace:none;
+	font-size:16.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+p.MsoClosing, li.MsoClosing, div.MsoClosing
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:3.0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoSignature, li.MsoSignature, div.MsoSignature
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:3.0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBodyText, li.MsoBodyText, div.MsoBodyText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:7.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBodyTextIndent, li.MsoBodyTextIndent, div.MsoBodyTextIndent
+	{margin-top:2.0pt;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:23.4pt;
+	margin-bottom:.0001pt;
+	text-indent:-23.4pt;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoListContinue, li.MsoListContinue, div.MsoListContinue
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoListContinue2, li.MsoListContinue2, div.MsoListContinue2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:.5in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoListContinue3, li.MsoListContinue3, div.MsoListContinue3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:.75in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoListContinue4, li.MsoListContinue4, div.MsoListContinue4
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:1.0in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoListContinue5, li.MsoListContinue5, div.MsoListContinue5
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:1.25in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoMessageHeader, li.MsoMessageHeader, div.MsoMessageHeader
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.75in;
+	margin-bottom:.0001pt;
+	text-indent:-.75in;
+	background:#CCCCCC;
+	text-autospace:none;
+	border:none;
+	padding:0in;
+	font-size:12.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoSubtitle, li.MsoSubtitle, div.MsoSubtitle
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-align:center;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoSalutation, li.MsoSalutation, div.MsoSalutation
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoDate, li.MsoDate, div.MsoDate
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBodyTextFirstIndent, li.MsoBodyTextFirstIndent, div.MsoBodyTextFirstIndent
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	text-indent:10.5pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBodyTextFirstIndent2, li.MsoBodyTextFirstIndent2, div.MsoBodyTextFirstIndent2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:.25in;
+	text-indent:10.5pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoNoteHeading, li.MsoNoteHeading, div.MsoNoteHeading
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBodyText2, li.MsoBodyText2, div.MsoBodyText2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	line-height:200%;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBodyText3, li.MsoBodyText3, div.MsoBodyText3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBodyTextIndent2, li.MsoBodyTextIndent2, div.MsoBodyTextIndent2
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:.25in;
+	line-height:200%;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBodyTextIndent3, li.MsoBodyTextIndent3, div.MsoBodyTextIndent3
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:.25in;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoBlockText, li.MsoBlockText, div.MsoBlockText
+	{margin-top:0in;
+	margin-right:1.0in;
+	margin-bottom:6.0pt;
+	margin-left:1.0in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.MsoDocumentMap, li.MsoDocumentMap, div.MsoDocumentMap
+	{margin:0in;
+	margin-bottom:.0001pt;
+	background:navy;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Tahoma","sans-serif";}
+p.MsoPlainText, li.MsoPlainText, div.MsoPlainText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Courier New";}
+p.MsoAutoSig, li.MsoAutoSig, div.MsoAutoSig
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+address
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";
+	font-style:italic;}
+pre
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Courier New";}
+p.MsoCommentSubject, li.MsoCommentSubject, div.MsoCommentSubject
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+p.MsoAcetate, li.MsoAcetate, div.MsoAcetate
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Tahoma","sans-serif";}
+p.QuickA, li.QuickA, div.QuickA
+	{mso-style-name:"Quick A\.";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	text-indent:-.5in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.ReminderList1, li.ReminderList1, div.ReminderList1
+	{mso-style-name:"Reminder List 1";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:6.0pt;
+	margin-left:.25in;
+	text-indent:-.25in;
+	line-height:13.0pt;
+	text-autospace:none;
+	font-size:11.0pt;
+	font-family:"Helvetica","sans-serif";
+	color:black;
+	font-weight:bold;}
+p.ReminderList2, li.ReminderList2, div.ReminderList2
+	{mso-style-name:"Reminder List 2";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:37.45pt;
+	text-indent:-.25in;
+	line-height:13.0pt;
+	text-autospace:none;
+	font-size:11.0pt;
+	font-family:"Helvetica","sans-serif";
+	color:black;}
+p.ReminderList3, li.ReminderList3, div.ReminderList3
+	{mso-style-name:"Reminder List 3";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:.75in;
+	text-indent:-.25in;
+	text-autospace:none;
+	font-size:11.0pt;
+	font-family:"Helvetica","sans-serif";}
+p.FormFooter, li.FormFooter, div.FormFooter
+	{mso-style-name:"Form Footer";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:2.9pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+p.FormFooterBorder, li.FormFooterBorder, div.FormFooterBorder
+	{mso-style-name:"FormFooter\/Border";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	border:none;
+	padding:0in;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+p.DataField11pt, li.DataField11pt, div.DataField11pt
+	{mso-style-name:"Data Field 11pt";
+	margin:0in;
+	margin-bottom:.0001pt;
+	line-height:15.0pt;
+	text-autospace:none;
+	font-size:11.0pt;
+	font-family:"Arial","sans-serif";}
+p.TableLegend, li.TableLegend, div.TableLegend
+	{mso-style-name:"Table Legend";
+	margin-top:6.0pt;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:4.5pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+p.DataField, li.DataField, div.DataField
+	{mso-style-name:"Data Field";
+	margin:0in;
+	margin-bottom:.0001pt;
+	line-height:12.0pt;
+	text-autospace:ideograph-numeric ideograph-other;
+	font-size:11.0pt;
+	font-family:"Arial","sans-serif";}
+p.DataField10pt, li.DataField10pt, div.DataField10pt
+	{mso-style-name:"Data Field 10pt";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.DataField10ptCenter, li.DataField10ptCenter, div.DataField10ptCenter
+	{mso-style-name:"Data Field 10pt Center";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	text-autospace:ideograph-numeric ideograph-other;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+span.DataFieldChar
+	{mso-style-name:"Data Field Char";
+	font-family:"Arial","sans-serif";}
+span.DataField11ptCenterChar
+	{mso-style-name:"Data Field 11pt Center Char";
+	font-family:"Arial","sans-serif";}
+span.DataField10ptCenterChar
+	{mso-style-name:"Data Field 10pt Center Char";
+	font-family:"Arial","sans-serif";}
+span.DataField10ptChar
+	{mso-style-name:"Data Field 10pt Char";
+	font-family:"Arial","sans-serif";}
+p.DataField11ptCenter, li.DataField11ptCenter, div.DataField11ptCenter
+	{mso-style-name:"Data Field 11pt Center";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	text-autospace:ideograph-numeric ideograph-other;
+	font-size:11.0pt;
+	font-family:"Arial","sans-serif";}
+p.FacePageHeading1, li.FacePageHeading1, div.FacePageHeading1
+	{mso-style-name:"Face Page Heading 1";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	page-break-after:avoid;
+	text-autospace:none;
+	font-size:11.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+p.FormFieldCaption, li.FormFieldCaption, div.FormFieldCaption
+	{mso-style-name:"Form Field Caption";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+span.FormFieldInlineCaption
+	{mso-style-name:"Form Field Inline Caption";
+	font-family:"Arial","sans-serif";}
+p.FormHeader, li.FormHeader, div.FormHeader
+	{mso-style-name:"Form Header";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:2.9pt;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+p.HeadingNote, li.HeadingNote, div.HeadingNote
+	{mso-style-name:"Heading Note";
+	margin-top:2.0pt;
+	margin-right:0in;
+	margin-bottom:2.0pt;
+	margin-left:0in;
+	text-align:center;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";
+	font-style:italic;}
+p.lineitem, li.lineitem, div.lineitem
+	{mso-style-name:lineitem;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:11.7pt;
+	margin-bottom:.0001pt;
+	text-indent:-11.7pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.NameofApplicant, li.NameofApplicant, div.NameofApplicant
+	{mso-style-name:"Name of Applicant";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+p.SectionHead, li.SectionHead, div.SectionHead
+	{mso-style-name:"Section Head";
+	margin-top:6.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+p.Arial10BoldText, li.Arial10BoldText, div.Arial10BoldText
+	{mso-style-name:Arial10BoldText;
+	margin-top:1.0pt;
+	margin-right:0in;
+	margin-bottom:1.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+p.Arial10ptlineitem, li.Arial10ptlineitem, div.Arial10ptlineitem
+	{mso-style-name:"Arial10ptline item";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Arial","sans-serif";}
+p.Arial9ptlineitem, li.Arial9ptlineitem, div.Arial9ptlineitem
+	{mso-style-name:Arial9ptlineitem;
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:9.0pt;
+	font-family:"Arial","sans-serif";}
+p.FormFieldCaption7pt, li.FormFieldCaption7pt, div.FormFieldCaption7pt
+	{mso-style-name:"Form Field Caption 7pt";
+	margin:0in;
+	margin-bottom:.0001pt;
+	text-autospace:none;
+	font-size:7.0pt;
+	font-family:"Arial","sans-serif";}
+p.PIHeader, li.PIHeader, div.PIHeader
+	{mso-style-name:"PI Header";
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:2.0pt;
+	margin-left:.6in;
+	text-autospace:none;
+	font-size:8.0pt;
+	font-family:"Arial","sans-serif";}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:.5in .5in .5in .5in;}
+div.WordSection1
+	{page:WordSection1;}
+	
+#prepToResearchDiv h1
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	page-break-after:avoid;
+	text-autospace:none;
+	font-size:11.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+#prepToResearchDiv h2
+	{margin:0in;
+	margin-bottom:.0001pt;
+	text-align:center;
+	page-break-after:avoid;
+	text-autospace:none;
+	font-size:14.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+#prepToResearchDiv h3
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	page-break-after:avoid;
+	text-autospace:none;
+	font-size:13.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;}
+#prepToResearchDiv h4
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	page-break-after:avoid;
+	text-autospace:none;
+	font-size:14.0pt;
+	font-family:"Times New Roman","serif";
+	font-weight:bold;}
+#prepToResearchDiv h5
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:13.0pt;
+	font-family:"Arial","sans-serif";
+	font-weight:bold;
+	font-style:italic;}
+#prepToResearchDiv h6
+	{margin-top:12.0pt;
+	margin-right:0in;
+	margin-bottom:3.0pt;
+	margin-left:0in;
+	text-autospace:none;
+	font-size:11.0pt;
+	font-family:"Times New Roman","serif";
+	font-weight:bold;}
+
+/* List Definitions */
