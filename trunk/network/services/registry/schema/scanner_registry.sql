@@ -101,7 +101,8 @@ create table study_policy_statement (
   role_id integer not null references study_role(role_id),
   analysis_tool_id integer not null references analysis_tool(tool_id),
   access_mode integer not null references access_mode(access_mode_id),
-  policy_status_id integer not null references policy_status_type(policy_status_type_id)
+  policy_status_id integer not null references policy_status_type(policy_status_type_id),
+  unique(data_set_definition_id, role_id, analysis_tool_id, access_mode)
 );
 
 create table if not exists site (
@@ -137,7 +138,8 @@ create table if not exists analysis_policy_statement (
   analysis_tool_id integer not null references analysis_tool(tool_id),
   access_mode_id integer not null references access_mode(access_mode_id),
   policy_status_id integer not null references policy_status_type(policy_status_type_id),
-  parent_study_policy_statement_id integer not null references study_policy_statement(study_policy_statement_id)
+  parent_study_policy_statement_id integer not null references study_policy_statement(study_policy_statement_id),
+  unique(data_set_instance_id, role_id, analysis_tool_id, access_mode_id, parent_study_policy_statement_id)
 );
 
 COMMENT on table analysis_policy_statement is 'Users in role <role_id> may run tool <tool_id> on data set instance <data_set_instance_id> in mode <access_mode> if status is active';
@@ -145,13 +147,15 @@ COMMENT on table analysis_policy_statement is 'Users in role <role_id> may run t
 create table if not exists site_policy (
   site_policy_id serial not null primary key,
   site_id integer not null references site(site_id),
-  role_id integer not null references study_role(role_id)
+  role_id integer not null references study_role(role_id),
+  unique(site_id, role_id)
 );
 
 create table if not exists study_management_policy (
   study_policy_id serial not null primary key,
   study_id integer not null references study(study_id),
-  role_id integer not null references study_role(role_id)
+  role_id integer not null references study_role(role_id),
+  unique(study_id, role_id) 
 );
 
 create table if not exists study_requested_site (

@@ -159,5 +159,5 @@ public class FavoritesCodeSet implements Serializable
     public String toString() {
         return "edu.isi.misd.scanner.network.registry.data.domain.FavoritesCodeSet[ conceptId=" + conceptId + " ]";
     }
-    
+
 }
