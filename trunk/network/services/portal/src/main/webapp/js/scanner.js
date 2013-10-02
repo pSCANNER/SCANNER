@@ -236,7 +236,7 @@ function initScanner() {
  * @return the value of the selected study
  */
 function getSelectedStudyName() {
-	var ret = studiesMultiSelect.get('value')[0];
+	var ret = null;
 	if (activeStudy != null) {
 		ret = activeStudy['studyName'];
 	} else if (ret == null) {
@@ -493,9 +493,6 @@ function postRenderAvailableStudies(data, textStatus, jqXHR, param) {
 	});
 	if (names.length == 0 && loggedInUser['isSuperuser']) {
 		names.push(emptyValue);
-		$('#selectStudyToAnalizeTable').hide();
-	} else {
-		$('#selectStudyToAnalizeTable').show();
 	}
 	if (names.length > 0) {
 		names.sort(compareIgnoreCase);
@@ -2473,16 +2470,10 @@ function copyObject(obj) {
 
 function enableScanner() {
 	if ($('#acceptConditions').attr('checked') == 'checked') {
-		$('#selectStudies').removeAttr('disabled');
-		if (checkSuperUser()) {
-			$('#continueButton').removeAttr('disabled');
-		}
+		$('#continueButton').removeAttr('disabled');
 	} else {
-		studiesMultiSelect.set('value', '');
 		$('#continueButton').attr('disabled', 'disabled');
-		$('#selectStudies').attr('disabled', 'disabled');
 	}
-
 }
 
 function makeId(id) {
