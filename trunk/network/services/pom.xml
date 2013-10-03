@@ -9,10 +9,11 @@
   <packaging>pom</packaging>
 
   <modules>    
-    <module>master</module>   
-    <module>worker</module>            
-    <module>worker-webapp</module>    
-    <module>registry</module>     
+    <module>master</module>
+    <module>worker</module>     
+    <module>worker-webapp</module>
+    <module>registry</module>
+    <module>portal</module>
   </modules>
   
   <parent>
