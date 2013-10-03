@@ -788,48 +788,55 @@ Enrollment Table Format Page</b></p>
 </div>
 							</div>
 						</div>
-						<div data-dojo-type="dijit/layout/ContentPane" title="Analyze" onShow="showQuery();">
+						<div data-dojo-type="dijit/layout/ContentPane" title="Analysis" onShow="showQuery();">
 							<div class="topMenu" id="studyName"></div>
 							<br style="clear: both;" />
-							<table>
-								<tbody>
-									<tr>
-										<td valign="top" style="width: 60%;">
-											<table>
-												<tbody>
-													<tr>
-														<td>Datasets</td>
-														<td>Sites</td>
-														<td>Libraries</td>
-														<td>Methods</td>
-													</tr>
-													<tr>
-														<td valign="top"><select id="selectDatasets"></select>
-														</td>
-														<td valign="top"><select id="selectSites"></select>
-														</td>
-														<td valign="top"><select id="selectLibraries"></select>
-														</td>
-														<td valign="top"><select id="selectMethods"></select>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</td>
-										<td valign="top" style="width: 20%;">
-											<span class="double_bottom_border" id="sitesStatusSpan"> Sites Status </span> <br/><br/> 
-											<table>
-												<tbody id="sitesStatusBody">
-												</tbody>
-											</table>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<div data-dojo-type="dijit/layout/ContentPane"
-							title="History" onShow="hideQuery();" id="historyPanel">
-							<div id="analyzeGridDiv"></div>
+							<div id="analysisTabDiv">
+								<ul>
+									<li><a href="#newAnalysisDiv"><span>New</span></a></li>
+									<li><a href="#historyAnalysisDiv"><span>History</span></a></li>
+								</ul>
+								<div id="newAnalysisDiv">
+									<table>
+										<tbody>
+											<tr>
+												<td valign="top" style="width: 60%;">
+													<table>
+														<tbody>
+															<tr>
+																<td>Datasets</td>
+																<td>Sites</td>
+																<td>Libraries</td>
+																<td>Methods</td>
+															</tr>
+															<tr>
+																<td valign="top"><select id="selectDatasets"></select>
+																</td>
+																<td valign="top"><select id="selectSites"></select>
+																</td>
+																<td valign="top"><select id="selectLibraries"></select>
+																</td>
+																<td valign="top"><select id="selectMethods"></select>
+																</td>
+															</tr>
+														</tbody>
+													</table>
+												</td>
+												<td valign="top" style="width: 25%;">
+													<span class="double_bottom_border" id="sitesStatusSpan"> Sites Status </span> <br/><br/> 
+													<table>
+														<tbody id="sitesStatusBody">
+														</tbody>
+													</table>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+								<div id="historyAnalysisDiv">
+									<div id="analyzeGridDiv"></div>
+								</div>
+							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
 							title="Data Sets" onShow="showAdministration();" onHide="hideAdministration();">
@@ -905,11 +912,11 @@ Enrollment Table Format Page</b></p>
 							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Tasks and Notifications" onShow="hideQuery();">
+							title="Tasks and Notifications" onShow="hideAnalysis();">
 							<div id="tasksAndNotificationsDiv"></div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Network Information" onShow="hideQuery();">
+							title="Network Information" onShow="hideAnalysis();">
 							<div id="networkInformationDiv"></div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
@@ -1172,11 +1179,11 @@ Enrollment Table Format Page</b></p>
 						</div>
 						<!-- 
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Products" onShow="hideQuery();">
+							title="Products" onShow="hideAnalysis();">
 							<div id="productsDiv"></div>
 						</div>
 						 -->
-						<div data-dojo-type="dijit/layout/ContentPane" title="Profile" onShow="hideQuery();">
+						<div data-dojo-type="dijit/layout/ContentPane" title="Profile" onShow="hideAnalysis();">
 							<div id="profileDiv" class="method_border method_margin">
 								<table id="profileTable">
 									<tr>
@@ -1210,7 +1217,7 @@ Enrollment Table Format Page</b></p>
 							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Contacts" onShow="hideQuery();">
+							title="Contacts" onShow="hideAnalysis();">
 							<div id="contactsDiv"></div>
 						</div>
 					</div>
@@ -1319,4 +1326,3 @@ Enrollment Table Format Page</b></p>
 	</div>
 </body>
 </html>
-
