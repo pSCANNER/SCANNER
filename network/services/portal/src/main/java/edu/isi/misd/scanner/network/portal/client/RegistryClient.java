@@ -143,7 +143,7 @@ public interface RegistryClient {
      *            the method name.
      * @return The client response.
      */
-	public RegistryClientResponse getSites(int dataSetId);
+	public RegistryClientResponse getSites(int studyId, int dataSetId);
 	
     /**
      * Gets a method from the registry.
