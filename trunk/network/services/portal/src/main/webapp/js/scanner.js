@@ -841,6 +841,9 @@ function postRenderSites(data, textStatus, jqXHR, param) {
 		names.push(name);
 	});
 	names.sort(compareIgnoreCase);
+	if (names.length == 0) {
+		names = emptyValue;
+	}
 	loadSites(names, false);
 }
 

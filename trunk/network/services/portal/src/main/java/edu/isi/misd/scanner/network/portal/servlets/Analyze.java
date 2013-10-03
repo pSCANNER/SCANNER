@@ -148,7 +148,7 @@ public class Analyze extends HttpServlet {
 		} else if (action.equals("getSites")) {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
-			RegistryClientResponse clientResponse = registryClient.getSites(getDatasetId(dataset));
+			RegistryClientResponse clientResponse = registryClient.getSites(getStudyId(study), getDatasetId(dataset));
 			retrievedDatasetInstances = clientResponse.getEntityResponse();
 			String ret = clientResponse.toSites(dataset);
 			clientResponse.release();

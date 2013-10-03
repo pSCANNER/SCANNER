@@ -179,9 +179,9 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	 * @see edu.isi.misd.scanner.network.portal.client.RegistryClient#getSites(java.lang.String, java.lang.String)
 	 */
 	@Override
-	public RegistryClientResponse getSites(int dataSetId) {
+	public RegistryClientResponse getSites(int studyId, int dataSetId) {
 		RegistryClientResponse ret = null;
-		String url = erdURL + "instances?dataSetId=" + dataSetId + getUserPredicate("&");
+		String url = erdURL + "instances?dataSetId=" + dataSetId + "&studyId=" + studyId + getUserPredicate("&");
 		System.out.println("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
