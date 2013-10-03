@@ -230,6 +230,18 @@ function initScanner() {
 			}
 		}
 	});
+	$('#analysisTabDiv').tabs({
+		activate: function(event, ui) {
+			var divId = ui.newPanel.attr('id');
+			if (divId == 'newAnalysisDiv') {
+				showQuery();
+			} else if (divId == 'historyAnalysisDiv') {
+				hideQuery();
+			}
+		}
+	});
+	$('#analysisTabDiv').css({'font-family': 'Tahoma,Verdana,Arial,sans-serif',
+		'font-size': '11px'});
 	scrollbarWidth = getScrollbarWidth();
 	submitLogin();
 }
@@ -1779,6 +1791,7 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 	if (res['status'] == 'success') {
 		loggedInUser = res['user'][0];
 		loggedInUserRoles = res['userRoles'];
+		$('#profileIdentity').html(loggedInUser['firstName'] + ' ' + loggedInUser['lastName']);
 		renderAvailableStudies();
 		renderSitesStatus();
 		initUsers(true);
@@ -2287,7 +2300,7 @@ function loadSites(values, selectAll) {
  * Actions to be performed when the "Query" tab is clicked
  */
 function showQuery() {
-	$('#tabContainerWrapperDiv').height(200);
+	$('#tabContainerWrapperDiv').height(225);
 	scannerTabContainer.resize();
 	$('#paramsWrapperDiv').show();
 	$('#replayDivContent').html('');
@@ -2312,7 +2325,7 @@ function showQuery() {
  * Actions to be performed when the "Query" tab is deselected
  */
 function hideQuery() {
-	$('#tabContainerWrapperDiv').height(300);
+	$('#tabContainerWrapperDiv').height(350);
 	scannerTabContainer.resize();
 	$('#paramsWrapperDiv').hide();
 	$('#replayDivWrapper').show();
@@ -4345,7 +4358,7 @@ function cancelUser() {
 }
 
 function showAdministration() {
-	hideQuery();
+	hideAnalysis();
 	$('#tabContainerWrapperDiv').height(600);
 	scannerTabContainer.resize();
 	
@@ -5499,5 +5512,15 @@ function getLoggedInUserRoles() {
 		}
 	});
 	return ret;
+}
+
+function hideAnalysis() {
+	$('#paramsWrapperDiv').hide();
+	$('#replayTitle').hide();
+	$('#expandResults').hide();
+	$('#collapseResults').hide();
+	$('#replayDivContent').hide();
+	$('#replayDivWrapper').hide();
+	$('#statusReplayWrapperDiv').hide();
 }
 
