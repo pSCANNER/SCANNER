@@ -10,6 +10,7 @@
   
   <modules>  
     <module>example</module>   
+    <module>ptr</module>     
     <module>oceans</module>             
     <module>glore</module> 
   </modules>
