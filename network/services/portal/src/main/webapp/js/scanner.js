@@ -950,11 +950,13 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	a.html('Data table');
 	resultDiv.append(a);
 	resultDiv.append('&nbsp;&nbsp;');
+	a.hide();
 	a = $('<a>');
 	a.addClass('link-style banner-text');
 	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
 	a.html('Box plot');
 	resultDiv.append(a);
+	a.hide();
 	buildStatusDataTable(tab);
 	buildDataTable(tab);
 	//buildBoxPlot(tab);
@@ -986,12 +988,14 @@ function buildTable(tab) {
 	a.attr('href', 'javascript:buildTable("'+tab+'");');
 	a.html('Data table');
 	resultDiv.append(a);
+	a.hide();
 	resultDiv.append('&nbsp;&nbsp;');
 	a = $('<a>');
 	a.addClass('link-style banner-text');
 	a.attr('href', 'javascript:buildBoxPlot("'+tab+'");');
 	a.html('Box plot');
 	resultDiv.append(a);
+	a.hide();
 	buildStatusDataTable(tab);
 	buildDataTable(tab);
 }
