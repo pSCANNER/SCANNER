@@ -33,7 +33,7 @@
   </welcome-file-list>
   <context-param>
     <param-name>registryURL</param-name>
-    <param-value>http://aspc.isi.edu:8088/scannerV2/registry/</param-value>
+    <param-value>http://localhost:8089/scannerV2/registry/</param-value>
   </context-param>
   <context-param>
     <param-name>trustStoreType</param-name>

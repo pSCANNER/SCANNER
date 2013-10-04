@@ -50,7 +50,7 @@ public class Echo extends HttpServlet {
 	 * The client to execute the network requests.
 	 */
 	ScannerClient scannerClient;
-	private String erdURL;
+	private String erdURL = "http://localhost:8088/scannerV2/registry/";
        
     /**
      * Default constructor. 
@@ -79,7 +79,8 @@ public class Echo extends HttpServlet {
 		keyStorePassword = servletConfig.getServletContext().getInitParameter("keyStorePassword");
 		keyStoreResource = servletConfig.getServletContext().getInitParameter("keyStoreResource");
 		keyManagerPassword = servletConfig.getServletContext().getInitParameter("keyManagerPassword");
-		String path = servletConfig.getServletContext().getRealPath("/index.html");
+		String registryUrl = servletConfig.getServletContext().getInitParameter("registryURL");
+        String path = servletConfig.getServletContext().getRealPath("/index.html");
 		int index = path.lastIndexOf(File.separator) + 1;
 		path = path.substring(0, index);
 		trustStoreResource = path + trustStoreResource;
@@ -87,8 +88,7 @@ public class Echo extends HttpServlet {
 		System.out.println("trustStoreResource: " + trustStoreResource);
 		System.out.println("keyStoreResource: " + keyStoreResource);
 		servletContext = config.getServletContext();
-		erdURL = "http://aspc.isi.edu:8088/scannerV2/registry/";
-		registryClient = new ERDClient(erdURL, "user");
+		registryClient = new ERDClient((registryUrl != null) ? registryUrl : erdURL, "user");
 		scannerClient = new ScannerClient(4, 8192, 300000,
 				trustStoreType, trustStorePassword, trustStoreResource,
 				keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
