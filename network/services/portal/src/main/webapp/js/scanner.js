@@ -886,26 +886,34 @@ function submitQuery(div, replay, checkStatus, resultData) {
 function postSubmitQuery(data, textStatus, jqXHR, param) {
 	param.spinner.hide();
 	param.spinner.parent().hide();
-	if (param['checkStatus'] != -1) {
-		// check if completed
-		var temp = $.parseJSON(data);
-		var serviceResponse = temp['data']['ServiceResponses']['ServiceResponse'];
-		if (!$.isArray(serviceResponse)) {
-			serviceResponse = [];
-			serviceResponse.push(temp['data']['ServiceResponses']['ServiceResponse']);
-		}
-		var complete = true;
-		var state = null;
-		$.each(serviceResponse, function(i, elem) {
-			if (elem['ServiceResponseMetadata'] != null && elem['ServiceResponseMetadata']['RequestState'] != 'Complete') {
-				complete = false;
-				if (elem['ServiceResponseMetadata']['RequestState'] != 'Held') {
-					state = elem['ServiceResponseMetadata']['RequestState'];
-				}
-				return false;
+	
+	// check if completed
+	var temp = $.parseJSON(data);
+	var serviceResponse = temp['data']['ServiceResponses']['ServiceResponse'];
+	if (!$.isArray(serviceResponse)) {
+		serviceResponse = [];
+		serviceResponse.push(temp['data']['ServiceResponses']['ServiceResponse']);
+	}
+	var complete = true;
+	var state = null;
+	$.each(serviceResponse, function(i, elem) {
+		if (elem['ServiceResponseMetadata'] != null && elem['ServiceResponseMetadata']['RequestState'] != 'Complete') {
+			complete = false;
+			if (elem['ServiceResponseMetadata']['RequestState'] != 'Held') {
+				state = elem['ServiceResponseMetadata']['RequestState'];
 			}
-		});
+			return false;
+		}
+	});
 
+	if (complete) {
+		collapseQueryResults('statusReplayDivContent', 'expandHistoryStatusArrow', 'collapseHistoryStatusArrow');
+		collapseQueryResults('statusQueryDivContent', 'expandQueryStatusArrow', 'collapseQueryStatusArrow');
+	} else {
+		expandQueryResults('statusReplayDivContent', 'expandHistoryStatusArrow', 'collapseHistoryStatusArrow');
+		expandQueryResults('statusQueryDivContent', 'expandQueryStatusArrow', 'collapseQueryStatusArrow');
+	}
+	if (param['checkStatus'] != -1) {
 		if (complete) {
 			postRefreshQueryStatus(param['checkStatus'], 'Complete');
 		} else if (state != null) {
