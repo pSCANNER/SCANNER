@@ -1224,48 +1224,47 @@ Enrollment Table Format Page</b></p>
 				</div>
 
 				<div id="paramsWrapperDiv">
-					<p id="paramsTitle"></p>
-					<table id="paramsTable">
-						<tbody>
-							<tr>
-								<td valign="top">
-									<div id="paramsDiv" class="method_border" style="display: none;">
-										<div id="paramsDivContent" class="method_margin"></div>
-										<div id="ajaxSpinnerContainer">
-											<img src="images/ajax-loader.gif" id="ajaxSpinnerImage"
-												title="Processing..." alt="Spinner" />
-										</div>
-										<p style="display:none;">
-											<input type="checkbox" id="asyncCheckBox" checked="checked" >Asynchronous (Debug only)
-										</p>
-										<input type="button" value="Analyze" id="submitQueryButton" onclick="submitQuery('queryDivContent', null, -1, null);"
-											class="method_margin"> <input type="button" value="Clear"
-											onclick="renderAvailableStudies();"> <br />
-										<br />
-									</div>
-								</td>
-								<td valign="top">
-									<div id="statusQueryWrapperDiv" class="method_border method_margin" style="display: none;">
-										<div id="statusQueryDiv" class="method_margin" style="display: none;" >
-											<h2>Status</h2>
-											<div id="statusQueryDivContent">
-											</div>
-										</div>
-									</div>
-									<div id="queryDiv" style="display: none;" >
-										<h2 id="queryTitle">Analyze Results</h2>
-										<img src="images/expand.jpg" id="expandQueryResultsArrow"
-											alt="Expand" onclick="expandQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');"/>
-										<img src="images/collapse.jpg" id="collapseQueryResultsArrow"
-											alt="Collapse"  onclick="collapseQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');" style="display: none;"/>
-										<div id="queryDivContent">
-										</div>
-										<br/><br/><br/>
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+					<div id="clearResultsDiv" class="topMenu">
+						<br/>
+						<input type="button" value="Clear" onclick="clearAnalysis();">
+					</div>
+					<br style="clear: both;"/>
+					<div id="statusQueryWrapperDiv" style="display: none;">
+						<div id="statusQueryDiv" class="method_margin" style="display: none;" >
+							<h2>Status</h2>
+							<div id="statusQueryDivContent">
+							</div>
+						</div>
+					</div>
+					<div id="analysisSpecifications">
+						<h2>Analysis Specifications</h2>
+						<div id="ajaxSpinnerContainer" class="topMenu">
+							<img src="images/ajax-loader.gif" id="ajaxSpinnerImage"
+								title="Processing..." alt="Spinner" />
+						</div>
+						<br style="clear: both;"/>
+						<div class="topMenu">
+							<input type="hidden" id="param_id">
+								&nbsp;&nbsp;Enter name:<input type="text" id="param_name">
+								&nbsp;&nbsp;&nbsp;&nbsp;Enter description:<input type="text" id="param_description" size="40">
+								&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" disabled="disabled" value="Analyze" id="submitQueryButton" onclick="submitQuery('queryDivContent', null, -1, null);"> 
+								<input type="button" value="Clear" onclick="clearAnalysis();">
+						</div>
+						<br style="clear: both;"/>
+						<div id="queryParametersDiv">
+						</div>
+						<br/><br/><br/>
+					</div>
+					<div id="queryDiv" style="display: none;" >
+						<h2 id="queryTitle">Analysis Results</h2>
+						<img src="images/expand.jpg" id="expandQueryResultsArrow"
+							alt="Expand" onclick="expandQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');"/>
+						<img src="images/collapse.jpg" id="collapseQueryResultsArrow"
+							alt="Collapse"  onclick="collapseQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');" style="display: none;"/>
+						<div id="queryDivContent">
+						</div>
+						<br/><br/><br/>
+					</div>
 				</div>
 			</div>
 			<div id="authorizationWrapperDiv" style="display: none;" >
@@ -1295,7 +1294,7 @@ Enrollment Table Format Page</b></p>
 					title="Processing..." alt="Spinner" />
 			</div>
 			<div id="replayDiv" style="display: none;" >
-				<h2 id="replayTitle">Analyze Results</h2>
+				<h2 id="replayTitle">Analysis Results</h2>
 				<img src="images/expand.jpg" id="expandResults"
 					alt="Expand" onclick="expandQueryResults('replayDivContent', 'expandResults', 'collapseResults');"/>
 				<img src="images/collapse.jpg" id="collapseResults"
