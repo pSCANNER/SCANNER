@@ -46,6 +46,7 @@ public class Echo extends HttpServlet {
 	private String keyManagerPassword;
 	
 	private RegistryClient registryClient;
+	private boolean debug = false;
 	/**
 	 * The client to execute the network requests.
 	 */
@@ -80,6 +81,10 @@ public class Echo extends HttpServlet {
 		keyStoreResource = servletConfig.getServletContext().getInitParameter("keyStoreResource");
 		keyManagerPassword = servletConfig.getServletContext().getInitParameter("keyManagerPassword");
 		String registryUrl = servletConfig.getServletContext().getInitParameter("registryURL");
+		String debugMode = servletConfig.getServletContext().getInitParameter("debug");
+		if (debugMode != null) {
+			debug = Boolean.parseBoolean(debugMode);
+		}
         String path = servletConfig.getServletContext().getRealPath("/index.html");
 		int index = path.lastIndexOf(File.separator) + 1;
 		path = path.substring(0, index);
@@ -115,9 +120,13 @@ public class Echo extends HttpServlet {
 				JSONObject ret = new JSONObject();
 				try {
 					if (count != 0) {
-						//ready = true;
+						if (debug) {
+							ready = true;
+						}
 						Thread.sleep(5*60*1000);
-						//continue;
+						if (debug) {
+							continue;
+						}
 					}
 					count++;
 					RegistryClientResponse clientResponse = registryClient.getSitesMap();
