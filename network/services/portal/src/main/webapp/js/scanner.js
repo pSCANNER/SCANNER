@@ -21,7 +21,7 @@
  * 
  */
 
-var debug = false;
+var debug = true;
 
 var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
