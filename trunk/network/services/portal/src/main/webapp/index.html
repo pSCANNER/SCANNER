@@ -1232,6 +1232,10 @@ Enrollment Table Format Page</b></p>
 					<div id="statusQueryWrapperDiv" style="display: none;">
 						<div id="statusQueryDiv" class="method_margin" style="display: none;" >
 							<h2>Status</h2>
+							<img src="images/expand.jpg" id="expandQueryStatusArrow"
+								alt="Expand" onclick="expandQueryResults('statusQueryDivContent', 'expandQueryStatusArrow', 'collapseQueryStatusArrow');"/>
+							<img src="images/collapse.jpg" id="collapseQueryStatusArrow"
+								alt="Collapse"  onclick="collapseQueryResults('statusQueryDivContent', 'expandQueryStatusArrow', 'collapseQueryStatusArrow');" style="display: none;"/>
 							<div id="statusQueryDivContent">
 							</div>
 						</div>
@@ -1283,6 +1287,10 @@ Enrollment Table Format Page</b></p>
 		<div id="statusReplayWrapperDiv">
 			<div id="statusReplayDiv" style="display: none;" >
 				<h2>Status</h2>
+				<img src="images/expand.jpg" id="expandHistoryStatusArrow"
+					alt="Expand" onclick="expandQueryResults('statusReplayDivContent', 'expandHistoryStatusArrow', 'collapseHistoryStatusArrow');"/>
+				<img src="images/collapse.jpg" id="collapseHistoryStatusArrow"
+					alt="Collapse"  onclick="collapseQueryResults('statusReplayDivContent', 'expandHistoryStatusArrow', 'collapseHistoryStatusArrow');" style="display: none;"/>
 				<div id="statusReplayDivContent">
 				</div>
 			</div>
