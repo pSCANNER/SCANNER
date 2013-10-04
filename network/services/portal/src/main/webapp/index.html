@@ -1231,11 +1231,19 @@ Enrollment Table Format Page</b></p>
 					<br style="clear: both;"/>
 					<div id="statusQueryWrapperDiv" style="display: none;">
 						<div id="statusQueryDiv" class="method_margin" style="display: none;" >
-							<h2>Status</h2>
-							<img src="images/expand.jpg" id="expandQueryStatusArrow"
-								alt="Expand" onclick="expandQueryResults('statusQueryDivContent', 'expandQueryStatusArrow', 'collapseQueryStatusArrow');"/>
-							<img src="images/collapse.jpg" id="collapseQueryStatusArrow"
-								alt="Collapse"  onclick="collapseQueryResults('statusQueryDivContent', 'expandQueryStatusArrow', 'collapseQueryStatusArrow');" style="display: none;"/>
+							<table>
+								<tbody>
+									<tr>
+										<td class="expand_collapse_heading">Status</td>
+										<td class="expand_collapse_img">
+											<img src="images/expand.jpg" id="expandQueryStatusArrow"
+												alt="Expand" onclick="expandQueryResults('statusQueryDivContent', 'expandQueryStatusArrow', 'collapseQueryStatusArrow');"/>
+											<img src="images/collapse.jpg" id="collapseQueryStatusArrow"
+												alt="Collapse"  onclick="collapseQueryResults('statusQueryDivContent', 'expandQueryStatusArrow', 'collapseQueryStatusArrow');" style="display: none;"/>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 							<div id="statusQueryDivContent">
 							</div>
 						</div>
@@ -1260,11 +1268,19 @@ Enrollment Table Format Page</b></p>
 						<br/><br/><br/>
 					</div>
 					<div id="queryDiv" style="display: none;" >
-						<h2 id="queryTitle">Analysis Results</h2>
-						<img src="images/expand.jpg" id="expandQueryResultsArrow"
-							alt="Expand" onclick="expandQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');"/>
-						<img src="images/collapse.jpg" id="collapseQueryResultsArrow"
-							alt="Collapse"  onclick="collapseQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');" style="display: none;"/>
+						<table id="queryTitle">
+							<tbody>
+								<tr>
+									<td class="expand_collapse_heading">Analysis Results</td>
+									<td class="expand_collapse_img">
+										<img src="images/expand.jpg" id="expandQueryResultsArrow"
+											alt="Expand" onclick="expandQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');"/>
+										<img src="images/collapse.jpg" id="collapseQueryResultsArrow"
+											alt="Collapse"  onclick="collapseQueryResults('queryDivContent', 'expandQueryResultsArrow', 'collapseQueryResultsArrow');" style="display: none;"/>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 						<div id="queryDivContent">
 						</div>
 						<br/><br/><br/>
@@ -1286,11 +1302,19 @@ Enrollment Table Format Page</b></p>
 		</div>
 		<div id="statusReplayWrapperDiv">
 			<div id="statusReplayDiv" style="display: none;" >
-				<h2>Status</h2>
-				<img src="images/expand.jpg" id="expandHistoryStatusArrow"
-					alt="Expand" onclick="expandQueryResults('statusReplayDivContent', 'expandHistoryStatusArrow', 'collapseHistoryStatusArrow');"/>
-				<img src="images/collapse.jpg" id="collapseHistoryStatusArrow"
-					alt="Collapse"  onclick="collapseQueryResults('statusReplayDivContent', 'expandHistoryStatusArrow', 'collapseHistoryStatusArrow');" style="display: none;"/>
+				<table>
+					<tbody>
+						<tr>
+							<td class="expand_collapse_heading">Status</td>
+							<td class="expand_collapse_img">
+								<img src="images/expand.jpg" id="expandHistoryStatusArrow"
+									alt="Expand" onclick="expandQueryResults('statusReplayDivContent', 'expandHistoryStatusArrow', 'collapseHistoryStatusArrow');"/>
+								<img src="images/collapse.jpg" id="collapseHistoryStatusArrow"
+									alt="Collapse"  onclick="collapseQueryResults('statusReplayDivContent', 'expandHistoryStatusArrow', 'collapseHistoryStatusArrow');" style="display: none;"/>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 				<div id="statusReplayDivContent">
 				</div>
 			</div>
@@ -1302,11 +1326,19 @@ Enrollment Table Format Page</b></p>
 					title="Processing..." alt="Spinner" />
 			</div>
 			<div id="replayDiv" style="display: none;" >
-				<h2 id="replayTitle">Analysis Results</h2>
-				<img src="images/expand.jpg" id="expandResults"
-					alt="Expand" onclick="expandQueryResults('replayDivContent', 'expandResults', 'collapseResults');"/>
-				<img src="images/collapse.jpg" id="collapseResults"
-					alt="Collapse"  onclick="collapseQueryResults('replayDivContent', 'expandResults', 'collapseResults');" style="display: none;"/>
+				<table id="replayTitle">
+					<tbody>
+						<tr>
+							<td class="expand_collapse_heading">Analysis Results</td>
+							<td class="expand_collapse_img">
+								<img src="images/expand.jpg" id="expandResults"
+									alt="Expand" onclick="expandQueryResults('replayDivContent', 'expandResults', 'collapseResults');"/>
+								<img src="images/collapse.jpg" id="collapseResults"
+									alt="Collapse"  onclick="collapseQueryResults('replayDivContent', 'expandResults', 'collapseResults');" style="display: none;"/>
+							</td>
+						</tr>
+					</tbody>
+				</table>
 				<div id="replayDivContent">
 				</div>
 				<br/><br/><br/>
