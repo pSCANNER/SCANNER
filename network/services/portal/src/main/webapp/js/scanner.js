@@ -29,6 +29,7 @@ var HOME;
 
 var oQueryTable = null;
 var oAnalyzeTable = null;
+var oParamsTable = null;
 
 var oStatusQueryTable = null;
 var oStatusAnalyzeTable = null;
@@ -303,7 +304,7 @@ function getSelectedParameters() {
 	var query = {};
 	var ret = true;
 	$.each(parametersBody, function(i, param) {
-		ret = buildParameterBody(param, query);
+		ret = buildQueryParameterBody(param, query);
 		if (!ret) {
 			return false;
 		}
@@ -315,52 +316,33 @@ function getSelectedParameters() {
 	return result;
 }
 
-function buildParameterBody(param, query) {
+function buildQueryParameterBody(param, query) {
 	var ret = true;
 	$.each(param, function(key, value) {
 	var metadata = value['metadata'];
 		if (metadata['parameterType'] == 'group') {
 			if (metadata['linkedParameter'] != null) {
 				// dependentVariableName
-				query[metadata['cname']] = $('#select_'+makeId(metadata['cname'])).val();
+				query[metadata['cname']] = $('input:radio:checked[name=radioDependentVariable]', $('#queryParametersTbody')).val();
 			} else if (metadata['arrayParameter'] != null) {
 				// independentVariableName
 				var values = [];
-				$.each($('input:checked', $('#table_'+makeId(metadata['cname']))), function(i, elem) {
-					values.push($(elem).attr('parValue'));
+				$.each($('input:checkbox:checked', $('#queryParametersTbody')), function(i, elem) {
+					values.push($(elem).val());
 				});
 				query[metadata['cname']] = values;
 			} else {
 				var obj = {};
 				query[metadata['cname']] = obj;
 				$.each(value['data'], function(i, elem) {
-					ret = buildParameterBody(elem, obj);
+					ret = buildQueryParameterBody(elem, obj);
 					if (!ret) {
 						return false;
 					}
 				});
 			}
-		} else if (metadata['parameterType'] == 'enum') {
-			var values = [];
-			$.each($('input:checked', $('#table_'+makeId(metadata['cname']))), function(i, elem) {
-				values.push($(elem).attr('parValue'));
-			});
-			if (values.length > 0) {
-				query[metadata['cname']] = values[0];
-			}
 		} else if (metadata['parameterType'] == 'auto') {
 			query[metadata['cname']] = $('#param_'+makeId(metadata['cname'])).val();
-		} else if (metadata['parameterType'] == 'integer') {
-			var val = $('#param_'+makeId(metadata['cname'])).val().replace(/^\s*/, "").replace(/\s*$/, "");
-			if (!isNaN(parseInt(val))) {
-				query[metadata['cname']] = parseInt(val);
-			} else if (val.length > 0) {
-				alert('Invalid integer value for "' + metadata['cname'] + '": "' + val + '".');
-				ret = false;
-			} else if (val.length == 0 && metadata['minOccurs'] == 1) {
-				alert('Please specify a value for "' + metadata['cname'] + '".');
-				ret = false;
-			}
 		} else if (metadata['parameterType'] == 'text') {
 			query[metadata['cname']] = $('#param_'+makeId(metadata['cname'])).val();
 		}
@@ -478,7 +460,8 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
  */
 function renderAvailableStudies() {
 	// some clean up
-	$('#paramsDiv').css('display', 'none');
+	$('#analysisSpecifications').css('display', 'none');
+	$('#clearResultsDiv').hide();
 	
 	// send the request
 	var url = HOME + '/query?action=getStudies';
@@ -684,142 +667,100 @@ var linkedParameters = {};
 
 function postRenderAvailableParameters(data, textStatus, jqXHR, param) {
 	parametersBody = data;
-	$('#paramsDiv').css('display', '');
+	$('#analysisSpecifications').css('display', '');
+	$('#clearResultsDiv').hide();
 	$('#statusQueryWrapperDiv').hide();
 	$('#queryDiv').hide();
-	var paramsDiv = $('#paramsDivContent');
-	paramsDiv.html('');
-	linkedParameters = {};
-	
-	var table = $('<table>');
-	table.attr('id', 'table_');
-	paramsDiv.append(table);
-
-	$.each(data, function(i, param) {
-		renderParam(paramsDiv, param, 1, table, null);
-	});
-
-	$.each(linkedParameters, function(id, linkedParameter) {
-		disableLinkedVariableName(id, linkedParameter);
-	});
-
+	renderParametersTable();
 }
 
-function disableLinkedVariableName(id, linkedParameter) {
-	var val = $('#'+id).val();
-	if (val != null) {
-		$('input:checkbox', $('#table_' + makeId(linkedParameter))).removeAttr('disabled');
-		$('#param_' + makeId(linkedParameter) + '_' + makeId(val)).removeAttr('checked');
-		$('#param_' + makeId(linkedParameter) + '_' + makeId(val)).attr('disabled', 'disabled');
-		if (val == '') {
-			$('#submitQueryButton').attr('disabled', 'disabled');
-		} else {
-			$('#submitQueryButton').removeAttr('disabled');
-		}
+function renderParametersTable() {
+	if (oParamsTable != null) {
+		$('#queryParametersTable').remove();
+		oParamsTable = null;
 	}
+	var independentVariablesList = parametersBody[0]['logisticRegressionInput']['data'][0]['inputParameters']['data'][1]['independentVariableName']['data'];
+	var independentVariablesMetadata = [];
+	$.each(independentVariablesList, function(i, param) {
+		$.each(param, function(key, value) {
+			independentVariablesMetadata.push(value['metadata']);
+		});
+	});
+	var columns = ['Name', 'Dependent Variable', 'Independent Variable'];
+	var queryParametersDiv = $('#queryParametersDiv');
+	queryParametersDiv.html('');
+	var table = $('<table>');
+	queryParametersDiv.append(table);
+	table.attr({	'cellpadding': '0',
+			'cellspacing': '0',
+			'border': '0',
+			'id': 'queryParametersTable'}); 
+	table.addClass('display');
+	var thead = $('<thead>');
+	table.append(thead);
+	var tr = $('<tr>');
+	thead.append(tr);
+	for (var i=0; i < columns.length; i++) {
+		var th = $('<th>');
+		tr.append(th);
+		th.html(columns[i]);
+	}
+	var tbody = $('<tbody>');
+	tbody.attr('id', 'queryParametersTbody');
+	table.append(tbody);
+	$.each(independentVariablesMetadata, function(i, metadata) {
+		var tr = $('<tr>');
+		tbody.append(tr);
+		var td = $('<td>');
+		tr.append(td);
+		var label = $('<label>');
+		td.append(label);
+		label.html(metadata['cname']);
+		label.hover(
+				function(event) {DisplayTipBox(event, metadata['description']);}, 
+				function(){HideTipBox();});
+		td = $('<td>');
+		tr.append(td);
+		td.css('text-align', 'center');
+		var input = $('<input>');
+		input.attr({'type': 'radio',
+			'name': 'radioDependentVariable',
+			'value': metadata['cname']});
+		td.append(input);
+		input.click(function(event) {deselectIndependentVariable(metadata['cname']);});
+		input.hover(
+				function(event) {DisplayTipBox(event, metadata['variableType']);}, 
+				function(){HideTipBox();});
+		td = $('<td>');
+		tr.append(td);
+		td.css('text-align', 'center');
+		input = $('<input>');
+		input.attr({'type': 'checkbox',
+			'name': 'checkboxIndependentVariable',
+			'value': metadata['cname'],
+			'checked': 'checked'});
+		td.append(input);
+	});
+	oParamsTable = $('#queryParametersTable').dataTable({
+		'aLengthMenu': [
+		                [-1],
+		                ['All']
+		                ],
+		'iDisplayLength': -1,
+		"bInfo": false,
+		"bPaginate": false,
+		"bFilter": false,
+        'sDom': 'lfr<"giveHeight"t>ip'
+	});
+	$('#submitQueryButton').attr('disabled', 'disabled');
 }
 
-function renderParam(div, param, index, table, select) {
-	$.each(param, function(key, value) {
-		var metadata = value['metadata'];
-		if (metadata['parameterType'] == 'group') {
-			table.remove();
-			var h = $('<h'+index+'>');
-			div.append(h);
-			h.html(metadata['cname']);
-			var parTable = $('<table>');
-			parTable.attr('id', 'table_'+makeId(metadata['cname']));
-			div.append(parTable);
-			var selectPar = null;
-			if (metadata['linkedParameter'] != null) {
-				var tr = $('<tr>');
-				parTable.append(tr);
-				var td = $('<td>');
-				tr.append(td);
-				selectPar = $('<select>');
-				selectPar.attr('id', 'select_'+makeId(metadata['cname']));
-				selectPar.change({'id': 'select_'+makeId(metadata['cname']),
-							'linkedParameter': metadata['linkedParameter']}, function(event) {disableLinkedVariableName(event.data.id, event.data.linkedParameter);});
-				td.append(selectPar);
-				linkedParameters['select_'+makeId(metadata['cname'])] = metadata['linkedParameter'];
-			}
-			$.each(value['data'], function(i, elem) {
-				renderParam(div, elem, index+1, parTable, selectPar);
-			});
-		} else if (metadata['parameterType'] == 'enum') {
-			if (select != null) {
-				var option = $('<option>');
-				option.text(metadata['cname']);
-				option.attr('value', metadata['text']);
-				if (metadata['selected'] != null) {
-					option.attr('selected', 'selected');
-				}
-				select.append(option);
-				option.hover(
-						function(event) {DisplaySelectTipBox(event, 'Variable Type: ' + metadata['variableType']);}, 
-						function(){HideSelectTipBox();});
-			} else {
-				var trNo = $('tr', table).length;
-				var tr = null;
-				if (trNo == 0) {
-					table.css('border-spacing', '10px 0px');
-					tr = $('<tr>');
-					table.append(tr);
-				} else {
-					tr = $($('tr', table)[trNo-1]);
-					if ($('td', tr).length != 1) {
-						tr = $('<tr>');
-						table.append(tr);
-					}
-				}
-				var td = $('<td>');
-				tr.append(td);
-				var tableId = table.attr('id');
-				tableId = tableId.substring('table_'.length);
-				var input = $('<input>');
-				input.attr({'type': 'checkbox',
-					'checked': 'checked',
-					'parName': metadata['cname'],
-					'id': 'param_' + tableId + '_' + makeId(metadata['cname']),
-					'parValue': metadata['cname']});
-				td.append(input);
-				var label = $('<label>');
-				td.append(label);
-				label.html(metadata['cname']);
-				label.hover(
-						function(event) {DisplayTipBox(event, metadata['description']);}, 
-						function(){HideTipBox();});
-			}
-		} else if (metadata['parameterType'] == 'auto') {
-			var tr = $('<tr>');
-			table.append(tr);
-			var td = $('<td>');
-			tr.append(td);
-			td.html(metadata['cname'] + ':');
-			td = $('<td>');
-			tr.append(td);
-			var input = $('<input>');
-			input.attr({'type': 'text',
-				'parName': metadata['cname'],
-				'id': 'param_'+makeId(metadata['cname'])});
-			input.val(++descriptionId);
-			input.attr('disabled', 'disabled');
-			td.append(input);
-		} else {
-			var tr = $('<tr>');
-			table.append(tr);
-			var td = $('<td>');
-			tr.append(td);
-			td.html(metadata['cname'] + ':');
-			td = $('<td>');
-			tr.append(td);
-			var input = $('<input>');
-			input.attr({'type': 'text',
-				'parName': metadata['cname'],
-				'id': 'param_'+makeId(metadata['cname'])});
-			td.append(input);
-		}
-	});
+function deselectIndependentVariable(val) {
+	$('input:checkbox', $('#queryParametersTbody')).removeAttr('disabled');
+	var checkbox = $('input:checkbox[value="'+val+'"]', $('#queryParametersTbody'))[0];
+	$(checkbox).removeAttr('checked');
+	$(checkbox).attr('disabled', 'disabled');
+	$('#submitQueryButton').removeAttr('disabled');
 }
 
 /**
@@ -880,7 +821,7 @@ function submitQuery(div, replay, checkStatus, resultData) {
 		param.tableId = 'analyzeExample';
 		param.statusTableId = 'statusAnalyzeExample';
 	}
-	obj['action'] = ($('#asyncCheckBox').attr('checked') == 'checked') ? 'getResultsAsync' : 'getResults';
+	obj['action'] = 'getResultsAsync';
 	if (replay == null) {
 		var sites = getSelectedSitesNames();
 		if (sites.length == 0) {
@@ -993,6 +934,8 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 		pushAnalyze(obj);
 		queryResult = dict;
 		tab = 'Query';
+		$('#analysisSpecifications').hide();
+		$('#clearResultsDiv').show();
 	} else {
 		analyzeResult = dict;
 		tab = 'Analyze';
@@ -2100,7 +2043,7 @@ function loadStudies(values) {
 				loadLibraries(emptyValue);
 				loadMethods(emptyValue);
 				loadSites(emptyValue, false);
-				$('#paramsDiv').css('display', 'none');
+				$('#analysisSpecifications').css('display', 'none');
 				$('#statusQueryWrapperDiv').css('display', 'none');
 				$('#queryDiv').css('display', 'none');
 				var selValues = studiesMultiSelect.get('value');
@@ -2131,6 +2074,9 @@ function loadStudies(values) {
 function loadDatasets(values) {
 	require(["dojo/ready", "dijit/form/MultiSelect", "dijit/form/Button", "dojo/dom", "dojo/_base/window"], function(ready, MultiSelect, Button, dom, win){
 		ready(function(){
+			loadLibraries(emptyValue);
+			loadMethods(emptyValue);
+			loadSites(emptyValue, false);
 			if (datasetsMultiSelect != null) datasetsMultiSelect.destroyRecursive(true);
 			selDatasets = dom.byId('selectDatasets');
 			selDatasets.innerHTML = '';
@@ -2145,7 +2091,7 @@ function loadDatasets(values) {
 				loadLibraries(emptyValue);
 				loadMethods(emptyValue);
 				loadSites(emptyValue, false);
-				$('#paramsDiv').css('display', 'none');
+				$('#analysisSpecifications').css('display', 'none');
 				$('#statusQueryWrapperDiv').css('display', 'none');
 				$('#queryDiv').css('display', 'none');
 				var selValues = datasetsMultiSelect.get('value');
@@ -2188,7 +2134,7 @@ function loadLibraries(values) {
 			librariesMultiSelect = new MultiSelect({ name: 'selectLibraries', value: '' }, selLibraries);
 			librariesMultiSelect.watch('value', function () {
 				loadMethods(emptyValue);
-				$('#paramsDiv').css('display', 'none');
+				$('#analysisSpecifications').css('display', 'none');
 				$('#statusQueryWrapperDiv').css('display', 'none');
 				$('#queryDiv').css('display', 'none');
 				var selValues = librariesMultiSelect.get('value');
@@ -2231,7 +2177,7 @@ function loadMethods(values) {
 			methodsMultiSelect = new MultiSelect({ name: 'selectMethods', value: '' }, selMethods);
 			methodsMultiSelect.watch('value', function () {
 				var selValues = methodsMultiSelect.get('value');
-				$('#paramsDiv').css('display', 'none');
+				$('#analysisSpecifications').css('display', 'none');
 				$('#statusQueryWrapperDiv').css('display', 'none');
 				$('#queryDiv').css('display', 'none');
 				if (selValues != null) { 
@@ -2275,7 +2221,7 @@ function loadSites(values, selectAll) {
 				loadMethods(emptyValue);
 				loadLibraries(emptyValue);
 				var selValues = sitesMultiSelect.get('value');
-				$('#paramsDiv').css('display', 'none');
+				$('#analysisSpecifications').css('display', 'none');
 				$('#statusQueryWrapperDiv').css('display', 'none');
 				$('#queryDiv').css('display', 'none');
 				if (selValues != null) { 
@@ -3636,7 +3582,8 @@ function showAvailableStudies() {
 	loadLibraries(emptyValue);
 	loadMethods(emptyValue);
 	loadSites(emptyValue, false);
-	$('#paramsDiv').css('display', 'none');
+	$('#analysisSpecifications').css('display', 'none');
+	$('#clearResultsDiv').hide();
 	$('#statusQueryWrapperDiv').css('display', 'none');
 	$('#queryDiv').css('display', 'none');
 	$('#studyName').html('Study: ' + getSelectedStudyName());
@@ -5522,5 +5469,13 @@ function hideAnalysis() {
 	$('#replayDivContent').hide();
 	$('#replayDivWrapper').hide();
 	$('#statusReplayWrapperDiv').hide();
+}
+
+function clearAnalysis() {
+	$('#analysisSpecifications').hide();
+	$('#clearResultsDiv').hide();
+	$('#queryDiv').hide();
+	$('#statusQueryWrapperDiv').hide();
+	renderAvailableDatasets();
 }
 
