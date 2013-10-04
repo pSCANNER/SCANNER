@@ -42,6 +42,18 @@
     </dependency> 
               
     <dependency>
+      <groupId>edu.isi.misd.scanner.network.modules.ptr</groupId>
+      <artifactId>ptr-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>edu.isi.misd.scanner.network.modules.ptr</groupId>
+      <artifactId>ptr-master</artifactId>
+      <version>${project.version}</version>
+    </dependency> 
+                  
+    <dependency>
       <groupId>edu.isi.misd.scanner.network.modules.oceans</groupId>
       <artifactId>oceans-common</artifactId>
       <version>${project.version}</version>
