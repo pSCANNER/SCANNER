@@ -6,7 +6,6 @@
   <name>SCANNER Network Prototype - Modules - Oceans - Integration Test</name>
   <groupId>edu.isi.misd.scanner.network.modules.oceans</groupId>
   <artifactId>oceans-test</artifactId>
-  <version>1.0-SNAPSHOT</version>
 
   <parent>
     <relativePath>../../../</relativePath>
