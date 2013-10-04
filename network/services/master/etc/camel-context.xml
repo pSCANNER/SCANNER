@@ -10,6 +10,7 @@
     <import resource="file:etc/samples/TestRouteContext.xml"/> 
     <import resource="file:etc/security/security-config.xml"/>                 
     <import resource="classpath:META-INF/spring/ExampleRouteContext.xml"/>                                                
+    <import resource="classpath:META-INF/spring/PrepToResearchRouteContext.xml"/>     
     <import resource="classpath:META-INF/spring/OceansRouteContext.xml"/> 
     <import resource="classpath:META-INF/spring/GloreRouteContext.xml"/>        
             
@@ -28,14 +29,16 @@
         </camel:packageScan>
         
         <!--<camel:routeContextRef ref="ExampleRouteContext"/>-->
-        <!--<camel:routeContextRef ref="OceansRouteContext"/>-->                
-        <!--<camel:routeContextRef ref="GloreRouteContext"/>-->            
+        <!--<camel:routeContextRef ref="OceansRouteContext"/>-->
+        <!--<camel:routeContextRef ref="PrepToResearchRouteContext"/>-->
+        <!--<camel:routeContextRef ref="GloreRouteContext"/>-->           
         <!--<camel:routeContextRef ref="TestRouteContext"/>-->
-
+      
         <camel:routeContextRef ref="ExampleSecureRouteContext"/>  
-        <camel:routeContextRef ref="OceansSecureRouteContext"/>                
-        <camel:routeContextRef ref="GloreSecureRouteContext"/>
-            
+        <camel:routeContextRef ref="PrepToResearchSecureRouteContext"/>      
+        <camel:routeContextRef ref="OceansSecureRouteContext"/>
+        <camel:routeContextRef ref="GloreSecureRouteContext"/> 
+                    
         <camel:threadPoolProfile 
             id="defaultThreadPoolProfile" 
             defaultProfile="true"

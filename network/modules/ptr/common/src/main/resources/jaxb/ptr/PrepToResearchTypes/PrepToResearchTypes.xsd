@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<xsd:schema version="1.0"
+            targetNamespace="http://scanner.misd.isi.edu/network/types/ptr"
+            xmlns:tns="http://scanner.misd.isi.edu/network/types/ptr"                                   
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">                               
+                
+    <xsd:element name="PrepToResearchRequest">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
+                   Parameters needed for a Prep to Research request
+               </xsd:documentation>
+            </xsd:annotation>   
+            <xsd:sequence>                                        
+              <xsd:element name="omopConceptID"
+                           type="xsd:int"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+            </xsd:sequence>                      
+        </xsd:complexType> 
+    </xsd:element>  
+                
+    <xsd:element name="PrepToResearchRecord">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
+                   The record format for Prep to Research results.
+               </xsd:documentation>
+            </xsd:annotation> 
+            <xsd:sequence>                                        
+              <xsd:element name="omopConceptID"
+                           type="xsd:int"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+              <xsd:element name="omopConceptName"
+                           type="xsd:string"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+              <xsd:element name="category"
+                           type="xsd:string"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+              <xsd:element name="categoryValue"
+                           type="xsd:string"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+              <xsd:element name="countFemales"
+                           type="xsd:int"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+              <xsd:element name="countMales"
+                           type="xsd:int"
+                           minOccurs="1"
+                           maxOccurs="1"/>
+              <xsd:element name="countTotal"
+                           type="xsd:int"
+                           minOccurs="1"
+                           maxOccurs="1"/>                                                                                    
+            </xsd:sequence>                         
+        </xsd:complexType> 
+    </xsd:element>   
+                        
+    <xsd:element name="PrepToResearchResponse">
+        <xsd:complexType>
+            <xsd:annotation>
+               <xsd:documentation>
+                   Results from a single Prep to Research analysis
+               </xsd:documentation>
+            </xsd:annotation> 
+            <xsd:sequence>                                        
+              <xsd:element ref="tns:PrepToResearchRecord"
+                           minOccurs="0"
+                           maxOccurs="unbounded"/>                                                                                   
+            </xsd:sequence>                         
+        </xsd:complexType> 
+    </xsd:element>   
+       
+</xsd:schema>

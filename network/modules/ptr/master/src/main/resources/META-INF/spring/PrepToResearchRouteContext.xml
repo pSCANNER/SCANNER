@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:camel="http://camel.apache.org/schema/spring"      
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"       
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd    
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+                      
+    <camel:routeContext id="PrepToResearchRouteContext">
+                
+        <camel:route>
+            <camel:from uri="jetty:http://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/ptr?sessionSupport=false&amp;matchOnUriPrefix=true"/>          
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.ptr.PrepToResearchRoute"/>
+        </camel:route>
+        
+    </camel:routeContext>
+    
+    <camel:routeContext id="PrepToResearchSecureRouteContext">
+ 
+        <camel:route>
+            <camel:from uri="jetty:https://{{master.address}}:{{master.port}}/{{master.appDomain}}/{{master.appContext}}/ptr?handlers=securityHandler&amp;sslContextParametersRef=sslContextParameters&amp;sessionSupport=false&amp;matchOnUriPrefix=true"/>          
+            <camel:to uri="direct:edu.isi.misd.scanner.network.modules.master.routes.ptr.PrepToResearchRoute"/>
+        </camel:route>
+        
+    </camel:routeContext>
+    
+</beans>

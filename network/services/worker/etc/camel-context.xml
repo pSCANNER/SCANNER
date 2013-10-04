@@ -8,7 +8,8 @@
   
     <import resource="file:etc/activiti-context.xml"/>    
     <import resource="file:etc/security/security-config.xml"/>
-    <import resource="classpath:META-INF/spring/ExampleRouteContext.xml"/>                                                
+    <import resource="classpath:META-INF/spring/ExampleRouteContext.xml"/>   
+    <import resource="classpath:META-INF/spring/PrepToResearchRouteContext.xml"/>                                                  
     <import resource="classpath:META-INF/spring/OceansRouteContext.xml"/>  
     <import resource="classpath:META-INF/spring/GloreRouteContext.xml"/>     
     
@@ -24,13 +25,15 @@
         </camel:packageScan>
                 
         <!--<camel:routeContextRef ref="OceansRouteContext"/>-->
+        <!--<camel:routeContextRef ref="PrepToResearchRouteContext"/>-->
         <!--<camel:routeContextRef ref="GloreRouteContext"/>-->        
-        <!--<camel:routeContextRef ref="ExampleRouteContext"/>-->        
-        
-        <camel:routeContextRef ref="ExampleSecureRouteContext"/>        
+        <!--<camel:routeContextRef ref="ExampleRouteContext"/>-->  
+                  
+        <camel:routeContextRef ref="ExampleSecureRouteContext"/>  
+        <camel:routeContextRef ref="PrepToResearchSecureRouteContext"/>            
         <camel:routeContextRef ref="OceansSecureRouteContext"/>
         <camel:routeContextRef ref="GloreSecureRouteContext"/> 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
     </camel:camelContext>
 
     <camel:errorHandler id="deadLetterErrorHandler"
