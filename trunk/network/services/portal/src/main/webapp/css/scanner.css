@@ -288,7 +288,16 @@ ol.blank {
 	list-style-type: none;
 }
 
- /* Style Definitions */
+td.expand_collapse_heading {
+	font-size:20px;
+	font-weight:bold;
+}
+
+td.expand_collapse_img {
+	vertical-align:bottom;
+}
+
+/* Style Definitions */
  p.MsoNormal, li.MsoNormal, div.MsoNormal
 	{margin:0in;
 	margin-bottom:.0001pt;
