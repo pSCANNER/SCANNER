@@ -21,6 +21,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -59,6 +61,7 @@ public class Login extends HttpServlet {
 	private static final String persistent_id = "persistent-id";
 	private static final String shibMailAttr = "mail";
 	private static final String shibRolesAttr = "protectNetworkEntitlement";
+	private boolean debug = false;
 	
     /**
      * Default constructor. 
@@ -67,6 +70,14 @@ public class Login extends HttpServlet {
     public Login() {
     }
 
+	public void init(ServletConfig servletConfig) throws ServletException {
+		super.init(servletConfig);
+		String debugMode = servletConfig.getServletContext().getInitParameter("debug");
+		if (debugMode != null) {
+			debug = Boolean.parseBoolean(debugMode);
+		}
+	}
+	
 	/**
 	 * Default method called by the server (via the service method) to allow a servlet to handle a GET request.
 	 * @param request
@@ -76,6 +87,19 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action = request.getParameter("action");
+		if (action != null && action.equals("checkDebug")) {
+			try {
+				JSONObject res = new JSONObject();
+				res.put("debug", debug);
+				PrintWriter out = response.getWriter();
+				String text = res.toString();
+				out.print(text);
+			} catch (JSONException e) {
+				e.printStackTrace();
+				throw(new ServletException(e));
+			}
+		}
 	}
 
 	/**
@@ -98,6 +122,19 @@ public class Login extends HttpServlet {
 		String remoteUser = request.getRemoteUser();
 		String eppn_val = (String) request.getAttribute(eppn);
 		String persistent_id_val = (String) request.getAttribute(persistent_id);
+
+		if (debug) {
+			username = request.getParameter("scannerUser");
+			displayName = "Scanner User";
+			firstName = "Scanner";
+			lastName = "User";
+			mail = "scanner@isi.edu";
+			roles = "test-role@@misd.isi.edu";
+			role = null;
+			remoteUser = "scanner@idp.protectnetwork.org";
+			eppn_val = "scanner@idp.protectnetwork.org";
+			persistent_id_val = "https://idp.protectnetwork.org/protectnetwork-idp!https://portal.scanner-net.org/scanner/shibboleth-sp!ATIrHdZXrSjfQT0OFknugOMcnEk=";
+		}
 		ArrayList<String> userRoles = new ArrayList<String>();
 		if (roles != null) {
 			StringTokenizer tokenizer = new StringTokenizer(roles, ";");

@@ -48,6 +48,7 @@ var methodsMultiSelect = null;
 var sitesMultiSelect = null;
 var queryResult = {};
 var analyzeResult = {};
+var connectionStatus = {};
 
 var availableStudies = {};
 var availableDatasets = {};
@@ -244,7 +245,7 @@ function initScanner() {
 	$('#analysisTabDiv').css({'font-family': 'Tahoma,Verdana,Arial,sans-serif',
 		'font-size': '11px'});
 	scrollbarWidth = getScrollbarWidth();
-	submitLogin();
+	checkDebug();
 }
 
 /**
@@ -401,6 +402,7 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 	});
 	$.each(successConnections, function(i, siteInfo) {
 		var siteName = siteInfo['RequestSiteName'] + ' - ' + siteInfo['RequestNodeName'];
+		connectionStatus[siteName] = 'Up';
 		var tr = $('<tr>');
 		tbody.append(tr);
 		var td = $('<td>');
@@ -422,6 +424,7 @@ function postRenderSitesStatus(data, textStatus, jqXHR, param) {
 	});
 	$.each(errorConnections, function(i, siteInfo) {
 		var siteName = siteInfo['RequestSiteName'] + ' - ' + siteInfo['RequestNodeName'];
+		connectionStatus[siteName] = 'Down';
 		var tr = $('<tr>');
 		tbody.append(tr);
 		var td = $('<td>');
@@ -1659,6 +1662,18 @@ var scanner = {
 		}
 };
 
+function checkDebug() {
+	var url = HOME + '/login';
+	var obj = new Object();
+	obj['action'] = 'checkDebug';
+	scanner.RETRIEVE(url, obj, true, postCheckDebug, null, null, 0);
+}
+
+function postCheckDebug(data, textStatus, jqXHR, param) {
+	debug = data['debug'];
+	submitLogin();
+}
+
 function submitLogin() {
 	var url = HOME + '/login';
 	var obj = new Object();
@@ -2224,6 +2239,14 @@ function loadSites(values, selectAll) {
 			selSites.innerHTML = '';
 			$.each(values, function(i, val) {
 				var c = win.doc.createElement('option');
+				if (connectionStatus[val] == 'Up') {
+					$(c).css('color', 'green');
+				} else if (connectionStatus[val] == 'Down') {
+					$(c).css('color', 'red');
+					$(c).attr('disabled', 'disabled');
+				} else if (connectionStatus[val] == null) {
+					$(c).css('color', 'green');
+				}
 				c.innerHTML = val;
 				c.value = val;
 				selSites.appendChild(c);
