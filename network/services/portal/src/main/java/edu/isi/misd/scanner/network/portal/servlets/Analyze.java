@@ -434,6 +434,19 @@ public class Analyze extends HttpServlet {
 					obj = new JSONObject();
 				}
 				//System.out.println("Return: "+obj.toString());
+			} else if (action.equals("analyzePTR")) {
+				RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
+				String omopConceptID = request.getParameter("omopConceptID");
+				obj.put("omopConceptID", omopConceptID);
+				/*
+				RegistryClientResponse clientResponse = registryClient.analyzePTR(omopConceptID);
+				if (clientResponse != null) {
+					obj = clientResponse.getEntity();
+				} else {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not analyzePTR for omopConceptID: " + omopConceptID);
+					return;
+				}
+				*/
 			}
 
 		} catch (JSONException e) {

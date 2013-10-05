@@ -2245,7 +2245,7 @@ function loadSites(values, selectAll) {
 					$(c).css('color', 'red');
 					$(c).attr('disabled', 'disabled');
 				} else if (connectionStatus[val] == null) {
-					$(c).css('color', 'green');
+					$(c).css('color', 'blue');
 				}
 				c.innerHTML = val;
 				c.value = val;

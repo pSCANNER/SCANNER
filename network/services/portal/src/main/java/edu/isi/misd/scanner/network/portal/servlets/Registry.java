@@ -93,6 +93,8 @@ public class Registry extends HttpServlet {
 		String studyId = request.getParameter("studyId");
 		String studyName = request.getParameter("studyName");
 		String userName = request.getParameter("userName");
+		String conceptType = request.getParameter("conceptType");
+		String searchString = request.getParameter("searchString");
 		RegistryClientResponse clientResponse = null;
 		if (action.equals("getMyStudies")) {
 			clientResponse = registryClient.getMyStudies();
@@ -373,6 +375,14 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("getStudyRequestedSites")) {
 			clientResponse = registryClient.getStudyRequestedSites(Integer.parseInt(studyId));
+			if (clientResponse != null) {
+				res = clientResponse.getEntityResponse().toString();
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies for study ." + studyId);
+				return;
+			}
+		} else if (action.equals("findConcept")) {
+			clientResponse = registryClient.findConcept(conceptType, searchString);
 			if (clientResponse != null) {
 				res = clientResponse.getEntityResponse().toString();
 			} else {

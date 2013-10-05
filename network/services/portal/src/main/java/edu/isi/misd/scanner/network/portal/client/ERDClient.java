@@ -963,4 +963,21 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse findConcept(String conceptType,
+			String searchString) {
+		RegistryClientResponse ret = null;
+		try {
+			String url = erdURL + conceptType;
+			if (searchString != null) {
+				url += "?search=" + Utils.urlEncode(searchString);
+			}
+			System.out.println("GET: " + url);
+			ClientURLResponse rsp = get(url, (String) null, loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
 }
