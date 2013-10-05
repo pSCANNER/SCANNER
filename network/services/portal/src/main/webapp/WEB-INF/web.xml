@@ -36,6 +36,10 @@
     <param-value>http://localhost:8089/scannerV2/registry/</param-value>
   </context-param>
   <context-param>
+    <param-name>debug</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
     <param-name>trustStoreType</param-name>
     <param-value>JKS</param-value>
   </context-param>
