@@ -288,4 +288,6 @@ public interface RegistryClient {
 	public RegistryClientResponse getDatasetInstances(String userName);
 	public RegistryClientResponse getNodes(String userName);
 	public RegistryClientResponse getSitesPolicies(String userName);
+	
+	public RegistryClientResponse findConcept(String conceptType, String searchString);
 }
