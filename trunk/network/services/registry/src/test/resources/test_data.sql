@@ -3,15 +3,15 @@ set search_path = scanner_registry;
 
 INSERT into site (site_name, description) VALUES
 ('ISI', 'USC Information Sciences Institute'),
-('UCSD', 'University of California, San Diego'),
+('ALTAMED', 'Altamed Medical Group'),
 ('RAND', 'RAND Corporation'),
-('LAHEY', 'Lahey Health');
+('UCSD', 'University of California, San Diego');
  
 INSERT INTO node (site_id, node_name, host_url, host_port, base_path, description, is_master) VALUES
 (1, 'Test Master', 'https://scanner.misd.isi.edu', 9998, '/scanner/query/', 'ISI Test Network Master Node', true),
-(1, 'Test Worker 1', 'https://scanner-node1.misd.isi.edu', 8888, '/scanner/dataset/','ISI Test Network Worker Node (ALTAMED SIM)', false),
-(1, 'Test Worker 2', 'https://scanner-node2.misd.isi.edu', 8888, '/scanner/dataset/', 'ISI Test Network Worker Node (RAND SIM)', false),
-(1, 'Test Worker 3', 'https://scanner-node3.misd.isi.edu', 8888, '/scanner/dataset/', 'ISI Test Network Worker Node (UCSD SIM)', false);
+(2, 'Test Worker', 'https://scanner-node1.misd.isi.edu', 8888, '/scanner/dataset/','ISI Test Network Worker Node (ALTAMED SIM)', false),
+(3, 'Test Worker', 'https://scanner-node2.misd.isi.edu', 8888, '/scanner/dataset/', 'ISI Test Network Worker Node (RAND SIM)', false),
+(4, 'Test Worker', 'https://scanner-node3.misd.isi.edu', 8888, '/scanner/dataset/', 'ISI Test Network Worker Node (UCSD SIM)', false);
 
 INSERT INTO scanner_user (user_name, email, HSPC_documents, Phone, Reports_To, Active, First_Name, Middle_Initial, Last_Name, PubMed_Author_ID, is_superuser) VALUES
 ('scanner', 'dmeeker@rand.org, laura@isi.edu, mdarcy@isi.edu, serban@isi.edu', null, null, 0, true, 'SCANNER', NULL, 'Network Administrator', NULL, true),
@@ -32,9 +32,9 @@ INSERT INTO standard_role(standard_role_name, description, create_by_default, ad
 
 INSERT INTO study_role (study_id,role_within_study) VALUES
 (1,'ISI Site Administrator'),
-(1,'UCSD Site Administrator'),
+(1,'ALTAMED Site Administrator'),
 (1,'RAND Site Administrator'),
-(1,'LAHEY Site Administrator'),
+(1,'UCSD Site Administrator'),
 (2,'Principal Investigator'),
 (2,'Site PI'),
 (2,'Investigator'),
