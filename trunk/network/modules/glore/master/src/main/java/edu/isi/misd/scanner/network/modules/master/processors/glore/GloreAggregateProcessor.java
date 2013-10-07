@@ -56,7 +56,7 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
         
         // fail fast - treating GLORE as transactional for now,
         // so if any part of the request fails, the entire request fails.
-        List<ServiceResponse> errorResponses = getGloreErrorList(exchange);
+        List<ServiceResponse> errorResponses = getErrorResponses(exchange);
         if (!errorResponses.isEmpty()) 
         {
             ServiceResponses responses = new ServiceResponses();                     
@@ -71,7 +71,7 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
         }
         
         List<GloreLogisticRegressionRequest> gloreRequestList = 
-            getGloreRequestList(exchange);
+            getTypedResponses(exchange, GloreLogisticRegressionRequest.class);
         if (gloreRequestList.isEmpty()) {
             ErrorUtils.setHttpError(
                 exchange, 
@@ -325,65 +325,6 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
         }
 
         exchange.getIn().setBody(request);        
-    }
-
-
-    private List<GloreLogisticRegressionRequest> 
-        getGloreRequestList(Exchange exchange)
-        throws Exception
-    {
-        ServiceResponses serviceResponses = 
-            exchange.getIn().getBody(ServiceResponses.class);   
-        if (serviceResponses == null) {
-            throw new NullPointerException(
-                "ServiceResponses aggregate structure was null");
-        }        
-        List<ServiceResponse> resultsInput = 
-            serviceResponses.getServiceResponse();     
-        
-        ArrayList<GloreLogisticRegressionRequest> resultsOutput = 
-            new ArrayList<GloreLogisticRegressionRequest>();        
-        for (ServiceResponse result : resultsInput) 
-        {
-            ServiceResponseData responseData = result.getServiceResponseData();
-            if (responseData != null) {
-                GloreLogisticRegressionRequest request = 
-                        (GloreLogisticRegressionRequest)MessageUtils.convertTo(
-                            GloreLogisticRegressionRequest.class,              
-                            responseData.getAny(),
-                            exchange);
-                resultsOutput.add(request);
-            } else {
-                log.warn("A ServiceResponse was missing the expected ServiceResponseData");
-            }
-        }        
-        return resultsOutput; 
-    }
-
-    private List<ServiceResponse> getGloreErrorList(Exchange exchange)
-        throws Exception
-    {
-        ServiceResponses serviceResponses = 
-            exchange.getIn().getBody(ServiceResponses.class);   
-        if (serviceResponses == null) {
-            throw new NullPointerException(
-                "ServiceResponses aggregate structure was null");
-        }        
-        List<ServiceResponse> resultsInput = 
-            serviceResponses.getServiceResponse(); 
-        
-        ArrayList<ServiceResponse> errors = 
-            new ArrayList<ServiceResponse>();         
-        for (ServiceResponse result : resultsInput) 
-        {
-                ServiceResponseMetadata status = 
-                    result.getServiceResponseMetadata();
-                if (ServiceRequestStateType.ERROR.equals(
-                    status.getRequestState())) {
-                        errors.add(result);
-                }
-        }
-        return errors;         
     }
     
 	/* Return a one dimensional array that is the sum of the E.length
