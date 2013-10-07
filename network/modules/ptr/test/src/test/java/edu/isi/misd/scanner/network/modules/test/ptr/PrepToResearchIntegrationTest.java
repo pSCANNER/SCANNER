@@ -49,10 +49,9 @@ public class PrepToResearchIntegrationTest extends BaseIntegrationTest
     {
         String targets =              
             context.resolvePropertyPlaceholders(
-                "http4://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=ptr_test_sample_1.csv,"+
-                "http4://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=ptr_test_sample_1.csv,"+
-                "http4://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=ptr_test_sample_1.csv,"+
-                "http4://{{worker.address}}:{{worker.port4}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=ptr_test_sample_1.csv");  
+                "http4://{{worker.address}}:{{worker.port}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=PTR_SIMULATED_ALTAMED.csv,"+
+                "http4://{{worker.address}}:{{worker.port2}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=PTR_SIMULATED_RAND.csv,"+
+                "http4://{{worker.address}}:{{worker.port3}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=PTR_SIMULATED_UCSD.csv");  
         return targets;
     }  
     

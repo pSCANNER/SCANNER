@@ -49,10 +49,9 @@ public class SecurePrepToResearchIntegrationTest extends BaseIntegrationTest
     {
         String targets =              
             context.resolvePropertyPlaceholders(
-                "https4://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=ptr_test_sample_1.csv&sslContextParametersRef=sslContextParametersMaster,"+
-                "https4://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=ptr_test_sample_1.csv&sslContextParametersRef=sslContextParametersMaster,"+
-                "https4://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=ptr_test_sample_1.csv&sslContextParametersRef=sslContextParametersMaster,"+
-                "https4://{{worker.address}}:{{worker.ssl.port4}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=ptr_test_sample_1.csv&sslContextParametersRef=sslContextParametersMaster");
+                "https4://{{worker.address}}:{{worker.ssl.port}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=PTR_SIMULATED_ALTAMED.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port2}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=PTR_SIMULATED_RAND.csv&sslContextParametersRef=sslContextParametersMaster,"+
+                "https4://{{worker.address}}:{{worker.ssl.port3}}/{{worker.appDomain}}/{{worker.appContext}}/ptr?dataSource=PTR_SIMULATED_UCSD.csv&sslContextParametersRef=sslContextParametersMaster");
         return targets;
     }  
     
