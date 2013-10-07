@@ -1285,3 +1285,19 @@ div.WordSection1
 	font-weight:bold;}
 
 /* List Definitions */
+
+
+.ptrSelection {
+	width: 800px;
+}
+	.ptrSelection .dropDown {
+		float: left;
+		margin-right: 10px;
+	}
+
+	.ptrSelection button {
+		float: left;
+		
+		width: 200px;
+		margin-top: 10px;
+	}
