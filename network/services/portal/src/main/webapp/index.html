@@ -64,6 +64,10 @@
 	require([ "dojo/parser", "dijit/layout/TabContainer",
 			"dijit/layout/ContentPane" ]);
 </script>
+
+<link rel="stylesheet" type="text/css" href="css/select2.css">
+<script src="js/select2.js"></script>
+
 <script type="text/javascript" src="js/scanner.js"></script>
 </head>
 
@@ -103,7 +107,7 @@
 					I understand and agree the <a target='_newtab2' href="http://www.hhs.gov/ocr/privacy/index.html" >Terms and Conditions</a> of using this site.
 				</div>
 				<br /><br />
-				<table style="display:none;" "id="selectStudyToAnalizeTable"><tr><td valign="top">Select study to analize:</td><td> <select id="selectStudies"></select></td></tr>
+				<table style="display:none;" id="selectStudyToAnalizeTable"><tr><td valign="top">Select study to analize:</td><td> <select id="selectStudies"></select></td></tr>
 				</table>
 				<br/><br />
 				<div><input type="button" id="continueButton" value="Continue" onclick="analyzeStudy();" disabled="disabled" ></div>
@@ -437,9 +441,34 @@
 						<div data-dojo-type="dijit/layout/ContentPane"
 							title="Prep to Research" onShow="showPrepToResearch();">
 							<div id="prepToResearchDiv">
+
+								<!-- SGC: PTR SELECTION -->
+									<div class="ptrSelection">
+								        <div class="dropDown">
+								            <div><b>Conditions:</b></div>
+								            <!-- <select size="1" class="conditions"></select> -->
+								            <input type="hidden" class="conditions"></input>
+								        </div>
+								        <div class="dropDown">
+								            <div><b>Favorites:</b></div>
+								            <!-- <select size="1" class="favorites"></select> -->
+								            <input type="hidden" class="favorites"></input>
+								        </div>
+
+								        <div class="dropDown">
+								            <div><b>Drugs:</b></div>
+								            <!-- <select class="drugs"></select> -->
+								            <input type="hidden" class="drugs"></input>
+								        </div>
+
+								        <button class="submit">Analyze</button>
+								    </div>
+								<!--  -->
+
 <div class=WordSection1>
 
 <div align=center>
+
 
 <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=710
  style='width:7.4in;border-collapse:collapse'>

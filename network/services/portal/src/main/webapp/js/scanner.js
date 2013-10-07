@@ -246,6 +246,80 @@ function initScanner() {
 		'font-size': '11px'});
 	scrollbarWidth = getScrollbarWidth();
 	checkDebug();
+
+
+	// SGC: PTR SELECTION
+	var currentSelection = '';
+
+        $('.ptrSelection input').select2({
+            width: '200px',
+            placeholder: "Click to search",
+            initSelection: function(element, callback) {
+                callback({id:-1, text: 'Click to search/select'});
+            },
+            minimumInputLength: 2,
+            query: function(options) {
+                var $this = $(options.element),
+                    conceptType = '';
+
+                if($this.hasClass('conditions')) {
+                    conceptType = 'conditions';
+                }
+                else if($this.hasClass('favorites')) {
+                    conceptType = 'favorites';
+                }
+                else if($this.hasClass('drugs')) {
+                    conceptType = 'drugs';
+                }
+
+                var obj = {
+                    action: 'findConcept',
+                    conceptType: conceptType,
+                    searchString: options.term,
+                };
+
+                var postFindConcept = function(data) {
+                    var results = [];
+                    console.log('received', data);
+
+                    for(var i=0; i<data.length;i++) {
+                        results.push({id: data[i].conceptId, text: data[i].conceptName});
+                    }
+
+                    options.callback({
+                        results: results,
+                    });
+                };
+
+                scanner.RETRIEVE(HOME + '/registry', obj, true, postFindConcept, null, null, 0);
+            },
+        });
+
+        $('.ptrSelection input').change(function() {
+            currentSelection = $(this).val();
+            $('.ptrSelection input').not(this).parent('.dropDown').find('.select2-chosen').html('');
+        });
+
+        $('.ptrSelection .submit').click(function() {
+            
+            function analyzePTR() {
+                var url = HOME + '/query',
+                    selectedConcept = currentSelection;
+
+                var options = {
+                    action: 'analyzePTR',
+                    omopConceptID: selectedConcept,
+                };
+
+               var postAnalyzePTR = function() {};
+
+                scanner.POST(url, options, true, postAnalyzePTR, null, null, 0);
+            }
+
+            analyzePTR();
+        });
+
+        // END PTR Selection
 }
 
 /**
