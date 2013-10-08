@@ -290,4 +290,5 @@ public interface RegistryClient {
 	public RegistryClientResponse getSitesPolicies(String userName);
 	
 	public RegistryClientResponse findConcept(String conceptType, String searchString);
+	public RegistryClientResponse getMethods();
 }

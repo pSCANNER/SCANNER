@@ -385,6 +385,7 @@ public class Registry extends HttpServlet {
 			clientResponse = registryClient.findConcept(conceptType, searchString);
 			if (clientResponse != null) {
 				res = clientResponse.getEntityResponse().toString();
+				System.out.println("findConcept: " + res);
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies for study ." + studyId);
 				return;
