@@ -5608,6 +5608,13 @@ function clearAnalysis() {
 }
 
 function renderPrepareToResearch(index) {
+	var studyTitle = '';
+	var user = loggedInUser['lastName'] + ', ' + loggedInUser['firstName'];
+	if (activeStudy != null) {
+		var scannerUser = scannerUsersDict[activeStudy['studyOwner']];
+		user = scannerUser['lastName'] + ', ' + scannerUser['firstName'];
+		studyTitle = activeStudy['studyName'];
+	}
 	var sitesCount = analyzePTRResponse['ServiceResponses']['ServiceResponse'].length;
 	if (index == sitesCount) {
 		alert('There is no PTR data available for omopConceptID=' + currentConceptSelectedId);
@@ -5621,9 +5628,8 @@ function renderPrepareToResearch(index) {
 		return;
 	}
 	var prepToResearchRecord = data['ServiceResponseData']['PrepToResearchResponse']['PrepToResearchRecord'];
-	$('#rc_studyPI').val('Ohno-Machado, Lucila');
-	$('#rc_studyTitle').val('pSCANNER HeartFailure');
-	$('#rc_sitenum').unbind();
+	$('#rc_studyPI').val(user);
+	$('#rc_studyTitle').val(studyTitle);
 	$('#rc_sitenum').html(' ' + (index+1) + ' of ' + (sitesCount));
 	$.each(categoryValueDict, function(key, prefix) {
 		$('#' + prefix + 'countFemales').html('');
@@ -5684,12 +5690,18 @@ function renderPrepareToResearch(index) {
 	$('#rc_racial_countTotal').html(''+tData['rc_racial_countTotal']);
 	$('#prepareToResearchTableDiv').show();
 	
-	if (sitesCount > 1) {
-		var nextIndex = index + 1;
-		if (nextIndex >= sitesCount) {
-			nextIndex = 0; 
-		}
-		$('#rc_sitenum').click(function(event) {renderPrepareToResearch(nextIndex);});
+	$('#rc_siteName').html(siteName);
+	if (index == 0) {
+		$('#rc_previousSite').hide();
+	} else {
+		$('#rc_previousSite').show();
+		$('#rc_previousSite').attr('href', 'javascript:renderPrepareToResearch('+(index-1)+');')
+	}
+	if (index == sitesCount-1) {
+		$('#rc_nextSite').hide();
+	} else {
+		$('#rc_nextSite').show();
+		$('#rc_nextSite').attr('href', 'javascript:renderPrepareToResearch('+(index+1)+');')
 	}
 }
 
