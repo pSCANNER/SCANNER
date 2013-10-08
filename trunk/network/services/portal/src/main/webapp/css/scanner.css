@@ -309,7 +309,7 @@ table.gridtable {
 
 table.gridtable td {
 	border-width: 1px;
-	padding: 8px;
+	padding: 4px;
 	border-style: solid;
 	border-color: black;
 }
