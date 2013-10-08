@@ -341,6 +341,13 @@ p.Arial8BoldText{
 	font-family:"Arial","sans-serif";
 	font-weight:bold;
 	}
+	
+p.DataField11pt {
+	margin:0in;
+	text-autospace:none;
+	height:11px; 
+	font-family:"Arial","sans-serif";
+}
 
 p.Arial10ptlineitem, li.Arial10ptlineitem, div.Arial10ptlineitem
 	{mso-style-name:"Arial10ptline item";
