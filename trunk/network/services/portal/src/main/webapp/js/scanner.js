@@ -24,6 +24,7 @@
 var debug = true;
 
 var analyzePTRResponse = null;
+var currentConceptSelectedId = null;
 
 var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
@@ -328,6 +329,8 @@ function initScanner() {
             	   analyzePTRResponse = $.parseJSON(data);
             	   renderPrepareToResearch(0);
                };
+               
+               currentConceptSelectedId = selectedConcept;
 
                 scanner.POST(url, options, true, postAnalyzePTR, null, null, 0);
             }
@@ -5606,8 +5609,17 @@ function clearAnalysis() {
 
 function renderPrepareToResearch(index) {
 	var sitesCount = analyzePTRResponse['ServiceResponses']['ServiceResponse'].length;
+	if (index == sitesCount) {
+		alert('There is no PTR data available for omopConceptID=' + currentConceptSelectedId);
+		return;
+	}
 	data = analyzePTRResponse['ServiceResponses']['ServiceResponse'][index];
 	var siteName = data['ServiceResponseMetadata']['RequestSiteName'];
+	var prepToResearchResponse = data['ServiceResponseData']['PrepToResearchResponse'];
+	if (prepToResearchResponse == null) {
+		renderPrepareToResearch(index+1);
+		return;
+	}
 	var prepToResearchRecord = data['ServiceResponseData']['PrepToResearchResponse']['PrepToResearchRecord'];
 	$('#rc_studyPI').val('Ohno-Machado, Lucila');
 	$('#rc_studyTitle').val('pSCANNER HeartFailure');

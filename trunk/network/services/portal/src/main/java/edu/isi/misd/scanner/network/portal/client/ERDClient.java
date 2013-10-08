@@ -980,4 +980,13 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		}
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse getMethods() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "tools";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 }

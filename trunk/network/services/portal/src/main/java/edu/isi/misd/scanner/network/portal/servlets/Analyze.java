@@ -48,6 +48,8 @@ public class Analyze extends HttpServlet {
 	private JSONArray retrievedLibraries;
 	private JSONArray retrievedTools;
 	private JSONArray retrievedDatasetInstances;
+	private JSONArray ptrDatasetInstances;
+	private JSONObject ptrTool;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -436,8 +438,77 @@ public class Analyze extends HttpServlet {
 				//System.out.println("Return: "+obj.toString());
 			} else if (action.equals("analyzePTR")) {
 				RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
-				String omopConceptID = request.getParameter("omopConceptID");
-				obj.put("omopConceptID", omopConceptID);
+				RegistryClientResponse clientResponse = null;
+				if (ptrTool == null) {
+					clientResponse = registryClient.getMethods();
+					if (clientResponse != null) {
+						JSONArray methods = clientResponse.getEntityResponse();
+						for (int i=0; i < methods.length(); i++) {
+							JSONObject method = methods.getJSONObject(i);
+							if (method.getString("toolName").equals("Prep to Research")) {
+								ptrTool = method;
+							}
+							clientResponse = registryClient.getDatasetInstances();
+							if (clientResponse != null) {
+								ptrDatasetInstances = clientResponse.getEntityResponse();
+								for (int j=ptrDatasetInstances.length()-1; j >= 0; j--) {
+									JSONObject instance = ptrDatasetInstances.getJSONObject(j);
+									if (!instance.getString("dataSetDefinition").equals("PTR")) {
+										ptrDatasetInstances.remove(j);
+									}
+								}
+								
+							} else {
+								response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the dataset instances.");
+								return;
+							}
+						}
+						
+					} else {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the tools.");
+						return;
+					}
+				}
+				if (ptrTool != null) {
+					StringBuffer buff = new StringBuffer();
+					for (int i=0; i < ptrDatasetInstances.length(); i++) {
+						JSONObject temp = ptrDatasetInstances.getJSONObject(i);
+						if (i > 0) {
+							buff.append(",");
+						}
+						String dataSource = temp.getString("dataSource");
+						JSONObject node = temp.getJSONObject("node");
+						buff.append(node.getString("hostUrl")).append(":").append(node.getString("hostPort")).append(node.getString("basePath")).append(ptrTool.getString("toolPath").substring(1)).append("?dataSource=").append(Utils.urlEncode(dataSource));
+					}
+					String targetsURLs = buff.toString();
+					JSONObject body = new JSONObject();
+					String omopConceptID = request.getParameter("omopConceptID");
+					body.put("omopConceptID", Integer.parseInt(omopConceptID));
+					clientResponse = registryClient.getMasterObject();
+					String res = clientResponse.toMasterString();
+					clientResponse.release();
+					System.out.println("master string: " + res);
+					JSONObject temp = new JSONObject(res);
+					String masterURL = temp.getString("hostUrl") + ":" + temp.getString("hostPort") + temp.getString("basePath");
+					String url = masterURL + ptrTool.getString("toolPath").substring(1);
+					System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nParams: "+body);
+					ClientURLResponse rsp = scannerClient.postScannerQuery(url, targetsURLs, body.toString());
+					if (rsp.isException()) {
+						throw(new ServletException(rsp.getException()));
+					} else if (rsp.isError()) {
+						response.sendError(rsp.getStatus(), rsp.getEntityString());
+						return;
+					}
+					res = rsp.getEntityString();
+					System.out.println("Response Body: \n"+res);
+					PrintWriter out = response.getWriter();
+					String text = res;
+					out.print(text);
+					return;
+				} else {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No PTR library.");
+					return;
+				}
 				/*
 				RegistryClientResponse clientResponse = registryClient.analyzePTR(omopConceptID);
 				if (clientResponse != null) {
