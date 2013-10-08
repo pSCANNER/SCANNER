@@ -23,6 +23,8 @@
 
 var debug = true;
 
+var analyzePTRResponse = null;
+
 var MAX_RETRIES = 1;
 var AJAX_TIMEOUT = 300000;
 var HOME;
@@ -114,6 +116,17 @@ var loggedInUserRoles = null;
 
 var emptySelectionString = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 var emptyValue = [emptySelectionString];
+
+var categoryValueDict = {
+		'Hispanic or Latino': 'rc_estHisp_',
+		'White': 'rc_racial_White_',
+		'Not Hispanic or Latino': 'rc_estNHisp_',
+		'Asian': 'rc_racial_Asian_',
+		'Black or African American': 'rc_racial_Black_or_African_American_',
+		'American Indian or Alaska Native': 'rc_racial_American_Indian_or_Alaska_Native_',
+		'Native Hawaiian or Other Pacific Islander': 'rc_racial_Native_Hawaiian_or_Other_Pacific_Islander_'
+
+	};
 
 var analyzeLayout = [[
                       {'name': 'Date', 'field': 'date', 'width': '15%'},
@@ -311,7 +324,10 @@ function initScanner() {
                     omopConceptID: selectedConcept,
                 };
 
-               var postAnalyzePTR = function() {};
+               var postAnalyzePTR = function(data, textStatus, jqXHR, param) {
+            	   analyzePTRResponse = $.parseJSON(data);
+            	   renderPrepareToResearch(0);
+               };
 
                 scanner.POST(url, options, true, postAnalyzePTR, null, null, 0);
             }
@@ -4377,7 +4393,7 @@ function compareNumbers(val1, val2) {
 }
 
 function showPrepToResearch() {
-	$('#tabContainerWrapperDiv').height(1100);
+	$('#tabContainerWrapperDiv').height(1500);
 	scannerTabContainer.resize();
 	$('#paramsWrapperDiv').hide();
 	$('#replayDivWrapper').show();
@@ -5586,5 +5602,82 @@ function clearAnalysis() {
 	$('#queryDiv').hide();
 	$('#statusQueryWrapperDiv').hide();
 	renderAvailableDatasets();
+}
+
+function renderPrepareToResearch(index) {
+	var sitesCount = analyzePTRResponse['ServiceResponses']['ServiceResponse'].length;
+	data = analyzePTRResponse['ServiceResponses']['ServiceResponse'][index];
+	var siteName = data['ServiceResponseMetadata']['RequestSiteName'];
+	var prepToResearchRecord = data['ServiceResponseData']['PrepToResearchResponse']['PrepToResearchRecord'];
+	$('#rc_studyPI').val('Ohno-Machado, Lucila');
+	$('#rc_studyTitle').val('pSCANNER HeartFailure');
+	$('#rc_sitenum').unbind();
+	$('#rc_sitenum').html(' ' + (index+1) + ' of ' + (sitesCount));
+	$.each(categoryValueDict, function(key, prefix) {
+		$('#' + prefix + 'countFemales').html('');
+		$('#' + prefix + 'countMales').html('');
+		$('#' + prefix + 'countTotal').html('');
+	});
+	var tData = {};
+	tData['rc_ethnic_countFemales'] = 0;
+	tData['rc_ethnic_countMales'] = 0;
+	tData['rc_ethnic_countTotal'] = 0;
+	tData['rc_racial_countFemales'] = 0;
+	tData['rc_racial_countMales'] = 0;
+	tData['rc_racial_countTotal'] = 0;
+	$.each(prepToResearchRecord, function(i, elem) {
+		var prefix = categoryValueDict[elem['categoryValue']];
+		if (prefix != null) {
+			tData[prefix + 'countFemales'] = parseInt(elem['countFemales']);
+			tData[prefix + 'countMales'] = parseInt(elem['countMales']);
+			tData[prefix + 'countTotal'] = parseInt(elem['countTotal']);
+			$('#'+prefix+'countFemales').html(''+tData[prefix + 'countFemales']);
+			$('#'+prefix+'countMales').html(''+tData[prefix + 'countMales']);
+			$('#'+prefix+'countTotal').html(''+tData[prefix + 'countTotal']);
+			if (elem['category'] == 'ethnic') {
+				tData['rc_ethnic_countFemales'] += parseInt(elem['countFemales']);
+				tData['rc_ethnic_countMales'] += parseInt(elem['countMales']);
+				tData['rc_ethnic_countTotal'] += parseInt(elem['countTotal']);
+			} else {
+				tData['rc_racial_countFemales'] += parseInt(elem['countFemales']);
+				tData['rc_racial_countMales'] += parseInt(elem['countMales']);
+				tData['rc_racial_countTotal'] += parseInt(elem['countTotal']);
+			}
+		}
+	});
+	var pctHis = .4;
+	tData['rc_estHisp_countFemales']=Math.round(pctHis*parseFloat(tData['rc_racial_White_countFemales']));
+	tData['rc_estHisp_countMales']=Math.round(pctHis*parseFloat(tData['rc_racial_White_countMales']));
+	tData['rc_estHisp_countTotal']=tData['rc_estHisp_countFemales']+tData['rc_estHisp_countMales'];
+	tData['rc_estNHisp_countFemales']=tData['rc_racial_countFemales']-tData['rc_estHisp_countFemales'];
+	tData['rc_estNHisp_countMales']=tData['rc_racial_countMales']-tData['rc_estHisp_countMales'];
+    tData['rc_estNHisp_countTotal']=tData['rc_estNHisp_countFemales']+tData['rc_estNHisp_countMales'];
+
+	$('#rc_estHisp_countFemales').html(''+tData['rc_estHisp_countFemales']);
+	$('#rc_estHisp_countMales').html(''+tData['rc_estHisp_countMales']);
+	$('#rc_estHisp_countTotal').html(''+tData['rc_estHisp_countTotal']);
+	$('#rc_estNHisp_countFemales').html(''+tData['rc_estNHisp_countFemales']);
+	$('#rc_estNHisp_countMales').html(''+tData['rc_estNHisp_countMales']);
+	$('#rc_estNHisp_countTotal').html(''+tData['rc_estNHisp_countTotal']);
+
+	$('#rc_racial_ethnic_countTotal').val('' + (tData['rc_estHisp_countTotal'] + tData['rc_estNHisp_countTotal']) + ' (' + siteName + ')');
+	$('#rc_ethnic_countFemales').html('' + (tData['rc_estHisp_countFemales']+tData['rc_estNHisp_countFemales']));
+	$('#rc_ethnic_countMales').html('' + (tData['rc_estHisp_countMales']+tData['rc_estNHisp_countMales']));
+	$('#rc_ethnic_countTotal').html('' + (tData['rc_estHisp_countTotal'] + tData['rc_estNHisp_countTotal']));
+	$('#rc_estNHisp_countFemales').html('' + tData['rc_estNHisp_countFemales']);
+	$('#rc_estNHisp_countMales').html('' + tData['rc_estNHisp_countMales']);
+	$('#rc_estNHisp_countTotal').html('' + tData['rc_estNHisp_countTotal']);
+	$('#rc_racial_countFemales').html(''+tData['rc_racial_countFemales']);
+	$('#rc_racial_countMales').html(''+tData['rc_racial_countMales']);
+	$('#rc_racial_countTotal').html(''+tData['rc_racial_countTotal']);
+	$('#prepareToResearchTableDiv').show();
+	
+	if (sitesCount > 1) {
+		var nextIndex = index + 1;
+		if (nextIndex >= sitesCount) {
+			nextIndex = 0; 
+		}
+		$('#rc_sitenum').click(function(event) {renderPrepareToResearch(nextIndex);});
+	}
 }
 
