@@ -311,6 +311,22 @@ public class Registry extends HttpServlet {
 					}
 					studyRoles.put("" + siteId, clientResponse.getEntityResponse());
 				}
+				clientResponse.release();
+				if (studyId != null) {
+					clientResponse = registryClient.getDatasetInstances(Integer.parseInt(studyId), userName);
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get instances for study: " + studyId);
+						return;
+					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+						System.out.println("Result:\n" + clientResponse.getEntity());
+						response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+						return;
+					}
+					responseObject.put("studyInstances", clientResponse.getEntityResponse());
+					clientResponse.release();
+				} else {
+					responseObject.put("studyInstances", new JSONArray());
+				}
 				responseObject.put("sitesAdmin", sitesAdmin);
 				responseObject.put("studyRoles", studyRoles);
 				res = responseObject.toString();

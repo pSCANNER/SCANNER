@@ -285,6 +285,7 @@ public interface RegistryClient {
 	public RegistryClientResponse deleteSiteAdministrationRole(int sitePolicyId);
 
 	public RegistryClientResponse getStudyManagementPolicies(int studyId, String userName);
+	public RegistryClientResponse getDatasetInstances(int studyId, String userName);
 	public RegistryClientResponse getDatasetInstances(String userName);
 	public RegistryClientResponse getNodes(String userName);
 	public RegistryClientResponse getSitesPolicies(String userName);
