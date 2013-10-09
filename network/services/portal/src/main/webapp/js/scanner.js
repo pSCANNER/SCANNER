@@ -5650,6 +5650,7 @@ function renderPrepareToResearch(index) {
 	$('#rc_studyPI').val(user);
 	$('#rc_studyTitle').val(studyTitle);
 	$('#rc_sitenum').html(' ' + (index+1) + ' of ' + (sitesCount));
+	$('#rc_sitenumTop').html(' ' + (index+1) + ' of ' + (sitesCount));
 	$.each(categoryValueDict, function(key, prefix) {
 		$('#' + prefix + 'countFemales').html('');
 		$('#' + prefix + 'countMales').html('');
@@ -5710,17 +5711,24 @@ function renderPrepareToResearch(index) {
 	$('#prepareToResearchTableDiv').show();
 	
 	$('#rc_siteName').html(siteName);
+	$('#rc_siteNameTop').html(siteName);
 	if (index == 0) {
 		$('#rc_previousSite').hide();
+		$('#rc_previousSiteTop').hide();
 	} else {
 		$('#rc_previousSite').show();
 		$('#rc_previousSite').attr('href', 'javascript:renderPrepareToResearch('+(index-1)+');')
+		$('#rc_previousSiteTop').show();
+		$('#rc_previousSiteTop').attr('href', 'javascript:renderPrepareToResearch('+(index-1)+');')
 	}
 	if (index == sitesCount-1) {
 		$('#rc_nextSite').hide();
+		$('#rc_nextSiteTop').hide();
 	} else {
 		$('#rc_nextSite').show();
 		$('#rc_nextSite').attr('href', 'javascript:renderPrepareToResearch('+(index+1)+');')
+		$('#rc_nextSiteTop').show();
+		$('#rc_nextSiteTop').attr('href', 'javascript:renderPrepareToResearch('+(index+1)+');')
 	}
 }
 
