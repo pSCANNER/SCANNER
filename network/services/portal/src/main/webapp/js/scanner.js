@@ -4482,6 +4482,9 @@ function manageAdministration() {
 	var obj = new Object();
 	obj['action'] = 'getUserAdminRoles';
 	obj['userName'] = loggedInUserName;
+	if (activeStudy != null) {
+		obj['studyId'] = activeStudy['studyId'];
+	}
 	var url = HOME + '/registry';
 	scanner.RETRIEVE(url, obj, true, postManageAdministration, null, null, 0);
 }
@@ -4494,6 +4497,8 @@ function postManageAdministration(data, textStatus, jqXHR, param) {
 	activeUser['instancesDict'] = {};
 	activeUser['sitesAdminDict'] = {};
 	activeUser['studyRolesDict'] = {};
+	activeUser['studyInstances'] = data['studyInstances'];
+	activeUser['studyInstances'].sort(compareInstances);
 	$.each(data['sitePolicies'], function(i, sitePolicy) {
 		activeUser['sitesDict'][sitePolicy['site']['siteName']] = sitePolicy['site'];
 	});
@@ -5198,8 +5203,11 @@ function setInstances() {
 	$('#newInstanceButton').show();
 	$('#add_instance_entity_div').hide();
 	$('#manageInstancesTbody').html('');
-	$.each(datasetInstancesList, function(i, instance) {
-		addInstanceRow(instance);
+	var allInstances = (activeStudy != null) ? activeUser['studyInstances'] : datasetInstancesList;
+	$.each(allInstances, function(i, instance) {
+		if (checkEditInstance(instance)) {
+			addInstanceRow(instance);
+		}
 	});
 	loadSelectNodes();
 	loadSelectDataSets();
@@ -5209,9 +5217,15 @@ function setInstances() {
 		$('#newInstanceButton').show();
 	}
 	if (checkManageDatasetInstances()) {
-		$('#manageDataSetInstancesP').html('Manage Data Set Instances');
+		$('#manageInstancesTable').show();
+		if (activeStudy != null) {
+			$('#manageDataSetInstancesP').html('Manage Data Set Instances for Study ' + activeStudy['studyName']);
+		} else {
+			$('#manageDataSetInstancesP').html('Manage Data Set Instances');
+		}
 	} else {
-		$('#manageDataSetInstancesP').html('View Data Set Instances');
+		$('#manageDataSetInstancesP').html('No Data Set Instances Available to Manage');
+		$('#manageInstancesTable').hide();
 	}
 }
 
@@ -5420,7 +5434,7 @@ function checkManageNodes() {
 }
 
 function checkManageDatasetInstances() {
-	return loggedInUser['isSuperuser'] || $('button', $('#manageInstancesTbody')).length > $('.hiddenButton', $('#manageInstancesTbody')).length;
+	return loggedInUser['isSuperuser'] || $('button', $('#manageInstancesTbody')).length > 0;
 }
 
 function newSitePolicy() {
