@@ -5165,7 +5165,7 @@ function loadSelectNodes() {
 	$.each(nodesList, function(i, node) {
 		if (!node['isMaster'] && checkEditNode(node)) {
 			option = $('<option>');
-			option.text(node['nodeName']);
+			option.text(node['site']['siteName'] + ' - ' + node['nodeName']);
 			option.attr('value', node['nodeId']);
 			select.append(option);
 		}
