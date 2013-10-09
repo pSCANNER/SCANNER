@@ -312,6 +312,11 @@ function initScanner() {
         $('.ptrSelection input').change(function() {
             currentSelection = $(this).val();
             $('.ptrSelection input').not(this).parent('.dropDown').find('.select2-chosen').html('');
+            if (currentSelection != '') {
+            	$('#findCohortButton').removeAttr('disabled');
+            } else {
+            	$('#findCohortButton').attr('disabled', 'disabled');
+            }
         });
 
         $('.ptrSelection .submit').click(function() {
