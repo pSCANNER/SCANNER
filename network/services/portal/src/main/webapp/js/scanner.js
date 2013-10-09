@@ -1786,6 +1786,7 @@ function postSubmitLogin(data, textStatus, jqXHR, param) {
 	var loginDiv = $('#loginForm');
 	$('#errorDiv').remove();
 	if (res['status'] == 'success') {
+		$('#acceptConditions').removeAttr('disabled');
 		loggedInUserName = res['user'];
 		$('#profileIdentity').html(res['mail']);
 		$('#profileIdentityDescription').html(res['description'][0]);
@@ -1864,7 +1865,8 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 		renderSitesStatus();
 		initUsers(true);
 	} else {
-		alert(res['status']);
+		alert('You are not a member of the SCANNER users.\nPlease contact us at sdsc-scanner@ucsd.edu.');
+		$('#acceptConditions').attr('disabled', 'disabled');
 	}
 }
 

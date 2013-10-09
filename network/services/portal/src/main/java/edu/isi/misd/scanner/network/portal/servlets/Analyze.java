@@ -257,9 +257,11 @@ public class Analyze extends HttpServlet {
 						trustStoreType, trustStorePassword, trustStoreResource,
 						keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
 				session.setAttribute("scannerClient", scannerClient);
-				obj.put("status", "success");
-				obj.put("user", user);
-				obj.put("userRoles", userRoles);
+				if (user != null) {
+					obj.put("status", "success");
+					obj.put("user", user);
+					obj.put("userRoles", userRoles);
+				}
 			} else if (action.equals("logout")) {
 				System.out.println("Logout successfully");
 				obj.put("status", "success");
