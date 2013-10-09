@@ -15,7 +15,19 @@ public interface DataSetInstanceRepository
 {    
     List<DataSetInstance> 
         findByNodeSiteSitePoliciesStudyRoleUserRolesUserUserName(
-            String userName);    
+            String userName); 
+    
+    @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
+           "JOIN i.analysisPolicyStatements p " + 
+           "JOIN p.studyRole r JOIN r.study s " + 
+           "JOIN r.userRoles ur JOIN ur.user u " +
+           "WHERE s.studyId = :studyId " +        
+           "AND u.userName = :userName " +
+           "AND p." + QueryConstants.ACTIVE_POLICY_CHECK)
+    List<DataSetInstance> 
+        findByStudyIdAndUserNameFilteredByAnalysisPolicy(
+            @Param("studyId")Integer studyId,        
+            @Param("userName")String userName);   
     
     @Query("SELECT DISTINCT i FROM DataSetInstance i " +  
            "JOIN i.dataSetDefinition d " + 
