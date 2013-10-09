@@ -86,6 +86,13 @@ public class DataSetInstanceController extends BaseController
                                 validateIntegerParameter(
                                     REQUEST_PARAM_STUDY_ID, studyId),                                
                                 userName);
+                } else if (studyId != null) {
+                    return
+                        dataSetInstanceRepository.
+                            findByStudyIdAndUserNameFilteredByAnalysisPolicy(
+                                validateIntegerParameter(
+                                    REQUEST_PARAM_STUDY_ID, studyId),                                
+                                userName);                    
                 } else if ((dataSetId == null) && (studyId == null)) {   
                     return 
                         dataSetInstanceRepository.
