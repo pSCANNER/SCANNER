@@ -1,6 +1,9 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -26,13 +29,18 @@ public class AnalysisResult implements Serializable
     @Column(name = "result_id")
     private Integer resultId;
     @Basic(optional = false)
-    @Column(name = "result_status")
-    private String resultStatus;
-    @Column(name = "result_status_detail")
-    private String resultStatusDetail;
+    @Column(name = "status")
+    private String status;
+    @Column(name = "status_detail")
+    private String statusDetail;
     @Basic(optional = false)
-    @Column(name = "result_url")
-    private String resultUrl;
+    @Column(name = "url")
+    private String url;
+    @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="dataSetInstanceId")
+    @JsonIdentityReference(alwaysAsId=true)  
+    @Basic(optional = false)
+    @Column(name = "data_set_instance_id")
+    private int dataSetInstanceId;    
     @JsonIgnore
     @JoinColumn(name = "analysis_id", referencedColumnName = "analysis_id")
     @ManyToOne(optional = false)
@@ -45,10 +53,10 @@ public class AnalysisResult implements Serializable
         this.resultId = resultId;
     }
 
-    public AnalysisResult(Integer resultId, String resultStatus, String resultUrl) {
+    public AnalysisResult(Integer resultId, String status, String url) {
         this.resultId = resultId;
-        this.resultStatus = resultStatus;
-        this.resultUrl = resultUrl;
+        this.status = status;
+        this.url = url;
     }
 
     public Integer getResultId() {
@@ -59,30 +67,38 @@ public class AnalysisResult implements Serializable
         this.resultId = resultId;
     }
 
-    public String getResultStatus() {
-        return resultStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public void setResultStatus(String resultStatus) {
-        this.resultStatus = resultStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public String getResultStatusDetail() {
-        return resultStatusDetail;
+    public String getStatusDetail() {
+        return statusDetail;
     }
 
-    public void setResultStatusDetail(String resultStatusDetail) {
-        this.resultStatusDetail = resultStatusDetail;
+    public void setStatusDetail(String statusDetail) {
+        this.statusDetail = statusDetail;
     }
     
-    public String getResultUrl() {
-        return resultUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setResultUrl(String resultUrl) {
-        this.resultUrl = resultUrl;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    
+    public int getDataSetInstanceId() {
+        return dataSetInstanceId;
     }
 
+    public void setDataSetInstanceId(int dataSetInstanceId) {
+        this.dataSetInstanceId = dataSetInstanceId;
+    }
+    
     public AnalysisInstance getAnalysisInstance() {
         return analysisInstance;
     }
@@ -90,7 +106,7 @@ public class AnalysisResult implements Serializable
     public void setAnalysisInstance(AnalysisInstance analysisInstance) {
         this.analysisInstance = analysisInstance;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;

@@ -194,11 +194,12 @@ CREATE TABLE IF NOT EXISTS analysis_instance (
 
 CREATE TABLE IF NOT EXISTS analysis_result (
   result_id serial NOT NULL primary key,
-  result_status text NOT NULL,
-  result_status_detail text,
-  result_url text NOT NULL,
+  status text NOT NULL,
+  status_detail text,
+  url text NOT NULL,
+  data_set_instance_id integer NOT NULL,
   analysis_id integer NOT NULL references analysis_instance(analysis_id),
-  unique (result_url, analysis_id)
+  unique (data_set_instance_id, analysis_id)
 );
 
 create table drugs_code_set (
