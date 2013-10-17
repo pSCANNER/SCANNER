@@ -69,7 +69,10 @@ public class ScannerUser implements Serializable
     private List<DataSetDefinition> dataSetDefinitions;
     @JsonIgnore    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "policyOriginator")
-    private List<StudyPolicyStatement> studyPolicyStatements;    
+    private List<StudyPolicyStatement> studyPolicyStatements;
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<AnalysisInstance> analysisInstances;
     
     public ScannerUser() {
     }
@@ -224,6 +227,14 @@ public class ScannerUser implements Serializable
         this.studyPolicyStatements = studyPolicyStatements;
     }
 
+    public List<AnalysisInstance> getAnalysisInstances() {
+        return analysisInstances;
+    }
+
+    public void setAnalysisInstanceList(List<AnalysisInstance> analysisInstances) {
+        this.analysisInstances = analysisInstances;
+    }
+        
     @Override
     public int hashCode() {
         int hash = 0;
@@ -248,5 +259,5 @@ public class ScannerUser implements Serializable
     public String toString() {
         return "edu.isi.misd.scanner.network.registry.data.domain.ScannerUser[ userId=" + userId + " ]";
     }
-    
+
 }

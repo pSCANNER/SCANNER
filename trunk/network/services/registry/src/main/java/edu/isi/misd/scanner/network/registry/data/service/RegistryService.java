@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.service;
 
+import edu.isi.misd.scanner.network.registry.data.domain.AnalysisInstance;
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
 import edu.isi.misd.scanner.network.registry.data.domain.ScannerUser;
 import edu.isi.misd.scanner.network.registry.data.domain.Site;
@@ -93,5 +94,11 @@ public interface RegistryService
      * Creates or updates a single DataSetDefinition.
      * @param dataSet
      */
-    public DataSetDefinition saveDataSetDefinition(DataSetDefinition dataSet);          
+    public DataSetDefinition saveDataSetDefinition(DataSetDefinition dataSet);    
+    
+    /**
+     * Creates or updates a single AnalysisInstance.
+     * @param instance
+     */
+    public AnalysisInstance saveAnalysisInstance(AnalysisInstance instance);    
 }

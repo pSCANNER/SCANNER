@@ -59,7 +59,10 @@ public class AnalysisTool implements Serializable
     @JsonIgnore       
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
     private List<StudyPolicyStatement> studyPolicyStatements;
-
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisTool")
+    private List<AnalysisInstance> analysisInstances;
+    
     public AnalysisTool() {
     }
 
@@ -154,6 +157,14 @@ public class AnalysisTool implements Serializable
 
     public void setStudyPolicyStatements(List<StudyPolicyStatement> studyPolicyStatements) {
         this.studyPolicyStatements = studyPolicyStatements;
+    }
+    
+    public List<AnalysisInstance> getAnalysisInstances() {
+        return analysisInstances;
+    }
+
+    public void setAnalysisInstanceList(List<AnalysisInstance> analysisInstances) {
+        this.analysisInstances = analysisInstances;
     }
     
     @Override

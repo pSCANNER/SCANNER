@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import java.text.DateFormat;
 
 public class CustomJacksonObjectMapper extends ObjectMapper 
 {
@@ -18,6 +19,11 @@ public class CustomJacksonObjectMapper extends ObjectMapper
         // do not serialize null valued properties or collections
         this.setSerializationInclusion(Include.NON_NULL);    
      
+        // Custom DateTime format string for serializer
+        this.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        this.setDateFormat(
+            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG));
+        
         // enable Hibernate4 module to avoid serializing lazy-loaded objects
         Hibernate4Module hibernate4Module = new Hibernate4Module();
         hibernate4Module.configure(

@@ -80,6 +80,9 @@ public class Study implements Serializable
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
     private List<StudyRequestedSite> studyRequestedSites;
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "study")
+    private List<AnalysisInstance> analysisInstances;
     
     public Study() {
     }
@@ -220,7 +223,15 @@ public class Study implements Serializable
 
     public void setStudyRequestedSites(List<StudyRequestedSite> studyRequestedSites) {
         this.studyRequestedSites = studyRequestedSites;
-    }  
+    } 
+    
+    public List<AnalysisInstance> getAnalysisInstances() {
+        return analysisInstances;
+    }
+
+    public void setAnalysisInstances(List<AnalysisInstance> analysisInstances) {
+        this.analysisInstances = analysisInstances;
+    }
     
     @Override
     public int hashCode() {

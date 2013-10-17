@@ -1,5 +1,7 @@
 package edu.isi.misd.scanner.network.registry.data.service;
 
+import edu.isi.misd.scanner.network.registry.data.domain.AnalysisInstance;
+import edu.isi.misd.scanner.network.registry.data.domain.AnalysisResult;
 import edu.isi.misd.scanner.network.registry.data.domain.AnalysisTool;
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetDefinition;
 import edu.isi.misd.scanner.network.registry.data.domain.DataSetInstance;
@@ -15,6 +17,8 @@ import edu.isi.misd.scanner.network.registry.data.domain.UserRole;
 import edu.isi.misd.scanner.network.registry.data.repository.*;
 import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +53,8 @@ public class RegistryServiceImpl implements RegistryService
     private SiteRepository siteRepository;   
     @Autowired
     private SitePolicyRepository sitePolicyRepository;   
+    @Autowired
+    private AnalysisInstanceRepository analysisInstanceRepository;        
     
     /**
      * Checks if the userName specified has the superuser flag set.
@@ -441,4 +447,32 @@ public class RegistryServiceImpl implements RegistryService
         }
         siteRepository.delete(site);
     }        
+    
+    /**
+     * Creates or updates a single AnalysisInstance, with optional creation of 
+     * AnalysisResult child relations.
+     * @param instance
+     */    
+    @Override
+    @Transactional
+    public AnalysisInstance saveAnalysisInstance(AnalysisInstance instance) 
+    {
+        List<AnalysisResult> resultList = 
+            instance.getAnalysisResults();
+        if ((resultList != null) && (!resultList.isEmpty())) 
+        {
+            instance.setAnalysisResults(null);
+            Date now = Calendar.getInstance().getTime();
+            if (instance.getCreated() == null) {
+                instance.setCreated(now);
+            }
+            instance.setUpdated(now);
+            analysisInstanceRepository.save(instance);              
+            for (AnalysisResult result : resultList) {
+                result.setAnalysisInstance(instance);
+            }
+            instance.setAnalysisResults(resultList);            
+        }
+        return analysisInstanceRepository.save(instance);
+    }     
 }
