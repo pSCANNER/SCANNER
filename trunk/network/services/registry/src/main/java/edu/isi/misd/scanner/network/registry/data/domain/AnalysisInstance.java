@@ -2,6 +2,7 @@ package edu.isi.misd.scanner.network.registry.data.domain;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.Date;
@@ -65,6 +66,7 @@ public class AnalysisInstance implements Serializable
     @JoinColumn(name = "analysis_tool_id", referencedColumnName = "tool_id")
     @ManyToOne(optional = false)
     private AnalysisTool analysisTool;
+    @JsonManagedReference("AnalysisInstance-AnalysisResult")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "analysisInstance", fetch=FetchType.EAGER)
     private List<AnalysisResult> analysisResults;
 

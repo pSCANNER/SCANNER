@@ -1,5 +1,6 @@
 package edu.isi.misd.scanner.network.registry.data.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -41,7 +42,7 @@ public class AnalysisResult implements Serializable
     @Basic(optional = false)
     @Column(name = "data_set_instance_id")
     private int dataSetInstanceId;    
-    @JsonIgnore
+    @JsonBackReference("AnalysisInstance-AnalysisResult")
     @JoinColumn(name = "analysis_id", referencedColumnName = "analysis_id")
     @ManyToOne(optional = false)
     private AnalysisInstance analysisInstance;
