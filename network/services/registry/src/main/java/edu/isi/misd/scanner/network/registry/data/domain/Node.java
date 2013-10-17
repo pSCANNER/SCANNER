@@ -50,8 +50,11 @@ public class Node implements Serializable
     private Site site;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "node")
-    private List<DataSetInstance> dataSetInstances;    
-
+    private List<DataSetInstance> dataSetInstances;   
+    @JsonIgnore    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "node")
+    private List<AnalysisInstance> analysisInstances;
+    
     public Node() {
     }
 
@@ -137,6 +140,14 @@ public class Node implements Serializable
 
     public void setDataSetInstances(List<DataSetInstance> dataSetInstances) {
         this.dataSetInstances = dataSetInstances;
+    }
+    
+    public List<AnalysisInstance> getAnalysisInstances() {
+        return analysisInstances;
+    }
+
+    public void setAnalysisInstanceList(List<AnalysisInstance> analysisInstances) {
+        this.analysisInstances = analysisInstances;
     }
     
     @Override

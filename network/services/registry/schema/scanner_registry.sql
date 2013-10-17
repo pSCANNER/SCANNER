@@ -180,6 +180,27 @@ COMMENT ON TABLE data_set_variable_metadata
 COMMENT ON COLUMN data_set_variable_metadata.variable_name IS 'variable name is unique wihtin data set';
 COMMENT ON COLUMN data_set_variable_metadata.variable_description IS 'this is the tooltip and description of the variable';
 
+CREATE TABLE IF NOT EXISTS analysis_instance (
+  analysis_id serial NOT NULL primary key,
+  transaction_id text NOT NULL unique,
+  created timestamp with time zone NOT NULL default now(),
+  updated timestamp with time zone NOT NULL default now(),
+  node_id integer NOT NULL references node(node_id),
+  study_id integer NOT NULL references study(study_id),
+  analysis_tool_id integer NOT NULL references analysis_tool(tool_id),
+  user_id integer NOT NULL references scanner_user(user_id),
+  status text
+);
+
+CREATE TABLE IF NOT EXISTS analysis_result (
+  result_id serial NOT NULL primary key,
+  result_status text NOT NULL,
+  result_status_detail text,
+  result_url text NOT NULL,
+  analysis_id integer NOT NULL references analysis_instance(analysis_id),
+  unique (result_url, analysis_id)
+);
+
 create table drugs_code_set (
     concept_id integer not null primary key,
     concept_name text not null,
@@ -297,32 +318,4 @@ CREATE TABLE IF NOT EXISTS study_data_warehouse (
 );
 
 COMMENT ON table study_data_warehouse is 'Placeholder study/warehouse xref table.';
-*/
-
---- More Mike-owned tables
-/*
-CREATE TABLE IF NOT EXISTS analysis_instance (
-  analysis_instance_id serial NOT NULL primary key,
-  -- I don't think study_policy_statement_id belongs here, but if it does, it should be a foreign key to the study_policy_statement table - LP
-  study_policy_statement_id integer NOT NULL,
-  -- Is there some table of states? - LP
-  analysis_instance_state integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS analysis_instance_site_status (
-  analysis_instance_site_status_id serial NOT NULL primary key,
-  analysis_instance_id integer NOT NULL references analysis_instance(analysis_instance_id),
-  -- I don't think study_policy_statement_id belongs here, but if it does, it should be a foreign key to the policy table - LP
-  policy_instance_id integer NOT NULL,
-  -- Is there a table of statuses? Are they the same as for analysis_table_state above?
-  analysis_instance_site_status integer NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS result_instance (
-  result_instance_id serial not null primary key,
-  analysis_instance_id integer NOT NULL references analysis_instance(analysis_instance_id),
-  -- What is result_location? Is it a foreign key to some other table?
-  result_location integer NOT NULL,
-  result_instance_url text NOT NULL
-);
 */
