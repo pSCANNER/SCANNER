@@ -18,6 +18,9 @@ package edu.isi.misd.scanner.network.portal.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -35,6 +38,7 @@ import edu.isi.misd.scanner.network.portal.client.ERDClient;
 import edu.isi.misd.scanner.network.portal.client.JakartaClient;
 import edu.isi.misd.scanner.network.portal.client.RegistryClient;
 import edu.isi.misd.scanner.network.portal.client.RegistryClientResponse;
+import edu.isi.misd.scanner.network.portal.utils.Utils;
 
 /**
  * Servlet for implementing the web service registry API.
@@ -406,6 +410,30 @@ public class Registry extends HttpServlet {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies for study ." + studyId);
 				return;
 			}
+		} else if (action.equals("getAllHistory")) {
+			clientResponse = registryClient.getAllHistory();
+			if (clientResponse != null) {
+				JSONArray history = clientResponse.getEntityResponse();
+				history = Utils.sortHistory(history);
+				convertDateFormat(history);
+				res = history.toString();
+				System.out.println("getAllHistory: " + res);
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get history ." + studyId);
+				return;
+			}
+		} else if (action.equals("getHistory")) {
+			clientResponse = registryClient.getAllHistory(Integer.parseInt(studyId));
+			if (clientResponse != null) {
+				JSONArray history = clientResponse.getEntityResponse();
+				history = Utils.sortHistory(history);
+				convertDateFormat(history);
+				res = history.toString();
+				System.out.println("getHistory: " + res);
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get history for study ." + studyId);
+				return;
+			}
 		} else {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unknown action: \"" + action + "\"");
 			return;
@@ -500,6 +528,8 @@ public class Registry extends HttpServlet {
 		String hostPort = request.getParameter("hostPort");
 		String isMaster = request.getParameter("isMaster");
 		String sitePolicyId = request.getParameter("sitePolicyId");
+		String analysisId = request.getParameter("analysisId");
+		String status = request.getParameter("status");
 		
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
@@ -990,6 +1020,26 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("updateHistory")) {
+			clientResponse = registryClient.updateHistory(Integer.parseInt(analysisId), status);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update dataset instance.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("updateDatasetInstance:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("analysisId", analysisId);
+				responseObject.put("status", status);
+				clientResponse.release();
+				responseBody = responseObject.toString();
+				if (debug) System.out.println("updateHistory responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("deleteStudyRequestedSites")) {
 			clientResponse = registryClient.deleteStudyRequestedSites(Integer.parseInt(studyRequestedSiteId));
 			if (clientResponse == null) {
@@ -1229,6 +1279,25 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("deleteHistory")) {
+			clientResponse = registryClient.deleteHistory(Integer.parseInt(analysisId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete history.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			try {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("analysisId", analysisId);
+				clientResponse.release();
+				responseBody = responseObject.toString();
+				if (debug) System.out.println("deleteHistory responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unknown action: \"" + action + "\"");
 			return;
@@ -1239,6 +1308,24 @@ public class Registry extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		String text = (responseBody != null) ? responseBody : "";
 		out.print(text);
+	}
+
+	void convertDateFormat(JSONArray response) {
+        SimpleDateFormat from_sdf = new SimpleDateFormat("MMM dd, yyyy h:mm:ss a z");
+        SimpleDateFormat to_sdf = new SimpleDateFormat("yyyy-MM-dd h:mm a");
+		try {
+			for (int i=0; i < response.length(); i++) {
+				JSONObject analysisHistory = response.getJSONObject(i);
+				Date created = from_sdf.parse(analysisHistory.getString("created"));
+				analysisHistory.put("created", to_sdf.format(created));
+				Date updated = from_sdf.parse(analysisHistory.getString("updated"));
+				analysisHistory.put("updated", to_sdf.format(updated));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -71,8 +71,10 @@ var scannerUsersDict = null;
 var scannerUsersList = null;
 
 var datasetInstancesList = null;
+var datasetInstancesDict = null;
 
 var toolList = null;
+var toolsDict = null;
 
 var librariesDict = null;
 
@@ -130,12 +132,12 @@ var categoryValueDict = {
 	};
 
 var analyzeLayout = [[
-                      {'name': 'Date', 'field': 'date', 'width': '15%'},
+                      {'name': 'Date', 'field': 'date', 'width': '20%'},
                       {'name': 'Study', 'field': 'study', 'width': '15%'},
                       {'name': 'Dataset', 'field': 'dataset', 'width': '15%'},
                       {'name': 'Library', 'field': 'library','width': '10%'},
                       {'name': 'Method', 'field': 'method', 'width': '15%'},
-                      {'name': 'Status', 'field': 'status', 'width': '15%'},
+                      {'name': 'Status', 'field': 'status', 'width': '10%'},
                       {'name': 'Options', 'field': 'options', 'width': '15%'}
                       ]];
 
@@ -947,13 +949,7 @@ function submitQuery(div, replay, checkStatus, resultData) {
 		$('#profileLastActivity').html(getDateString(new Date()));
 		param['analyze'] = obj;
 	} else {
-		obj['trxId'] = replay['trxId'][0];
-		obj['parameters'] = replay['parameters'][0];
-		obj['study'] = replay['study'][0];
-		obj['dataset'] = replay['dataset'][0];
-		obj['library'] = replay['library'][0];
-		obj['method'] = replay['method'][0];
-		obj['sites'] = replay['sites'][0];
+		obj['analysisId'] = replay['analysisId'][0];
 	}
 	param['resultDiv'] = $('#' + div);
 	param['statusDiv'] = (div == 'queryDivContent') ? $('#statusQueryDivContent') : $('#statusReplayDivContent');
@@ -1036,10 +1032,10 @@ function postSubmitQuery(data, textStatus, jqXHR, param) {
 	var obj = param['analyze'];
 	var index;
 	if (obj != null) {
-		obj['trxId'] = data['trxId'];
+		obj['analysisId'] = data['analysisId'];
+		obj['created'] = data['created'];
 		obj['complete'] = checkComplete(data['data']);
 		obj['hasError'] = checkError(data['data']);
-		index = analyzeDataStore.items.length + 1;
 		pushAnalyze(obj);
 		queryResult = dict;
 		tab = 'Query';
@@ -2454,29 +2450,35 @@ function getDateString(date) {
  */
 function pushAnalyze(obj) {
 	require(['dojox/grid/DataGrid', 'dojo/data/ItemFileWriteStore'], function(DataGrid, ItemFileWriteStore) {
-		var index = analyzeDataStore.items.length;
+		var index = obj['analysisId'];
 		if (analyzeGrid != null) {
 			analyzeGrid.destroyRecursive();
 		}
 		var item = {};
-		item.trxId = obj.trxId;
-		item.parameters = obj.parameters;
-		item.action = obj.action;
+		item.analysisId = obj.analysisId;
 		item.study = obj.study;
 		item.dataset = obj.dataset;
 		item.library = obj.library;
 		item.method = obj.method;
-		item.sites = obj.sites;
-		item.date = getDateString(new Date());
+		item.date = obj['created'];
 		if (obj['complete']) {
 			item.status = 'Complete';
 			item.options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
+			if (checkDeleteHistory()) {
+				item.options += '<img width="15" height="15" src="images/delete.jpg" alt="Delete" align="right" onclick="deleteHistory(' + index + ');"/>';
+			}
 		} else if (obj['hasError']) {
 			item.status = 'Error';
 			item.options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
+			if (checkDeleteHistory()) {
+				item.options += '<img width="15" height="15" src="images/delete.jpg" alt="Delete" align="right" onclick="deleteHistory(' + index + ');"/>';
+			}
 		} else {
 			item.status = 'In Progress';
 			item.options = '<a href="javascript:refreshQueryStatus(' + index + ')" >Refresh</a>';
+			if (checkDeleteHistory()) {
+				item.options += '<img width="15" height="15" src="images/delete.jpg" alt="Delete" align="right" onclick="deleteHistory(' + index + ');"/>';
+			}
 		}
 		item.id = index;
 		analyzeDataStore.items.unshift(item);
@@ -2497,38 +2499,70 @@ function pushAnalyze(obj) {
 }
 
 function refreshQueryStatus(index) {
-	var tableIndex = analyzeDataStore.items.length - index - 1;
-	var item = analyzeDataStore.items[tableIndex];
+	var analyzeItem = null;
+	$.each(analyzeDataStore.items, function(i, item) {
+		if (item['id'][0] == index) {
+			analyzeItem = item;
+			return false;
+		}
+	});
 	$('#replayTitle').show();
 	$('#expandResults').hide();
 	$('#collapseResults').show();
 	$('#replayDivContent').show();
-	submitQuery('replayDivContent', item, index, null);
+	submitQuery('replayDivContent', analyzeItem, index, null);
 }
 
 function displayQueryStatus(index) {
-	var tableIndex = analyzeDataStore.items.length - index - 1;
-	var item = analyzeDataStore.items[tableIndex];
+	var analyzeItem = null;
+	$.each(analyzeDataStore.items, function(i, item) {
+		if (item['id'][0] == index) {
+			analyzeItem = item;
+			return false;
+		}
+	});
 	$('#replayTitle').show();
 	$('#expandResults').hide();
 	$('#collapseResults').show();
-	submitQuery('replayDivContent', item, index, postResult);
+	submitQuery('replayDivContent', analyzeItem, index, postResult);
 }
 
 function postRefreshQueryStatus(index, status) {
-	var tableIndex = analyzeDataStore.items.length - index - 1;
-	var item = analyzeDataStore.items[tableIndex];
-	var val = [];
 	if (status != 'Held') {
-		val.push(status);
-		item.status = val;
-		val = [];
-		val.push('<a href="javascript:analyzeQuery(' + index + ')" >See results</a>');
-		item.options = val;
+		updateHistory(index, status);
 	}
+}
+
+function updateHistory(index, status) {
+	var url = HOME + '/registry';
+	var obj = new Object();
+	obj['action'] = 'updateHistory';
+	obj['analysisId'] = index;
+	obj['status'] = status;
+	scanner.POST(url, obj, true, postUpdateHistory, null, null, 0);
+}
+
+function postUpdateHistory(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	var index = data['analysisId'];
+	var status = data['status'];
+	var analyzeItem = null;
+	$.each(analyzeDataStore.items, function(i, item) {
+		if (item['id'][0] == index) {
+			analyzeItem = item;
+			return false;
+		}
+	});
+	var val = [];
+	val.push(status);
+	analyzeItem.status = val;
 	val = [];
-	val.push(getDateString(new Date()));
-	item.date = val;
+	var options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
+	if (checkDeleteHistory()) {
+		options += '<img width="15" height="15" src="images/delete.jpg" alt="Delete" align="right" onclick="deleteHistory(' + index + ');"/>';
+	}
+	val.push(options);
+	analyzeItem.options = val;
 	analyzeGrid.update();
 }
 
@@ -2539,12 +2573,17 @@ function postRefreshQueryStatus(index, status) {
  * 	the row index in the analyze table
  */
 function analyzeQuery(index) {
-	var tableIndex = analyzeDataStore.items.length - index - 1;
-	var item = analyzeDataStore.items[tableIndex];
+	var analyzeItem = null;
+	$.each(analyzeDataStore.items, function(i, item) {
+		if (item['id'][0] == index) {
+			analyzeItem = item;
+			return false;
+		}
+	});
 	$('#replayTitle').show();
 	$('#expandResults').hide();
 	$('#collapseResults').show();
-	submitQuery('replayDivContent', item, -1, null);
+	submitQuery('replayDivContent', analyzeItem, -1, null);
 }
 
 function copyValue(val) {
@@ -4037,6 +4076,10 @@ function initDatasetInstances(all) {
 }
 
 function postInitDatasetInstances(data, textStatus, jqXHR, param) {
+	datasetInstancesDict = {};
+	$.each(data, function(i, instance) {
+		datasetInstancesDict[instance['dataSetInstanceId']] = instance;
+	});
 	datasetInstancesList = data;
 	datasetInstancesList.sort(compareInstances);
 	if (param) {
@@ -4069,6 +4112,10 @@ function initTools(all) {
 }
 
 function postInitTools(data, textStatus, jqXHR, param) {
+	toolsDict = {};
+	$.each(data, function(i, tool) {
+		toolsDict[tool['toolId']] = tool;
+	});
 	toolList = data;
 	toolList.sort(compareTools);
 	if (param) {
@@ -4265,6 +4312,25 @@ function postInitStudyRequestedSites(data, textStatus, jqXHR, param) {
 	if (param) {
 		setContacts();
 	}
+}
+
+function initHistory() {
+	var url = HOME + '/registry';
+	var obj = new Object();
+	if (loggedInUser['isSuperuser']) {
+		obj['action'] = 'getAllHistory';
+	}
+	else if (activeStudy != null) {
+		obj['action'] = 'getHistory';
+		obj['studyId'] = activeStudy['studyId'];
+	}
+	if (!$.isEmptyObject(obj)) {
+		scanner.RETRIEVE(url, obj, true, postInitHistory, null, null, 0);
+	}
+}
+
+function postInitHistory(data, textStatus, jqXHR, param) {
+	initAnalysisHistory(data);
 }
 
 function compareStudyRequestedSites(studyRequestedSite1, studyRequestedSite2) {
@@ -5628,6 +5694,13 @@ function clearAnalysis() {
 	renderAvailableDatasets();
 }
 
+function clearAnalysisResults() {
+	$('#queryDiv').hide();
+	$('#clearResultsDiv').hide();
+	$('#statusQueryWrapperDiv').show();
+	$('#analysisSpecifications').show();
+}
+
 function renderPrepareToResearch(index) {
 	var studyTitle = '';
 	var user = loggedInUser['lastName'] + ', ' + loggedInUser['firstName'];
@@ -5732,5 +5805,125 @@ function renderPrepareToResearch(index) {
 		$('#rc_nextSiteTop').show();
 		$('#rc_nextSiteTop').attr('href', 'javascript:renderPrepareToResearch('+(index+1)+');')
 	}
+}
+
+function checkDeleteHistory() {
+	return loggedInUser['isSuperuser'];
+}
+
+function deleteHistory(index) {
+	var analyzeItem = null;
+	var tableIndex = -1;
+	$.each(analyzeDataStore.items, function(i, item) {
+		if (item['id'][0] == index) {
+			analyzeItem = item;
+			tableIndex = i;
+			return false;
+		}
+	});
+	var answer = confirm('Are you sure you want to remove the history of the study "' + analyzeItem['study'] + '", dataset "' +
+			analyzeItem['dataset'] + '", library "' + analyzeItem['library'] + '", method "' + analyzeItem['method'] + '" from "' + 
+			analyzeItem['date'] + '"?');
+	if (!answer) {
+		return;
+	}
+	var url = HOME + '/registry';
+	var obj = new Object();
+	obj['action'] = 'deleteHistory';
+	obj['analysisId'] = index;
+	scanner.POST(url, obj, true, postDeleteHistory, null, null, 0);
+}
+
+function postDeleteHistory(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	var index = data['analysisId'];
+	var tableIndex = -1;
+	$.each(analyzeDataStore.items, function(i, item) {
+		if (item['id'][0] == index) {
+			analyzeItem = item;
+			tableIndex = i;
+			return false;
+		}
+	});
+	require(['dojox/grid/DataGrid', 'dojo/data/ItemFileWriteStore'], function(DataGrid, ItemFileWriteStore) {
+		analyzeDataStore.items.splice(tableIndex, 1);
+		analyzeGrid.destroyRecursive();
+		var store = new ItemFileWriteStore({data: analyzeDataStore});
+		analyzeGrid = new DataGrid({
+			id: 'analyzeGrid',
+			store: store,
+			structure: analyzeLayout,
+			escapeHTMLInData: false,
+			rowSelector: '20px'});
+
+		/*append the new grid to the div*/
+		analyzeGrid.placeAt("analyzeGridDiv");
+
+		/*Call startup() to render the grid*/
+		analyzeGrid.startup();
+	});
+}
+
+function initAnalysisHistory(histories) {
+	require(['dojox/grid/DataGrid', 'dojo/data/ItemFileWriteStore'], function(DataGrid, ItemFileWriteStore) {
+		analyzeDataStore.items = [];
+		$.each(histories, function(i, obj) {
+			var index = obj['analysisId'];
+			var tool = toolsDict[obj['analysisTool']];
+			var dataSetInstanceId = obj['analysisResults'][0]['dataSetInstanceId'];
+			var item = {};
+			item.analysisId = obj.analysisId;
+			item.study = obj.study;
+			item.dataset = datasetInstancesDict[dataSetInstanceId]['dataSetDefinition'];
+			item.library = librariesDict[tool['toolParentLibrary']]['libraryName'];
+			item.method = tool['toolName'];
+			item.date = obj['created'];
+			if (obj['status'] == 'Complete') {
+				item.status = 'Complete';
+				item.options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
+				if (checkDeleteHistory()) {
+					item.options += '<img width="15" height="15" src="images/delete.jpg" alt="Delete" align="right" onclick="deleteHistory(' + index + ');"/>';
+				}
+			} else if (obj['status'] == 'Held') {
+				item.status = 'In Progress';
+				item.options = '<a href="javascript:refreshQueryStatus(' + index + ')" >Refresh</a>';
+				if (checkDeleteHistory()) {
+					item.options += '<img width="15" height="15" src="images/delete.jpg" alt="Delete" align="right" onclick="deleteHistory(' + index + ');"/>';
+				}
+			} else if (obj['status'] == 'Error') {
+				item.status = 'Error';
+				item.options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
+				if (checkDeleteHistory()) {
+					item.options += '<img width="15" height="15" src="images/delete.jpg" alt="Delete" align="right" onclick="deleteHistory(' + index + ');"/>';
+				}
+			} else {
+				item.status = obj['status'];
+				item.options = '<a href="javascript:analyzeQuery(' + index + ')" >See results</a>';
+				if (checkDeleteHistory()) {
+					item.options += '<img width="15" height="15" src="images/delete.jpg" alt="Delete" align="right" onclick="deleteHistory(' + index + ');"/>';
+				}
+			}
+			item.id = index;
+			analyzeDataStore.items.push(item);
+		});
+		var store = new ItemFileWriteStore({data: analyzeDataStore});
+		analyzeGrid = new DataGrid({
+			id: 'analyzeGrid',
+			store: store,
+			structure: analyzeLayout,
+			escapeHTMLInData: false,
+			rowSelector: '20px'});
+
+		/*append the new grid to the div*/
+		analyzeGrid.placeAt("analyzeGridDiv");
+
+		/*Call startup() to render the grid*/
+		analyzeGrid.startup();
+	});
+}
+
+function showAnalysis() {
+	showQuery();
+	initHistory();
 }
 

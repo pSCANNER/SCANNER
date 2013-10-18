@@ -21,6 +21,13 @@ package edu.isi.misd.scanner.network.portal.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -112,4 +119,44 @@ public class Utils {
     	"SCANNER is supported by the Agency for Healthcare Research and Quality (AHRQ) through the American Recovery & Reinvestment Act of 2009, Grant R01 HS19913-01."
     };
     
+	public static JSONArray sortHistory(JSONArray arr) {
+		JSONArray ret = new JSONArray();
+		List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+		try {
+			for (int i=0; i < arr.length(); i++) {
+				jsonValues.add(arr.getJSONObject(i));
+			}
+			Collections.sort(jsonValues, new JSONHistoryComparator());
+			for (int i=0; i < jsonValues.size(); i++) {
+				ret.put(jsonValues.get(i));
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
 }
+
+class JSONHistoryComparator implements Comparator<JSONObject>
+{
+    SimpleDateFormat from_sdf = new SimpleDateFormat("MMM dd, yyyy h:mm:ss a z");
+
+    public int compare(JSONObject a, JSONObject b)
+    {
+		try {
+			Date dateA = from_sdf.parse(a.getString("created"));
+			Date dateB = from_sdf.parse(b.getString("created"));
+	        return (-1) * dateA.compareTo(dateB);    
+		} catch (JSONException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+ 
+    }
+}
+
+

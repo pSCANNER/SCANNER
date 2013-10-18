@@ -1003,4 +1003,106 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		}
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse getTools(int toolId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "tools/" + toolId;
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getAllHistory() {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "analysisHistory";
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse updateHistory(int analysisId, String status) {
+		RegistryClientResponse ret = null;
+		try {
+			ret = getHistory(analysisId);
+			JSONObject history = ret.getEntity();
+			ret.release();
+			JSONArray analysisResults = history.getJSONArray("analysisResults");
+			for (int i=0; i < analysisResults.length(); i++) {
+				JSONObject analysisResult = analysisResults.getJSONObject(i);
+				analysisResult.put("status", status);
+			}
+			String url = erdURL + "analysisHistory/" + analysisId;
+			JSONObject body = new JSONObject();
+			body.put("status", status);
+			body.put("analysisResults", analysisResults);
+			System.out.println("PUT: " + url);
+			System.out.println("PUT Body: " + body.toString());
+			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteHistory(int analysisId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "analysisHistory/" + analysisId;
+		System.out.println("DELETE: " + url);
+		ClientURLResponse rsp = delete(url, null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getAllHistory(int studyId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "analysisHistory?studyId=" + studyId + getUserPredicate("&");
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse createHistory(String transactionId,
+			String status, int studyId, int userId, int nodeId, int toolId,
+			String analysisResults) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "analysisHistory";
+		try {
+			JSONObject body = new JSONObject();
+			body.put("transactionId", transactionId);
+			body.put("status", status);
+			JSONObject study = new JSONObject();
+			study.put("studyId", studyId);
+			body.put("study", study);
+			JSONObject user = new JSONObject();
+			user.put("userId", userId);
+			body.put("user", user);
+			JSONObject node = new JSONObject();
+			node.put("nodeId", nodeId);
+			body.put("node", node);
+			JSONObject analysisTool = new JSONObject();
+			analysisTool.put("toolId", toolId);
+			body.put("analysisTool", analysisTool);
+			body.put("analysisResults", new JSONArray(analysisResults));
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse getHistory(int analysisId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "analysisHistory/" + analysisId;
+		System.out.println("GET: " + url);
+		ClientURLResponse rsp = get(url, (String) null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 }
