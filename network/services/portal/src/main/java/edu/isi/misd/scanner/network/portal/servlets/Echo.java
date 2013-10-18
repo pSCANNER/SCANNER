@@ -20,7 +20,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.isi.misd.scanner.network.portal.client.ERDClient;
-import edu.isi.misd.scanner.network.portal.client.JakartaClient;
 import edu.isi.misd.scanner.network.portal.client.RegistryClient;
 import edu.isi.misd.scanner.network.portal.client.RegistryClientResponse;
 import edu.isi.misd.scanner.network.portal.client.ScannerClient;

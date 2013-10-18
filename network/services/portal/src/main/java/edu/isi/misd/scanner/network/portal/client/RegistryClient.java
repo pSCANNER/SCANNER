@@ -238,6 +238,7 @@ public interface RegistryClient {
 	public RegistryClientResponse getUsers();
 	public RegistryClientResponse getNodes();
 	public RegistryClientResponse getTools();
+	public RegistryClientResponse getTools(int toolId);
 	public RegistryClientResponse getDatasetInstances();
 	public RegistryClientResponse getDatasetDefinitions();
 	public RegistryClientResponse getUser(String user);
@@ -292,4 +293,11 @@ public interface RegistryClient {
 	
 	public RegistryClientResponse findConcept(String conceptType, String searchString);
 	public RegistryClientResponse getMethods();
+	
+	public RegistryClientResponse getAllHistory();
+	public RegistryClientResponse getAllHistory(int studyId);
+	public RegistryClientResponse getHistory(int analysisId);
+	public RegistryClientResponse createHistory(String transactionId, String status, int studyId, int userId, int nodeId, int toolId, String analysisResults);
+	public RegistryClientResponse updateHistory(int analysisId, String status);
+	public RegistryClientResponse deleteHistory(int analysisId);
 }

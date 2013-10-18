@@ -3,8 +3,10 @@ package edu.isi.misd.scanner.network.portal.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Date;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -275,114 +277,126 @@ public class Analyze extends HttpServlet {
 					String func = request.getParameter("method");
 					String dataset = request.getParameter("dataset");
 					String study = request.getParameter("study");
+					String analysisId = request.getParameter("analysisId");
 					RegistryClientResponse clientResponse = registryClient.getMasterObject();
 					String res = clientResponse.toMasterString();
 					clientResponse.release();
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("hostUrl") + ":" + temp.getString("hostPort") + temp.getString("basePath");
-					clientResponse = registryClient.getMethods(getStudyId(study), getDatasetId(dataset), getLibraryId(lib));
-					retrievedTools = clientResponse.getEntityResponse();
-					clientResponse = new ERDClientResponse(retrievedTools);
-					res = clientResponse.toMethodString(func, "" + getLibraryId(lib));
-					clientResponse.release();
-					System.out.println("method string: " + res);
-					temp = new JSONObject(res);
-					String funcPath = temp.getString("toolPath").substring(1);
-					ArrayList<String> values = null;
-					if (sites != null) {
-						JSONArray arr = new JSONArray(sites);
-						if (arr.length() > 0) {
-							values = new ArrayList<String>();
-							for (int i=0; i < arr.length(); i++) {
-								values.add(arr.getString(i));
-							}
-						}
-					}
-					clientResponse = new ERDClientResponse(retrievedDatasetInstances);
-					res = clientResponse.toSiteString(values, dataset);
-					clientResponse.release();
-					System.out.println("site string: " + res);
-					JSONArray targets = new JSONArray(res);
+					int masterId = temp.getInt("nodeId");
 					StringBuffer buff = new StringBuffer();
-					int toolId = getMethodId(lib, func);
 					boolean isAuthorized = true;
-					for (int i=0; i < targets.length(); i++) {
-						// check authorization
-						temp = targets.getJSONObject(i);
-						RegistryClientResponse rsp = registryClient.getAnalysisPolicies(userName, toolId, temp.getInt("dataSetInstanceId"));
-						JSONArray policy = rsp.getEntityResponse();
-						if (policy.length() == 0) {
-							isAuthorized = false;
-							break;
-						}
-						if (i > 0) {
-							buff.append(",");
-						}
-						String dataSource = temp.getString("dataSource");
-						JSONObject node = temp.getJSONObject("node");
-						buff.append(node.getString("hostUrl")).append(":").append(node.getString("hostPort")).append(node.getString("basePath")).append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
-						if (policy.getJSONObject(0).getJSONObject("accessMode").getString("description").equals("async")) {
-							buff.append("&resultsReleaseAuthReq=true");
-						}
-					}
-					if (!isAuthorized) {
-						response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-						return;
-					}
-					String targetsURLs = buff.toString();
-					buff = new StringBuffer();
-					buff.append(masterURL).append(funcPath);
-					String trxId = request.getParameter("trxId");
+					String funcPath = null;
 					String url = null;
 					ClientURLResponse rsp = null;
-					String rspId = null;
-					obj = new JSONObject();
-					System.out.println("Study Id: " + getStudyId(study));
-					System.out.println("Dataset Id: " + getDatasetId(dataset));
-					System.out.println("Library Id: " + getLibraryId(lib));
-					System.out.println("Method Id: " + getMethodId(lib, func));
-					System.out.println("Dataset Instances Ids: " + getDatasetInstancesIds(values));
-					if (trxId != null) {
-						// check that the user authorization for this trxId
+					String responseBody = null;
+					if (analysisId != null) {
+						// check that the user authorization for this transactionId
 						isAuthorized = true;
-						Hashtable<String, JSONObject> trxTable = (Hashtable<String, JSONObject>) session.getAttribute("trxIdTable");
-						if (trxTable != null) {
-							JSONObject trxTargets = trxTable.get(trxId);
-							// check authorization
-							String uid = trxTargets.getString("user");
-							int analysisToolId = trxTargets.getInt("analysisToolId");
-							JSONArray instances = trxTargets.getJSONArray("dataSetInstanceId");
-							for (int i=0; i < instances.length(); i++) {
-								JSONObject instance = instances.getJSONObject(i);
-								RegistryClientResponse resp = registryClient.getAnalysisPolicies(uid, analysisToolId, instance.getInt("dataSetInstanceId"));
-								JSONArray policy = resp.getEntityResponse();
-								if (policy.length() == 0) {
-									isAuthorized = false;
-									break;
-								}
+						clientResponse = registryClient.getHistory(Integer.parseInt(analysisId));
+						JSONObject history = clientResponse.getEntity();
+						clientResponse.release();
+						JSONArray instances = null;
+						// check authorization
+						String user = (String) session.getAttribute("user");
+						int analysisToolId = history.getInt("analysisTool");
+						clientResponse = registryClient.getTools(analysisToolId);
+						JSONObject tool = clientResponse.getEntity();
+						clientResponse.release();
+						funcPath = tool.getString("toolPath").substring(1);
+						instances = history.getJSONArray("analysisResults");
+						for (int i=0; i < instances.length(); i++) {
+							JSONObject instance = instances.getJSONObject(i);
+							RegistryClientResponse resp = registryClient.getAnalysisPolicies(user, analysisToolId, instance.getInt("dataSetInstanceId"));
+							JSONArray policy = resp.getEntityResponse();
+							if (policy.length() == 0) {
+								isAuthorized = false;
+								break;
 							}
 						}
 						if (!isAuthorized) {
 							response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
 							return;
 						}
-						trxId = Utils.urlEncode(trxId);
-						buff.append("/id/" + trxId);
+						buff = new StringBuffer();
+						buff.append(masterURL).append(funcPath);
+						String transactionId = Utils.urlEncode(history.getString("transactionId"));
+						buff.append("/id/" + transactionId);
 						url = buff.toString();
 						System.out.println("URL: " + url);
 						buff = new StringBuffer();
-						for (int i=0; i < targets.length(); i++) {
+						for (int i=0; i < instances.length(); i++) {
 							if (i > 0) {
 								buff.append(",");
 							}
-							temp = targets.getJSONObject(i);
-							JSONObject node = temp.getJSONObject("node");
-							buff.append(node.getString("hostUrl")).append(":").append(node.getString("hostPort")).append(node.getString("basePath")).append(funcPath);
+							String targetURL = instances.getJSONObject(i).getString("url");
+							buff.append(targetURL);
 						}
-						System.out.println("GET Targets: "+buff.toString());
+						System.out.println("History URL: " + url + "\nHistory Targets: " + buff.toString());
 						rsp = scannerClient.get(url, buff);
+						responseBody = rsp.getEntityString();
 					} else {
+						clientResponse = registryClient.getMethods(getStudyId(study), getDatasetId(dataset), getLibraryId(lib));
+						retrievedTools = clientResponse.getEntityResponse();
+						clientResponse = new ERDClientResponse(retrievedTools);
+						res = clientResponse.toMethodString(func, "" + getLibraryId(lib));
+						clientResponse.release();
+						System.out.println("method string: " + res);
+						temp = new JSONObject(res);
+						funcPath = temp.getString("toolPath").substring(1);
+						ArrayList<String> values = null;
+						if (sites != null) {
+							JSONArray arr = new JSONArray(sites);
+							if (arr.length() > 0) {
+								values = new ArrayList<String>();
+								for (int i=0; i < arr.length(); i++) {
+									values.add(arr.getString(i));
+								}
+							}
+						}
+						clientResponse = new ERDClientResponse(retrievedDatasetInstances);
+						res = clientResponse.toSiteString(values, dataset);
+						clientResponse.release();
+						System.out.println("site string: " + res);
+						JSONArray targets = new JSONArray(res);
+						buff = new StringBuffer();
+						int toolId = getMethodId(lib, func);
+						for (int i=0; i < targets.length(); i++) {
+							// check authorization
+							temp = targets.getJSONObject(i);
+							RegistryClientResponse resp = registryClient.getAnalysisPolicies(userName, toolId, temp.getInt("dataSetInstanceId"));
+							JSONArray policy = resp.getEntityResponse();
+							if (policy.length() == 0) {
+								isAuthorized = false;
+								break;
+							}
+							if (i > 0) {
+								buff.append(",");
+							}
+							String dataSource = temp.getString("dataSource");
+							JSONObject node = temp.getJSONObject("node");
+							buff.append(node.getString("hostUrl")).append(":").append(node.getString("hostPort")).append(node.getString("basePath")).append(funcPath).append("?dataSource=").append(Utils.urlEncode(dataSource));
+							if (policy.getJSONObject(0).getJSONObject("accessMode").getString("description").equals("async")) {
+								buff.append("&resultsReleaseAuthReq=true");
+							}
+						}
+						if (!isAuthorized) {
+							response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+							return;
+						}
+						String targetsURLs = buff.toString();
+						buff = new StringBuffer();
+						buff.append(masterURL).append(funcPath);
+						rsp = null;
+						String rspId = null;
+						obj = new JSONObject();
+						System.out.println("Study Id: " + getStudyId(study));
+						System.out.println("Dataset Id: " + getDatasetId(dataset));
+						System.out.println("Library Id: " + getLibraryId(lib));
+						System.out.println("Method Id: " + getMethodId(lib, func));
+						System.out.println("Sites: " + sites);
+						System.out.println("Dataset Instances Ids: " + getDatasetInstancesIds(values));
 						url = buff.toString();
 						System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nParams: "+params);
 						rsp = scannerClient.postScannerQuery(url, targetsURLs, params);
@@ -390,17 +404,20 @@ public class Analyze extends HttpServlet {
 							rspId = rsp.getIdHeader();
 							System.out.println("Response Id: "+rspId);
 							if (rspId != null) {
-								obj.put("trxId", rspId);
-								Hashtable<String, JSONObject> trxTable = (Hashtable<String, JSONObject>) session.getAttribute("trxIdTable");
-								if (trxTable == null) {
-									trxTable = new Hashtable<String, JSONObject>();
-									session.setAttribute("trxIdTable", trxTable);
-								}
-								JSONObject analysisPolicies = new JSONObject();
-								analysisPolicies.put("user", userName);
-								analysisPolicies.put("analysisToolId", toolId);
-								analysisPolicies.put("dataSetInstanceId", targets);
-								trxTable.put(rspId, analysisPolicies);
+								responseBody = rsp.getEntityString();
+								JSONArray analysisResults = getAnalysisResults(responseBody, targets, funcPath);
+								String transactionId = rspId;
+								String status = getAnalysisStatus(analysisResults);
+								int studyId = getStudyId(study);
+								int userId = (Integer) session.getAttribute("userId");
+								clientResponse = registryClient.createHistory(transactionId, status, studyId, userId, masterId, toolId, analysisResults.toString());
+								JSONObject history = clientResponse.getEntity();
+								clientResponse.release();
+				                SimpleDateFormat from_sdf = new SimpleDateFormat("MMM dd, yyyy h:mm:ss a z");
+				                SimpleDateFormat to_sdf = new SimpleDateFormat("yyyy-MM-dd h:mm a");
+								Date created = from_sdf.parse(history.getString("created"));
+								obj.put("created", to_sdf.format(created));
+								obj.put("analysisId", history.getString("analysisId"));
 							}
 						}
 					}
@@ -410,7 +427,7 @@ public class Analyze extends HttpServlet {
 						response.sendError(rsp.getStatus(), rsp.getEntityString());
 						return;
 					}
-					res = rsp.getEntityString();
+					res = responseBody;
 					System.out.println("Response Body: \n"+res);
 					try {
 						JSONObject body = new JSONObject(res);
@@ -431,6 +448,8 @@ public class Analyze extends HttpServlet {
 				} catch (JSONException e) {
 					e.printStackTrace();
 					throw(new ServletException(e));
+				} catch (ParseException e) {
+					e.printStackTrace();
 				}
 			} else if (action.equals("displaySitesStatus")) {
 				obj = (JSONObject) servletConfig.getServletContext().getAttribute("echo");
@@ -511,15 +530,6 @@ public class Analyze extends HttpServlet {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "No PTR library.");
 					return;
 				}
-				/*
-				RegistryClientResponse clientResponse = registryClient.analyzePTR(omopConceptID);
-				if (clientResponse != null) {
-					obj = clientResponse.getEntity();
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not analyzePTR for omopConceptID: " + omopConceptID);
-					return;
-				}
-				*/
 			}
 
 		} catch (JSONException e) {
@@ -601,9 +611,79 @@ public class Analyze extends HttpServlet {
 			for (int i=0; i < retrievedDatasetInstances.length(); i++) {
 				JSONObject instance = retrievedDatasetInstances.getJSONObject(i);
 				JSONObject node = instance.getJSONObject("node");
-				String site = node.getString("site") + " - " + node.getString("nodeName");
+				String site = node.getJSONObject("site").getString("siteName") + " - " + node.getString("nodeName");
 				if (values.contains(site)) {
 					ret.put(instance.getInt("dataSetInstanceId"));
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	JSONArray getAnalysisResults(String response, JSONArray targets, String funcPath) {
+		JSONObject instancesDict = new JSONObject();
+		JSONArray ret = new JSONArray();
+		try {
+			for (int i=0; i < targets.length(); i++) {
+				JSONObject target = targets.getJSONObject(i);
+				JSONObject node = target.getJSONObject("node");
+				instancesDict.put(node.getString("hostUrl") + ":" + node.getString("hostPort") + node.getString("basePath") + funcPath, target);
+			}
+			JSONObject serviceResponses = (new JSONObject(response)).getJSONObject("ServiceResponses");
+			JSONArray serviceResponse = serviceResponses.optJSONArray("ServiceResponse");
+			if (serviceResponse == null) {
+				serviceResponse = new JSONArray();
+				serviceResponse.put(serviceResponses.getJSONObject("ServiceResponse"));
+			}
+			boolean isMaster = false;
+			String status = null;
+			String statusDetail = null;
+			for (int i=0; i < serviceResponse.length(); i++) {
+				JSONObject serviceResponseMetadata = serviceResponse.getJSONObject(i).getJSONObject("ServiceResponseMetadata");
+				JSONObject analysisResult = new JSONObject();
+				status = serviceResponseMetadata.getString("RequestState");
+				statusDetail = serviceResponseMetadata.getString("RequestStateDetail");
+				String url = serviceResponseMetadata.getString("RequestURL");
+				if (instancesDict.optJSONObject(url) == null) {
+					isMaster = true;
+					break;
+				}
+				analysisResult.put("status", status);
+				analysisResult.put("statusDetail", statusDetail);
+				analysisResult.put("url", url);
+				analysisResult.put("dataSetInstanceId", ((JSONObject) instancesDict.get(serviceResponseMetadata.getString("RequestURL"))).getInt("dataSetInstanceId"));
+				ret.put(analysisResult);
+			}
+			if (isMaster) {
+				ret = new JSONArray();
+				for (int i=0; i < targets.length(); i++) {
+					JSONObject target = targets.getJSONObject(i);
+					JSONObject analysisResult = new JSONObject();
+					analysisResult.put("status", status);
+					analysisResult.put("statusDetail", statusDetail);
+					JSONObject node = target.getJSONObject("node");
+					String url = node.getString("hostUrl") + ":" + node.getString("hostPort") + node.getString("basePath") + funcPath;
+					analysisResult.put("url", url);
+					analysisResult.put("dataSetInstanceId", ((JSONObject) instancesDict.get(url)).getInt("dataSetInstanceId"));
+					ret.put(analysisResult);
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	String getAnalysisStatus(JSONArray serviceResponse) {
+		String ret = "Complete";
+		try {
+			for (int i=0; i < serviceResponse.length(); i++) {
+				String status = serviceResponse.getJSONObject(i).getString("status");
+				if (!ret.equals(status)) {
+					ret = status;
+					break;
 				}
 			}
 		} catch (JSONException e) {
