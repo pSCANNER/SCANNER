@@ -1105,4 +1105,71 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
+	@Override
+	public RegistryClientResponse createDatasetDefinition(String dataSetName,
+			String description, int studyId, int userId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "datasets";
+		try {
+			JSONObject body = new JSONObject();
+			body.put("dataSetName", dataSetName);
+			body.put("description", description);
+			JSONObject originatingStudy = new JSONObject();
+			originatingStudy.put("studyId", studyId);
+			body.put("originatingStudy", originatingStudy);
+			JSONObject author = new JSONObject();
+			author.put("userId", userId);
+			body.put("author", author);
+			JSONObject dataSetConfidentialityLevel = new JSONObject();
+			dataSetConfidentialityLevel.put("levelId", 100);
+			dataSetConfidentialityLevel.put("description", "SAFE HARBOR");
+			body.put("dataSetConfidentialityLevel", dataSetConfidentialityLevel);
+			System.out.println("POST: " + url);
+			System.out.println("POST Body: " + body.toString());
+			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse updateDatasetDefinition(
+			int dataSetDefinitionId, String dataSetName, String description,
+			int studyId, int userId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "datasets/" + dataSetDefinitionId;
+		try {
+			JSONObject body = new JSONObject();
+			body.put("dataSetName", dataSetName);
+			body.put("description", description);
+			JSONObject originatingStudy = new JSONObject();
+			originatingStudy.put("studyId", studyId);
+			body.put("originatingStudy", originatingStudy);
+			JSONObject author = new JSONObject();
+			author.put("userId", userId);
+			body.put("author", author);
+			JSONObject dataSetConfidentialityLevel = new JSONObject();
+			dataSetConfidentialityLevel.put("levelId", 100);
+			dataSetConfidentialityLevel.put("description", "SAFE HARBOR");
+			body.put("dataSetConfidentialityLevel", dataSetConfidentialityLevel);
+			System.out.println("PUT: " + url);
+			System.out.println("PUT Body:\n" + body.toString(2));
+			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
+			ret = new ERDClientResponse(rsp);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	@Override
+	public RegistryClientResponse deleteDatasetDefinition(
+			int dataSetDefinitionId) {
+		RegistryClientResponse ret = null;
+		String url = erdURL + "datasets/" + dataSetDefinitionId;
+		System.out.println("DELETE: " + url);
+		ClientURLResponse rsp = delete(url, null, loginUser);
+		ret = new ERDClientResponse(rsp);
+		return ret;
+	}
 }

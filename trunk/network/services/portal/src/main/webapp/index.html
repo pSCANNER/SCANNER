@@ -754,8 +754,73 @@
 							</div>
 						</div>
 						<div data-dojo-type="dijit/layout/ContentPane"
-							title="Data Sets" onShow="showAdministration();" onHide="hideAdministration();">
+							title="Data Sets" onShow="showDatasets();" onHide="hideDatasets();">
 							<div id="dataSetsDiv" class="wizard_layer">
+								<ul>
+									<li><a href="#datasetDefinitionsDiv"><span>Definitions</span></a></li>
+									<li><a id="datasetDataDivLink" href="#datasetDataDiv"><span>Data</span></a></li>
+									<li><a href="#manageInstancesDiv"><span>Instances</span></a></li>
+								</ul>
+								<div id="datasetDefinitionsDiv">
+								 <p id="manageDatasetDefinitionsP" class="wizard_heading">Manage Data Set Definitions</p>
+								 <div class="wizard_content">
+									<table id="manageDatasetDefinitionsTable" class="manageStudyProtocols">
+										<thead>
+											<tr>
+												<th class="protocol_border">Name</th>
+												<th class="protocol_border">Study</th>
+												<th class="protocol_border">Owner</th>
+												<th class="protocol_border">Description</th>
+												<th></th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody id="manageDatasetDefinitionsTbody"></tbody>
+									</table>
+									<br/>
+									<div id="newDatasetDefinitionDiv">
+										<button id="newDatasetDefinitionButton" onclick="newDatasetDefinition();">New data set</button>
+									</div>
+									<div id="add_dataset_definition_entity_div">
+										<table>
+											<tr>
+												<td>
+													<table>
+														<tr>
+															<td>
+																<table class="add_protocol">
+																	<tbody id="addDatasetDefinitionEntityTable">
+																		<tr>
+																			<td class="tag">Dataset Name:</td>
+																			<td><input class="required" type="text" id="datasetDefinitionNameInput"></td>
+																			<td class="tag">Description:</td>
+																			<td><input type="text" id="datasetDefinitionDescriptionInput" size="30"></td>
+																		</tr>
+																		<tr>
+																			<td class="tag">Study:</td>
+																			<td><select id="selectDatasetDefinitionStudy"></select></td>
+																			<td class="tag">Owner:</td>
+																			<td><select id="selectDatasetDefinitionOwner"></select></td>
+																		</tr>
+																	</tbody>
+																</table>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+											<tr>
+												<td class="tag">
+													<input type="hidden" value="" name="datasetDefinitionIdHidden" id="datasetDefinitionIdHidden">
+													<input type="button" value="Cancel" onclick="cancelDatasetDefinitionEntity()">
+													<input id="addDatasetDefinitionEntityButton" type="button" value="Add dataset" onclick="addDatasetDefinitionEntity()">
+													<input id="updateDatasetDefinitionButton" type="button" value="Update dataset" onclick="updateDatasetDefinition()">
+												</td>
+											</tr>
+										</table>
+										</div>
+									</div>
+								</div>
 								<div id="manageInstancesDiv">
 								 <p id="manageDataSetInstancesP" class="wizard_heading">Manage Data Set Instances</p>
 								 <div class="wizard_content">
@@ -823,6 +888,9 @@
 										</table>
 									</div>
 								 </div>
+								</div>
+								<div id="datasetDataDiv">
+								This is where the Data Definition (and variable definition) CRUD goes.
 								</div>
 							</div>
 						</div>

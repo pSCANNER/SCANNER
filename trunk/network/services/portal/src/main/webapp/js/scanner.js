@@ -260,6 +260,18 @@ function initScanner() {
 	});
 	$('#analysisTabDiv').css({'font-family': 'Tahoma,Verdana,Arial,sans-serif',
 		'font-size': '11px'});
+	$('#dataSetsDiv').tabs({
+		activate: function(event, ui) {
+			var divId = ui.newPanel.attr('id');
+			if (divId == 'datasetDefinitionsDiv') {
+			} else if (divId == 'datasetDataDiv') {
+				// This is where the Data Definition (and variable definition) CRUD goes.
+			} else if (divId == 'manageInstancesDiv') {
+			}
+		}
+	});
+	$('#dataSetsDiv').css({'font-family': 'Tahoma,Verdana,Arial,sans-serif',
+		'font-size': '11px'});
 	scrollbarWidth = getScrollbarWidth();
 	checkDebug();
 
@@ -4364,6 +4376,10 @@ function compareStudyManagementPolicies(policy1, policy2) {
 	return compareIgnoreCase(policy1['study'], policy2['study']);
 }
 
+function compareStudies(study1, study2) {
+	return compareIgnoreCase(study1['studyName'], study2['studyName']);
+}
+
 function compareStandardRoles(role1, role2) {
 	var val1 = role1['standardRoleName'];
 	var val2 = role2['standardRoleName'];
@@ -4540,14 +4556,6 @@ function showAdministration() {
 	$('.required', $('#add_node_div')).unbind('keyup');
 	$('.required', $('#add_node_div')).keyup(function(event) {checkCreateNodeButton();});
 	
-	$('.wizard_heading', $('#manageInstancesDiv')).unbind('click');
-	$('.wizard_heading', $('#manageInstancesDiv')).click(function() {
-		$(this).next(".wizard_content").toggle();
-	});
-	$('.wizard_content', $('#manageInstancesDiv')).hide();
-	$('.required', $('#add_instance_entity_div')).unbind('keyup');
-	$('.required', $('#add_instance_entity_div')).keyup(function(event) {checkCreateInstanceButton();});
-
 	manageAdministration();
 }
 
@@ -4591,7 +4599,6 @@ function postManageAdministration(data, textStatus, jqXHR, param) {
 	setSites();
 	setSitePolicies();
 	setNodes();
-	setInstances();
 }
 
 function checkCreateUserButton() {
@@ -4676,6 +4683,11 @@ function addUserRow(user) {
 }
 
 function hideAdministration() {
+	$('#tabContainerWrapperDiv').height(300);
+	scannerTabContainer.resize();
+}
+
+function hideDatasets() {
 	$('#tabContainerWrapperDiv').height(300);
 	scannerTabContainer.resize();
 }
@@ -5385,7 +5397,7 @@ function addInstanceEntity() {
 function postAddInstanceEntity(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitDatasetInstances(data['instances'], null, null, false);
-	manageAdministration();
+	manageDatasets();
 }
 
 function updateInstance() {
@@ -5405,7 +5417,7 @@ function updateInstance() {
 function postUpdateInstance(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitDatasetInstances(data['instances'], null, null, false);
-	manageAdministration();
+	manageDatasets();
 }
 
 function removeInstance(button, instance) {
@@ -5423,7 +5435,7 @@ function removeInstance(button, instance) {
 function postRemoveInstance(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
 	postInitDatasetInstances(data['instances'], null, null, false);
-	manageAdministration();
+	manageDatasets();
 }
 
 function checkRemoveUser(user) {
@@ -5490,8 +5502,21 @@ function checkAddInstance() {
 	return loggedInUser['isSuperuser'] || !$.isEmptyObject(activeUser['nodesDict']);
 }
 
+function checkAddDatasetDefinition() {
+	// anybody can create a dataset definition for now
+	return loggedInUser['isSuperuser'] || true;
+}
+
 function checkEditInstance(instance) {
 	return loggedInUser['isSuperuser'] || activeUser['instancesDict'][instance['dataSetInstanceId']] != null;
+}
+
+function checkEditDatasetDefinition(dataset) {
+	return loggedInUser['isSuperuser'] || datasetDefinitionDict[dataset['dataSetName']]['author'] == loggedInUser['userName'];
+}
+
+function checkRemoveDatasetDefinition(dataset) {
+	return loggedInUser['isSuperuser'];
 }
 
 function checkManageSites() {
@@ -5508,6 +5533,10 @@ function checkManageNodes() {
 
 function checkManageDatasetInstances() {
 	return loggedInUser['isSuperuser'] || $('button', $('#manageInstancesTbody')).length > 0;
+}
+
+function checkManageDatasetDefinitions() {
+	return loggedInUser['isSuperuser'] || $('button', $('#manageDatasetDefinitionsTbody')).length > 0;
 }
 
 function newSitePolicy() {
@@ -5927,3 +5956,278 @@ function showAnalysis() {
 	initHistory();
 }
 
+function showDatasets() {
+	hideAnalysis();
+	$('#tabContainerWrapperDiv').height(600);
+	scannerTabContainer.resize();
+	
+	$('.wizard_heading', $('#manageInstancesDiv')).unbind('click');
+	$('.wizard_heading', $('#manageInstancesDiv')).click(function() {
+		$(this).next(".wizard_content").toggle();
+	});
+	$('.wizard_content', $('#manageInstancesDiv')).hide();
+	$('.required', $('#add_instance_entity_div')).unbind('keyup');
+	$('.required', $('#add_instance_entity_div')).keyup(function(event) {checkCreateInstanceButton();});
+
+	$('.wizard_heading', $('#datasetDefinitionsDiv')).unbind('click');
+	$('.wizard_heading', $('#datasetDefinitionsDiv')).click(function() {
+		$(this).next(".wizard_content").toggle();
+	});
+	$('.wizard_content', $('#datasetDefinitionsDiv')).hide();
+	$('.required', $('#add_dataset_definition_entity_div')).unbind('keyup');
+	$('.required', $('#add_dataset_definition_entity_div')).keyup(function(event) {checkCreateDatasetDefinitionButton();});
+
+	manageDatasets();
+}
+
+function manageDatasets() {
+	var obj = new Object();
+	obj['action'] = 'getUserAdminRoles';
+	obj['userName'] = loggedInUserName;
+	if (activeStudy != null) {
+		obj['studyId'] = activeStudy['studyId'];
+	}
+	var url = HOME + '/registry';
+	scanner.RETRIEVE(url, obj, true, postManageDatasets, null, null, 0);
+}
+
+function postManageDatasets(data, textStatus, jqXHR, param) {
+	postInitSitesPolicies(data['allSitePolicies'], null, null, false);
+	activeUser = {};
+	activeUser['sitesDict'] = {};
+	activeUser['nodesDict'] = {};
+	activeUser['instancesDict'] = {};
+	activeUser['sitesAdminDict'] = {};
+	activeUser['studyRolesDict'] = {};
+	activeUser['studyInstances'] = data['studyInstances'];
+	activeUser['studyInstances'].sort(compareInstances);
+	activeUser['datasets'] = data['datasets'];
+	activeUser['datasets'].sort(compareDatasetDefinitions);
+	activeUser['studies'] = data['studies'];
+	if (activeUser['studies'] == null) {
+		activeUser['studies'] = [activeStudy];
+	}
+	activeUser['studies'].sort(compareStudies);
+	$.each(data['sitePolicies'], function(i, sitePolicy) {
+		activeUser['sitesDict'][sitePolicy['site']['siteName']] = sitePolicy['site'];
+	});
+	$.each(data['nodes'], function(i, node) {
+		activeUser['nodesDict'][node['nodeId']] = node;
+	});
+	$.each(data['instances'], function(i, instance) {
+		activeUser['instancesDict'][instance['dataSetInstanceId']] = instance;
+	});
+	$.each(data['sitesAdmin'], function(siteId, userRole) {
+		activeUser['sitesAdminDict'][parseInt(siteId)] = userRole;
+	});
+	$.each(data['studyRoles'], function(siteId, studyRole) {
+		activeUser['studyRolesDict'][parseInt(siteId)] = studyRole;
+	});
+	setInstances();
+	setDatasetDefinitions();
+}
+
+function newDatasetDefinition() {
+	$('#datasetDefinitionNameInput').val('');
+	$('#selectDatasetDefinitionStudy').val(activeStudy == null ? '' : activeStudy['studyId']);
+	$('#datasetDefinitionDescriptionInput').val('');
+	$('#selectDatasetDefinitionOwner').val(loggedInUser['userId']);
+	$('#add_dataset_definition_entity_div').show();
+	$('#newDatasetDefinitionButton').hide();
+	$('#updateDatasetDefinitionButton').hide();
+	$('#addDatasetDefinitionEntityButton').show();
+	$('#addDatasetDefinitionEntityButton').attr('disabled', 'disabled');
+	$('#manageDatasetDefinitionsTable').hide();
+}
+
+function cancelDatasetDefinitionEntity() {
+	$('#add_dataset_definition_entity_div').hide();
+	$('#newDatasetDefinitionButton').show();
+	$('#manageDatasetDefinitionsTable').show();
+}
+
+function loadSelectDatasetDefinitionStudies() {
+	var select = $('#selectDatasetDefinitionStudy');
+	select.unbind();
+	select.html('');
+	var option = $('<option>');
+	option.text('Select study...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(activeUser['studies'], function(i, study) {
+		option = $('<option>');
+		option.text(study['studyName']);
+		option.attr('value', study['studyId']);
+		select.append(option);
+	});
+	select.change(function(event) {checkCreateDatasetDefinitionButton();});
+}
+
+function loadSelectDatasetDefinitionOwners() {
+	var select = $('#selectDatasetDefinitionOwner');
+	select.unbind();
+	select.html('');
+	var option = $('<option>');
+	option.text('Select user...');
+	option.attr('value', '');
+	select.append(option);
+	$.each(scannerUsersList, function(i, user) {
+		option = $('<option>');
+		option.text(user['userName']);
+		option.attr('value', user['userId']);
+		select.append(option);
+	});
+	select.change(function(event) {checkCreateDatasetDefinitionButton();});
+}
+
+function checkCreateDatasetDefinitionButton() {
+	if ($('#datasetDefinitionNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "").length > 0 &&
+			$('#selectDatasetDefinitionStudy').val().length > 0 && $('#selectDatasetDefinitionOwner').val().length > 0) {
+		$('#addDatasetDefinitionEntityButton').removeAttr('disabled');
+		$('#updateDatasetDefinitionButton').removeAttr('disabled');
+	} else {
+		$('#addDatasetDefinitionEntityButton').attr('disabled', 'disabled');
+		$('#updateDatasetDefinitionButton').attr('disabled', 'disabled');
+	}
+}
+
+function setDatasetDefinitions() {
+	$('#manageDatasetDefinitionsTable').show();
+	$('#newDatasetDefinitionButton').show();
+	$('#add_dataset_definition_entity_div').hide();
+	$('#manageDatasetDefinitionsTbody').html('');
+	$.each(activeUser['datasets'], function(i, dataset) {
+		if (checkEditDatasetDefinition(dataset)) {
+			addDatasetDefinitionRow(dataset);
+		}
+	});
+	loadSelectDatasetDefinitionStudies();
+	loadSelectDatasetDefinitionOwners();
+	if (!checkAddDatasetDefinition()) {
+		$('#newDatasetDefinitionButton').hide();
+	} else {
+		$('#newDatasetDefinitionButton').show();
+	}
+	if (checkManageDatasetDefinitions()) {
+		$('#manageDatasetDefinitionsTable').show();
+		if (activeStudy != null) {
+			$('#manageDatasetDefinitionsP').html('Manage Data Set Definitions for Study ' + activeStudy['studyName']);
+		} else {
+			$('#manageDatasetDefinitionsP').html('Manage Data Set Definitions');
+		}
+	} else {
+		$('#manageDatasetDefinitionsP').html('Manage Data Set Definitions');
+		$('#manageDatasetDefinitionsTable').hide();
+	}
+}
+
+function addDatasetDefinitionRow(dataset) {
+	var tbody = $('#manageDatasetDefinitionsTbody');
+	var tr = $('<tr>');
+	tbody.append(tr);
+	var td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(dataset['dataSetName']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(dataset['originatingStudy']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(dataset['author']);
+	td = $('<td>');
+	td.addClass('protocol_border');
+	tr.append(td);
+	td.html(dataset['description']);
+	td = $('<td>');
+	tr.append(td);
+	var button = $('<button>');
+	button.click(function(event) {removeDatasetDefinition($(this), dataset);});
+	button.html('Remove');
+	td.append(button);
+	if (!checkRemoveDatasetDefinition(dataset)) {
+		button.hide();
+		button.addClass('hiddenButton');
+	}
+	td = $('<td>');
+	tr.append(td);
+	button = $('<button>');
+	button.click(function(event) {editDatasetDefinition($(this), dataset);});
+	button.html('Edit');
+	td.append(button);
+	if (!checkEditDatasetDefinition(dataset)) {
+		button.hide();
+		button.addClass('hiddenButton');
+	}
+}
+
+function editDatasetDefinition(button, dataset) {
+	$('#datasetDefinitionNameInput').val(dataset['dataSetName']);
+	$('#selectDatasetDefinitionStudy').val(allStudiesDict[dataset['originatingStudy']]['studyId']);
+	$('#selectDatasetDefinitionOwner').val(scannerUsersDict[dataset['author']]['userId']);
+	$('#datasetDefinitionDescriptionInput').val(dataset['description']);
+	$('#datasetDefinitionIdHidden').val(dataset['dataSetDefinitionId']);
+	$('#updateDatasetDefinitionButton').removeAttr('disabled');
+	$('#manageDatasetDefinitionsTable').hide();
+	$('#updateDatasetDefinitionButton').show();
+	$('#addDatasetDefinitionEntityButton').hide();
+	$('#newDatasetDefinitionButton').hide();
+	$('#add_dataset_definition_entity_div').show();
+}
+
+function addDatasetDefinitionEntity() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'createDatasetDefinition';
+	obj['dataSetName'] = $('#datasetDefinitionNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['studyId'] = $('#selectDatasetDefinitionStudy').val();
+	obj['author'] = $('#selectDatasetDefinitionOwner').val();
+	obj['description'] = $('#datasetDefinitionDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	$('#addDatasetDefinitionEntityButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postAddDatasetDefinitionEntity, null, null, 0);
+}
+
+function postAddDatasetDefinitionEntity(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitDatasets(data['datasets'], null, null, false);
+	manageDatasets();
+}
+
+function updateDatasetDefinition() {
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'updateDataset';
+	obj['dataSetName'] = $('#datasetDefinitionNameInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['studyId'] = $('#selectDatasetDefinitionStudy').val();
+	obj['author'] = $('#selectDatasetDefinitionOwner').val();
+	obj['description'] = $('#datasetDefinitionDescriptionInput').val().replace(/^\s*/, "").replace(/\s*$/, "");
+	obj['dataSetDefinitionId'] = $('#datasetDefinitionIdHidden').val();
+	$('#updateDatasetDefinitionButton').attr('disabled', 'disabled');
+	scanner.POST(url, obj, true, postUpdateDatasetDefinition, null, null, 0);
+}
+
+function postUpdateDatasetDefinition(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitDatasets(data['datasets'], null, null, false);
+	manageDatasets();
+}
+
+function removeDatasetDefinition(button, dataset) {
+	var answer = confirm('Are you sure you want to remove the data set "' + dataset['dataSetName'] + '"?');
+	if (!answer) {
+		return;
+	}
+	var obj = {};
+	var url = HOME + '/registry';
+	obj['action'] = 'deleteDataset';
+	obj['dataSetDefinitionId'] = dataset['dataSetDefinitionId'];
+	scanner.POST(url, obj, true, postRemoveDatasetDefinition, null, null, 0);
+}
+
+function postRemoveDatasetDefinition(data, textStatus, jqXHR, param) {
+	data = $.parseJSON(data);
+	postInitDatasets(data['datasets'], null, null, false);
+	manageDatasets();
+}
