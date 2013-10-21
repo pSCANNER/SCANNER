@@ -328,8 +328,41 @@ public class Registry extends HttpServlet {
 					}
 					responseObject.put("studyInstances", clientResponse.getEntityResponse());
 					clientResponse.release();
+					clientResponse = registryClient.getDatasets(Integer.parseInt(studyId));
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get datasets for study: " + studyId);
+						return;
+					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+						System.out.println("Result:\n" + clientResponse.getEntity());
+						response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+						return;
+					}
+					responseObject.put("datasets", clientResponse.getEntityResponse());
+					clientResponse.release();
 				} else {
 					responseObject.put("studyInstances", new JSONArray());
+					clientResponse = registryClient.getStudies();
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies.");
+						return;
+					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+						System.out.println("Result:\n" + clientResponse.getEntity());
+						response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+						return;
+					}
+					responseObject.put("studies", clientResponse.getEntityResponse());
+					clientResponse.release();
+					clientResponse = registryClient.getDatasetDefinitions();
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get datasets.");
+						return;
+					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+						System.out.println("Result:\n" + clientResponse.getEntity());
+						response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+						return;
+					}
+					responseObject.put("datasets", clientResponse.getEntityResponse());
+					clientResponse.release();
 				}
 				responseObject.put("sitesAdmin", sitesAdmin);
 				responseObject.put("studyRoles", studyRoles);
@@ -530,6 +563,8 @@ public class Registry extends HttpServlet {
 		String sitePolicyId = request.getParameter("sitePolicyId");
 		String analysisId = request.getParameter("analysisId");
 		String status = request.getParameter("status");
+		String dataSetName = request.getParameter("dataSetName");
+		String author = request.getParameter("author");
 		
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
@@ -850,6 +885,36 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("createDatasetDefinition")) {
+			clientResponse = registryClient.createDatasetDefinition(dataSetName, description, 
+					Integer.parseInt(studyId), Integer.parseInt(author));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create dataset definition.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("createDatasetDefinition:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			JSONObject responseObject = new JSONObject();
+			try {
+				clientResponse.release();
+				clientResponse = registryClient.getDatasetDefinitions();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get datasets.");
+					return;
+				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + clientResponse.getEntity());
+					response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+					return;
+				}
+				responseObject.put("datasets", clientResponse.getEntityResponse());
+				clientResponse.release();
+				responseBody = responseObject.toString();
+				if (debug) System.out.println("createDatasetDefinition responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		} else if (action.equals("updateStudy")) {
 			clientResponse = registryClient.updateStudy(studyId, studyName, irbId, studyOwner, studyStatusType,
 					description, protocol, startDate, endDate, clinicalTrialsId, analysisPlan);
@@ -1037,6 +1102,36 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("updateHistory responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("updateDataset")) {
+			clientResponse = registryClient.updateDatasetDefinition(Integer.parseInt(dataSetDefinitionId), dataSetName, description, 
+					Integer.parseInt(studyId), Integer.parseInt(author));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update dataset definition.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("updateDataset:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			JSONObject responseObject = new JSONObject();
+			try {
+				clientResponse.release();
+				clientResponse = registryClient.getDatasetDefinitions();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get datasets.");
+					return;
+				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + clientResponse.getEntity());
+					response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+					return;
+				}
+				responseObject.put("datasets", clientResponse.getEntityResponse());
+				clientResponse.release();
+				responseBody = responseObject.toString();
+				if (debug) System.out.println("createDatasetDefinition responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -1295,6 +1390,35 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("deleteHistory responseBody: " + responseBody);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		} else if (action.equals("deleteDataset")) {
+			clientResponse = registryClient.deleteDatasetDefinition(Integer.parseInt(dataSetDefinitionId));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete dataset definition.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			JSONObject responseObject = new JSONObject();
+			try {
+				clientResponse.release();
+				clientResponse = registryClient.getDatasetDefinitions();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get datasets.");
+					return;
+				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + clientResponse.getEntity());
+					response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+					return;
+				}
+				responseObject.put("datasets", clientResponse.getEntityResponse());
+				clientResponse.release();
+				responseBody = responseObject.toString();
+				if (debug) System.out.println("createDatasetDefinition responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

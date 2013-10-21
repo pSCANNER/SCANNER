@@ -300,4 +300,8 @@ public interface RegistryClient {
 	public RegistryClientResponse createHistory(String transactionId, String status, int studyId, int userId, int nodeId, int toolId, String analysisResults);
 	public RegistryClientResponse updateHistory(int analysisId, String status);
 	public RegistryClientResponse deleteHistory(int analysisId);
+	
+	public RegistryClientResponse createDatasetDefinition(String dataSetName, String description, int studyId, int author);
+	public RegistryClientResponse updateDatasetDefinition(int dataSetDefinitionId, String dataSetName, String description, int studyId, int author);
+	public RegistryClientResponse deleteDatasetDefinition(int dataSetDefinitionId);
 }
