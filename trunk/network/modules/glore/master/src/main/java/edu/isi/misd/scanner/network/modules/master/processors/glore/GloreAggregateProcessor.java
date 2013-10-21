@@ -59,10 +59,8 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
         List<ServiceResponse> errorResponses = getErrorResponses(exchange);
         if (!errorResponses.isEmpty()) 
         {
-            ServiceResponses responses = new ServiceResponses();                     
-            for (ServiceResponse errorResponse : errorResponses) {      
-                responses.getServiceResponse().add(errorResponse);
-            }
+            ServiceResponses responses = new ServiceResponses();                         
+            responses.getServiceResponse().addAll(errorResponses);
             exchange.getIn().setBody(responses);  
             
             // signal complete
