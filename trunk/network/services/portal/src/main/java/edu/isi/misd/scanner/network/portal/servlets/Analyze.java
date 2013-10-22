@@ -98,6 +98,14 @@ public class Analyze extends HttpServlet {
 		RegistryClient registryClient = (RegistryClient) session.getAttribute("registryClient");
 		if (action.equals("getStudies")) {
 			RegistryClientResponse clientResponse = registryClient.getStudies();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			retrievedStudies = clientResponse.getEntityResponse();
 			String ret = clientResponse.toStudies();
 			clientResponse.release();
@@ -109,10 +117,26 @@ public class Analyze extends HttpServlet {
 			RegistryClientResponse clientResponse = null;
 			if (getStudyId(study) == -1) {
 				clientResponse = registryClient.getStudies();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies.");
+					return;
+				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + clientResponse.getEntity());
+					response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+					return;
+				}
 				retrievedStudies = clientResponse.getEntityResponse();
 				clientResponse.release();
 			}
 			clientResponse = registryClient.getDatasets(getStudyId(study));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get datasets for study " + study);
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			retrievedDatasets = clientResponse.getEntityResponse();
 			String ret = clientResponse.toDatasets();
 			clientResponse.release();
@@ -124,6 +148,14 @@ public class Analyze extends HttpServlet {
 			String dataset = request.getParameter("dataset");
 			String sites = request.getParameter("site");
 			RegistryClientResponse clientResponse = registryClient.getLibraries(getStudyId(study), getDatasetId(dataset), sites);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get libraries for study " + study + " and dataset " + dataset);
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			retrievedLibraries = clientResponse.getEntityResponse();
 			String ret = clientResponse.toLibraries();
 			clientResponse.release();
@@ -135,6 +167,14 @@ public class Analyze extends HttpServlet {
 			String dataset = request.getParameter("dataset");
 			String lib = request.getParameter("library");
 			RegistryClientResponse clientResponse = registryClient.getMethods(getStudyId(study), getDatasetId(dataset), getLibraryId(lib));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get methods for study " + study + " and dataset " + dataset + " and library " + lib);
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			retrievedTools = clientResponse.getEntityResponse();
 			String ret = clientResponse.toMethods();
 			clientResponse.release();
@@ -144,6 +184,14 @@ public class Analyze extends HttpServlet {
 		} else if (action.equals("getParameters")) {
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getParameters(getDatasetId(dataset), webContentPath + "etc/parameterTypes/LogisticRegressionBase.json");
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get parameters.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			String ret = clientResponse.toParameters();
 			clientResponse.release();
 			System.out.println("Analyze Get Parameters:\n"+ret);
@@ -153,6 +201,14 @@ public class Analyze extends HttpServlet {
 			String study = request.getParameter("study");
 			String dataset = request.getParameter("dataset");
 			RegistryClientResponse clientResponse = registryClient.getSites(getStudyId(study), getDatasetId(dataset));
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites for study " + study + " and dataset " + dataset);
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			retrievedDatasetInstances = clientResponse.getEntityResponse();
 			String ret = clientResponse.toSites(dataset);
 			clientResponse.release();
@@ -161,6 +217,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getUsers")) {
 			RegistryClientResponse clientResponse = registryClient.getUsers();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get users.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			JSONArray ret = clientResponse.toUsers();
 			clientResponse.release();
 			System.out.println("Analyze Get Users:\n"+ret);
@@ -168,6 +232,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret.toString());
 		} else if (action.equals("getNodes")) {
 			RegistryClientResponse clientResponse = registryClient.getNodes();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get nodes.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			JSONArray ret = clientResponse.toNodes();
 			clientResponse.release();
 			System.out.println("Analyze Get Nodes:\n"+ret);
@@ -175,6 +247,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret.toString());
 		} else if (action.equals("getTools")) {
 			RegistryClientResponse clientResponse = registryClient.getTools();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get methods.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			String ret = clientResponse.toTools().toString();
 			clientResponse.release();
 			System.out.println("Analyze Get Tools: "+ret);
@@ -182,6 +262,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getDatasetInstances")) {
 			RegistryClientResponse clientResponse = registryClient.getDatasetInstances();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset instances.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			String ret = clientResponse.toDatasetInstances().toString();
 			clientResponse.release();
 			System.out.println("Analyze Get Dataset Instances: "+ret);
@@ -189,6 +277,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getDatasetDefinitions")) {
 			RegistryClientResponse clientResponse = registryClient.getDatasetDefinitions();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset definitions.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			String ret = clientResponse.toDatasetDefinitions().toString();
 			clientResponse.release();
 			System.out.println("Analyze Get Datasets: "+ret);
@@ -196,6 +292,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getUserRoles")) {
 			RegistryClientResponse clientResponse = registryClient.getUserRoles();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user roles.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			String ret = clientResponse.toUserRoles().toString();
 			clientResponse.release();
 			System.out.println("Analyze Get user roles: "+ret);
@@ -203,6 +307,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getStudyPolicies")) {
 			RegistryClientResponse clientResponse = registryClient.getStudyPolicies();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study policies.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			String ret = clientResponse.toStudyPolicies().toString();
 			clientResponse.release();
 			System.out.println("Analyze Get studies policies: "+ret);
@@ -210,6 +322,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getStudyRoles")) {
 			RegistryClientResponse clientResponse = registryClient.getStudyRoles();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study roles.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			String ret = clientResponse.toStudyRoles().toString();
 			clientResponse.release();
 			System.out.println("Analyze Get studies roles: "+ret);
@@ -217,6 +337,14 @@ public class Analyze extends HttpServlet {
 			out.print(ret);
 		} else if (action.equals("getAnalysisPolicies")) {
 			RegistryClientResponse clientResponse = registryClient.getAnalysisPolicies();
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analysis policies.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
 			String ret = clientResponse.getEntityResponse().toString();
 			clientResponse.release();
 			System.out.println("Analyze Get Analysis Policies: "+ret);
@@ -242,19 +370,37 @@ public class Analyze extends HttpServlet {
 				RegistryClient registryClient = new ERDClient(erdURL, (String) session.getAttribute("user"));
 				session.setAttribute("registryClient", registryClient);
 				RegistryClientResponse rsp = registryClient.getUser((String) session.getAttribute("user"));
+				if (rsp == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user " + session.getAttribute("user"));
+					return;
+				} else if (rsp.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + rsp.getEntity());
+					response.sendError(rsp.getStatus(), rsp.getErrorMessage());
+					return;
+				}
 				JSONArray user = rsp.getEntityResponse();
 				if (user != null) {
 					session.setAttribute("userId", user.getJSONObject(0).getInt("userId"));
 				} else {
 					// to handle error case "user not found"
 				}
+				rsp.release();
 				rsp = registryClient.getUserRoles((String) session.getAttribute("user"));
+				if (rsp == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get roles for user " + session.getAttribute("user"));
+					return;
+				} else if (rsp.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + rsp.getEntity());
+					response.sendError(rsp.getStatus(), rsp.getErrorMessage());
+					return;
+				}
 				JSONArray userRoles = rsp.getEntityResponse();
 				if (user != null) {
 					session.setAttribute("userId", user.getJSONObject(0).getInt("userId"));
 				} else {
 					// to handle error case "user not found"
 				}
+				rsp.release();
 				scannerClient = new ScannerClient(4, 8192, 300000,
 						trustStoreType, trustStorePassword, trustStoreResource,
 						keyStoreType, keyStorePassword, keyStoreResource, keyManagerPassword);
@@ -279,6 +425,14 @@ public class Analyze extends HttpServlet {
 					String study = request.getParameter("study");
 					String analysisId = request.getParameter("analysisId");
 					RegistryClientResponse clientResponse = registryClient.getMasterObject();
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get master node.");
+						return;
+					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+						System.out.println("Result:\n" + clientResponse.getEntity());
+						response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+						return;
+					}
 					String res = clientResponse.toMasterString();
 					clientResponse.release();
 					System.out.println("master string: " + res);
@@ -295,6 +449,14 @@ public class Analyze extends HttpServlet {
 						// check that the user authorization for this transactionId
 						isAuthorized = true;
 						clientResponse = registryClient.getHistory(Integer.parseInt(analysisId));
+						if (clientResponse == null) {
+							response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get history for analysis " + analysisId);
+							return;
+						} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+							System.out.println("Result:\n" + clientResponse.getEntity());
+							response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+							return;
+						}
 						JSONObject history = clientResponse.getEntity();
 						clientResponse.release();
 						JSONArray instances = null;
@@ -302,6 +464,14 @@ public class Analyze extends HttpServlet {
 						String user = (String) session.getAttribute("user");
 						int analysisToolId = history.getInt("analysisTool");
 						clientResponse = registryClient.getTools(analysisToolId);
+						if (clientResponse == null) {
+							response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get method for analysisToolId " + analysisToolId);
+							return;
+						} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+							System.out.println("Result:\n" + clientResponse.getEntity());
+							response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+							return;
+						}
 						JSONObject tool = clientResponse.getEntity();
 						clientResponse.release();
 						funcPath = tool.getString("toolPath").substring(1);
@@ -309,6 +479,14 @@ public class Analyze extends HttpServlet {
 						for (int i=0; i < instances.length(); i++) {
 							JSONObject instance = instances.getJSONObject(i);
 							RegistryClientResponse resp = registryClient.getAnalysisPolicies(user, analysisToolId, instance.getInt("dataSetInstanceId"));
+							if (resp == null) {
+								response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analysis policies for user " + user + " and analysisToolId " + analysisToolId + " and instance " + instance.getInt("dataSetInstanceId"));
+								return;
+							} else if (resp.getStatus() != HttpServletResponse.SC_OK) {
+								System.out.println("Result:\n" + resp.getEntity());
+								response.sendError(resp.getStatus(), resp.getErrorMessage());
+								return;
+							}
 							JSONArray policy = resp.getEntityResponse();
 							if (policy.length() == 0) {
 								isAuthorized = false;
@@ -338,6 +516,14 @@ public class Analyze extends HttpServlet {
 						responseBody = rsp.getEntityString();
 					} else {
 						clientResponse = registryClient.getMethods(getStudyId(study), getDatasetId(dataset), getLibraryId(lib));
+						if (clientResponse == null) {
+							response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get methods for study " + study + " and dataset " + dataset + " and library " + lib);
+							return;
+						} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+							System.out.println("Result:\n" + clientResponse.getEntity());
+							response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+							return;
+						}
 						retrievedTools = clientResponse.getEntityResponse();
 						clientResponse = new ERDClientResponse(retrievedTools);
 						res = clientResponse.toMethodString(func, "" + getLibraryId(lib));
@@ -366,6 +552,14 @@ public class Analyze extends HttpServlet {
 							// check authorization
 							temp = targets.getJSONObject(i);
 							RegistryClientResponse resp = registryClient.getAnalysisPolicies(userName, toolId, temp.getInt("dataSetInstanceId"));
+							if (resp == null) {
+								response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analysis policies for user " + userName + " and toolId " + toolId + " and dataSetInstanceId " + temp.getInt("dataSetInstanceId"));
+								return;
+							} else if (resp.getStatus() != HttpServletResponse.SC_OK) {
+								System.out.println("Result:\n" + clientResponse.getEntity());
+								response.sendError(resp.getStatus(), resp.getErrorMessage());
+								return;
+							}
 							JSONArray policy = resp.getEntityResponse();
 							if (policy.length() == 0) {
 								isAuthorized = false;
@@ -411,6 +605,14 @@ public class Analyze extends HttpServlet {
 								int studyId = getStudyId(study);
 								int userId = (Integer) session.getAttribute("userId");
 								clientResponse = registryClient.createHistory(transactionId, status, studyId, userId, masterId, toolId, analysisResults.toString());
+								if (clientResponse == null) {
+									response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create history.");
+									return;
+								} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+									System.out.println("Result:\n" + clientResponse.getEntity());
+									response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+									return;
+								}
 								JSONObject history = clientResponse.getEntity();
 								clientResponse.release();
 				                SimpleDateFormat from_sdf = new SimpleDateFormat("MMM dd, yyyy h:mm:ss a z");
@@ -462,33 +664,39 @@ public class Analyze extends HttpServlet {
 				RegistryClientResponse clientResponse = null;
 				if (ptrTool == null) {
 					clientResponse = registryClient.getMethods();
-					if (clientResponse != null) {
-						JSONArray methods = clientResponse.getEntityResponse();
-						for (int i=0; i < methods.length(); i++) {
-							JSONObject method = methods.getJSONObject(i);
-							if (method.getString("toolName").equals("Prep to Research")) {
-								ptrTool = method;
-							}
-							clientResponse = registryClient.getDatasetInstances();
-							if (clientResponse != null) {
-								ptrDatasetInstances = clientResponse.getEntityResponse();
-								for (int j=ptrDatasetInstances.length()-1; j >= 0; j--) {
-									JSONObject instance = ptrDatasetInstances.getJSONObject(j);
-									if (!instance.getString("dataSetDefinition").equals("PTR")) {
-										ptrDatasetInstances.remove(j);
-									}
-								}
-								
-							} else {
-								response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the dataset instances.");
-								return;
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get methods.");
+						return;
+					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+						System.out.println("Result:\n" + clientResponse.getEntity());
+						response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+						return;
+					}
+					JSONArray methods = clientResponse.getEntityResponse();
+					for (int i=0; i < methods.length(); i++) {
+						JSONObject method = methods.getJSONObject(i);
+						if (method.getString("toolName").equals("Prep to Research")) {
+							ptrTool = method;
+						}
+						clientResponse = registryClient.getDatasetInstances();
+						if (clientResponse == null) {
+							response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get dataset instances.");
+							return;
+						} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+							System.out.println("Result:\n" + clientResponse.getEntity());
+							response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+							return;
+						}
+						ptrDatasetInstances = clientResponse.getEntityResponse();
+						for (int j=ptrDatasetInstances.length()-1; j >= 0; j--) {
+							JSONObject instance = ptrDatasetInstances.getJSONObject(j);
+							if (!instance.getString("dataSetDefinition").equals("PTR")) {
+								ptrDatasetInstances.remove(j);
 							}
 						}
 						
-					} else {
-						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the tools.");
-						return;
 					}
+					
 				}
 				if (ptrTool != null) {
 					StringBuffer buff = new StringBuffer();
@@ -506,6 +714,14 @@ public class Analyze extends HttpServlet {
 					String omopConceptID = request.getParameter("omopConceptID");
 					body.put("omopConceptID", Integer.parseInt(omopConceptID));
 					clientResponse = registryClient.getMasterObject();
+					if (clientResponse == null) {
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get master node.");
+						return;
+					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+						System.out.println("Result:\n" + clientResponse.getEntity());
+						response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+						return;
+					}
 					String res = clientResponse.toMasterString();
 					clientResponse.release();
 					System.out.println("master string: " + res);
