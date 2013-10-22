@@ -102,12 +102,15 @@ public class Registry extends HttpServlet {
 		RegistryClientResponse clientResponse = null;
 		if (action.equals("getMyStudies")) {
 			clientResponse = registryClient.getMyStudies();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get my studies.");
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("getStudyData")) {
 			clientResponse = registryClient.getStudyRequestedSites(Integer.parseInt(studyId));
 			if (clientResponse == null) {
@@ -125,7 +128,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getUserRoles(Integer.parseInt(studyId));
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get users roles." + studyId);
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get users roles for study " + studyId);
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -137,7 +140,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getStudyRoles(Integer.parseInt(studyId));
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study roles." + studyId);
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study roles for study " + studyId);
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -149,7 +152,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getStudyPolicies();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study policies." + studyId);
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study policies.");
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -168,7 +171,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getAnalysisPolicies();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analyze policies." + studyId);
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get analyze policies.");
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -218,7 +221,6 @@ public class Registry extends HttpServlet {
 					return;
 				}
 				responseObject.put("nodes", clientResponse.getEntityResponse());
-				clientResponse.release();
 				res = responseObject.toString();
 				if (debug) System.out.println("getStudyData responseBody: " + res);
 			} catch (JSONException e) {
@@ -226,12 +228,15 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("getAllStudies")) {
 			clientResponse = registryClient.getAllStudies();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
 				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("getUserAdminRoles")) {
 			try {
 				JSONObject responseObject = new JSONObject();
@@ -280,22 +285,25 @@ public class Registry extends HttpServlet {
 				responseObject.put("allSitePolicies", clientResponse.getEntityResponse());
 				clientResponse.release();
 				clientResponse = registryClient.getAllSites();
+				if (clientResponse == null) {
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site policies.");
+					return;
+				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+					System.out.println("Result:\n" + clientResponse.getEntity());
+					response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+					return;
+				}
 				JSONArray allSites = null;
 				JSONObject sitesAdmin = new JSONObject();
 				JSONObject studyRoles = new JSONObject();
-				if (clientResponse != null) {
-					allSites = clientResponse.getEntityResponse();
-				} else {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
-					return;
-				}
+				allSites = clientResponse.getEntityResponse();
 				clientResponse.release();
 				for (int i=0; i < allSites.length(); i++) {
 					JSONObject site = allSites.getJSONObject(i);
 					int siteId = site.getInt("siteId");
 					clientResponse = registryClient.getUserRoles(siteId, 1);
 					if (clientResponse == null) {
-						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not user role for siteId ." + siteId);
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not user role for siteId " + siteId);
 						return;
 					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 						System.out.println("Result:\n" + clientResponse.getEntity());
@@ -303,10 +311,10 @@ public class Registry extends HttpServlet {
 						return;
 					}
 					sitesAdmin.put("" + siteId, clientResponse.getEntityResponse());
-					
+					clientResponse.release();
 					clientResponse = registryClient.getSiteStudyRoles(siteId);
 					if (clientResponse == null) {
-						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not study roles for siteId ." + siteId);
+						response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not study roles for siteId " + siteId);
 						return;
 					} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 						System.out.println("Result:\n" + clientResponse.getEntity());
@@ -314,8 +322,8 @@ public class Registry extends HttpServlet {
 						return;
 					}
 					studyRoles.put("" + siteId, clientResponse.getEntityResponse());
+					clientResponse.release();
 				}
-				clientResponse.release();
 				if (studyId != null) {
 					clientResponse = registryClient.getDatasetInstances(Integer.parseInt(studyId), userName);
 					if (clientResponse == null) {
@@ -338,7 +346,6 @@ public class Registry extends HttpServlet {
 						return;
 					}
 					responseObject.put("datasets", clientResponse.getEntityResponse());
-					clientResponse.release();
 				} else {
 					responseObject.put("studyInstances", new JSONArray());
 					clientResponse = registryClient.getStudies();
@@ -362,7 +369,6 @@ public class Registry extends HttpServlet {
 						return;
 					}
 					responseObject.put("datasets", clientResponse.getEntityResponse());
-					clientResponse.release();
 				}
 				responseObject.put("sitesAdmin", sitesAdmin);
 				responseObject.put("studyRoles", studyRoles);
@@ -372,101 +378,134 @@ public class Registry extends HttpServlet {
 			}
 		} else if (action.equals("getAllLibraries")) {
 			clientResponse = registryClient.getAllLibraries();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get libraries.");
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("getAllSites")) {
 			clientResponse = registryClient.getAllSites();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("getAllNodes")) {
 			clientResponse = registryClient.getAllNodes();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get nodes.");
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("getAllStandardRoles")) {
 			clientResponse = registryClient.getAllStandardRoles();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get standard roles.");
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("getAllStudyManagementPolicies")) {
 			clientResponse = registryClient.getAllStudyManagementPolicies();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies.");
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		}  else if (action.equals("getAllSitesPolicies")) {
 			clientResponse = registryClient.getAllSitesPolicies();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies.");
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site policies.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
 				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("getAllStudyRequestedSites")) {
 			clientResponse = registryClient.getAllStudyRequestedSites();
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies.");
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all study requested sites.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
 				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("getStudyRequestedSites")) {
 			clientResponse = registryClient.getStudyRequestedSites(Integer.parseInt(studyId));
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies for study ." + studyId);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study requested sites for study ." + studyId);
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
 				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
 		} else if (action.equals("findConcept")) {
 			clientResponse = registryClient.findConcept(conceptType, searchString);
-			if (clientResponse != null) {
-				res = clientResponse.getEntityResponse().toString();
-				System.out.println("findConcept: " + res);
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get study management policies for study ." + studyId);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not find concept.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
 				return;
 			}
+			res = clientResponse.getEntityResponse().toString();
+			System.out.println("findConcept: " + res);
 		} else if (action.equals("getAllHistory")) {
 			clientResponse = registryClient.getAllHistory();
-			if (clientResponse != null) {
-				JSONArray history = clientResponse.getEntityResponse();
-				history = Utils.sortHistory(history);
-				convertDateFormat(history);
-				res = history.toString();
-				System.out.println("getAllHistory: " + res);
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get history ." + studyId);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get history.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
 				return;
 			}
+			JSONArray history = clientResponse.getEntityResponse();
+			history = Utils.sortHistory(history);
+			convertDateFormat(history);
+			res = history.toString();
+			System.out.println("getAllHistory: " + res);
 		} else if (action.equals("getHistory")) {
 			clientResponse = registryClient.getAllHistory(Integer.parseInt(studyId));
-			if (clientResponse != null) {
-				JSONArray history = clientResponse.getEntityResponse();
-				history = Utils.sortHistory(history);
-				convertDateFormat(history);
-				res = history.toString();
-				System.out.println("getHistory: " + res);
-			} else {
+			if (clientResponse == null) {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get history for study ." + studyId);
 				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
 			}
+			JSONArray history = clientResponse.getEntityResponse();
+			history = Utils.sortHistory(history);
+			convertDateFormat(history);
+			res = history.toString();
+			System.out.println("getHistory: " + res);
 		} else {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unknown action: \"" + action + "\"");
 			return;
@@ -584,7 +623,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getAllStudies();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all the studies.");
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -615,7 +654,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				if (debug) System.out.println("responseBody: " + responseBody);
+				if (debug) System.out.println("create study responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -683,7 +722,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				if (debug) System.out.println("createStudyRequestedSites responseBody: " + responseBody);
+				if (debug) System.out.println("createUserRole responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -691,7 +730,7 @@ public class Registry extends HttpServlet {
 			clientResponse = registryClient.createStudyPolicy(Integer.parseInt(roleId), Integer.parseInt(studyId), 
 					Integer.parseInt(dataSetDefinitionId), Integer.parseInt(toolId), Integer.parseInt(accessModeId));
 			if (clientResponse == null) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create study protocol.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create study policy.");
 				return;
 			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 				System.out.println("createStudyPolicy:\n" + clientResponse.getEntity());
@@ -704,7 +743,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getStudyPolicies();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all studies requested sites.");
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all studies policies.");
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -721,7 +760,7 @@ public class Registry extends HttpServlet {
 			clientResponse = registryClient.createSitePolicy(Integer.parseInt(roleId), Integer.parseInt(dataSetInstanceId), 
 					Integer.parseInt(studyPolicyStatementId), Integer.parseInt(toolId), Integer.parseInt(accessModeId));
 			if (clientResponse == null) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create site protocol.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not create site policy.");
 				return;
 			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 				System.out.println("createSitePolicy:\n" + clientResponse.getEntity());
@@ -731,7 +770,6 @@ public class Registry extends HttpServlet {
 			try {
 				JSONObject responseObject = new JSONObject();
 				responseObject.put("analysisPolicy", clientResponse.getEntity());
-				clientResponse.release();
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("createSitePolicy responseBody: " + responseBody);
 			} catch (JSONException e) {
@@ -871,7 +909,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getAllSitesPolicies();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get site policies.");
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all sites policies.");
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -879,7 +917,6 @@ public class Registry extends HttpServlet {
 					return;
 				}
 				responseObject.put("sitePolicies", clientResponse.getEntityResponse());
-				clientResponse.release();
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("createSiteAdministrationRole responseBody: " + responseBody);
 			} catch (JSONException e) {
@@ -909,7 +946,6 @@ public class Registry extends HttpServlet {
 					return;
 				}
 				responseObject.put("datasets", clientResponse.getEntityResponse());
-				clientResponse.release();
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("createDatasetDefinition responseBody: " + responseBody);
 			} catch (JSONException e) {
@@ -932,7 +968,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getAllStudies();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get the studies.");
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all the studies.");
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -954,7 +990,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getAllStudyManagementPolicies();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get studies management policies.");
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get all studies management policies.");
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -963,7 +999,7 @@ public class Registry extends HttpServlet {
 				}
 				responseObject.put("studyManagementPolicies", clientResponse.getEntityResponse());
 				responseBody = responseObject.toString();
-				if (debug) System.out.println("responseBody: " + responseBody);
+				if (debug) System.out.println("updateStudy responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -1042,7 +1078,7 @@ public class Registry extends HttpServlet {
 				clientResponse.release();
 				clientResponse = registryClient.getAllNodes();
 				if (clientResponse == null) {
-					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get sites.");
+					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get nodes.");
 					return;
 				} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 					System.out.println("Result:\n" + clientResponse.getEntity());
@@ -1088,7 +1124,7 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("updateHistory")) {
 			clientResponse = registryClient.updateHistory(Integer.parseInt(analysisId), status);
 			if (clientResponse == null) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update dataset instance.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not update history.");
 				return;
 			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 				System.out.println("updateDatasetInstance:\n" + clientResponse.getEntity());
@@ -1099,7 +1135,6 @@ public class Registry extends HttpServlet {
 				JSONObject responseObject = new JSONObject();
 				responseObject.put("analysisId", analysisId);
 				responseObject.put("status", status);
-				clientResponse.release();
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("updateHistory responseBody: " + responseBody);
 			} catch (JSONException e) {
@@ -1129,9 +1164,8 @@ public class Registry extends HttpServlet {
 					return;
 				}
 				responseObject.put("datasets", clientResponse.getEntityResponse());
-				clientResponse.release();
 				responseBody = responseObject.toString();
-				if (debug) System.out.println("createDatasetDefinition responseBody: " + responseBody);
+				if (debug) System.out.println("updateDatasetDefinition responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -1250,7 +1284,7 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("deleteAnalyzePolicy")) {
 			clientResponse = registryClient.deleteAnalyzePolicy(Integer.parseInt(analysisPolicyStatementId));
 			if (clientResponse == null) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete site policy.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete analyze policy.");
 				return;
 			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 				System.out.println("Result:\n" + clientResponse.getEntity());
@@ -1258,9 +1292,8 @@ public class Registry extends HttpServlet {
 				return;
 			}
 			JSONObject responseObject = new JSONObject();
-			clientResponse.release();
 			responseBody = responseObject.toString();
-			if (debug) System.out.println("deleteSitePolicy responseBody: " + responseBody);
+			if (debug) System.out.println("deleteAnalyzePolicy responseBody: " + responseBody);
 		} else if (action.equals("deleteSite")) {
 			clientResponse = registryClient.deleteSite(Integer.parseInt(siteId));
 			if (clientResponse == null) {
@@ -1348,7 +1381,7 @@ public class Registry extends HttpServlet {
 		} else if (action.equals("deleteSiteAdministrationRole")) {
 			clientResponse = registryClient.deleteSiteAdministrationRole(Integer.parseInt(sitePolicyId));
 			if (clientResponse == null) {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete instance.");
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not delete site administration role.");
 				return;
 			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
 				System.out.println("Result:\n" + clientResponse.getEntity());
@@ -1368,7 +1401,6 @@ public class Registry extends HttpServlet {
 					return;
 				}
 				responseObject.put("sitePolicies", clientResponse.getEntityResponse());
-				clientResponse.release();
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("deleteSiteAdministrationRole responseBody: " + responseBody);
 			} catch (JSONException e) {
@@ -1387,7 +1419,6 @@ public class Registry extends HttpServlet {
 			try {
 				JSONObject responseObject = new JSONObject();
 				responseObject.put("analysisId", analysisId);
-				clientResponse.release();
 				responseBody = responseObject.toString();
 				if (debug) System.out.println("deleteHistory responseBody: " + responseBody);
 			} catch (JSONException e) {
@@ -1416,9 +1447,8 @@ public class Registry extends HttpServlet {
 					return;
 				}
 				responseObject.put("datasets", clientResponse.getEntityResponse());
-				clientResponse.release();
 				responseBody = responseObject.toString();
-				if (debug) System.out.println("createDatasetDefinition responseBody: " + responseBody);
+				if (debug) System.out.println("deleteDatasetDefinition responseBody: " + responseBody);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
