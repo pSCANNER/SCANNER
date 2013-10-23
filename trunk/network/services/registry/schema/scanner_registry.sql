@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS data_set_definition (
   data_set_definition_id serial NOT NULL primary key,
   data_set_name text not null unique,
   description text,
-  data_processing_xml text,
+  data_processing_specification text,
   data_processing_program text,
   author_uid integer references scanner_user(user_id),
   originating_study_id integer references study(study_id),
