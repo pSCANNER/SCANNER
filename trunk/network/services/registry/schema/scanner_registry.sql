@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS data_set_definition (
   data_set_confidentiality_level integer NOT NULL references confidentiality_level(level_id)
 );
 
-COMMENT on column data_set_definition.data_processing_xml is 'Daniella: Path to XML for data processing specifications';
+COMMENT on column data_set_definition.data_processing_specification is 'Daniella: Path to data processing specifications';
 COMMENT on column data_set_definition.data_processing_program is 'Daniella: Path to SQL or other data processing program';
 COMMENT on column data_set_definition.author_uid is 'Daniella: UID of author';
 COMMENT on column data_set_definition.originating_study_id is 'Daniella: ID of study using this data set';

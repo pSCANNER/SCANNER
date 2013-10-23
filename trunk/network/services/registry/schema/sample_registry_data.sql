@@ -85,7 +85,7 @@ INSERT INTO analysis_tool (tool_name, tool_path, Tool_Parent_Library_ID, Tool_De
 ('Logistic Regression', '/glore/lr', 2, 'Virtually pooled logistic regression ', '', '', 'x1jiang@ucsd.edu'),
 ('Prep to Research', '/ptr', 3, 'Aggregate patient counts based on OMOP concept matching ', '', '', 'dmeeker@rand.org');
 
-INSERT INTO data_set_definition (data_set_name, description, Data_Processing_XML, Data_Processing_Program, Author_UID, Originating_Study_ID, Data_Set_Confidentiality_Level) VALUES
+INSERT INTO data_set_definition (data_set_name, description, Data_Processing_Specification, Data_Processing_Program, Author_UID, Originating_Study_ID, Data_Set_Confidentiality_Level) VALUES
 ('MTM-1', 'MTM Sample Dataset 1', null, null, 2, 2, 100),
 ('BEARI-1', 'BEARI Sample Dataset 1', null, null, 3, 3, 100),
 ('PTR', 'Prep to Research Dataset', null, null, 2, 1, 100);
