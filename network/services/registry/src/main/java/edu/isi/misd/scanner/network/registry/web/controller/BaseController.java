@@ -33,6 +33,8 @@ public class BaseController
     public static final String HEADER_LOGIN_NAME = "loginName";    
     public static final String HEADER_JSON_MEDIA_TYPE = 
         "application/json;charset=UTF-8";
+    public static final String HEADER_TEXT_MEDIA_TYPE = 
+        "text/plain;charset=UTF-8";
     
     @ExceptionHandler(Exception.class)
     @ResponseBody

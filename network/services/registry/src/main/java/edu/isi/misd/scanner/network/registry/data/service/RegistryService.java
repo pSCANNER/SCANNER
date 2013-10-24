@@ -100,5 +100,14 @@ public interface RegistryService
      * Creates or updates a single AnalysisInstance.
      * @param instance
      */
-    public AnalysisInstance saveAnalysisInstance(AnalysisInstance instance);    
+    public AnalysisInstance saveAnalysisInstance(AnalysisInstance instance);  
+    
+    /**
+     * Converts a Data Processing Specification into an executable script (e.g., SQL).
+     */
+    public String convertDataProcessingSpecification(String workingDir,
+                                                     String execName,
+                                                     String args,
+                                                     String input)        
+        throws Exception;       
 }

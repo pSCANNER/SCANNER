@@ -16,6 +16,9 @@ import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 import edu.isi.misd.scanner.network.registry.data.domain.UserRole;
 import edu.isi.misd.scanner.network.registry.data.repository.*;
 import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,6 +27,10 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.Executor;
+import org.apache.commons.exec.PumpStreamHandler;
 
 /**
  *
@@ -475,4 +482,29 @@ public class RegistryServiceImpl implements RegistryService
         }
         return analysisInstanceRepository.save(instance);
     }     
+
+    @Override
+    public String convertDataProcessingSpecification(
+        String workingDir, String execName, String args, String input)
+            throws Exception
+    {
+        Executor exec = new DefaultExecutor();    
+        exec.setWorkingDirectory(new File(workingDir));
+        CommandLine cl = new CommandLine(execName);
+        cl.addArgument(args);
+        
+        ByteArrayInputStream in =
+            new ByteArrayInputStream(input.getBytes("UTF-8"));        
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream err = new ByteArrayOutputStream();  
+        PumpStreamHandler streamHandler = new PumpStreamHandler(out,err,in);
+        exec.setStreamHandler(streamHandler);
+        
+        try {
+            exec.execute(cl);  
+        } catch (Exception e) {
+            throw new Exception(e.toString() + "\n\n" + err.toString("UTF-8"));
+        } 
+        return out.toString("UTF-8");
+    }
 }
