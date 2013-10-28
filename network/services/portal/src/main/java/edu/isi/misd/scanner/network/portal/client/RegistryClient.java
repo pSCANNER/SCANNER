@@ -304,4 +304,6 @@ public interface RegistryClient {
 	public RegistryClientResponse createDatasetDefinition(String dataSetName, String description, int studyId, int author);
 	public RegistryClientResponse updateDatasetDefinition(int dataSetDefinitionId, String dataSetName, String description, int studyId, int author);
 	public RegistryClientResponse deleteDatasetDefinition(int dataSetDefinitionId);
+	
+	public RegistryClientResponse postDatasetSpec(String body);
 }

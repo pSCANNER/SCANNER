@@ -3856,11 +3856,13 @@ function setActiveStudy(name) {
 			return false;
 		}
 	});
-	var span = $('#Study_span_' + activeStudy['studyId']);
-	span.html('');
-	var b = $('<b>');
-	span.append(b);
-	b.html('Active');
+	if (activeStudy != null) {
+		var span = $('#Study_span_' + activeStudy['studyId']);
+		span.html('');
+		var b = $('<b>');
+		span.append(b);
+		b.html('Active');
+	}
 	collapseMyStudies();
 	manageStudy(true);
 }

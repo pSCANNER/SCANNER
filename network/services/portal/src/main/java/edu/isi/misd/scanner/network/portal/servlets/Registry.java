@@ -604,6 +604,7 @@ public class Registry extends HttpServlet {
 		String status = request.getParameter("status");
 		String dataSetName = request.getParameter("dataSetName");
 		String author = request.getParameter("author");
+		String body = request.getParameter("body");
 		
 		RegistryClientResponse clientResponse = null;
 		String responseBody = null;
@@ -1452,6 +1453,20 @@ public class Registry extends HttpServlet {
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+		} else if (action.equals("datasetSpec")) {
+			clientResponse = registryClient.postDatasetSpec(body);
+			if (clientResponse == null) {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not POST datasetSpec.");
+				return;
+			} else if (clientResponse.getStatus() != HttpServletResponse.SC_OK) {
+				System.out.println("Result:\n" + clientResponse.getEntity());
+				response.sendError(clientResponse.getStatus(), clientResponse.getErrorMessage());
+				return;
+			}
+			JSONObject responseObject = clientResponse.getEntity();
+			clientResponse.release();
+			responseBody = responseObject.toString();
+			if (debug) System.out.println("datasetSpec responseBody: " + responseBody);
 		} else {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unknown action: \"" + action + "\"");
 			return;
