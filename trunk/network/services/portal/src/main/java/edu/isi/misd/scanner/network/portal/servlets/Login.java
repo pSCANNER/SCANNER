@@ -142,6 +142,7 @@ public class Login extends HttpServlet {
 			}
 		}
 		System.out.println("User \"" + remoteUser + "\" agreed." + "\n\t" +
+				"username: " + username + "\n\t" +
 				"id: " + remoteUser + "\n\t" +
 				"displayName: " + displayName + "\n\t" +
 				"firstName: " + firstName + "\n\t" +
