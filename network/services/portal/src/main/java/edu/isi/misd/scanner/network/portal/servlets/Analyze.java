@@ -366,7 +366,7 @@ public class Analyze extends HttpServlet {
 			}
 			ScannerClient scannerClient = (ScannerClient) session.getAttribute("scannerClient");
 			if (action.equals("loginRegistry")) {
-				obj.put("status", "login error");
+				obj.put("status", "error");
 				RegistryClient registryClient = new ERDClient(erdURL, (String) session.getAttribute("user"));
 				session.setAttribute("registryClient", registryClient);
 				RegistryClientResponse rsp = registryClient.getUser((String) session.getAttribute("user"));
@@ -374,7 +374,15 @@ public class Analyze extends HttpServlet {
 					response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Can not get user " + session.getAttribute("user"));
 					return;
 				} else if (rsp.getStatus() != HttpServletResponse.SC_OK) {
+					rsp.release();
 					System.out.println("Result:\n" + rsp.getEntity());
+					if (rsp.getStatus() == HttpServletResponse.SC_NOT_FOUND) {
+						obj.put("user", session.getAttribute("user"));
+						PrintWriter out = response.getWriter();
+						String text = obj.toString();
+						out.print(text);
+						return;
+					}
 					response.sendError(rsp.getStatus(), rsp.getErrorMessage());
 					return;
 				}

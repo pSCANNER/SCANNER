@@ -1785,6 +1785,10 @@ function submitLogin() {
 	var obj = new Object();
 	if (debug) {
 		obj['scannerUser'] = prompt('User: ', '');
+		if (obj['scannerUser'] == null || obj['scannerUser'].replace(/^\s*/, "").replace(/\s*$/, "").length == 0) {
+			$('#acceptConditions').attr('disabled', 'disabled');
+			return;
+		}
 	}
 	scanner.POST(url, obj, true, postSubmitLogin, null, null, 0);
 }
@@ -1873,7 +1877,7 @@ function postLoginRegistry(data, textStatus, jqXHR, param) {
 		renderSitesStatus();
 		initUsers(true);
 	} else {
-		alert('You are not a member of the SCANNER users.\nPlease contact us at sdsc-scanner@ucsd.edu.');
+		alert('User "' + res['user'] + '" is not a member of the SCANNER users.\nPlease contact us at sdsc-scanner@ucsd.edu.');
 		$('#acceptConditions').attr('disabled', 'disabled');
 	}
 }
