@@ -303,10 +303,23 @@ public class JakartaClient {
      * @return The HTTP response.
      */
     public ClientURLResponse postRegistry(String url, String body, String user) {
+    	return postRegistry(url, "application/json; charset=UTF-8", body, user);
+    }
+    
+    /**
+     * Execute a Registry request.
+     * 
+     * @param url
+     *            the query URL.
+     * @param body
+     *            the request body.
+     * @return The HTTP response.
+     */
+    public ClientURLResponse postRegistry(String url, String contentType, String body, String user) {
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("loginName", user);
         httppost.setHeader("Accept", "application/json");
-        httppost.setHeader("Content-Type", "application/json; charset=UTF-8");
+        httppost.setHeader("Content-Type", contentType);
         if (body != null) {
 			try {
 				StringEntity entity = new StringEntity(body, "UTF-8");
