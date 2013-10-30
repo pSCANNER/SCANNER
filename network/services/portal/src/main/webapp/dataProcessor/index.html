@@ -1,0 +1,166 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+        <!-- <link rel="stylesheet" href="bower_components/jquery-ui-bootstrap/jquery.ui.theme.css"> -->
+        <!-- <link rel="stylesheet" href="bower_components/jquery-ui/themes/cupertino/jquery-ui.css">
+        <link rel="stylesheet" href="bower_components/jquery-ui/themes/cupertino/jquery.ui.theme.css"> -->
+        <!-- <link rel="stylesheet" href="styles/jquery-ui/themes/smoothness/jquery.ui.theme.css">
+        <link rel="stylesheet" href="styles/jquery-multiselect/jquery.multiselect.css"> -->
+        <!-- /*<style>
+            @import 'sass-bootstrap/lib/bootstrap';
+            @import 'http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css';
+            @import 'styles/jquery.ui.theme.css';
+            @import 'styles/jquery.multiselect.css';
+            @import 'styles/jquery.multiselect.filter.css';
+        </style>*/ -->
+
+        <link rel="stylesheet" href="styles/e986e44c.main.css">
+        <link rel="stylesheet" href="bower_components/select2/select2.css">
+        <script src="scripts/vendor/b2bf8288.modernizr.js"></script>
+    </head>
+    <body>
+
+    <div id="eventProcessing"></div>
+    <div id="wideProcessing"></div>
+
+        <!--    
+        <div class="ptrSelection">
+        <div class="dropDown">
+            <div><b>Conditions:</b></div>
+    
+            <input type="hidden" class="conditions"></input>
+        </div>
+        <div class="dropDown">
+            <div><b>Favorites:</b></div>
+    
+            <input type="hidden" class="favorites"></input>
+        </div>
+
+        <div class="dropDown">
+            <div><b>Drugs:</b></div>
+    
+            <input type="hidden" class="drugs"></input>
+        </div>
+        
+        <button class="submit">Analyze</button>
+    </div>
+    -->
+    
+
+    <script>
+        // HOME = '/scanner';
+        // var currentSelection = '';
+
+        // $('.ptrSelection input').select2({
+        //     width: '200px',
+        //     placeholder: "Click to search",
+        //     initSelection: function(element, callback) {
+        //         callback({id:-1, text: 'Click to search/select'});
+        //     },
+        //     query: function(options) {
+        //         var $this = $(options.element),
+        //             conceptType = '';
+
+        //         if($this.hasClass('conditions')) {
+        //             conceptType = 'conditions';
+        //         }
+        //         else if($this.hasClass('favorites')) {
+        //             conceptType = 'favorites';
+        //         }
+        //         else if($this.hasClass('drugs')) {
+        //             conceptType = 'drugs';
+        //         }
+
+        //         var obj = {
+        //             action: 'findConcept',
+        //             conceptType: conceptType,
+        //             searchString: options.term,
+        //         };
+
+        //         var postFindConcept = function(data) {
+        //             var results = [];
+
+        //             for(var i=0; i<data.length;i++) {
+        //                 results.push({id: data[i].conceptId, text: data[i].conceptName});
+        //             }
+
+        //             options.callback({
+        //                 results: results,
+        //             });
+        //         };
+
+        //         // scanner.RETRIEVE(HOME + '/registry', obj, true, postFindConcept, null, null, 0);
+
+        //         options.callback({
+        //             results: [{id:'1', text: 'hello'}, {id:'2', text: 'help'}, {id:'3', text: 'jugg'}],
+        //         });
+
+        //     },
+        // });
+
+        // $('.ptrSelection input').change(function() {
+        //     currentSelection = $(this).val();
+        //     // $('.ptrSelection input').not(this).val('');
+        //     $('.ptrSelection input').not(this).parent('.dropDown').find('.select2-chosen').html('');
+        //     // $('.ptrSelection input').select2('val',"");
+        // });
+
+        // $('.ptrSelection .submit').click(function() {
+        //     console.log(currentSelection);
+        //     function analyzePTR() {
+        //         var url = HOME + '/query',
+        //             selectedConcept = currentSelection;
+
+        //         var options = {
+        //             action: 'analyzePTR',
+        //             omopConceptID: selectedConcept,
+        //         };
+
+        //         scanner.POST(url, options, true, postAnalyzePTR, null, null, 0);
+        //     }
+        // });
+
+    </script>
+    
+
+        <!-- <div class="container">
+            <div class="hero-unit">
+                <h1>'Allo, 'Allo!</h1>
+                <p>You now have</p>
+                <ul>
+                    <li>HTML5 Boilerplate</li>
+                    <li>jQuery</li>
+                    <li>Backbone.js</li>
+                    <li>Underscore.js</li>
+                    <li>RequireJS</li>
+                    <li>Twitter Bootstrap</li>
+                </ul>
+                <p>installed.</p>
+                <h3>Enjoy coding! - Yeoman</h3>
+            </div>
+        </div> -->
+
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+        </script>
+
+        <script data-main="scripts/827cdd5d.main" src="bower_components/requirejs/require.js"></script>
+</body>
+</html>

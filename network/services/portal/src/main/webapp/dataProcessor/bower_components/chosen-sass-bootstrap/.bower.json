@@ -1,0 +1,14 @@
+{
+  "name": "chosen-sass-bootstrap",
+  "homepage": "https://github.com/joeylomanto/chosen-sass-bootstrap",
+  "version": "0.9.8",
+  "_release": "0.9.8",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.9.8",
+    "commit": "422d7f743a842a1f044d74963b3a885a650991e1"
+  },
+  "_source": "git://github.com/joeylomanto/chosen-sass-bootstrap.git",
+  "_target": "~0.9.8",
+  "_direct": true
+}
