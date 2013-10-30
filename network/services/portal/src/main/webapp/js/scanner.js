@@ -1935,8 +1935,6 @@ function valueToString(val) {
 		return arrayToString(val);
 	} else if ($.isPlainObject(val)) {
 		return objectToString(val);
-	} else if ($.isNumeric(val)) {
-		return val;
 	} else if ($.isFunction(val)) {
 		return '"Function"';
 	} else if($.isWindow(val)) {
@@ -1947,7 +1945,7 @@ function valueToString(val) {
 		var valType = $.type(val);
 		if (valType == 'string') {
 			return '"' + escapeDoubleQuotes(val) + '"';
-		} else if (valType == 'boolean') {
+		} else if (valType == 'boolean' || valType == 'number') {
 			return val;
 		} else if (valType == 'object') {
 			return '"Object"';
@@ -2010,7 +2008,7 @@ function objectToString(obj) {
  * @return the escaped string
 */
 function escapeDoubleQuotes(text) {
-	return text.replace(/"/g, '\\"');
+	return text.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/"/g, '\\"');
 }
 
 /**
