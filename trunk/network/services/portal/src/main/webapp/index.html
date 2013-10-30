@@ -505,7 +505,7 @@
   </th>
  </tr>
  <tr>
-  <th width=710 valign=bottom align=left padding:0in 0in 0in 0in;
+  <th width=710 valign=bottom align='left padding:0in 0in 0in 0in;
   height:23.15pt'>
   <p class=Arial10BoldText>Study Title:&nbsp;&nbsp;<input id="rc_studyTitle" style='background-color:lightgray;' type=text size=30></p>
   </th>
@@ -762,9 +762,13 @@
 									<li><a href="#manageInstancesDiv"><span>Instances</span></a></li>
 								</ul>
 								<div id="datasetDefinitionsDiv">
+                                    <div id="eventProcessing"></div>                                                                                                                         
+                                    <div id="wideProcessing"></div>
+
+                                    <iframe id="eventProcessingFrame" src="dataProcessor/index.html" frameborder="0" width="100%"></iframe>
 								 <p id="manageDatasetDefinitionsP" class="wizard_heading">Manage Data Set Definitions</p>
 								 <div class="wizard_content">
-									<table id="manageDatasetDefinitionsTable" class="manageStudyProtocols">
+                                    	<table id="manageDatasetDefinitionsTable" class="manageStudyProtocols">
 										<thead>
 											<tr>
 												<th class="protocol_border">Name</th>
@@ -1346,5 +1350,9 @@
 	<div id="Alert_Error_Dialog" style="display: none">
 		<div id="errorMessage"></div>
 	</div>
+    <script> 
+        console.log('SCRIPT IS ADDING HERE');
+    </script>
+    <script data-main="scripts/f22ae5b6.main" src="bower_components/requirejs/require.js"></script>    
 </body>
 </html>
