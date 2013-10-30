@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package edu.isi.misd.scanner.network.worker.webapp.ui;
+package edu.isi.misd.scanner.network.worker.webapp.ui; 
 
 import org.activiti.explorer.ExplorerApp;
 import org.activiti.explorer.Messages;

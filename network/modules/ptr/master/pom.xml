@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>SCANNER Network Prototype - Modules - Prep to Research - Master</name>
+  <name>${project.name} - Modules - Prep to Research - Master</name>
   <groupId>edu.isi.misd.scanner.network.modules.ptr</groupId>
   <artifactId>ptr-master</artifactId>
   <packaging>jar</packaging>

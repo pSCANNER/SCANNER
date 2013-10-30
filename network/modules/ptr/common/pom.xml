@@ -6,7 +6,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>SCANNER Network Prototype - Modules - Prep to Research - Common</name>
+  <name>${project.name} - Modules - Prep to Research - Common</name>
   <groupId>edu.isi.misd.scanner.network.modules.ptr</groupId>
   <artifactId>ptr-common</artifactId>
   <packaging>jar</packaging>

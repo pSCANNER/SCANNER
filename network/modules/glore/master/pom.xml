@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>SCANNER Network Prototype - Modules - Glore - Master</name>
+  <name>${project.name} - Modules - Glore - Master</name>
   <groupId>edu.isi.misd.scanner.network.modules.glore</groupId>
   <artifactId>glore-master</artifactId>
   <packaging>jar</packaging>

@@ -1181,7 +1181,7 @@ class Measure (QdmElement):
 
                 pso = 'audit'
                 crit.data['specific_occurrence'] = ConstantStr(pso)
-                crit.data['specific_occurrence_const'] = ConstantUnicode(key_flat)
+                crit.data['specific_occurrence_const'] = ConstantUnicode(unicode(key_flat))
                 crit.psuedo_specific_occurrence = True
 
                 return crit

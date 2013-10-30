@@ -6,7 +6,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>SCANNER Network Prototype - Modules - Glore - Common</name>
+  <name>${project.name} - Modules - Glore - Common</name>
   <groupId>edu.isi.misd.scanner.network.modules.glore</groupId>
   <artifactId>glore-common</artifactId>
   <packaging>jar</packaging>

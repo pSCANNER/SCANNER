@@ -1,4 +1,4 @@
-package org.activiti.explorer.rest.application;
+package org.activiti.explorer.rest.application; 
 
 import org.activiti.diagram.rest.application.DiagramServicesInit;
 import org.activiti.editor.rest.application.ModelerServicesInit;

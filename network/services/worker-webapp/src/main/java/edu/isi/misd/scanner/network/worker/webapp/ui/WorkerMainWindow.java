@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.isi.misd.scanner.network.worker.webapp.ui;
+package edu.isi.misd.scanner.network.worker.webapp.ui; 
 
 import org.activiti.explorer.ui.MainWindow;
 import org.activiti.explorer.ui.mainlayout.ExplorerLayout;
