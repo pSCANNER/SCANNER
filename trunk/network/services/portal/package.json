@@ -1,0 +1,14 @@
+{
+  "name": "portal-frontend-dataProcessor",
+  "version": "1.0.0",
+
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-cli": "~0.1.9",
+    "grunt-bower-task": "*"
+  },
+  "engines": {
+    "node": ">=0.8.0",
+    "npm": ">=2.0.0"
+  }
+}
