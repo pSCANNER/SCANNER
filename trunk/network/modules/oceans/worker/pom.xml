@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>SCANNER Network Prototype - Modules - Oceans - Worker</name>
+  <name>${project.name} - Modules - Oceans - Worker</name>
   <groupId>edu.isi.misd.scanner.network.modules.oceans</groupId>
   <artifactId>oceans-worker</artifactId>
   <packaging>jar</packaging>

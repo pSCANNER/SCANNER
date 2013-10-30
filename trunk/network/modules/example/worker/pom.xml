@@ -5,7 +5,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>SCANNER Network Prototype - Modules - Example - Worker</name>
+  <name>${project.name} - Modules - Example - Worker</name>
   <groupId>edu.isi.misd.scanner.network.modules.example</groupId>
   <artifactId>example-worker</artifactId>
   <packaging>jar</packaging>

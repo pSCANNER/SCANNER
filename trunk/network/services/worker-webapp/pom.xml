@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<name>SCANNER Network Prototype - Services - Worker - Webapp</name>
+	<name>${project.name} - Services - Worker - Webapp</name>
 	<artifactId>worker-webapp</artifactId>
     <groupId>edu.isi.misd.scanner.network.services</groupId>  
 	<packaging>war</packaging>  

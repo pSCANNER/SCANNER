@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>SCANNER Network Prototype - Services - Master</name>
+  <name>${project.name} - Services - Master</name>
   <groupId>edu.isi.misd.scanner.network.services</groupId>
   <artifactId>service-master</artifactId>
   <packaging>jar</packaging>

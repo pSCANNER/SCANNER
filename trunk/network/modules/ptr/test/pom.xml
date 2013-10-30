@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   
-  <name>SCANNER Network Prototype - Modules - Prep to Research - Integration Test</name>
+  <name>${project.name} - Modules - Prep to Research - Integration Test</name>
   <groupId>edu.isi.misd.scanner.network.modules.ptr</groupId>
   <artifactId>ptr-test</artifactId>
 

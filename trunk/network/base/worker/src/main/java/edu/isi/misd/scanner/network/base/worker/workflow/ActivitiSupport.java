@@ -1,5 +1,19 @@
-
-package edu.isi.misd.scanner.network.base.worker.workflow;
+/*  
+ * Copyright 2013 University of Southern California 
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License. 
+ * You may obtain a copy of the License at 
+ *  
+ *    http://www.apache.org/licenses/LICENSE-2.0 
+ *  
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and 
+ * limitations under the License. 
+ */ 
+package edu.isi.misd.scanner.network.base.worker.workflow; 
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,11 +37,13 @@ import org.springframework.context.ApplicationContextAware;
  *  TODO: The user and group account defaults probably need to be read from an 
  *  external script first, then fallback to these if that script is not present.
  * 
- * The spring bean for this class has to be loaded even if Activiti is not 
- * used.  This is because of a Spring issue which makes conditional bean 
- * loading difficult when trying to use only context properties to define
- * the condition. 
+ *  The spring bean for this class has to be loaded even if Activiti is not 
+ *  used.  This is because of a Spring issue which makes conditional bean 
+ *  loading difficult when trying to use only context properties to define
+ *  the condition. 
  * 
+ *
+ *  @author Mike D'Arcy 
  */
 public class ActivitiSupport implements ApplicationContextAware 
 {
