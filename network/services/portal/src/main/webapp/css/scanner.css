@@ -402,3 +402,6 @@ p.Arial10ptlineitem, li.Arial10ptlineitem, div.Arial10ptlineitem
 #dijit_layout_ContentPane_3 {
     padding: 0;
 }
+#dataSetsDiv {
+    width: 100%;
+}
