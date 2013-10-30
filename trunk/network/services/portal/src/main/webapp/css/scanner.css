@@ -405,3 +405,8 @@ p.Arial10ptlineitem, li.Arial10ptlineitem, div.Arial10ptlineitem
 #dataSetsDiv {
     width: 100%;
 }
+
+#eventProcessingFrame {
+    width: 100%;
+    height: 1024px;
+}
