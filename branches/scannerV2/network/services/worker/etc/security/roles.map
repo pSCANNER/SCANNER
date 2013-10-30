@@ -1,5 +1,0 @@
-# Default SCANNER Production Network Master DN
-"CN=master.scanner-net.org, OU=SCANNER Production Network, O=SCANNER Project, C=US" authorized
-
-# Default SCANNER Test Network Master DN
-#"CN=scanner.misd.isi.edu, OU=SCANNER Test Network, O=SCANNER Project, C=US" authorized

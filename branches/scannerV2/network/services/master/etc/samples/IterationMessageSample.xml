@@ -1,6 +1,0 @@
-<ExampleIterationMessage
-    xmlns="http://scanner.misd.isi.edu/network/types/example"> 
-       
-    <random>3</random>   
-      
-</ExampleIterationMessage>
