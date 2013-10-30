@@ -398,3 +398,7 @@ p.Arial10ptlineitem, li.Arial10ptlineitem, div.Arial10ptlineitem
 		width: 200px;
 		margin-top: 10px;
 	}
+
+#dijit_layout_ContentPane_3 {
+    padding: 0;
+}
