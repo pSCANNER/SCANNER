@@ -18,6 +18,7 @@ package edu.isi.misd.scanner.network.registry.data.domain;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import java.io.Serializable;
 import java.util.List;
@@ -52,8 +53,6 @@ public class DataSetDefinition implements Serializable
     private String dataSetName; 
     @Column(name = "description")
     private String description;
-    @Column(name = "data_processing_program")
-    private String dataProcessingProgram;
     @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="studyName")
     @JsonIdentityReference(alwaysAsId=true)     
     @JoinColumn(name = "originating_study_id", referencedColumnName = "study_id")
@@ -76,7 +75,11 @@ public class DataSetDefinition implements Serializable
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataSetDefinition")
     private List<DataSetVariableMetadata> dataSetVariableMetadata;    
-
+    @Column(name = "data_processing_specification")
+    private String dataProcessingSpecification;    
+    @Column(name = "data_processing_program")
+    private String dataProcessingProgram;
+    
     public DataSetDefinition() {
     }
 
@@ -111,14 +114,6 @@ public class DataSetDefinition implements Serializable
 
     public void setDescription(String description) {
         this.description = description;
-    }
-    
-    public String getDataProcessingProgram() {
-        return dataProcessingProgram;
-    }
-
-    public void setDataProcessingProgram(String dataProcessingProgram) {
-        this.dataProcessingProgram = dataProcessingProgram;
     }
 
     public Study getOriginatingStudy() {
@@ -167,6 +162,23 @@ public class DataSetDefinition implements Serializable
 
     public void setDataSetVariableMetadata(List<DataSetVariableMetadata> dataSetVariableMetadata) {
         this.dataSetVariableMetadata = dataSetVariableMetadata;
+    }
+    
+    @JsonRawValue    
+    public String getDataProcessingSpecification() {
+        return dataProcessingSpecification;
+    }
+
+    public void setDataProcessingSpecification(String dataProcessingSpecification) {
+        this.dataProcessingSpecification = dataProcessingSpecification;
+    }
+    
+    public String getDataProcessingProgram() {
+        return dataProcessingProgram;
+    }
+
+    public void setDataProcessingProgram(String dataProcessingProgram) {
+        this.dataProcessingProgram = dataProcessingProgram;
     }
     
     @Override

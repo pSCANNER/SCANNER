@@ -31,6 +31,7 @@ import edu.isi.misd.scanner.network.registry.data.domain.ToolLibrary;
 import edu.isi.misd.scanner.network.registry.data.domain.UserRole;
 import edu.isi.misd.scanner.network.registry.data.repository.*;
 import edu.isi.misd.scanner.network.registry.web.errors.ForbiddenException;
+import edu.isi.misd.scanner.network.registry.web.errors.ResourceNotFoundException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -501,8 +502,11 @@ public class RegistryServiceImpl implements RegistryService
     }     
 
     @Override
-    public String convertDataProcessingSpecification(
-        String workingDir, String execName, String args, String input)
+    public String convertDataProcessingSpecification(String workingDir,
+                                                     String execName,
+                                                     String args,
+                                                     String input,
+                                                     Integer dataSetId)
             throws Exception
     {
         Executor exec = new DefaultExecutor();    
@@ -521,7 +525,21 @@ public class RegistryServiceImpl implements RegistryService
             exec.execute(cl);  
         } catch (Exception e) {
             throw new Exception(e.toString() + "\n\n" + err.toString("UTF-8"));
-        } 
-        return out.toString("UTF-8");
+        }
+        String output = out.toString("UTF-8");
+        
+        if (dataSetId != null) 
+        {
+            DataSetDefinition dataSet = 
+                dataSetDefinitionRepository.findOne(dataSetId);
+
+            if (dataSet == null) {
+                throw new ResourceNotFoundException(dataSetId);
+            }
+            dataSet.setDataProcessingSpecification(input);
+            dataSet.setDataProcessingProgram(output);
+            dataSetDefinitionRepository.save(dataSet);
+        }        
+        return output;
     }
 }
