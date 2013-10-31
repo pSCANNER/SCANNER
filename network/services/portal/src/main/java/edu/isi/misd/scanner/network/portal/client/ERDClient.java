@@ -1194,7 +1194,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		String url = erdURL + "datasetSpecProcessor";
 		System.out.println("POST: " + url);
 		System.out.println("POST Body: " + body);
-		ClientURLResponse rsp = postRegistry(url, "text/plain; charset=UTF-8", body, loginUser);
+		ClientURLResponse rsp = postRegistry(url, body, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
 	}
