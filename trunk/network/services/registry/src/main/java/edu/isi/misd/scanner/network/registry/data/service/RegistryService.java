@@ -125,6 +125,7 @@ public interface RegistryService
     public String convertDataProcessingSpecification(String workingDir,
                                                      String execName,
                                                      String args,
-                                                     String input)        
+                                                     String input,
+                                                     Integer dataSetId)        
         throws Exception;       
 }

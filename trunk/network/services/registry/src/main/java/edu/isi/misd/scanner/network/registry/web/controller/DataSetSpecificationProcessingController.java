@@ -15,6 +15,7 @@
  */ 
 package edu.isi.misd.scanner.network.registry.web.controller; 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import edu.isi.misd.scanner.network.registry.data.service.RegistryService;
 import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
@@ -52,42 +53,69 @@ public class DataSetSpecificationProcessingController extends BaseController
     
     @RequestMapping(value = BASE_PATH,
                     method = RequestMethod.POST,
-                    consumes = HEADER_TEXT_MEDIA_TYPE, 
+                    consumes = HEADER_JSON_MEDIA_TYPE, 
                     produces = HEADER_JSON_MEDIA_TYPE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public @ResponseBody DataProcessingOutput createDataSetProcessingCode(
-        @RequestHeader(HEADER_LOGIN_NAME) String loginName,         
-        @RequestBody String dataSetProcessingInput) 
+    public @ResponseBody DataSetSpecProcessingContext 
+        createDataSetProcessingCode(
+            @RequestHeader(HEADER_LOGIN_NAME) String loginName,         
+            @RequestBody DataSetSpecProcessingContext context) 
     {
         try 
         {
             String workingDir = servletContext.getRealPath(PYTHON_BASE);
-            String output =  
+            context.setDataSetSpecOutput(
                 registryService.convertDataProcessingSpecification(
                     workingDir,
                     EXECUTABLE,
                     PYTHON_FILE, 
-                    dataSetProcessingInput);
-           return new DataProcessingOutput(output);
+                    context.getDataSetSpecInput().toString(),
+                    context.getDataSetId()));
+           return context;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }   
   
-    public static class DataProcessingOutput
+    public static class DataSetSpecProcessingContext
     {
-        private String output;        
+        private Integer dataSetId;
+        private String dataSetSpecOutput;        
+        private JsonNode dataSetSpecInput;
+        
+        public DataSetSpecProcessingContext() {};
+        
+        public DataSetSpecProcessingContext(Integer dataSetId,
+                                            JsonNode input,
+                                            String output) 
+        {
+            this.dataSetId = dataSetId;
+            this.dataSetSpecInput = input;
+            this.dataSetSpecOutput = output;
+        }
 
-        public DataProcessingOutput(String output) {
-            this.output = output;
+        public Integer getDataSetId() {
+            return dataSetId;
         }
-        
-        public String getOutput() {
-            return this.output;
+
+        public void setDataSetId(Integer dataSetId) {
+            this.dataSetId = dataSetId;
         }
-        
-        public void setOutput(String output) {
-            this.output = output;
+
+        public String getDataSetSpecOutput() {
+            return dataSetSpecOutput;
         }
+
+        public void setDataSetSpecOutput(String dataSetSpecOutput) {
+            this.dataSetSpecOutput = dataSetSpecOutput;
+        }
+
+        public JsonNode getDataSetSpecInput() {
+            return dataSetSpecInput;
+        }
+
+        public void setDataSetSpecInput(JsonNode dataSetSpecInput) {
+            this.dataSetSpecInput = dataSetSpecInput;
+        }        
     }
 }
