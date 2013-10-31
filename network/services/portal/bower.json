@@ -4,13 +4,9 @@
     "description": "",
     "devDependencies": {
         "backbone": "*",
-        //"chosen": "*",
-        //"chosen-sass-bootstrap": "*",
-        //"jquery-multiselect": "*",
         "modernizr": "*",
         "requirejs": "*",
         "requirejs-text": "*",
-        //"sass-bootstrap": "*",
         "jquery-ui-bootstrap": "*",
         "underscore": "*",        
         "select2":"*"            
