@@ -40,6 +40,7 @@ import edu.vanderbilt.oceans.statistics.analysis.LogisticRegressionAnalysis;
 import edu.vanderbilt.oceans.statistics.analysis.LogisticRegressionAnalysis.LogisticRegressionCoefficient;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.camel.Exchange;
@@ -190,15 +191,31 @@ public class OceansLogisticRegressionProcessor implements Processor
         {
             Coefficient coefficient = new Coefficient();
             coefficient.setName(c.getName());
-            coefficient.setB(c.getEstimate());
-            coefficient.setPValue(c.getPValue());
+            coefficient.setB(df(c.getEstimate()));
+            coefficient.setPValue(df(c.getPValue()));
             coefficient.setDegreeOfFreedom(c.getDegreeOfFreedom());
-            coefficient.setSE(c.getStandardError());
-            coefficient.setTStatistics(c.getTestStatistics());
+            coefficient.setSE(df(c.getStandardError()));
+            coefficient.setTStatistics(df(c.getTestStatistics()));
             target.add(coefficient);
         }        
     }   
-        
+
+    /**
+     * Formats a double to a fixed (currently three) number of decimal places.
+     */    
+    public static double df(double a)
+    {
+        DecimalFormat f = new DecimalFormat(".000");
+        Double input = Double.valueOf(a);
+        // check for special values so that they are not parsed
+        if (input.equals(Double.NEGATIVE_INFINITY) ||
+            input.equals(Double.POSITIVE_INFINITY) || 
+            input.equals(Double.NaN)) {
+            return input.doubleValue();
+        }
+        return Double.parseDouble(f.format(input));
+    }
+    
     // The hardcoding of values returned is just here for testing.  
     // It will be replaced by reading the local registry for metadata 
 

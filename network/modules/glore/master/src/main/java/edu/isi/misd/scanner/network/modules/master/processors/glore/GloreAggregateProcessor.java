@@ -451,7 +451,12 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
 
     private static double ztest(double v)
     {
-        return 2*(1-getCDF(Math.abs(v)));
+        double result =  2*(1-getCDF(Math.abs(v)));
+        // don't return a negative number
+        if (result != Math.abs(result)) {
+            result = 0.0;
+        }
+        return result;
     }
     
 }
