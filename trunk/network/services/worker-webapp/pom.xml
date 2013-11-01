@@ -126,7 +126,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>${project.maven.compiler.plugin.version}</version>
 				<configuration>
 					<source>${project.java.version}</source>
 					<target>${project.java.version}</target>
@@ -155,7 +155,11 @@
 					</descriptors>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
 			<!-- A simple Jetty server at http://localhost:8080/worker-webapp
 				 can be launched with the Maven goal jetty:run-war -->
 			<plugin>

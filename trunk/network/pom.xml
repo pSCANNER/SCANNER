@@ -25,7 +25,8 @@
       <project.repo.url>http://scanner.misd.isi.edu:8081/nexus/content/groups/public</project.repo.url>
       
       <!-- Some global dependency versions -->
-      <project.java.version>1.6</project.java.version> <!-- change to 1.7 before release -->     
+      <project.java.version>1.7</project.java.version>  
+      <project.maven.compiler.plugin.version>3.1</project.maven.compiler.plugin.version>
       <project.camel.version>2.11.0</project.camel.version>  
       <project.spring.version>3.1.4.RELEASE</project.spring.version> 
       <project.activity.version>5.13</project.activity.version>    
