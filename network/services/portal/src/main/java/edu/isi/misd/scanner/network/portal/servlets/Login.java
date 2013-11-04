@@ -141,6 +141,12 @@ public class Login extends HttpServlet {
 				userRoles.add(tokenizer.nextToken());
 			}
 		}
+		if (username == null) {
+			int index = remoteUser.indexOf("@");
+			if (index != -1) {
+				username = remoteUser.substring(0, index);
+			}
+		}
 		System.out.println("User \"" + remoteUser + "\" agreed." + "\n\t" +
 				"username: " + username + "\n\t" +
 				"id: " + remoteUser + "\n\t" +
