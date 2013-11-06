@@ -64,9 +64,6 @@ var descriptionId = 0;
 var tipBox;
 var alertErrorDialog;
 
-var investigatorsMultiSelect = null;
-var selInvestigators = null;
-
 var scannerUsersDict = null;
 var scannerUsersList = null;
 
@@ -146,21 +143,9 @@ var analyzeDataStore = {
 		items: []
 };
 
-var slicesDataStore = {
-		identifier: "id",
-		items: []
-};
-
-var projectsDataStore = {
-		identifier: "id",
-		items: []
-};
-
 var intervalVariable;
 
 var analyzeGrid = null;
-var slicesGrid = null;
-var projectsGrid = null;
 var queriesCounter = 0;
 var studiesCounter = [];
 
@@ -399,10 +384,6 @@ function getSelectedMethodName() {
  */
 function getSelectedSitesNames() {
 	return sitesMultiSelect.get('value');
-}
-
-function getSelectedInvestigatorsNames() {
-	return investigatorsMultiSelect.get('value');
 }
 
 /**
