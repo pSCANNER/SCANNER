@@ -41,6 +41,9 @@ import edu.isi.misd.scanner.network.portal.client.RegistryClientResponse;
 import edu.isi.misd.scanner.network.portal.client.ScannerClient;
 import edu.isi.misd.scanner.network.portal.client.JakartaClient.ClientURLResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Servlet for pinging the sites nodes.
  * 
@@ -67,7 +70,9 @@ public class Echo extends HttpServlet {
 	 */
 	ScannerClient scannerClient;
 	private String erdURL = "http://localhost:8088/scannerV2/registry/";
-       
+    
+    private static final transient Logger log = 
+        LoggerFactory.getLogger(Echo.class);    
     /**
      * Default constructor. 
      * @see HttpServlet#HttpServlet()
@@ -86,7 +91,7 @@ public class Echo extends HttpServlet {
 	 */
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		System.out.println("Echo is initialized");
+		log.info("Echo is initialized");
 		servletConfig = config;
 		trustStoreType = servletConfig.getServletContext().getInitParameter("trustStoreType");
 		trustStorePassword = servletConfig.getServletContext().getInitParameter("trustStorePassword");
@@ -105,8 +110,10 @@ public class Echo extends HttpServlet {
 		path = path.substring(0, index);
 		trustStoreResource = path + trustStoreResource;
 		keyStoreResource = path + keyStoreResource;
-		System.out.println("trustStoreResource: " + trustStoreResource);
-		System.out.println("keyStoreResource: " + keyStoreResource);
+        if (log.isDebugEnabled()) {
+            log.debug("trustStoreResource: " + trustStoreResource);
+            log.debug("keyStoreResource: " + keyStoreResource);
+        }
 		servletContext = config.getServletContext();
 		registryClient = new ERDClient((registryUrl != null) ? registryUrl : erdURL, "user");
 		scannerClient = new ScannerClient(4, 8192, 300000,
