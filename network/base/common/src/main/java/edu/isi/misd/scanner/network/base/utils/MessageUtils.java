@@ -167,9 +167,9 @@ public class MessageUtils
      * @return The converted object.
      * @throws Exception
      */
-    public static Object convertTo(Class<?> toType,
-                                   Object fromType,                                 
-                                   Exchange exchange)
+    public static <T extends Object> T convertTo(Class<T> toType,
+                                                 Object fromType,                                 
+                                                 Exchange exchange)
     {
         // avoid the overhead of type conversion if already same type
         if (toType.isInstance(fromType)) {

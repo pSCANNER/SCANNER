@@ -139,7 +139,7 @@ public class OceansLogisticRegressionProcessor implements Processor
             // assemble the dependent and independent variables
             String dependentVariableName = params.getDependentVariableName();
             ArrayList<String> independentVariables = 
-                new ArrayList(params.getIndependentVariableName());    
+                new ArrayList<>(params.getIndependentVariableName());    
             
             // complete the response up until the analysis execution point, 
             // from here it will be returned regardless of any exception caught

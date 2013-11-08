@@ -44,8 +44,7 @@ public class IterationAggregateProcessor implements Processor
     {
         ExampleIterationMessage newData = null;
         
-        ArrayList<String> results = 
-            exchange.getIn().getBody(ArrayList.class);
+        ArrayList results = exchange.getIn().getBody(ArrayList.class);
         
         for (Object result : results) 
         {

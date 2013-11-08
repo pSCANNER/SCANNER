@@ -50,6 +50,7 @@ public class BaseResultsAggregator implements AggregationStrategy
      * @return The aggregated exchange
      */
     @Override
+    @SuppressWarnings("unchecked")
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) 
     {  
         Object newBody = newExchange.getIn().getBody(String.class);
@@ -59,7 +60,7 @@ public class BaseResultsAggregator implements AggregationStrategy
         
         if (failureEndpoint != null) 
         {
-            String failureDesc = "";
+            String failureDesc;
             Throwable cause =
                 newExchange.getProperty(
                     Exchange.EXCEPTION_CAUGHT,
@@ -70,16 +71,8 @@ public class BaseResultsAggregator implements AggregationStrategy
             if (log.isDebugEnabled()) {
                 log.debug(
                     "Caught exception during aggregation: " + cause.toString());
-            }            
-//            if (cause instanceof HttpOperationFailedException) { 
-//                 errorDesc = " " + 
-//                    ((HttpOperationFailedException)cause).getStatusText() + ": " +
-//                    ((HttpOperationFailedException)cause).getResponseBody();
-//            } 
-//            else
-            {
-                failureDesc = cause.toString();
             }
+            failureDesc = cause.toString();
             
             ServiceResponse response = new ServiceResponse();
             ServiceResponseMetadata responseMetadata =

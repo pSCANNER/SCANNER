@@ -158,8 +158,7 @@ public class TextFileRoleBasedCertLoginModule
         BufferedReader reader = 
             new BufferedReader(new InputStreamReader(input));
 
-        Map<String, List<String>> localMap = 
-            new HashMap<String, List<String>>();
+        Map<String, List<String>> localMap = new HashMap<>();
 
         QuotedStringTokenizer dnTokenizer;
         StringTokenizer roleTokenizer;
@@ -202,7 +201,7 @@ public class TextFileRoleBasedCertLoginModule
             }
 
             roleTokenizer = new StringTokenizer(roles, ",");
-            ArrayList rolesList = new ArrayList();
+            ArrayList<String> rolesList = new ArrayList<>();
             while(roleTokenizer.hasMoreTokens()) {
                 rolesList.add(roleTokenizer.nextToken());
             }

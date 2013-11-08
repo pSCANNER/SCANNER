@@ -9,7 +9,7 @@
     <groupId>edu.isi.misd.scanner.network</groupId>
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.2</version>
 
     <modules>
       <module>base</module>        
@@ -19,14 +19,12 @@
   
     <properties>
       <project.name>SCANNER Network</project.name>
-      <project.version>1.0-SNAPSHOT</project.version>  
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
       <project.repo.url>http://scanner.misd.isi.edu:8081/nexus/content/groups/public</project.repo.url>
       
       <!-- Some global dependency versions -->
       <project.java.version>1.7</project.java.version>  
-      <project.maven.compiler.plugin.version>3.1</project.maven.compiler.plugin.version>
       <project.camel.version>2.11.0</project.camel.version>  
       <project.spring.version>3.1.4.RELEASE</project.spring.version> 
       <project.activity.version>5.13</project.activity.version>    
@@ -81,6 +79,18 @@
     <build>
       <defaultGoal>install</defaultGoal>  
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+          <configuration>
+            <source>${project.java.version}</source>
+            <target>${project.java.version}</target>
+            <compilerArgs>
+                <arg>-Xlint:unchecked</arg>
+            </compilerArgs>          
+          </configuration>
+        </plugin>           
         <plugin>      
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>

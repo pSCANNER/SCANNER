@@ -108,7 +108,7 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
         LogisticRegressionInputParameters params = 
             request.getLogisticRegressionInput().getInputParameters();
         ArrayList<String> independentVariables = 
-            new ArrayList(params.getIndependentVariableName());
+            new ArrayList<>(params.getIndependentVariableName());
         int features = independentVariables.size()+1;
 
         int iter = gloreData.getIteration();

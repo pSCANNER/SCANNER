@@ -81,14 +81,13 @@ public class BaseAggregateProcessor implements Processor
         List<ServiceResponse> resultsInput = 
             serviceResponses.getServiceResponse();     
         
-        ArrayList<T> resultsOutput = new ArrayList<T>();        
+        ArrayList<T> resultsOutput = new ArrayList<>();        
         for (ServiceResponse result : resultsInput) 
         {
             ServiceResponseData responseData = result.getServiceResponseData();
             if (responseData != null) {
                 T request = 
-                        (T)MessageUtils.convertTo(
-                            T, responseData.getAny(), exchange);
+                    MessageUtils.convertTo(T, responseData.getAny(), exchange);
                 resultsOutput.add(request);
             } else {
                 log.warn("A ServiceResponse was missing the expected ServiceResponseData containing requested object type: " + T.getName());

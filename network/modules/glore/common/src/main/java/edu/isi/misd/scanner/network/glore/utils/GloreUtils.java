@@ -107,10 +107,10 @@ public class GloreUtils
     public static Matrix convertMatrixTypeToMatrix(MatrixType baseMatrixType)
     {
         List<MatrixRowType> rowArrays = baseMatrixType.getMatrixRow();
-        ArrayList<List<Double>> doubleList = new ArrayList<List<Double>>();
+        ArrayList<List<Double>> doubleList = new ArrayList<>();
         
         for (MatrixRowType rowArray : rowArrays) {
-            ArrayList doubles = new ArrayList();            
+            ArrayList<Double> doubles = new ArrayList<>();            
             for (DoubleType column : rowArray.getMatrixColumn()) {
                 doubles.add(column.getValue());             
             }

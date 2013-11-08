@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.junit4.CamelSpringTestSupport;
+import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.apache.commons.io.IOUtils;
 
 import org.slf4j.Logger;
@@ -109,7 +109,7 @@ public abstract class BaseIntegrationTest extends CamelSpringTestSupport
             resultEndpoint.expectedBodiesReceived(outBody);
         }
         
-        HashMap headers = new HashMap();
+        HashMap<String,Object> headers = new HashMap<>();
         headers.put(Exchange.HTTP_METHOD, "POST");
         headers.put(Exchange.CONTENT_TYPE, contentType);
         resultEndpoint.expectedHeaderReceived(Exchange.CONTENT_TYPE, contentType); 
