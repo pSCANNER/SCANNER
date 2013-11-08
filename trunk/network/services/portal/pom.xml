@@ -27,9 +27,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20090211</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/JSON.jar</systemPath>             
+            <version>20131018</version>            
         </dependency>
         
         <!-- Apache HTTP Client -->
