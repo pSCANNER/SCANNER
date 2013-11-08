@@ -155,7 +155,7 @@ public class Echo extends HttpServlet {
 					clientResponse.release();
 					System.out.println("master string: " + res);
 					JSONObject temp = new JSONObject(res);
-					String masterURL = temp.getString("hostUrl") + ":" + temp.getString("hostPort") + temp.getString("basePath");
+					String masterURL = temp.getString("hostUrl") + ":" + temp.getInt("hostPort") + temp.getString("basePath");
 					String url = masterURL + "example/echo";
 					StringBuffer buff = new StringBuffer();
 					JSONArray names = targets.names();
