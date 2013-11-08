@@ -288,12 +288,14 @@ public class GloreProcessor implements Processor
                         GloreLogisticRegressionRequest.class);
 
         ArrayList<Integer> independentVariableColumnsSelected = 
-            new ArrayList<Integer>();
-        ArrayList<String> independentVariableNames = new ArrayList(
-            request.getLogisticRegressionInput().getInputParameters().getIndependentVariableName());
+            new ArrayList<>();
+        ArrayList<String> independentVariableNames = new ArrayList<>(
+            request.getLogisticRegressionInput().
+                getInputParameters().getIndependentVariableName());
 
         String dependentVariableName = 
-            request.getLogisticRegressionInput().getInputParameters().getDependentVariableName();
+            request.getLogisticRegressionInput().
+                getInputParameters().getDependentVariableName();
         if (log.isDebugEnabled()) {
             log.debug("--##-- DependentVariableName="+dependentVariableName);
         }

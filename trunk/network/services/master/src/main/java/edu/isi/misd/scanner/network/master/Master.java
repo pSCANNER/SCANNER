@@ -150,8 +150,12 @@ public class Master extends Main
                 "No CamelContexts are configured!");
         } else {
             this.camelContext = getCamelContexts().get(0);
-            Map contextProps = this.camelContext.getProperties();
-            contextProps.putAll(new HashMap(properties));   
+            Map<String,String> contextProps = this.camelContext.getProperties();
+            for (Map.Entry property : properties.entrySet()) {
+                contextProps.put(
+                    property.getKey().toString(),
+                    property.getValue().toString());
+            }  
             
             HttpComponent httpComponent = new HttpComponent(); 
             httpComponent.setConnectionsPerRoute(60);

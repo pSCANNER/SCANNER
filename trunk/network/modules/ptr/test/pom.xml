@@ -11,7 +11,7 @@
     <relativePath>../../../</relativePath>
     <groupId>edu.isi.misd.scanner.network</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.2</version>
   </parent>
     
   <dependencies>  
@@ -59,17 +59,6 @@
     <defaultGoal>test</defaultGoal>
 
     <plugins> 
-        
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>${project.maven.compiler.plugin.version}</version>
-          <configuration>
-            <source>${project.java.version}</source>
-            <target>${project.java.version}</target>
-          </configuration>
-        </plugin>
-                
         <plugin>
           <groupId>org.apache.maven.plugins</groupId> 
           <artifactId>maven-surefire-plugin</artifactId>
@@ -81,9 +70,9 @@
             <childDelegation>false</childDelegation>
             <useFile>true</useFile>
           </configuration>
-        </plugin>          
-                           
-    </plugins>                    
+        </plugin>                             
+    </plugins>
+                        
   </build>
 
 </project>
