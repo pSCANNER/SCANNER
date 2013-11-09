@@ -38,6 +38,9 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Class to implement an HTTPS client.
@@ -46,6 +49,9 @@ import org.apache.http.params.CoreConnectionPNames;
  *
  */
 public class ScannerClient extends JakartaClient {
+
+	private static final transient Logger log = 
+	        LoggerFactory.getLogger(ScannerClient.class);    
 	/**
      * Constructor.
      * 
@@ -110,7 +116,7 @@ public class ScannerClient extends JakartaClient {
 			String trustStoreType, String trustStorePassword, String trustStoreResource,
 			String keyStoreType, String keyStorePassword, String keyStoreResource, String keyManagerPassword) throws Throwable {
 		/*
-		System.out.println("keyManagerPassword: "+keyManagerPassword +
+		if (log.isDebugEnabled()) log.debug("keyManagerPassword: "+keyManagerPassword +
 				"\nkeyStoreType: "+keyStoreType +
 				"\nkeyStoreResource: "+keyStoreResource +
 				"\nkeyStorePassword: "+keyStorePassword +
@@ -118,8 +124,8 @@ public class ScannerClient extends JakartaClient {
 				"\ntrustStoreResource: "+trustStoreResource +
 				"\ntrustStorePassword: "+trustStorePassword);
 		*/
-		System.out.println("keyStoreResource: "+keyStoreResource +
-				"\ntrustStoreResource: "+trustStoreResource);
+		log.info("keyStoreResource: "+keyStoreResource);
+		log.info("trustStoreResource: "+trustStoreResource);
 
 		
 		KeyStore trustKeyStore = KeyStore.getInstance(trustStoreType);
@@ -163,7 +169,7 @@ public class ScannerClient extends JakartaClient {
     	BasicCookieStore cookieStore = new BasicCookieStore();
     	httpclient.setCookieStore(cookieStore);
     	
-    	System.out.println("Scanner Client was successfully initialized");
+    	log.info("Scanner Client was successfully initialized.");
 	}
 
 }

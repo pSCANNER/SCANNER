@@ -36,6 +36,9 @@ import org.json.JSONObject;
 import edu.isi.misd.scanner.network.portal.client.JakartaClient;
 import edu.isi.misd.scanner.network.portal.utils.Utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Servlet for initializing the servlet session at login.
  * 
@@ -61,6 +64,8 @@ public class Login extends HttpServlet {
 	private static final String shibMailAttr = "mail";
 	private static final String shibRolesAttr = "protectNetworkEntitlement";
 	private boolean debug = false;
+	private static final transient Logger log = 
+	        LoggerFactory.getLogger(Login.class);    
 	
     /**
      * Default constructor. 
@@ -147,7 +152,8 @@ public class Login extends HttpServlet {
 				username = remoteUser.substring(0, index);
 			}
 		}
-		System.out.println("User \"" + remoteUser + "\" agreed." + "\n\t" +
+		log.info("User " + username + " has logged in.");
+		if (log.isDebugEnabled()) log.debug("User \"" + remoteUser + "\" agreed." + "\n\t" +
 				"username: " + username + "\n\t" +
 				"id: " + remoteUser + "\n\t" +
 				"displayName: " + displayName + "\n\t" +

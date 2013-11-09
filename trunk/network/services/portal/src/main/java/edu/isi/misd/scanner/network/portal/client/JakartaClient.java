@@ -61,6 +61,9 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class to implement an HTTP Client
  * @author Serban Voinea
@@ -109,7 +112,9 @@ public class JakartaClient {
 	 * 
 	 */
 	protected String ioException;
-	
+	private static final transient Logger log = 
+	        LoggerFactory.getLogger(JakartaClient.class);    
+
 	public JakartaClient() {
 		
 	}
@@ -468,7 +473,7 @@ public class JakartaClient {
     			if (cookie != null) {
     				setCookieValue(response.getCookieValue());
     				if (getCookieValue() != null) {
-    	        		System.out.println("Response cookie: "+ getCookieValue());
+    	        		if (log.isDebugEnabled()) log.debug("Response cookie: "+ getCookieValue());
     				}
     			}
     			break;
@@ -513,7 +518,7 @@ public class JakartaClient {
 				}
 				// sleep before retrying
 				int delay = (int) Math.ceil((0.75 + Math.random() * 0.5) * Math.pow(10, count) * 0.00001);
-				System.out.println("Retry delay: " + delay + " ms.");
+				log.info("Retry delay: " + delay + " ms.");
 				try {
 					Thread.sleep(delay);
 				} catch (InterruptedException e1) {
@@ -549,7 +554,7 @@ public class JakartaClient {
      */
     private void setCookie(String cookie, HttpUriRequest request) {
     	if (cookie != null) {
-    		//System.out.println("Request cookie: "+cookie);
+    		//if (log.isDebugEnabled()) log.debug("Request cookie: "+cookie);
         	//request.setHeader("Cookie", cookieName+"="+cookie);
         	request.setHeader("Cookie", cookie);
     	}
@@ -732,7 +737,7 @@ public class JakartaClient {
         	try {
         		Header cookies[] = response.getHeaders("Set-Cookie");
         		if (cookies.length > 0) {
-            		System.out.println("Number of cookies: " + cookies.length);
+            		if (log.isDebugEnabled()) log.debug("Number of cookies: " + cookies.length);
     				res = URLDecoder.decode(response.getFirstHeader("Set-Cookie").getValue(), "UTF-8");
        		}
 			} catch (UnsupportedEncodingException e) {
@@ -776,18 +781,18 @@ public class JakartaClient {
          */
         public void debug() {
         	if (response != null) {
-            	System.out.println("Status: " + response.getStatusLine().getStatusCode());
+            	if (log.isDebugEnabled()) log.debug("Status: " + response.getStatusLine().getStatusCode());
     			Header headers[] = response.getAllHeaders();
     	        for (int i=0; i<headers.length; i++) {
     	        	try {
-    					System.out.println(headers[i].getName()+": "+URLDecoder.decode(headers[i].getValue(), "UTF-8"));
+    					if (log.isDebugEnabled()) log.debug(headers[i].getName()+": "+URLDecoder.decode(headers[i].getValue(), "UTF-8"));
     				} catch (UnsupportedEncodingException e) {
     					e.printStackTrace();
     				}
     	        }
         	}
             for (Cookie cookie : httpclient.getCookieStore().getCookies()) {
-    			System.out.println("Cookie: " + cookie.getName() +"=" + cookie.getValue());
+    			if (log.isDebugEnabled()) log.debug("Cookie: " + cookie.getName() +"=" + cookie.getValue());
             }
         }
         

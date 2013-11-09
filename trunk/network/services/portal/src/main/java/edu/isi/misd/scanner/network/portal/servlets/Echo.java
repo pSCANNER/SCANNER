@@ -91,7 +91,7 @@ public class Echo extends HttpServlet {
 	 */
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		log.info("Echo is initialized");
+		log.info("Echo was initialized.");
 		servletConfig = config;
 		trustStoreType = servletConfig.getServletContext().getInitParameter("trustStoreType");
 		trustStorePassword = servletConfig.getServletContext().getInitParameter("trustStorePassword");
@@ -137,7 +137,7 @@ public class Echo extends HttpServlet {
 			index = path.lastIndexOf(File.separator) + 1;
 			path = path.substring(0, index);
 			String fileName = path + "scanner_echo.log";
-			System.out.println("Echo log file: " + fileName);
+			log.info("Echo log file: " + fileName);
 			while (!ready) {
 				JSONObject ret = new JSONObject();
 				try {
@@ -160,7 +160,7 @@ public class Echo extends HttpServlet {
 					clientResponse = registryClient.getMasterObject();
 					String res = clientResponse.toMasterString();
 					clientResponse.release();
-					System.out.println("master string: " + res);
+					if (log.isDebugEnabled()) log.debug("master string: " + res);
 					JSONObject temp = new JSONObject(res);
 					String masterURL = temp.getString("hostUrl") + ":" + temp.getInt("hostPort") + temp.getString("basePath");
 					String url = masterURL + "example/echo";
@@ -181,16 +181,16 @@ public class Echo extends HttpServlet {
 					simpleMapData.put(params);
 					params.put("key", "echoParameter");
 					params.put("value", "Test");
-					System.out.println("URL: " + url + "\nTargets: "+targetsURLs+"\nBody: "+body);
+					if (log.isDebugEnabled()) log.debug("URL: " + url + "\nTargets: "+targetsURLs+"\nBody: "+body);
 					ClientURLResponse rsp = scannerClient.postScannerQuery(url, targetsURLs, body.toString());
 					if (rsp.isException()) {
 						continue;
 					}
 					String contentType = rsp.getHeader("Content-Type");
-					System.out.println("contentType received: " + contentType);
+					if (log.isDebugEnabled()) log.debug("contentType received: " + contentType);
 					res = rsp.getEntityString();
-					System.out.println("Response Body: \n"+res);
-					System.out.println("Ret: \n"+ret);
+					if (log.isDebugEnabled()) log.debug("Response Body: \n"+res);
+					if (log.isDebugEnabled()) log.debug("Ret: \n"+ret);
 					ret.put("timestamp", (new Date()).toString());
 					if (contentType != null && contentType.indexOf("application/json") != -1) {
 						JSONObject echoResult = new JSONObject(res);
