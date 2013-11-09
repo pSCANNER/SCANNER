@@ -32,6 +32,9 @@ import org.json.JSONObject;
 
 import edu.isi.misd.scanner.network.portal.client.JakartaClient.ClientURLResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author serban
  *
@@ -42,6 +45,8 @@ public class ERDClientResponse implements RegistryClientResponse {
 	protected JSONArray entityResponse;
 	protected JSONObject entityObject;
 	protected JSONObject errorObject;
+	private static final transient Logger log = 
+	        LoggerFactory.getLogger(ERDClientResponse.class);    
 
 	public ERDClientResponse(ClientURLResponse rsp) {
 		response = rsp;
@@ -57,7 +62,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 					}
 				} catch (JSONException e1) {
 					e1.printStackTrace();
-					System.out.println("Received response: " + res);
+					if (log.isDebugEnabled()) log.error("Received response: " + res);
 				}
 			}
 		}
@@ -254,7 +259,7 @@ public class ERDClientResponse implements RegistryClientResponse {
 			JSONObject ret = new JSONObject();
 			for (int i=0; i < entityResponse.length(); i++) {
 				JSONObject tool = entityResponse.getJSONObject(i);
-				if (tool.getString("toolName").equals(func) && tool.getString("toolParentLibrary").equals(lib)) {
+				if (tool.getString("toolName").equals(func) && ("" + tool.getInt("toolParentLibrary")).equals(lib)) {
 					ret = tool;
 					break;
 				}

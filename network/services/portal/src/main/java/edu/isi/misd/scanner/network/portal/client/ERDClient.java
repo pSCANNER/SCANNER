@@ -32,6 +32,9 @@ import org.json.JSONObject;
 
 import edu.isi.misd.scanner.network.portal.utils.Utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author serban
  *
@@ -39,11 +42,14 @@ import edu.isi.misd.scanner.network.portal.utils.Utils;
 public class ERDClient extends JakartaClient implements RegistryClient {
 	private String erdURL = null;
 	private String loginUser = null;
+	private static final transient Logger log = 
+	        LoggerFactory.getLogger(ERDClient.class);    
 
 	public ERDClient(String url, String user) {
 		super(4, 8192, 120000);
 		erdURL = url;
 		this.loginUser = user;
+		log.info("Registry Client was initialized.");
 	}
 	/* (non-Javadoc)
 	 * @see edu.isi.misd.scanner.network.portal.client.RegistryClient#createStudy(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
@@ -59,8 +65,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject investigator = new JSONObject();
 			investigator.put("userId", Integer.parseInt(studyOwner));
 			body.put("studyOwner", investigator);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -91,8 +97,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			body.put("endDate", endDate.length() == 0 ? JSONObject.NULL : endDate);
 			body.put("clinicalTrialsId", clinicalTrialsId.length() == 0 ? JSONObject.NULL : clinicalTrialsId);
 			body.put("analysisPlan", analysisPlan.length() == 0 ? JSONObject.NULL : analysisPlan);
-			System.out.println("PUT: " + url);
-			System.out.println("PUT Body:\n" + body.toString(2));
+			if (log.isDebugEnabled()) log.debug("PUT: " + url);
+			if (log.isDebugEnabled()) log.debug("PUT Body:\n" + body.toString(2));
 			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -108,7 +114,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getStudies() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studies" + getUserPredicate("?");
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -121,7 +127,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getDatasets(int studyId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "datasets?studyId=" + studyId + getUserPredicate("&");
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -134,7 +140,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getLibraries(int studyId, int dataSetId, String sites) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "libraries" + "?studyId=" + studyId + "&dataSetId=" + dataSetId + getUserPredicate("&");
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -148,7 +154,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "tools" + "?studyId=" + studyId + "&dataSetId=" + dataSetId + 
 			"&libraryId=" + libraryId + getUserPredicate("&");
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -163,7 +169,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		try {
 			JSONArray jsonRsp = readParameterFile(jsonFile);
 			String url = erdURL + "variables?dataSetId=" + dataSetId;
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			RegistryClientResponse ret = new ERDClientResponse(rsp);
 			JSONArray parents = new JSONArray();
@@ -198,7 +204,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getSites(int studyId, int dataSetId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "instances?dataSetId=" + dataSetId + "&studyId=" + studyId + getUserPredicate("&");
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -211,7 +217,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getMethodObject(String name, String lib) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "libraries";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -224,7 +230,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getMasterObject() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "nodes?nodeType=master";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -237,7 +243,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getSitesMap() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "nodes";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -273,7 +279,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getUsers() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "users";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -282,7 +288,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getNodes() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "nodes";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -291,7 +297,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getTools() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "tools";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -300,7 +306,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getDatasetInstances() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "instances";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -309,7 +315,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getDatasetDefinitions() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "datasets";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -319,7 +325,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		try {
 			String url = erdURL + "users?userName=" + Utils.urlEncode(user);
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -333,7 +339,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		try {
 			String url = erdURL + "analysisPolicies?userName=" + Utils.urlEncode(userName) + "&analysisToolId=" + toolId + "&dataSetInstanceId=" + datasetInstanceId;
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -345,7 +351,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getUserRoles() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "userRoles";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -354,7 +360,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getStudyPolicies() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyPolicies";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -363,7 +369,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getStudyRoles() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyRoles";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -372,7 +378,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getMyStudies() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studies" + getUserPredicate("?");
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -381,7 +387,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAnalysisPolicies() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "analysisPolicies";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -390,7 +396,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllStudies() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studies";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -399,7 +405,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllLibraries() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "libraries";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -408,7 +414,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllSites() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "sites";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -417,7 +423,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllNodes() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "nodes";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -426,7 +432,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllStandardRoles() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "standardRoles";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -435,7 +441,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllStudyManagementPolicies() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyManagementPolicies";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -444,7 +450,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllSitesPolicies() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "sitePolicies";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -453,7 +459,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllStudyRequestedSites() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyRequestedSites";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -471,8 +477,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject site = new JSONObject();
 			site.put("siteId", siteId);
 			body.put("site", site);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -485,7 +491,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			Integer studyRequestedSiteId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyRequestedSites/" + studyRequestedSiteId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -494,7 +500,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getStudyRequestedSites(Integer studyId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyRequestedSites?studyId=" + studyId;
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -503,7 +509,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getUserRoles(int studyId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "userRoles?studyId=" + studyId;
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -520,8 +526,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject studyRole = new JSONObject();
 			studyRole.put("roleId", roleId);
 			body.put("studyRole", studyRole);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -533,7 +539,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse deleteUserRole(Integer userRoleId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "userRoles/" + userRoleId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -542,7 +548,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getStudyRoles(int studyId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyRoles?studyId=" + studyId;
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -572,8 +578,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject accessMode = new JSONObject();
 			accessMode.put("accessModeId", accessModeId);
 			body.put("accessMode", accessMode);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -585,7 +591,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse deleteStudyPolicy(int studyPolicyStatementId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyPolicies/" + studyPolicyStatementId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -616,8 +622,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject parentStudyPolicyStatement = new JSONObject();
 			parentStudyPolicyStatement.put("studyPolicyStatementId", studyPolicyStatementId);
 			body.put("parentStudyPolicyStatement", parentStudyPolicyStatement);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -630,7 +636,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			int analysisPolicyStatementId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "analysisPolicies/" + analysisPolicyStatementId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -654,8 +660,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject node = new JSONObject();
 			node.put("nodeId", nodeId);
 			body.put("node", node);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -676,8 +682,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			body.put("lastName", lastName);
 			body.put("phone", phone);
 			body.put("isSuperuser", isSuperuser);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -698,8 +704,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			body.put("lastName", lastName);
 			body.put("phone", phone);
 			body.put("isSuperuser", isSuperuser);
-			System.out.println("PUT: " + url);
-			System.out.println("PUT Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("PUT: " + url);
+			if (log.isDebugEnabled()) log.debug("PUT Body: " + body.toString());
 			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -711,7 +717,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse deleteUser(int userId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "users/" + userId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -724,8 +730,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject body = new JSONObject();
 			body.put("siteName", siteName);
 			body.put("description", description);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -745,8 +751,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject body = new JSONObject();
 			body.put("siteName", siteName);
 			body.put("description", description);
-			System.out.println("PUT: " + url);
-			System.out.println("PUT Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("PUT: " + url);
+			if (log.isDebugEnabled()) log.debug("PUT Body: " + body.toString());
 			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -760,7 +766,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse deleteSite(int siteId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "sites/" + siteId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -782,8 +788,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject site = new JSONObject();
 			site.put("siteId", siteId);
 			body.put("site", site);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -808,8 +814,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject site = new JSONObject();
 			site.put("siteId", siteId);
 			body.put("site", site);
-			System.out.println("PUT: " + url);
-			System.out.println("PUT Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("PUT: " + url);
+			if (log.isDebugEnabled()) log.debug("PUT Body: " + body.toString());
 			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -821,7 +827,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse deleteNode(int nodeId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "nodes/" + nodeId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -845,8 +851,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject node = new JSONObject();
 			node.put("nodeId", nodeId);
 			body.put("node", node);
-			System.out.println("PUT: " + url);
-			System.out.println("PUT Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("PUT: " + url);
+			if (log.isDebugEnabled()) log.debug("PUT Body: " + body.toString());
 			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -858,7 +864,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse deleteInstance(int dataSetInstanceId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "instances/" + dataSetInstanceId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -868,7 +874,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		try {
 			String url = erdURL + "userRoles?userName=" + Utils.urlEncode(userName);
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -882,7 +888,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		try {
 			String url = erdURL + "studyManagementPolicies?userName=" + Utils.urlEncode(userName) + "&studyId=" + studyId;
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -895,7 +901,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		try {
 			String url = erdURL + "instances?userName=" + Utils.urlEncode(userName);
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -908,7 +914,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		try {
 			String url = erdURL + "nodes?userName=" + Utils.urlEncode(userName);
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -921,7 +927,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		try {
 			String url = erdURL + "sitePolicies?userName=" + Utils.urlEncode(userName);
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -933,7 +939,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getUserRoles(int siteId, int studyId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "userRoles?studyId=" + studyId + "&siteId=" + siteId;
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -943,7 +949,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getSiteStudyRoles(int siteId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "studyRoles?siteId=" + siteId;
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -961,8 +967,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject studyRole = new JSONObject();
 			studyRole.put("roleId", roleId);
 			body.put("studyRole", studyRole);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -974,7 +980,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse deleteSiteAdministrationRole(int sitePolicyId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "sitePolicies/" + sitePolicyId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -988,7 +994,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			if (searchString != null) {
 				url += "?search=" + Utils.urlEncode(searchString);
 			}
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -1000,7 +1006,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getMethods() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "tools";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -1011,7 +1017,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 		RegistryClientResponse ret = null;
 		try {
 			String url = erdURL + "instances?studyId=" + studyId + "&userName=" + Utils.urlEncode(userName);
-			System.out.println("GET: " + url);
+			if (log.isDebugEnabled()) log.debug("GET: " + url);
 			ClientURLResponse rsp = get(url, (String) null, loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (UnsupportedEncodingException e) {
@@ -1023,7 +1029,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getTools(int toolId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "tools/" + toolId;
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -1032,7 +1038,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllHistory() {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "analysisHistory";
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -1053,8 +1059,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			JSONObject body = new JSONObject();
 			body.put("status", status);
 			body.put("analysisResults", analysisResults);
-			System.out.println("PUT: " + url);
-			System.out.println("PUT Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("PUT: " + url);
+			if (log.isDebugEnabled()) log.debug("PUT Body: " + body.toString());
 			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -1066,7 +1072,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse deleteHistory(int analysisId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "analysisHistory/" + analysisId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -1075,7 +1081,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getAllHistory(int studyId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "analysisHistory?studyId=" + studyId + getUserPredicate("&");
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -1103,8 +1109,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			analysisTool.put("toolId", toolId);
 			body.put("analysisTool", analysisTool);
 			body.put("analysisResults", new JSONArray(analysisResults));
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -1116,7 +1122,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse getHistory(int analysisId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "analysisHistory/" + analysisId;
-		System.out.println("GET: " + url);
+		if (log.isDebugEnabled()) log.debug("GET: " + url);
 		ClientURLResponse rsp = get(url, (String) null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -1140,8 +1146,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			dataSetConfidentialityLevel.put("levelId", 100);
 			dataSetConfidentialityLevel.put("description", "SAFE HARBOR");
 			body.put("dataSetConfidentialityLevel", dataSetConfidentialityLevel);
-			System.out.println("POST: " + url);
-			System.out.println("POST Body: " + body.toString());
+			if (log.isDebugEnabled()) log.debug("POST: " + url);
+			if (log.isDebugEnabled()) log.debug("POST Body: " + body.toString());
 			ClientURLResponse rsp = postRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -1169,8 +1175,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			dataSetConfidentialityLevel.put("levelId", 100);
 			dataSetConfidentialityLevel.put("description", "SAFE HARBOR");
 			body.put("dataSetConfidentialityLevel", dataSetConfidentialityLevel);
-			System.out.println("PUT: " + url);
-			System.out.println("PUT Body:\n" + body.toString(2));
+			if (log.isDebugEnabled()) log.debug("PUT: " + url);
+			if (log.isDebugEnabled()) log.debug("PUT Body:\n" + body.toString(2));
 			ClientURLResponse rsp = putRegistry(url, body.toString(), loginUser);
 			ret = new ERDClientResponse(rsp);
 		} catch (JSONException e) {
@@ -1183,7 +1189,7 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 			int dataSetDefinitionId) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "datasets/" + dataSetDefinitionId;
-		System.out.println("DELETE: " + url);
+		if (log.isDebugEnabled()) log.debug("DELETE: " + url);
 		ClientURLResponse rsp = delete(url, null, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
@@ -1192,8 +1198,8 @@ public class ERDClient extends JakartaClient implements RegistryClient {
 	public RegistryClientResponse postDatasetSpec(String body) {
 		RegistryClientResponse ret = null;
 		String url = erdURL + "datasetSpecProcessor";
-		System.out.println("POST: " + url);
-		System.out.println("POST Body: " + body);
+		if (log.isDebugEnabled()) log.debug("POST: " + url);
+		if (log.isDebugEnabled()) log.debug("POST Body: " + body);
 		ClientURLResponse rsp = postRegistry(url, body, loginUser);
 		ret = new ERDClientResponse(rsp);
 		return ret;
