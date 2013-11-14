@@ -20,6 +20,7 @@ import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.UUID;
 import org.apache.camel.Exchange;
@@ -46,13 +47,15 @@ public class BaseRequestProcessor implements Processor
     @Override
     public void process(Exchange exchange) throws Exception 
     {        
+        exchange.setProperty(
+            BaseConstants.EXECUTION_START, Calendar.getInstance());
+        
         String id = MessageUtils.getID(exchange);        
         Object body = exchange.getIn().getBody();
         MessageUtils.setTimestamp(exchange);
         
         String requestURL = MessageUtils.getRequestURL(exchange.getIn());
         exchange.setProperty(BaseConstants.REQUEST_URL, requestURL);  
-        
         String httpMethod = 
                 (String)exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         

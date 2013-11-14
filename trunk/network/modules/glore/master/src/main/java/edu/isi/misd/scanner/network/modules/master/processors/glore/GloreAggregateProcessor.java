@@ -16,6 +16,7 @@
 package edu.isi.misd.scanner.network.modules.master.processors.glore; 
 
 import Jama.Matrix;
+import edu.isi.misd.scanner.network.base.BaseConstants;
 import edu.isi.misd.scanner.network.base.master.processors.BaseAggregateProcessor;
 import edu.isi.misd.scanner.network.base.utils.ErrorUtils;
 import edu.isi.misd.scanner.network.base.utils.MessageUtils;
@@ -35,6 +36,7 @@ import edu.isi.misd.scanner.network.types.regression.Coefficient;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionInputParameters;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionOutput;
 import edu.isi.misd.scanner.network.types.regression.LogisticRegressionResponse;
+import java.util.Calendar;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.commons.lang.ArrayUtils;
@@ -245,10 +247,14 @@ public class GloreAggregateProcessor extends BaseAggregateProcessor
             responseData.setAny(gloreResponse);            
             ServiceResponse response = new ServiceResponse();
             response.setServiceResponseData(responseData); 
+            Calendar start = 
+                exchange.getProperty(BaseConstants.EXECUTION_START, Calendar.class);
+            Calendar end = Calendar.getInstance();
             ServiceResponseMetadata responseMetadata = 
                 MessageUtils.createServiceResponseMetadata(
                     exchange, ServiceRequestStateType.COMPLETE,
-                    "The distributed GLORE analysis completed successfully.");
+                    "The distributed GLORE analysis completed successfully.",
+                    MessageUtils.formatEventDuration(start, end));
             response.setServiceResponseMetadata(responseMetadata);
             ServiceResponses responses = new ServiceResponses();              
             responses.getServiceResponse().add(response);
