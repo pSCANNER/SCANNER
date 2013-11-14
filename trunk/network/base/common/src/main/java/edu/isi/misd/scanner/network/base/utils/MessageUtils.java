@@ -27,15 +27,14 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.TypeConverter;
 import org.joda.time.Period;
-import org.joda.time.format.PeriodFormat;
 import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A collection of utility functions for working with Camel message exchanges
- * and the headers contained within those exchanges that are specific to the 
- * operation of the SCANNER Network.
+ * that are specific to the operation of the SCANNER Network.
  *
  * @author Mike D'Arcy 
  */
@@ -102,13 +101,36 @@ public class MessageUtils
     public static String formatEventDuration(Calendar start, Calendar end)
     {
         if (end.before(start)) {
-            throw new RuntimeException("Event start time was after event end time");
+            throw new RuntimeException(
+                "Event start time was after event end time");
         }
+
+        Period period =
+            new Period(start.getTimeInMillis(), end.getTimeInMillis());
         
-        long startTime = start.getTimeInMillis();
-        long endTime = end.getTimeInMillis();
-        Period period = new Period(startTime, endTime);
-        PeriodFormatter pf = PeriodFormat.getDefault();
+        PeriodFormatter pf = new PeriodFormatterBuilder()
+            .appendYears()
+            .appendSuffix("Y")
+            .appendSeparator("-")
+            .appendMonths()
+            .appendSuffix("M")
+            .appendSeparator("-")
+            .appendWeeks()
+            .appendSuffix("W")
+            .appendSeparator("-")
+            .appendDays()
+            .appendSuffix("D")
+            .appendSeparator(" ")
+            .appendHours()
+            .appendSuffix("h")            
+            .appendSeparator(":")
+            .appendMinutes()
+            .appendSuffix("m")
+            .appendSeparator(":")
+            .appendSecondsWithMillis()
+            .appendSuffix("s")
+            .printZeroRarelyLast()
+            .toFormatter(); 
         
         return pf.print(period);
     }
