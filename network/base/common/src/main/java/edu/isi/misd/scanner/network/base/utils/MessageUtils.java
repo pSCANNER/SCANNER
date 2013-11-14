@@ -26,6 +26,9 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.TypeConverter;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormat;
+import org.joda.time.format.PeriodFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +97,20 @@ public class MessageUtils
         SimpleDateFormat sdf = 
             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"); // ISO 8601
         exchange.getIn().setHeader(BaseConstants.TIMESTAMP, sdf.format(date));
+    }
+    
+    public static String formatEventDuration(Calendar start, Calendar end)
+    {
+        if (end.before(start)) {
+            throw new RuntimeException("Event start time was after event end time");
+        }
+        
+        long startTime = start.getTimeInMillis();
+        long endTime = end.getTimeInMillis();
+        Period period = new Period(startTime, endTime);
+        PeriodFormatter pf = PeriodFormat.getDefault();
+        
+        return pf.print(period);
     }
     
     /**
@@ -272,6 +289,16 @@ public class MessageUtils
         ServiceRequestStateType state,
         String stateDetail)
     {
+        return 
+            createServiceResponseMetadata(exchange, state, stateDetail, null);
+    }
+    
+    public static ServiceResponseMetadata createServiceResponseMetadata(
+        Exchange exchange,
+        ServiceRequestStateType state,
+        String stateDetail,
+        String executionDuration)
+    {
         ServiceResponseMetadata serviceResponseMetadata = 
             new ServiceResponseMetadata();
         serviceResponseMetadata.setRequestID(MessageUtils.getID(exchange));  
@@ -283,6 +310,16 @@ public class MessageUtils
             MessageUtils.getSiteName(exchange));        
         serviceResponseMetadata.setRequestNodeName(
             MessageUtils.getNodeName(exchange));
+        
+        String includeDuration = 
+            exchange.getIn().getHeader(
+                BaseConstants.INCLUDE_EXECUTION_DURATION, String.class);
+        if (!((includeDuration != null) && 
+            (("false".equalsIgnoreCase(includeDuration))))) {
+            serviceResponseMetadata.setRequestExecutionDuration(
+                executionDuration);      
+        } 
+        
         return serviceResponseMetadata;
     }
 }

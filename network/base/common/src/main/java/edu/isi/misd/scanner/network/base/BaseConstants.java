@@ -74,7 +74,15 @@ public class BaseConstants
      *  Boolean parameter indicating results are held for authorization
      */
     public static final String RESULTS_RELEASE_AUTH_REQUIRED = "resultsReleaseAuthReq";     
-
+    /**
+     *  Boolean parameter indicating execution time should be included in output
+     */
+    public static final String INCLUDE_EXECUTION_DURATION = "includeExecutionDuration"; 
+    
+    public static final String EXECUTION_START = "execStart";
+    
+    public static final String EXECUTION_END = "execEnd";
+    
     /**
      *  The property name of master node data input directory
      */

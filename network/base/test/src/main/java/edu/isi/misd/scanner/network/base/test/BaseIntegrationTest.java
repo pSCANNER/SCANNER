@@ -112,6 +112,7 @@ public abstract class BaseIntegrationTest extends CamelSpringTestSupport
         HashMap<String,Object> headers = new HashMap<>();
         headers.put(Exchange.HTTP_METHOD, "POST");
         headers.put(Exchange.CONTENT_TYPE, contentType);
+        headers.put(BaseConstants.INCLUDE_EXECUTION_DURATION, "false");        
         resultEndpoint.expectedHeaderReceived(Exchange.CONTENT_TYPE, contentType); 
         
         headers.put(BaseConstants.ID, this.getClass().getName());

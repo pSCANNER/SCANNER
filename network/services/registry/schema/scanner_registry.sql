@@ -196,6 +196,7 @@ CREATE TABLE IF NOT EXISTS analysis_result (
   result_id serial NOT NULL primary key,
   status text NOT NULL,
   status_detail text,
+  execution_duration text,
   url text NOT NULL,
   data_set_instance_id integer NOT NULL,
   analysis_id integer NOT NULL references analysis_instance(analysis_id),

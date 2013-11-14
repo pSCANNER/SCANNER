@@ -41,7 +41,11 @@
                 <xsd:element name="RequestStateDetail" 
                              type="xsd:string"
                              minOccurs="0"
-                             maxOccurs="1"/>                                   
+                             maxOccurs="1"/>   
+                <xsd:element name="RequestExecutionDuration" 
+                             type="xsd:string"
+                             minOccurs="0"
+                             maxOccurs="1"/>                                                 
                 <xsd:element name="RequestSiteName" 
                              type="xsd:string"
                              minOccurs="0"

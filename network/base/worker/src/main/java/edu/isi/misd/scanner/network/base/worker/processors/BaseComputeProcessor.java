@@ -21,6 +21,7 @@ import edu.isi.misd.scanner.network.types.base.ServiceRequestStateType;
 import edu.isi.misd.scanner.network.types.base.ServiceResponse;
 import edu.isi.misd.scanner.network.types.base.ServiceResponseData;
 import edu.isi.misd.scanner.network.types.base.SimpleMap;
+import java.util.Calendar;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
@@ -40,20 +41,23 @@ public class BaseComputeProcessor implements Processor
         
     @Override
     public void process(Exchange exchange) throws Exception 
-    {     
+    {    
+        Calendar start = Calendar.getInstance();
         ServiceResponse response = new ServiceResponse();        
-        response.setServiceResponseMetadata(
-            MessageUtils.createServiceResponseMetadata(
-                    exchange, 
-                    ServiceRequestStateType.COMPLETE,
-                    BaseConstants.STATUS_COMPLETE));
         SimpleMap request = 
             (SimpleMap)exchange.getIn().getBody(SimpleMap.class);         
         if (request != null) {
             ServiceResponseData responseData = new ServiceResponseData();
             responseData.setAny(request);
             response.setServiceResponseData(responseData);
-        }        
+        }   
+        Calendar end = Calendar.getInstance();
+        response.setServiceResponseMetadata(
+            MessageUtils.createServiceResponseMetadata(
+                    exchange, 
+                    ServiceRequestStateType.COMPLETE,
+                    BaseConstants.STATUS_COMPLETE,
+                    MessageUtils.formatEventDuration(start, end)));        
         exchange.getIn().setBody(response);
     }              
 }

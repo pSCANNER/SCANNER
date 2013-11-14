@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -90,6 +91,12 @@ public class OceansLogisticRegressionProcessor implements Processor
     private ServiceResponse executeAnalysis(Exchange exchange) 
         throws Exception
     {
+        Calendar start = Calendar.getInstance();
+        Calendar end;
+        ServiceRequestStateType requestStatus = 
+            ServiceRequestStateType.PROCESSING;
+        String requestStatusDetail = BaseConstants.STATUS_PROCESSING;
+        
         // Create the service response object
         ServiceResponse response = 
             new ServiceResponse(); 
@@ -163,23 +170,28 @@ public class OceansLogisticRegressionProcessor implements Processor
                 lrAnalysis.getLRCoefficients(),
                 output.getCoefficient());         
             lrResponse.getOutput().add(output); 
-            
-            response.setServiceResponseMetadata(
-                MessageUtils.createServiceResponseMetadata(
-                    exchange, 
-                    ServiceRequestStateType.COMPLETE,
-                    BaseConstants.STATUS_COMPLETE)); 
+                   
+            requestStatus = ServiceRequestStateType.COMPLETE;
+            requestStatusDetail = BaseConstants.STATUS_COMPLETE;
             response.setServiceResponseData(responseData);                  
         }
         catch (Exception e) 
-        {    
+        {       
+            requestStatus = ServiceRequestStateType.ERROR;
+            requestStatusDetail = 
+                "Unhandled exception during OCEANS processing. Caused by [" 
+                        + e.toString() + "]";                           
+        } 
+        finally 
+        {
+            end = Calendar.getInstance();
             response.setServiceResponseMetadata(
                 MessageUtils.createServiceResponseMetadata(
                     exchange, 
-                    ServiceRequestStateType.ERROR,
-                    "Unhandled exception during OCEANS processing. Caused by [" 
-                        + e.toString() + "]"));                            
-        }      
+                    requestStatus,
+                    requestStatusDetail,
+                    MessageUtils.formatEventDuration(start, end)));             
+        }
         return response;    
     }
     

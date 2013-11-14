@@ -19,7 +19,7 @@
   </parent>
       
   <dependencies>
-  
+      
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -59,6 +59,14 @@
       <artifactId>jetty-plus</artifactId>
       <version>7.6.8.v20121106</version>
     </dependency>  
+    
+    <!-- Joda time -->
+    <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.3</version>
+    </dependency> 
+         
   </dependencies>
 
   <build>

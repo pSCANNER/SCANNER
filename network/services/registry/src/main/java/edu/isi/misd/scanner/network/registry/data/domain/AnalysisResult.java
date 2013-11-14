@@ -49,6 +49,8 @@ public class AnalysisResult implements Serializable
     private String status;
     @Column(name = "status_detail")
     private String statusDetail;
+    @Column(name = "execution_duration")
+    private String executionDuration;    
     @Basic(optional = false)
     @Column(name = "url")
     private String url;
@@ -97,6 +99,14 @@ public class AnalysisResult implements Serializable
 
     public void setStatusDetail(String statusDetail) {
         this.statusDetail = statusDetail;
+    }
+    
+    public String getExecutionDuration() {
+        return executionDuration;
+    }
+
+    public void setExecutionDuration(String executionDuration) {
+        this.executionDuration = executionDuration;
     }
     
     public String getUrl() {
