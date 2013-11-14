@@ -1406,7 +1406,7 @@ function buildStatusDataTable(tab) {
 	res = dict['data'];
 	resultDiv = dict['statusDiv'];
 	tableId = dict['statusTableId'];
-	var columns = ['Site', 'State', 'State Detail'];
+	var columns = ['Site', 'State', 'State Detail', 'Execution Duration'];
 	var rows = [];
 	var complete = true;
 	var serviceResponse = res['ServiceResponses']['ServiceResponse'];
@@ -1422,6 +1422,11 @@ function buildStatusDataTable(tab) {
 			row.push(siteName);
 			row.push(serviceResponseMetadata['RequestState']);
 			row.push(serviceResponseMetadata['RequestStateDetail']);
+			var requestExecutionDuration = serviceResponseMetadata['RequestExecutionDuration'];
+			if (requestExecutionDuration == null) {
+				requestExecutionDuration = '';
+			}
+			row.push(requestExecutionDuration);
 			rows.push(row);
 			if (serviceResponseMetadata['RequestState'] != 'Complete') {
 				complete = false;
