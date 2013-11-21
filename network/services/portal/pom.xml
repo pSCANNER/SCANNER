@@ -86,10 +86,11 @@
 	<build>
         <defaultGoal>verify</defaultGoal>        
 		<plugins>
+<!-- 
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>0.0.6</version> <!-- NB! Set this to the latest released version of frontend-maven-plugin -->
+                <version>0.0.6</version> 
                 
                 <executions>
                     <execution>
@@ -115,7 +116,8 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>            
+            </plugin>      
+-->                  
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -148,6 +150,7 @@
 				<version>2.4</version>
                 <configuration>
                     <warName>scanner</warName>
+                    <warSourceExcludes>**/dataProcessor/bower_components/**</warSourceExcludes>
                 </configuration>
 			</plugin>
 			<!-- A simple Jetty server at http://localhost:8088/scanner
