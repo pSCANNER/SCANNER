@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
- * Copyright 2012 University of Southern California
+ * Copyright 2013 University of Southern California
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,10 @@
   <context-param>
     <param-name>debug</param-name>
     <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <param-name>remoteUserPattern</param-name>
+    <param-value>{user}@idp.protectnetwork.org</param-value>
   </context-param>
   <context-param>
     <param-name>trustStoreType</param-name>
