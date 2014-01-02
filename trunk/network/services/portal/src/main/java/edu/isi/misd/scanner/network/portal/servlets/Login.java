@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -64,6 +66,7 @@ public class Login extends HttpServlet {
 	private static final String shibMailAttr = "mail";
 	private static final String shibRolesAttr = "protectNetworkEntitlement";
 	private boolean debug = false;
+	private String remoteUserPattern = null;
 	private static final transient Logger log = 
 	        LoggerFactory.getLogger(Login.class);    
 	
@@ -80,6 +83,7 @@ public class Login extends HttpServlet {
 		if (debugMode != null) {
 			debug = Boolean.parseBoolean(debugMode);
 		}
+		remoteUserPattern = servletConfig.getServletContext().getInitParameter("remoteUserPattern");
 	}
 	
 	/**
@@ -139,6 +143,16 @@ public class Login extends HttpServlet {
 			eppn_val = "scanner@idp.protectnetwork.org";
 			persistent_id_val = "https://idp.protectnetwork.org/protectnetwork-idp!https://portal.scanner-net.org/scanner/shibboleth-sp!ATIrHdZXrSjfQT0OFknugOMcnEk=";
 		}
+		
+		if (remoteUserPattern != null) {
+			remoteUserPattern = remoteUserPattern.replaceFirst("\\{user\\}", "(.*)");
+			Pattern p = Pattern.compile(remoteUserPattern);
+			Matcher m = p.matcher(remoteUser);
+			if (m.matches()) {
+				remoteUser = m.group(1);
+			}
+		}
+
 		ArrayList<String> userRoles = new ArrayList<String>();
 		if (roles != null) {
 			StringTokenizer tokenizer = new StringTokenizer(roles, ";");
@@ -147,10 +161,7 @@ public class Login extends HttpServlet {
 			}
 		}
 		if (username == null) {
-			int index = remoteUser.indexOf("@");
-			if (index != -1) {
-				username = remoteUser.substring(0, index);
-			}
+			username = remoteUser;
 		}
 		log.info("User " + username + " has logged in.");
 		if (log.isDebugEnabled()) log.debug("User \"" + remoteUser + "\" agreed." + "\n\t" +
