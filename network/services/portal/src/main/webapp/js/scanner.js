@@ -170,6 +170,20 @@ Array.prototype.contains = function (elem) {
  * Function called after the SCANNER page was loaded
  */
 function initScanner() {
+	window.onbeforeunload = function (e) {
+		alert('This application does not support the Browser Back button. Leaving this page might end up in errors.');
+		e = e || window.event;
+		var msg = "Do you really want to leave this page?";
+
+		// For IE and Firefox
+		if (e) {
+			e.returnValue = msg;
+		}
+
+		// For Safari / chrome
+		return msg;
+	};
+
 	var val = '' + window.location;
 	var len = val.length - 1;
 	if (val[len] == '/') {
