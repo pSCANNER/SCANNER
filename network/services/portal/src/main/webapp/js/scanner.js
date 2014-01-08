@@ -170,19 +170,28 @@ Array.prototype.contains = function (elem) {
  * Function called after the SCANNER page was loaded
  */
 function initScanner() {
-	window.onbeforeunload = function (e) {
-		alert('This application does not support the Browser Back button. Leaving this page might end up in errors.');
-		e = e || window.event;
-		var msg = "Do you really want to leave this page?";
-
-		// For IE and Firefox
-		if (e) {
-			e.returnValue = msg;
-		}
-
-		// For Safari / chrome
-		return msg;
-	};
+	if(window.history && history.pushState){ // check for history api support
+		window.addEventListener('load', function(){
+			// create history states
+			history.pushState(-1, null); // back state
+			history.pushState(0, null); // main state
+			history.pushState(1, null); // forward state
+			history.go(-1); // start in main state
+			this.addEventListener('popstate', function(event, state){
+				// check history state and fire custom events
+				if(state = event.state){
+					event = document.createEvent('Event');
+					event.initEvent(state > 0 ? 'next' : 'previous', true, true);
+					this.dispatchEvent(event);
+					// reset state
+					history.go(-state);
+				}
+			}, false);
+		}, false);
+		window.addEventListener('previous', function(){
+			alert('This application does not support the Browser Back button.');
+		}, false);
+	}
 
 	var val = '' + window.location;
 	var len = val.length - 1;
