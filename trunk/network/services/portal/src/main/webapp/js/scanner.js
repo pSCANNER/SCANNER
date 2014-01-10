@@ -4707,7 +4707,7 @@ function hideDatasets() {
 
 function editUser(button, user) {
 	$('#userIdInput').val(user['userName']);
-	if (user['userName'] == 'scanner') {
+	if (user['userName'] == 'scanner' || !loggedInUser['isSuperuser']) {
 		$('#userIdInput').attr('disabled', 'disabled');
 	} else {
 		$('#userIdInput').removeAttr('disabled');
@@ -4777,6 +4777,7 @@ function updateUser() {
 
 function postUpdateUser(data, textStatus, jqXHR, param) {
 	data = $.parseJSON(data);
+	/*
 	var user = data['user'];
 	if (user['userId'] == $('#userIdHidden').val()) {
 		loggedInUser = user;
@@ -4789,6 +4790,7 @@ function postUpdateUser(data, textStatus, jqXHR, param) {
 					function(){HideTipBox();});
 		}
 	}
+	*/
 	postInitUsers(data['users'], null, null, false);
 	manageAdministration();
 }
