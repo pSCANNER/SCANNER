@@ -15,6 +15,7 @@
  */ 
 package edu.isi.misd.scanner.network.registry.data.domain; 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -61,9 +62,11 @@ public class Study implements Serializable
     private String protocol;
     @Column(name = "start_date")
     @Temporal(TemporalType.DATE)
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")    
     private Date startDate;
     @Column(name = "end_date")
     @Temporal(TemporalType.DATE)
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd")
     private Date endDate;
     @Column(name = "clinical_trials_id")
     private String clinicalTrialsId;

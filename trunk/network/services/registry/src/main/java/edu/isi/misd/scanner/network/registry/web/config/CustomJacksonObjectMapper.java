@@ -40,7 +40,7 @@ public class CustomJacksonObjectMapper extends ObjectMapper
      
         // Custom DateTime format string for serializer
         this.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        this.getSerializationConfig().with(
+        this.setDateFormat(
             DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.LONG));
         
         // enable Hibernate4 module to avoid serializing lazy-loaded objects
