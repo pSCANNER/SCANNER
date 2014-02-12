@@ -78,6 +78,7 @@ public class OceansLogisticRegressionProcessor implements Processor
                     "Unhandled exception during OCEANS processing. Caused by [" + 
                     e.toString() + "]");
             ErrorUtils.setHttpError(exchange, rtex, 500);
+            log.warn("Unhandled exception during OCEANS processing: ", e);
         }                
     }
     
