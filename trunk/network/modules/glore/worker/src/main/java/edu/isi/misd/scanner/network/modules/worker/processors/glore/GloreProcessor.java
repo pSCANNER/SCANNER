@@ -127,7 +127,9 @@ public class GloreProcessor implements Processor
 
             if ("computeCovarianceMatrix".equalsIgnoreCase(data.getState()))
             {
-                log.info("Compute covariance matrix");
+                if (log.isDebugEnabled()) {
+                    log.debug("Compute covariance matrix");
+                }
                 state.beta = 
                     GloreUtils.convertMatrixTypeToMatrix(data.getBeta());            
                 state.hat_beta = state.beta.copy();
@@ -155,10 +157,14 @@ public class GloreProcessor implements Processor
                 state.cov_matrix = 
                     GloreUtils.convertMatrixTypeToMatrix(
                         data.getCovarianceMatrix());
-                log.info("Covariance matrix: " +
-                    GloreUtils.matrixToString(state.cov_matrix, 8, 6));
+                if (log.isDebugEnabled()) {                
+                    log.debug("Covariance matrix: " +
+                        GloreUtils.matrixToString(state.cov_matrix, 8, 6));
+                }
 
-                log.info("Compute SD matrix");            
+                if (log.isDebugEnabled()) {                
+                    log.debug("Compute SD matrix");            
+                }
                 state.SD = new Matrix(1, state.columns);
                 for (int i = 0; i < state.columns; i++) {
                     state.SD.set(0, i, Math.sqrt(state.cov_matrix.get(i,i)));
@@ -169,12 +175,18 @@ public class GloreProcessor implements Processor
                 calMandSTD(state);
                 data.getM().addAll(
                     Arrays.asList(ArrayUtils.toObject(state.Ma)));
-                log.info("M: " + data.getM());              
+                if (log.isDebugEnabled()) {                
+                    log.debug("M: " + data.getM());              
+                }
                 data.getSTD().addAll(
                     Arrays.asList(ArrayUtils.toObject(state.STDa)));
-                log.info("STD: " + data.getSTD()); 
-                
-                log.info("SD matrix:" + GloreUtils.matrixToString(state.SD, 8, 6));            
+                if (log.isDebugEnabled()) {                
+                    log.debug("STD: " + data.getSTD()); 
+                }
+                if (log.isDebugEnabled()) {                
+                    log.debug("SD matrix:" + 
+                        GloreUtils.matrixToString(state.SD, 8, 6));            
+                }
                 data.setSDMatrix(GloreUtils.convertMatrixToMatrixType(state.SD));
                 removeState(exchange);
                 
@@ -186,6 +198,9 @@ public class GloreProcessor implements Processor
             }                       
             else 
             {
+                if (log.isDebugEnabled()) {                
+                    log.debug("Compute beta value");
+                }
                 if (data.getBeta() != null) {
                     state.beta = 
                         GloreUtils.convertMatrixTypeToMatrix(data.getBeta());
@@ -217,7 +232,9 @@ public class GloreProcessor implements Processor
                 data.setE(GloreUtils.convertMatrixToMatrixType(state.E));
 
                 // print beta for this iteration
-                log.info("Beta: " + GloreUtils.matrixToString(state.beta, 8, 8));     
+                if (log.isDebugEnabled()) {                      
+                    log.debug("Beta: " + GloreUtils.matrixToString(state.beta, 8, 8));     
+                }
                 responseMetadata.setRequestStateDetail(
                     "The GLORE computational request is in process." + 
                     "  Current state: " + data.getState() + 
@@ -241,7 +258,8 @@ public class GloreProcessor implements Processor
                     ServiceRequestStateType.ERROR,
                     "Unhandled exception during GLORE processing. Caused by [" + 
                     e.toString() + "]"));    
-            removeState(exchange);            
+            removeState(exchange); 
+            log.warn("Unhandled exception during GLORE processing: ", e);
         }
         return response;         
     }
@@ -327,7 +345,7 @@ public class GloreProcessor implements Processor
                 }
             }
             else{
-                log.info("Warning: no line is read, empty file...");
+                log.debug("Warning: no line is read, empty file...");
             }
 
             while ((file_line = file_br.readLine()) != null) 
