@@ -31380,7 +31380,7 @@ define('views/InitialPopulation/Favorites',[
                         var results = [];
 
                         for(var i=0; i<data.length;i++) {
-                            results.push({id: data[i].conceptId, text: data[i].conceptName});
+                            results.push({id: data[i].conceptId, text: data[i].conceptName, code: data[i].conceptCode});
                         }
 
                         options.callback({
@@ -31400,7 +31400,7 @@ define('views/InitialPopulation/Favorites',[
                            var results = [];
 
                             for(var i=0; i<data.length;i++) {
-                                results.push({id: data[i].conceptId, text: data[i].conceptName});
+                                results.push({id: data[i].conceptId, text: data[i].conceptName, code: data[i].conceptCode});
                             }
 
                             options.callback({results: results});
@@ -31433,6 +31433,7 @@ define('views/InitialPopulation/Favorites',[
             app.trigger(self.nameSpace + ':addVariable', {
                 conceptId: checked.id,
                 name: checked.text,
+                conceptCode: checked.code,
                 type: sectionTitle,
                 section: self.nameSpace,
                 static: self.static,
@@ -33368,7 +33369,7 @@ define('views/InitialPopulation/FavoritesCore',[
                         var results = [];
 
                         for(var i=0; i<data.length;i++) {
-                            results.push({id: data[i].conceptId, text: data[i].conceptName});
+                            results.push({id: data[i].conceptId, text: data[i].conceptName, code: data[i].conceptCode});
                         }
 
                         options.callback({
@@ -33395,7 +33396,7 @@ define('views/InitialPopulation/FavoritesCore',[
                            var results = [];
 
                             for(var i=0; i<data.length;i++) {
-                                results.push({id: data[i].conceptId, text: data[i].conceptName});
+                                results.push({id: data[i].conceptId, text: data[i].conceptName, code: data[i].conceptCode});
                             }
 
                             options.callback({results: results});
@@ -33439,6 +33440,7 @@ define('views/InitialPopulation/FavoritesCore',[
                     app.trigger(self.nameSpace + ':addVariable', {
                         conceptId: checked.id,
                         name: checked.text,
+                        conceptCode: checked.code,
                         type: sectionTitle,
                         static: self.static,
                     });
@@ -33949,8 +33951,9 @@ define('views/WideProcessing/ExportPrograms',[
     'jquery',
     'underscore',
     'backbone',
-    'templates'
-], function (app, $, _, Backbone, JST) {
+    'templates',
+    'hqmfGenerator'
+], function (app, $, _, Backbone, JST, hqmfGen) {
     'use strict';
 
     var WideprocessingExportprogramsView = Backbone.View.extend({
@@ -33976,26 +33979,30 @@ define('views/WideProcessing/ExportPrograms',[
                 app.variables,
             ];
 
-            var dataSpecBody = {
-                dataSetId: null,
-                dataSetSpecInput: variables,
-                dataSetSpecOutput: null,
-            };
+    var measure = hqmfGen.generate(app);
+    $(w.document.body).html(JSON.stringify(measure));
+//    $(w.document.body).html(JSON.stringify(variables));
 
-             $.ajax({
-                url: '/scanner/registry?action=datasetSpec',
-                headers: {'User-agent': 'Scanner/1.0'},
-                timeout: 300000,
-                async: true,
-                accepts: {text: 'application/json'},
-                processData: false,
-                dataType: 'json',
-                type: 'POST',
-                data: JSON.stringify(dataSpecBody),
-                success: function(data) {
-                    $(w.document.body).html(data.dataSetSpecOutput);
-                },
-            });
+//            var dataSpecBody = {
+//                dataSetId: null,
+//                dataSetSpecInput: variables,
+//                dataSetSpecOutput: null,
+//            };
+
+//             $.ajax({
+//                url: '/scanner/registry?action=datasetSpec',
+//                headers: {'User-agent': 'Scanner/1.0'},
+//                timeout: 300000,
+//                async: true,
+//                accepts: {text: 'application/json'},
+//                processData: false,
+//                dataType: 'json',
+//                type: 'POST',
+//                data: JSON.stringify(dataSpecBody),
+//                success: function(data) {
+//                    $(w.document.body).html(data.dataSetSpecOutput);
+//                },
+//            });
 
         },
 
@@ -34245,6 +34252,7 @@ require.config({
         bootstrap: 'vendor/bootstrap',
         //select2: '//cdnjs.cloudflare.com/ajax/libs/select2/3.4.4/select2.min.js',
         select2: '../bower_components/select2/select2.min',
+        hqmfGenerator: 'hqmf/generator'
     }
 });
 
