@@ -28,12 +28,12 @@ define([
                     {
                         // Create HQMF data_criteria.
                         var criterionCodeList = CriterionCodeList.getInstance();
-                        criterionCodeList.initialize(ipVar);
+                        criterionCodeList.initialize(ipVar, CriterionCodeList.typeMappingTable);
                         dataCriteria[ipVar.name] = criterionCodeList;
                         
                         // Create HQMF source_data_criteria.
                         criterionCodeList = CriterionCodeList.getInstance();
-                        criterionCodeList.initialize(ipVar);
+                        criterionCodeList.initialize(ipVar, CriterionCodeList.typeMappingTable);
                         srcDataCriteria[ipVar.name] = criterionCodeList;
                     }
                 }
@@ -45,12 +45,12 @@ define([
                     {
                         // Create HQMF data_criteria.
                         var criterionCodeList = CriterionCodeList.getInstance();
-                        criterionCodeList.initialize(coreVar);
+                        criterionCodeList.initialize(coreVar, CriterionCodeList.typeMappingTable);
                         dataCriteria[coreVar.name] = criterionCodeList;
                         
                         // Create HQMF source_data_criteria.
                         criterionCodeList = CriterionCodeList.getInstance();
-                        criterionCodeList.initialize(coreVar);
+                        criterionCodeList.initialize(coreVar, CriterionCodeList.typeMappingTable);
                         srcDataCriteria[coreVar.name] = criterionCodeList;
                     }
                     // Save any event variables for later processing.
@@ -62,20 +62,20 @@ define([
                 // Process the event variables, if any.
                 for (var x in eventVars)
                 {
+                    var eventVar = eventVars[x];
                     // Convert any temporal variables into data_criteria.
-                    if ( TemporalReference.lookup(eventVars[x].operator) )
-                        this.convertTimeSequence(eventVars[x], dataCriteria);
+                    if ( TemporalReference.lookup(eventVar.operator) )
+                        this.convertTimeSequence(eventVar, dataCriteria);
                     // Keeps track of the distinct indexed variable, if defined. Currently SCANNER allows only one such variable.
                     // Also mark this variable as specific occurence for HQMF.
-                    if ( eventVars[x].distinct && eventVars[x].index )
-                    {
-                        indexedVar = eventVars[x];
-//                        dataCriteria[eventVars[x].variables.attributes.name].specific_occurrence = 'A';
-//                        dataCriteria[eventVars[x].variables.attributes.name].specific_occurrence_const = dataCriteria[eventVars[x].variables.attributes.name].description;
-//                        srcDataCriteria[eventVars[x].variables.attributes.name].specific_occurrence = 'A';
-//                        srcDataCriteria[eventVars[x].variables.attributes.name].specific_occurrence_const = srcDataCriteria[eventVars[x].variables.attributes.name].description;
-                    }
+                    if ( eventVar.distinct && eventVar.index )
+                        indexedVar = eventVar;
+                    // Mark the nested logic expression event variables, if any. The non-marked ones will be used in generation
+                    // of the logic expression tree.
+                    if ( eventVar.operator === 'OR' || eventVar.operator === 'AND' || eventVar.operator === 'ANY' )
+                        this.markNestedLogicExpressionTrees(eventVar, eventVars);
                 }
+                
                 // Aggregate the wide dataset entries with the same segment together into a map of segment variables.
                 for (var k=0; k < app.wideDataSet.models.length; ++k)
                 {
@@ -151,26 +151,35 @@ define([
             return result;
         },
         
-        // Creates HQMF temporal references for any time segment variables defined in the wide dataset.
-        reconcileTimeSegmentVariables: function(allDataCriteria)
+        // Inserts HQMF temporal references into all preconditions defined in data_criteria.
+        insertTemporalReferences: function(allDataCriteria)
         {
-            // Loop thru the time segment variables (specific occurrences) and inject the start and end temporal references. 
             var timeSegmentVars = allDataCriteria.time_segment_vars;
-            for ( var ts in timeSegmentVars )
+            for ( var dcName in allDataCriteria.data_criteria)
             {
-                var timeSegmentVar = timeSegmentVars[ts];
-                for ( var i=0; i<timeSegmentVar.length; ++i )
+                // Check data criteria that are specific occurrences against the time segment variables.
+                if ( allDataCriteria.data_criteria[dcName].specific_occurrence )
                 {
-                    for ( var dcName in allDataCriteria.data_criteria)
+                    for ( var ts in timeSegmentVars )
                     {
-                        // Look for matching variable name in data criteria with the time segment variables.
-                        if ( allDataCriteria.data_criteria[dcName].specific_occurrence &&
-                             allDataCriteria.data_criteria[dcName].source_data_criteria === timeSegmentVar[i].variable )
+                        var timeSegmentVar = timeSegmentVars[ts];
+                        for ( var i=0; i<timeSegmentVar.length; ++i )
                         {
-                            allDataCriteria.data_criteria[dcName].temporal_references = 
-                                    allDataCriteria.start_end_temporal_refs[timeSegmentVar[i].interval] ;
+                            // Look for matching time segment variable name and matching time segment interval.
+                            if ( allDataCriteria.data_criteria[dcName].specific_occurrence === ts &&
+                                 allDataCriteria.data_criteria[dcName].source_data_criteria === timeSegmentVar[i].variable )
+                            {
+                                allDataCriteria.data_criteria[dcName].temporal_references = 
+                                        allDataCriteria.start_end_temporal_refs[timeSegmentVar[i].interval];
+                                break
+                            }
                         }
                     }
+                }
+                // Add temporal reference of the measure period if this data criteria is a precondition in a logic expression.
+                else if ( dcName.indexOf("_precondition_") >= 0 )
+                {
+                    allDataCriteria.data_criteria[dcName].temporal_references = [{type: 'DURING', reference: 'measure_period'}];
                 }
             }
         },
@@ -263,6 +272,25 @@ define([
                 result.initialize("IVL_PQ", {type: "PQ", unit:"d", value: endValue, 'inclusive?': false, 'derived?': false}, null);
             }
             return result;
+        },
+        // Recursively walks the event variables that contain logic operators and mark those that are nested inside others.
+        markNestedLogicExpressionTrees: function(eventVar, eventVars) 
+        {
+            // Loop thru the variables contained in this event variable.
+            for (var i=0; i < eventVar.variables.length; ++i)
+            {
+                var variable = eventVar.variables[i].attributes;
+                if ( variable.operator === 'OR' || variable.operator === 'AND' || variable.operator === 'ANY' )
+                {
+                    // Reached a "non-leaf" variable. If the same event variable exists in the top-level eventVar list mark 
+                    // it as "used" by this event variable. Only non-used top-level event variables will be collected as 
+                    // top-level trees for later processing.
+                    if ( eventVars[variable.name] )
+                        eventVars[variable.name].used = true;
+                    // Recursively walk the nested event variables.
+                    this.markNestedLogicExpressionTrees(variable, eventVars);
+                }
+            }
         }
     };
     return result;

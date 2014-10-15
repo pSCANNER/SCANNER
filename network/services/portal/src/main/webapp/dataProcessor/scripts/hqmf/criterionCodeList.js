@@ -4,7 +4,14 @@
 define([], function () 
 {
     'use strict';
-    return    {
+    return  {
+        typeMappingTable: 
+        {
+//          'User Defined Variables': {},
+            'Drugs': {qds: 'medication_order', st_cat: 'medication', status: 'ordered', type: 'medications'},
+            'Demographics': {qds: 'individual_characteristic', st_cat: 'individual_characteristic', type: 'characteristic'},
+            'Clinical Findings': {qds: 'diagnosis_active', st_cat: 'diagnosis_condition_problem', status: 'active', type: 'conditions'}
+        },
         // Factory method to create instances.
         getInstance: function()
         {
@@ -29,15 +36,6 @@ define([], function ()
                             specific_occurrence_const: null,
                             value:                     null,
                             inline_code_list:          {}, // this field is ignored by eqmxlate
-                            initialize: function(scanner_var)
-                            {
-                                this.title = scanner_var.name;
-                                this.description = scanner_var.name;
-                                this.source_data_criteria = scanner_var.name;
-                                this.code_list_id = (scanner_var.conceptCode)? scanner_var.conceptCode : '';
-//                                this.code_list_id = scanner_var.conceptId;
-                                this.property = scanner_var.type;
-                            },
                             copy: function(criterionCodeList)
                             {
                                 this.title = criterionCodeList.title;
@@ -59,6 +57,25 @@ define([], function ()
                                 this.specific_occurrence = criterionCodeList.specific_occurrence;
                                 this.specific_occurrence_const = criterionCodeList.specific_occurrence_const;
                                 this.value = criterionCodeList.value;
+                            },
+                            // Initializes this object with data from the given scanner variable.
+                            initialize: function(scanner_var, typeMappingTable)
+                            {
+                                this.title = scanner_var.name;
+                                this.description = scanner_var.name;
+                                this.source_data_criteria = scanner_var.name;
+                                this.code_list_id = (scanner_var.conceptCode)? scanner_var.conceptCode : '';
+                                if ( typeMappingTable )
+                                {
+                                    var hqmfProps = typeMappingTable[scanner_var.type];
+                                    if ( hqmfProps )
+                                    {
+                                        this.qds_data_type = hqmfProps.qds;
+                                        this.standard_category = hqmfProps.st_cat;
+                                        this.status = hqmfProps.status;
+                                        this.type = hqmfProps.type;
+                                    }
+                                }
                             }
             };
             return result;
