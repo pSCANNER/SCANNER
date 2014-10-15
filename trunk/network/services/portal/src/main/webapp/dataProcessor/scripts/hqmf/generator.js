@@ -25,7 +25,7 @@ define([
             measure.populations.push(PopulationsBuilder.buildPopulations(app));
             // The following must be done after the population criteria are done because the population criteria will generate
             // time segment variables in data_criteria as it builds the logical expressions.
-            DataCriteriaBuilder.reconcileTimeSegmentVariables(allDataCriteria);
+            DataCriteriaBuilder.insertTemporalReferences(allDataCriteria);
             
             return measure;
         }

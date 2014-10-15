@@ -86,16 +86,16 @@ define([
             // Build the DENOM from the event variables.
             if ( eventVars )
             {
-                // Loop thru all of the event variables looking for ones with logical operators.
+                // Loop thru all of the event variables looking for ones with logical operators and "un-used" (top-level).
                 for (var ev in eventVars)
                 {
                     var eventVar = eventVars[ev];
-                    if ( eventVar.operator === 'OR' || eventVar.operator === 'AND' || 
-                         eventVar.operator === 'ANY' )
+                    if ( !eventVar.used && (eventVar.operator === 'OR' || eventVar.operator === 'AND' || 
+                         eventVar.operator === 'ANY') )
                     {
                         // Build the logical expression for this event variable and temporarily attach the expression to the variable
                         // as an attribute.
-                        eventVar.logicExpression = this.buildLogicalExpression(eventVar, eventVars, allDataCriteria, timeSegmentVars);
+                        eventVar.logicExpression = this.buildLogicalExpression(eventVar, allDataCriteria, timeSegmentVars);
                     }
                 }
                 // Extract all the "un-used" event variables' logicExpressions to an array for later incorporation into
@@ -134,7 +134,7 @@ define([
         },
 
         // Recursively builds the logical expressions from the given logic event variable.
-        buildLogicalExpression: function(eventVar, eventVars, allDataCriteria, timeSegmentVars) 
+        buildLogicalExpression: function(eventVar, allDataCriteria, timeSegmentVars) 
         {
             var conjunction = Conjunction.getInstance();
             conjunction.id = Counter.getNextValue();
@@ -172,12 +172,8 @@ define([
                 }
                 else if ( variable.operator === 'OR' || variable.operator === 'AND' || variable.operator === 'ANY' )
                 {
-                    // Reached a "non-leaf" variable. If the same event variable exists in the top-level eventVar list mark it as "used".
-                    // Only non-used top-level event variables will be collected as population criteria later.
-                    if ( eventVars[variable.name] )
-                        eventVars[variable.name].used = true;
-                    // Recursively build the nested logical expression.
-                    conjunction.preconditions.push(this.buildLogicalExpression(variable, eventVars, allDataCriteria, timeSegmentVars));
+                    // Reached a "non-leaf" variable, recursively build the nested logical expression.
+                    conjunction.preconditions.push(this.buildLogicalExpression(variable, allDataCriteria, timeSegmentVars));
                 }
             }
             return conjunction;
