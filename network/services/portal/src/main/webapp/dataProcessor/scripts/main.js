@@ -33979,30 +33979,26 @@ define('views/WideProcessing/ExportPrograms',[
                 app.variables,
             ];
 
-    var measure = hqmfGen.generate(app);
-    $(w.document.body).html(JSON.stringify(measure));
-//    $(w.document.body).html(JSON.stringify(variables));
+            var dataSpecBody = {
+                dataSetId: null,
+                dataSetSpecInput: hqmfGen.generate(app),
+                dataSetSpecOutput: null,
+            };
 
-//            var dataSpecBody = {
-//                dataSetId: null,
-//                dataSetSpecInput: variables,
-//                dataSetSpecOutput: null,
-//            };
-
-//             $.ajax({
-//                url: '/scanner/registry?action=datasetSpec',
-//                headers: {'User-agent': 'Scanner/1.0'},
-//                timeout: 300000,
-//                async: true,
-//                accepts: {text: 'application/json'},
-//                processData: false,
-//                dataType: 'json',
-//                type: 'POST',
-//                data: JSON.stringify(dataSpecBody),
-//                success: function(data) {
-//                    $(w.document.body).html(data.dataSetSpecOutput);
-//                },
-//            });
+             $.ajax({
+                url: '/scanner/registry?action=datasetSpec',
+                headers: {'User-agent': 'Scanner/1.0'},
+                timeout: 300000,
+                async: true,
+                accepts: {text: 'application/json'},
+                processData: false,
+                dataType: 'json',
+                type: 'POST',
+                data: JSON.stringify(dataSpecBody),
+                success: function(data) {
+                    $(w.document.body).html(data.dataSetSpecOutput);
+                },
+            });
 
         },
 
