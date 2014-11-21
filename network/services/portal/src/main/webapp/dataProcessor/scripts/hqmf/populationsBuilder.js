@@ -6,14 +6,21 @@ define(['hqmf/populations'], function (Populations)
     'use strict';
     var result =  
     { 
-        buildPopulations: function(app) 
+        buildPopulations: function(app, measure) 
         {
-            // Currently just one population.
-            var populations = Populations.getInstance();
-            populations.id = 'SCANNER';
-            populations.title = 'Population1';
-            
-            return populations;
+            // Create a population for each DENOM found in the current measure.
+            var counter = 1;
+            for ( var pc in measure.population_criteria )
+            {
+                if ( pc.indexOf("DENOM") >= 0 )
+                {
+                    var population = Populations.getInstance();
+                    population.id = 'SCANNER';
+                    population.DENOM = pc;
+                    population.title = 'Population' + (counter++);
+                    measure.populations.push(population);
+                }
+            }
         }
     };
     return result;
