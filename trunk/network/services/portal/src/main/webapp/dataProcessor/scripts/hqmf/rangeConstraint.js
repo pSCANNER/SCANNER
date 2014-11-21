@@ -10,13 +10,13 @@ define([], function ()
         {
             var result = {
                 type: '',
-                high: null, // Value | null, defaults to null if absent
-                low: null,   // Value | null, defaults to null if absent
                 initialize: function(type, high, low)
                 {
                     this.type = type;
-                    this.high = high;
-                    this.low = low;
+                    if ( high )
+                        this.high = high;
+                    if ( low )
+                        this.low = low;
                 }
             };
             return result;

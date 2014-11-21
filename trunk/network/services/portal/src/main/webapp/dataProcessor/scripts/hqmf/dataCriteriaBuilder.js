@@ -135,19 +135,24 @@ define([
         {
             var result = [];
             
-            // Create the start temporal reference.
+            // Create the start temporal reference only if there is a range defined.
             var type = this.determineStartTemporalReferenceType(timeSegment.start, indexedVar.indexAlignment);
             var range = this.determineStartTemporalReferenceRange(timeSegment.start);
-            var startTemporalRef = TemporalReference.getInstance();
-            startTemporalRef.initialize(type, indexedVar.variables.attributes.name, range, null);
-            result.push(startTemporalRef);
+            if ( range )
+            {
+                var startTemporalRef = TemporalReference.getInstance();
+                startTemporalRef.initialize(type, indexedVar.variables.attributes.name, range, null);
+                result.push(startTemporalRef);
+            }
             // Create the end temporal reference.
             type = this.determineEndTemporalReferenceType(timeSegment.endInterval, indexedVar.indexAlignment);
             range = this.determineEndTemporalReferenceRange(timeSegment.endInterval);
-            var endTemporalRef = TemporalReference.getInstance();
-            endTemporalRef.initialize(type, indexedVar.variables.attributes.name, range, null);
-            result.push(endTemporalRef);
-            
+            if ( range )
+            {
+                var endTemporalRef = TemporalReference.getInstance();
+                endTemporalRef.initialize(type, indexedVar.variables.attributes.name, range, null);
+                result.push(endTemporalRef);
+            }            
             return result;
         },
         
@@ -194,7 +199,7 @@ define([
             {
                 if ( startValue < 0 )
                     result = "SBS";
-                else if ( startValue == 0 )
+                else if ( startValue === 0 )
                     result = "SDU";
                 else 
                     result = "SAS";
@@ -203,7 +208,7 @@ define([
             {
                 if ( startValue < 0 )
                     result = "SBE";
-                else if ( startValue == 0 )
+                else if ( startValue === 0 )
                     result = "SDU";
                 else 
                     result = "SAE";
@@ -215,16 +220,18 @@ define([
         determineStartTemporalReferenceRange: function(startValue)
         {
             var result = null;
+            // Convert value to a string.
+            var value = Math.abs(Number(startValue)).toString();
             // Determine the start temporal reference range (e.g., number of days before or after start date of indexed variable)
             if ( startValue < 0 )
             {
                 result = RangeConstraint.getInstance();
-                result.initialize("IVL_PQ", null, {type: "PQ", unit:"d", value: Math.abs(Number(startValue)), 'inclusive?': false, 'derived?': false});
+                result.initialize("IVL_PQ", null, {type: "PQ", unit:"d", value: value, 'inclusive?': false, 'derived?': false});
             }
             else if ( startValue > 0 )
             {
                 result = RangeConstraint.getInstance();
-                result.initialize("IVL_PQ", {type: "PQ", unit:"d", value: startValue, 'inclusive?': false, 'derived?': false}, null);
+                result.initialize("IVL_PQ", {type: "PQ", unit:"d", value: value, 'inclusive?': false, 'derived?': false}, null);
             }
             
             return result;
@@ -260,16 +267,18 @@ define([
         determineEndTemporalReferenceRange: function(endValue)
         {
             var result = null;
+            // Convert value to a string.
+            var value = Math.abs(Number(endValue)).toString();
             // Determine the end temporal reference range (e.g., number of days after or before end date of indexed variable)
             if ( endValue < 0 )
             {
                 result = RangeConstraint.getInstance();
-                result.initialize("IVL_PQ", null, {type: "PQ", unit:"d", value: Math.abs(Number(endValue)), 'inclusive?': false, 'derived?': false});
+                result.initialize("IVL_PQ", null, {type: "PQ", unit:"d", value: value, 'inclusive?': false, 'derived?': false});
             }
             else if ( endValue > 0 )
             {
                 result = RangeConstraint.getInstance();
-                result.initialize("IVL_PQ", {type: "PQ", unit:"d", value: endValue, 'inclusive?': false, 'derived?': false}, null);
+                result.initialize("IVL_PQ", {type: "PQ", unit:"d", value: value, 'inclusive?': false, 'derived?': false}, null);
             }
             return result;
         },
