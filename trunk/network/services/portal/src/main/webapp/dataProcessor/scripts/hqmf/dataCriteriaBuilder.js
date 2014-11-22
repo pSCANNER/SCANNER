@@ -247,7 +247,7 @@ define([
             {
                 if ( endValue < 0 )
                     result = "EBS";
-                else if ( endValue == 0 )
+                else if ( endValue === 0 )
                     result = "EDU";
                 if ( endValue > 0 )
                     result = "EAS";
@@ -256,7 +256,7 @@ define([
             {
                 if ( endValue < 0 )
                     result = "EBE";
-                else if ( endValue == 0 )
+                else if ( endValue === 0 )
                     result = "EDU";
                 if ( endValue > 0 )
                     result = "EAE";
