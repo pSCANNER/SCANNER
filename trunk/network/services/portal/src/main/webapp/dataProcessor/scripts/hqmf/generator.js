@@ -35,6 +35,7 @@ define([
         normalizeAllNames: function(app) 
         {
             this.normalizeIPPNames(app.initialPopulation.models);
+            this.normalizeVariableNames(app.wideDataSet.models);
             this.normalizeVariableNames(app.variables.models);
         },
         normalizeIPPNames: function(ipVars) 
@@ -52,7 +53,11 @@ define([
             {
                 var coreVar = coreVars[k].attributes;
                 if ( coreVar.type !== 'Event' )
+				{
                     coreVar.name = coreVar.name.replace(/[\s,\[\]]/g, "");
+					if ( coreVar.variable )
+						coreVar.variable = coreVar.variable.replace(/[\s,\[\]]/g, "");
+				}
                 // Recursively normalize all nested variables, if any.
                 if ( coreVar.variables )
                     this.normalizeVariableNames(coreVar.variables);
