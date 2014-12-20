@@ -64,7 +64,10 @@ define([], function ()
                                 this.title = scanner_var.name;
                                 this.description = scanner_var.name;
                                 this.source_data_criteria = scanner_var.name;
-                                this.code_list_id = (scanner_var.conceptCode)? scanner_var.conceptCode : '';
+                                if ( scanner_var.conceptCode )
+                                    this.code_list_id = scanner_var.conceptCode;
+                                else if ( scanner_var.conceptId && !isNaN(scanner_var.conceptId) )
+                                    this.code_list_id = "omop_concept_" + scanner_var.conceptId;
                                 if ( typeMappingTable )
                                 {
                                     var hqmfProps = typeMappingTable[scanner_var.type];
