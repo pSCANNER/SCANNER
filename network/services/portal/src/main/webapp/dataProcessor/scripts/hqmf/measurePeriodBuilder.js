@@ -32,7 +32,10 @@ define(['hqmf/rangeConstraint'], function (RangeConstraint)
         {
                 var d = new Date(dateTimeString);
                 var year = d.getFullYear().toString();
+                // Pad with leading zero if less than 2 digits.
                 var month = (d.getMonth()+1).toString();
+                if ( month.length === 1 )
+                    month = '0'+month;
                 // Pad with leading zero if less than 2 digits.
                 var day = d.getDate().toString();
                 if ( day.length === 1 )

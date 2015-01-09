@@ -69,7 +69,14 @@ define([
                     // Keeps track of the distinct indexed variable, if defined. Currently SCANNER allows only one such variable.
                     // Also mark this variable as specific occurence for HQMF.
                     if ( eventVar.distinct && eventVar.index )
+					{
                         indexedVar = eventVar;
+                        // Create the indexed variable as a data_criteria but with the indexed name instead of the source name.
+						// This indexed name will be used by temporal references in specific occurrence preconditions, if any.
+                        var criterionCodeList = CriterionCodeList.getInstance();
+                        criterionCodeList.initialize(indexedVar.variables.attributes, CriterionCodeList.typeMappingTable);
+                        dataCriteria[indexedVar.name] = criterionCodeList;
+					}
                     // Mark the nested logic expression event variables, if any. The non-marked ones will be used in generation
                     // of the logic expression tree.
                     if ( eventVar.operator === 'OR' || eventVar.operator === 'AND' || eventVar.operator === 'ANY' )
@@ -141,7 +148,7 @@ define([
             if ( range )
             {
                 var startTemporalRef = TemporalReference.getInstance();
-                startTemporalRef.initialize(type, indexedVar.variables.attributes.name, range, null);
+                startTemporalRef.initialize(type, indexedVar.name, range, null);
                 result.push(startTemporalRef);
             }
             // Create the end temporal reference.
@@ -150,7 +157,7 @@ define([
             if ( range )
             {
                 var endTemporalRef = TemporalReference.getInstance();
-                endTemporalRef.initialize(type, indexedVar.variables.attributes.name, range, null);
+                endTemporalRef.initialize(type, indexedVar.name, range, null);
                 result.push(endTemporalRef);
             }            
             return result;

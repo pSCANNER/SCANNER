@@ -33219,7 +33219,7 @@ define('views/InitialPopulation/DrugsCore',[
                 _.each(self.$('.drugs').select2('data'), function(checked) {
                     console.log(checked.text);
                     app.trigger(self.nameSpace + ':addVariable', {
-                        // conceptId: checked.id,
+                        conceptId: checked.id,
                         name: checked.text,
                         type: sectionTitle,
                         static: self.static,
@@ -33979,26 +33979,30 @@ define('views/WideProcessing/ExportPrograms',[
                 app.variables,
             ];
 
-            var dataSpecBody = {
-                dataSetId: null,
-                dataSetSpecInput: hqmfGen.generate(app),
-                dataSetSpecOutput: null,
-            };
-
-             $.ajax({
-                url: '/scanner/registry?action=datasetSpec',
-                headers: {'User-agent': 'Scanner/1.0'},
-                timeout: 300000,
-                async: true,
-                accepts: {text: 'application/json'},
-                processData: false,
-                dataType: 'json',
-                type: 'POST',
-                data: JSON.stringify(dataSpecBody),
-                success: function(data) {
-                    $(w.document.body).html(data.dataSetSpecOutput);
-                },
-            });
+    var measure = hqmfGen.generate(app);
+    $(w.document.body).html(JSON.stringify(measure));
+//    $(w.document.body).html(JSON.stringify(variables));
+            
+//            var dataSpecBody = {
+//                dataSetId: null,
+//                dataSetSpecInput: hqmfGen.generate(app),
+//                dataSetSpecOutput: null,
+//            };
+//
+//             $.ajax({
+//                url: '/scanner/registry?action=datasetSpec',
+//                headers: {'User-agent': 'Scanner/1.0'},
+//                timeout: 300000,
+//                async: true,
+//                accepts: {text: 'application/json'},
+//                processData: false,
+//                dataType: 'json',
+//                type: 'POST',
+//                data: JSON.stringify(dataSpecBody),
+//                success: function(data) {
+//                    $(w.document.body).html(data.dataSetSpecOutput);
+//                },
+//            });
 
         },
 
