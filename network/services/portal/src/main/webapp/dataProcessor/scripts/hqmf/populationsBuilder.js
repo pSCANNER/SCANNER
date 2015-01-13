@@ -14,10 +14,11 @@ define(['hqmf/populations'], function (Populations)
             {
                 if ( pc.indexOf("DENOM") >= 0 )
                 {
+					var count = counter++;
                     var population = Populations.getInstance();
-                    population.id = 'SCANNER';
+                    population.id = 'Population' + count;
                     population.DENOM = pc;
-                    population.title = 'Population' + (counter++);
+                    population.title = 'Population ' + count;
                     measure.populations.push(population);
                 }
             }
