@@ -27,6 +27,7 @@ import edu.isi.misd.scanner.network.types.ptr.PrepToResearchRecord;
 import edu.isi.misd.scanner.network.types.ptr.PrepToResearchResponse;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -163,9 +164,10 @@ public class PrepToResearchProcessor implements Processor
         CSVFormat csvFormat = 
             CSVFormat.newFormat(',')
             .withHeader()
-            .withCommentStart('#')
-            .withQuoteChar('"');
-        CSVParser parser = CSVParser.parse(analysisFile,csvFormat);                 
+            .withCommentMarker('#')
+            .withQuote('"');
+        CSVParser parser = 
+            CSVParser.parse(analysisFile,Charset.defaultCharset(),csvFormat);                 
         for (CSVRecord csvRecord : parser)
         {
             try
